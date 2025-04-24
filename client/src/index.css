@@ -67,7 +67,9 @@
   }
   
   .briki-logo .checkmark {
-    @apply text-primary absolute -top-2 -right-6;
+    @apply text-primary absolute -top-1.5 -right-7;
+    /* Position checkmark to replace the dot on the second 'i' */
+    transform: translateX(42px);
   }
   
   /* Card styles for mobile-first design - iOS inspired with soft shadows */
