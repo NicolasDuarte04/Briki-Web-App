@@ -37,8 +37,8 @@ export function setupAuth(app: Express) {
     store: storage.sessionStore,
     cookie: {
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-      sameSite: isDevelopment ? 'none' : 'lax',
-      secure: isDevelopment ? false : true,
+      sameSite: 'lax', // Works in both development and production
+      secure: false, // Set to false in development to allow cookie to be sent over http
       httpOnly: true,
       path: '/'
     }
@@ -117,16 +117,16 @@ export function setupAuth(app: Express) {
           return next(loginErr);
         }
         
-        console.log('POST /api/login - Login successful, regenerating session');
+        console.log('POST /api/login - Login successful, saving session');
         
-        // Add a session regeneration to ensure cookie is set properly
-        req.session.regenerate((regenerateErr: any) => {
-          if (regenerateErr) {
-            console.log('POST /api/login - Session regeneration error:', regenerateErr);
-            return next(regenerateErr);
+        // Save the session before sending the response to ensure the cookie is set properly
+        req.session.save((saveErr) => {
+          if (saveErr) {
+            console.log('POST /api/login - Session save error:', saveErr);
+            return next(saveErr);
           }
           
-          console.log('POST /api/login - Session regenerated successfully, new session ID:', req.sessionID);
+          console.log('POST /api/login - Session saved successfully, session ID:', req.sessionID);
           return res.status(200).json(user);
         });
       });

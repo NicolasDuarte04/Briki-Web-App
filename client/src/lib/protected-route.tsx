@@ -16,14 +16,20 @@ export function ProtectedRoute({
   const [verificationAttempts, setVerificationAttempts] = useState(0);
   
   useEffect(() => {
-    const MAX_ATTEMPTS = 2;
+    const MAX_ATTEMPTS = 3; // Increase max attempts
     
     const verifyAuth = async () => {
       // No need to verify if we already have the user
-      if (user) return;
+      if (user) {
+        console.log("Protected route: User already authenticated:", user.username);
+        return;
+      }
       
       // Prevent excessive refetching
-      if (verificationAttempts >= MAX_ATTEMPTS) return;
+      if (verificationAttempts >= MAX_ATTEMPTS) {
+        console.log("Protected route: Max verification attempts reached");
+        return;
+      }
       
       // Only attempt to verify if not already in progress and not loading
       if (!isVerifying && !isLoading && !user) {
@@ -32,7 +38,7 @@ export function ProtectedRoute({
           console.log("Protected route: Verifying authentication...");
           
           const result = await refetchUser();
-          console.log("Auth verification result:", result?.data ? "User found" : "No user");
+          console.log("Auth verification result:", result?.data ? `User found: ${result.data.username}` : "No user");
           
           setVerificationAttempts(prev => prev + 1);
         } catch (error) {
@@ -42,6 +48,13 @@ export function ProtectedRoute({
         }
       }
     };
+    
+    console.log("Protected route state:", { 
+      isLoading, 
+      isVerifying, 
+      verificationAttempts,
+      authenticated: !!user
+    });
     
     verifyAuth();
   }, [user, isLoading, refetchUser, isVerifying, verificationAttempts]);
