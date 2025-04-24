@@ -35,7 +35,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const tripFormSchema = z.object({
+// Define the base schema (form input)
+const tripFormInputSchema = z.object({
   destination: z.string({
     required_error: "Please select a destination.",
   }),
@@ -50,13 +51,13 @@ const tripFormSchema = z.object({
   }),
   travelers: z.string({
     required_error: "Please select number of travelers.",
-  }).transform(val => parseInt(val)), // Transform to number for API
+  }),
   primaryAge: z.string({
     required_error: "Please enter your age.",
-  }).transform(val => parseInt(val)), // Transform to number for API
+  }),
   hasMedicalConditions: z.enum(["yes", "no"], {
     required_error: "Please indicate if you have medical conditions.",
-  }).transform(val => val === "yes"), // Transform to boolean for API
+  }),
   priorities: z.object({
     medical: z.boolean().default(false),
     cancellation: z.boolean().default(false),
@@ -72,14 +73,22 @@ const tripFormSchema = z.object({
   path: ["returnDate"],
 });
 
+// API submission schema with transformations for the backend
+const tripFormSchema = tripFormInputSchema.transform((data) => ({
+  ...data,
+  travelers: parseInt(data.travelers),
+  primaryAge: parseInt(data.primaryAge),
+  hasMedicalConditions: data.hasMedicalConditions === "yes",
+}));
+
 type TripFormValues = z.infer<typeof tripFormSchema>;
 
 export default function TripInfoPage() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
   
-  const form = useForm<z.input<typeof tripFormSchema>>({
-    resolver: zodResolver(tripFormSchema),
+  const form = useForm<z.infer<typeof tripFormInputSchema>>({
+    resolver: zodResolver(tripFormInputSchema),
     defaultValues: {
       travelers: "1",
       hasMedicalConditions: "no",
@@ -144,9 +153,12 @@ export default function TripInfoPage() {
     },
   });
   
-  function onSubmit(data: z.input<typeof tripFormSchema>) {
-    // The form data will be transformed by the schema before being passed to the mutation
-    createTripMutation.mutate(tripFormSchema.parse(data) as TripFormValues);
+  function onSubmit(data: z.infer<typeof tripFormInputSchema>) {
+    // Transform the form data using our schema before passing to the mutation
+    const transformedData = tripFormSchema.parse(data);
+    console.log("Form data before transformation:", data);
+    console.log("Form data after transformation:", transformedData);
+    createTripMutation.mutate(transformedData);
   }
 
   return (
