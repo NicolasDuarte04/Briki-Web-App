@@ -15,13 +15,10 @@ export const trips = pgTable("trips", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id),
   destination: text("destination").notNull(),
-  tripType: text("trip_type").notNull(),
+  countryOfOrigin: text("country_of_origin").notNull(), // This will be used instead of tripType
   departureDate: text("departure_date").notNull(),
   returnDate: text("return_date").notNull(),
   travelers: integer("travelers").notNull(),
-  primaryAge: integer("primary_age"),
-  hasMedicalConditions: boolean("has_medical_conditions").default(false),
-  priorities: jsonb("priorities"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -64,13 +61,10 @@ export const insertUserSchema = createInsertSchema(users).pick({
 export const insertTripSchema = createInsertSchema(trips).pick({
   userId: true,
   destination: true,
-  tripType: true,
+  countryOfOrigin: true,
   departureDate: true,
   returnDate: true,
   travelers: true,
-  primaryAge: true,
-  hasMedicalConditions: true,
-  priorities: true,
 });
 
 export const insertInsurancePlanSchema = createInsertSchema(insurancePlans).omit({
@@ -90,6 +84,7 @@ export const insertOrderSchema = createInsertSchema(orders).pick({
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 
+// Include countryOfOrigin instead of tripType in the schema
 export type InsertTrip = z.infer<typeof insertTripSchema>;
 export type Trip = typeof trips.$inferSelect;
 

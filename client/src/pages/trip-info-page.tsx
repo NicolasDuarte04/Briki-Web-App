@@ -127,16 +127,13 @@ export default function TripInfoPage() {
           throw new Error("Authentication required. Please log in to save trip details.");
         }
         
-        // The schema now transforms the data to the correct types
+        // Map the form data to match the updated schema
         const apiData = {
           destination: tripData.destination,
-          tripType: tripData.tripType,
+          countryOfOrigin: tripData.tripType, // Use tripType as countryOfOrigin (adapted for new schema)
           departureDate: format(tripData.departureDate, "yyyy-MM-dd"),
           returnDate: format(tripData.returnDate, "yyyy-MM-dd"),
           travelers: tripData.travelers, // Already transformed by schema
-          primaryAge: tripData.primaryAge, // Already transformed by schema
-          hasMedicalConditions: tripData.hasMedicalConditions, // Already transformed by schema
-          priorities: tripData.priorities,
         };
         
         console.log("Sending trip data to API:", apiData);
