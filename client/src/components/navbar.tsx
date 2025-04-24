@@ -52,7 +52,10 @@ export default function Navbar() {
         <div className="flex justify-between h-16">
           <div className="flex">
             <Link href="/" className="flex-shrink-0 flex items-center">
-              <h1 className="text-2xl font-semibold text-gray-800">Briki</h1>
+              <h1 className="briki-logo">
+                briki
+                <span className="checkmark">✓</span>
+              </h1>
             </Link>
           </div>
           
@@ -157,7 +160,12 @@ export default function Navbar() {
               </SheetTrigger>
               <SheetContent side="right">
                 <SheetHeader>
-                  <SheetTitle>Briki</SheetTitle>
+                  <SheetTitle>
+                    <h1 className="briki-logo">
+                      briki
+                      <span className="checkmark">✓</span>
+                    </h1>
+                  </SheetTitle>
                 </SheetHeader>
                 <div className="py-4">
                   <div className="space-y-1">

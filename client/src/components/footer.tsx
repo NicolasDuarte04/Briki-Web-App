@@ -6,7 +6,10 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8">
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">
           <div className="space-y-8 xl:col-span-1">
-            <h1 className="text-2xl font-semibold text-gray-800">Briki</h1>
+            <h1 className="briki-logo">
+              briki
+              <span className="checkmark">✓</span>
+            </h1>
             <p className="text-gray-500 text-base">
               Making travel insurance simple and accessible for everyone.
               Compare plans, find the perfect coverage, and travel with peace of mind.
