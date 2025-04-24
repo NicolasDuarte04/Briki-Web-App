@@ -93,6 +93,18 @@ export default function CheckoutPage() {
     mutationFn: async () => {
       if (!planId || !latestTrip?.id) return null;
       
+      // Verify authentication first
+      const authCheck = await fetch("/api/user", { credentials: "include" });
+      if (authCheck.status === 401) {
+        toast({
+          title: "Authentication required",
+          description: "Please log in to complete your purchase",
+          variant: "destructive",
+        });
+        navigate("/auth");
+        return null;
+      }
+      
       const orderData = {
         tripId: latestTrip.id,
         planId: parseInt(planId),
@@ -103,9 +115,11 @@ export default function CheckoutPage() {
       const res = await apiRequest("POST", "/api/orders", orderData);
       return await res.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
-      setShowSuccess(true);
+    onSuccess: (data) => {
+      if (data) {
+        queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
+        setShowSuccess(true);
+      }
     },
     onError: (error: Error) => {
       toast({
@@ -120,15 +134,15 @@ export default function CheckoutPage() {
   const form = useForm<CheckoutFormValues>({
     resolver: zodResolver(checkoutFormSchema),
     defaultValues: {
-      firstName: user?.firstName || "",
-      lastName: user?.lastName || "",
+      firstName: "",
+      lastName: "",
       email: user?.email || "",
-      phone: user?.phone || "",
-      address: user?.address || "",
-      city: user?.city || "",
-      state: user?.state || "",
-      zip: user?.zip || "",
-      country: user?.country || "us",
+      phone: "",
+      address: "",
+      city: "",
+      state: "",
+      zip: "",
+      country: "us",
       paymentMethod: "credit-card",
     },
   });
