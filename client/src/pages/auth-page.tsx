@@ -80,6 +80,7 @@ export default function AuthPage() {
       username: values.username,
       password: values.password,
       email: values.email,
+      name: values.username, // Using username as name for simplicity
     });
   };
   

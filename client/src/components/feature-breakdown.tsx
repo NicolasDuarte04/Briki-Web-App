@@ -85,7 +85,7 @@ export function FeatureBreakdown({
       name: "Evacuación de emergencia",
       icon: <AlertTriangle className="h-5 w-5 text-primary" />,
       getValue: (plan: InsurancePlan) => formatPrice(plan.emergencyEvacuation),
-      getProgress: (plan: InsurancePlan) => plan.emergencyEvacuation ? getPercentage(plan.emergencyEvacuation, maxEvacuation) : 0,
+      getProgress: (plan: InsurancePlan) => plan.emergencyEvacuation !== null && plan.emergencyEvacuation !== undefined ? getPercentage(plan.emergencyEvacuation, maxEvacuation) : 0,
       format: "currency",
       description: "Transporte médico de emergencia"
     },
