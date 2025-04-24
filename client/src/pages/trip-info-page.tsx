@@ -96,20 +96,35 @@ export default function TripInfoPage() {
   
   const createTripMutation = useMutation({
     mutationFn: async (tripData: TripFormValues) => {
-      // Transform data to match API expectations
-      const apiData = {
-        destination: tripData.destination,
-        tripType: tripData.tripType,
-        departureDate: format(tripData.departureDate, "yyyy-MM-dd"),
-        returnDate: format(tripData.returnDate, "yyyy-MM-dd"),
-        travelers: parseInt(tripData.travelers),
-        primaryAge: parseInt(tripData.primaryAge),
-        hasMedicalConditions: tripData.hasMedicalConditions === "yes",
-        priorities: tripData.priorities,
-      };
-      
-      const res = await apiRequest("POST", "/api/trips", apiData);
-      return await res.json();
+      // Check if the user is logged in first via a quick auth check
+      try {
+        const authCheck = await fetch("/api/user", { credentials: "include" });
+        if (authCheck.status === 401) {
+          throw new Error("Authentication required. Please log in to save trip details.");
+        }
+        
+        // Transform data to match API expectations
+        const apiData = {
+          destination: tripData.destination,
+          tripType: tripData.tripType,
+          departureDate: format(tripData.departureDate, "yyyy-MM-dd"),
+          returnDate: format(tripData.returnDate, "yyyy-MM-dd"),
+          travelers: parseInt(tripData.travelers),
+          primaryAge: parseInt(tripData.primaryAge),
+          hasMedicalConditions: tripData.hasMedicalConditions === "yes",
+          priorities: tripData.priorities,
+        };
+        
+        const res = await apiRequest("POST", "/api/trips", apiData);
+        return await res.json();
+      } catch (error) {
+        if (error instanceof Error && error.message.includes("Authentication required")) {
+          // If it's an auth error, redirect to login
+          navigate("/auth");
+          throw error;
+        }
+        throw error;
+      }
     },
     onSuccess: () => {
       toast({
