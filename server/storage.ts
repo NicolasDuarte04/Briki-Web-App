@@ -87,8 +87,37 @@ export class DatabaseStorage implements IStorage {
   }
   
   async createTrip(insertTrip: InsertTrip): Promise<Trip> {
-    const results = await db.insert(trips).values(insertTrip).returning();
-    return results[0];
+    console.log("DatabaseStorage.createTrip - Inserting trip:", insertTrip);
+    
+    try {
+      // Make sure the userId is valid and exists
+      const user = await this.getUser(insertTrip.userId);
+      if (!user) {
+        throw new Error(`User with ID ${insertTrip.userId} not found`);
+      }
+      
+      // Verify the data is valid
+      if (!insertTrip.destination || !insertTrip.tripType || 
+          !insertTrip.departureDate || !insertTrip.returnDate) {
+        throw new Error("Missing required trip fields");
+      }
+      
+      // Insert the trip with explicit typing of priorities as jsonb
+      const results = await db.insert(trips).values({
+        ...insertTrip,
+        priorities: insertTrip.priorities as any // Cast to any to handle jsonb type
+      }).returning();
+      
+      if (!results || results.length === 0) {
+        throw new Error("Failed to create trip - no results returned");
+      }
+      
+      console.log("DatabaseStorage.createTrip - Trip created successfully:", results[0]);
+      return results[0];
+    } catch (error) {
+      console.error("DatabaseStorage.createTrip - Error:", error);
+      throw error; // Re-throw to handle in the route
+    }
   }
   
   // Insurance plan methods

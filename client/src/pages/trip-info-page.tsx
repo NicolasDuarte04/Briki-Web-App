@@ -160,11 +160,38 @@ export default function TripInfoPage() {
         console.log("Trip API response status:", res.status);
         
         if (!res.ok) {
-          const errorData = await res.json().catch(() => ({ message: res.statusText || "Failed to save trip" }));
-          throw new Error(errorData.message || "Failed to save trip");
+          // Try to get a detailed error message from the server
+          let errorMessage = "Failed to save trip information";
+          try {
+            const errorData = await res.json();
+            console.log("Server error response:", errorData);
+            
+            // Handle the different error formats we might receive
+            if (errorData.message) {
+              errorMessage = errorData.message;
+            } else if (errorData.error) {
+              errorMessage = typeof errorData.error === 'string' 
+                ? errorData.error 
+                : JSON.stringify(errorData.error);
+            }
+          } catch (parseError) {
+            console.error("Error parsing error response:", parseError);
+            errorMessage = res.statusText || "Failed to save trip";
+          }
+          
+          throw new Error(errorMessage);
         }
         
-        return await res.json();
+        // If we get here, the request was successful
+        let responseData;
+        try {
+          responseData = await res.json();
+          console.log("Trip creation successful:", responseData);
+          return responseData;
+        } catch (parseError) {
+          console.error("Error parsing success response:", parseError);
+          throw new Error("Received invalid response from server");
+        }
       } catch (error) {
         console.error("Error submitting trip data:", error);
         if (error instanceof Error && error.message.includes("Authentication required")) {
