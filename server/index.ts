@@ -6,13 +6,27 @@ import cors from "cors";
 const app = express();
 
 // Setup CORS with proper credentials support
+// In development, use this more permissive CORS configuration
 app.use(cors({
-  origin: true, // Allow requests from any origin in development
+  origin: function(origin, callback) {
+    callback(null, true); // Allow requests from any origin in development
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Cache-Control', 'Pragma'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cache-Control', 'Pragma', 'Accept'],
   exposedHeaders: ['Set-Cookie']
 }));
+
+// Add explicit Access-Control-Allow-Credentials for auth endpoints
+app.use("/api/login", (req, res, next) => {
+  res.header('Access-Control-Allow-Credentials', 'true');
+  next();
+});
+
+app.use("/api/register", (req, res, next) => {
+  res.header('Access-Control-Allow-Credentials', 'true');
+  next();
+});
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

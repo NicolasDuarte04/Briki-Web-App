@@ -32,9 +32,10 @@ export function setupAuth(app: Express) {
   const isDevelopment = process.env.NODE_ENV === 'development';
   const sessionSettings: session.SessionOptions = {
     secret: process.env.SESSION_SECRET || "briki-travel-insurance-secret",
-    resave: true,
-    saveUninitialized: true,
+    resave: false, // Don't save session if unmodified
+    saveUninitialized: false, // Don't create session until something is stored
     store: storage.sessionStore,
+    name: 'briki.sid', // Custom name to avoid conflicts
     cookie: {
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
       sameSite: 'lax', // Works in both development and production
@@ -168,6 +169,7 @@ export function setupAuth(app: Express) {
 
   app.get("/api/user", (req, res) => {
     console.log('GET /api/user - Session ID:', req.sessionID);
+    console.log('GET /api/user - Cookie header:', req.headers.cookie || 'none');
     console.log('GET /api/user - Is authenticated:', req.isAuthenticated());
     
     if (!req.isAuthenticated()) {
@@ -176,6 +178,17 @@ export function setupAuth(app: Express) {
     }
     
     console.log('GET /api/user - Authenticated user:', req.user.username);
+    
+    // Refresh the session expiration
+    if (req.session.cookie) {
+      req.session.touch();
+      req.session.save((err) => {
+        if (err) {
+          console.error('GET /api/user - Error saving session:', err);
+        }
+      });
+    }
+    
     res.json(req.user);
   });
 }
