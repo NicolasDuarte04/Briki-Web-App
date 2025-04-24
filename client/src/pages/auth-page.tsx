@@ -87,9 +87,20 @@ export default function AuthPage() {
   // Redirect if user is logged in
   useEffect(() => {
     if (user) {
+      console.log("AuthPage: User already logged in, redirecting to home page");
       navigate("/");
+    } else {
+      console.log("AuthPage: No logged in user detected, staying on auth page");
     }
   }, [user, navigate]);
+  
+  // Update redirect after successful login or registration
+  useEffect(() => {
+    if (loginMutation.isSuccess || registerMutation.isSuccess) {
+      console.log("AuthPage: Login/Registration successful, redirecting to home page");
+      navigate("/");
+    }
+  }, [loginMutation.isSuccess, registerMutation.isSuccess, navigate]);
 
   return (
     <div className="flex min-h-screen">
