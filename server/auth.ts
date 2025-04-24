@@ -96,16 +96,37 @@ export function setupAuth(app: Express) {
   });
 
   app.post("/api/login", (req, res, next) => {
+    console.log('POST /api/login - Login attempt for username:', req.body.username);
+    
     passport.authenticate("local", (err: any, user: Express.User | false, info: any) => {
-      if (err) return next(err);
+      if (err) {
+        console.log('POST /api/login - Authentication error:', err);
+        return next(err);
+      }
+      
       if (!user) {
+        console.log('POST /api/login - Authentication failed: Invalid credentials');
         return res.status(401).json({ message: "Invalid username or password" });
       }
+      
+      console.log('POST /api/login - Authentication successful for user:', user.username);
+      
       req.login(user, (loginErr: any) => {
-        if (loginErr) return next(loginErr);
+        if (loginErr) {
+          console.log('POST /api/login - Login session error:', loginErr);
+          return next(loginErr);
+        }
+        
+        console.log('POST /api/login - Login successful, regenerating session');
+        
         // Add a session regeneration to ensure cookie is set properly
         req.session.regenerate((regenerateErr: any) => {
-          if (regenerateErr) return next(regenerateErr);
+          if (regenerateErr) {
+            console.log('POST /api/login - Session regeneration error:', regenerateErr);
+            return next(regenerateErr);
+          }
+          
+          console.log('POST /api/login - Session regenerated successfully, new session ID:', req.sessionID);
           return res.status(200).json(user);
         });
       });
@@ -120,7 +141,15 @@ export function setupAuth(app: Express) {
   });
 
   app.get("/api/user", (req, res) => {
-    if (!req.isAuthenticated()) return res.sendStatus(401);
+    console.log('GET /api/user - Session ID:', req.sessionID);
+    console.log('GET /api/user - Is authenticated:', req.isAuthenticated());
+    
+    if (!req.isAuthenticated()) {
+      console.log('GET /api/user - Not authenticated, returning 401');
+      return res.sendStatus(401);
+    }
+    
+    console.log('GET /api/user - Authenticated user:', req.user.username);
     res.json(req.user);
   });
 }
