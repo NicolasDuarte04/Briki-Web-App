@@ -16,7 +16,7 @@ const MemoryStore = createMemoryStore(session);
 
 export interface IStorage {
   // User methods
-  getUser(id: number): Promise<User | undefined>;
+  getUser(id: number | null | undefined): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   
@@ -59,7 +59,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   // User methods
-  async getUser(id: number): Promise<User | undefined> {
+  async getUser(id: number | null | undefined): Promise<User | undefined> {
+    if (id === null || id === undefined) {
+      return undefined;
+    }
     const results = await db.select().from(users).where(eq(users.id, id));
     return results[0];
   }
@@ -91,21 +94,29 @@ export class DatabaseStorage implements IStorage {
     
     try {
       // Make sure the userId is valid and exists
+      if (insertTrip.userId === undefined) {
+        throw new Error("User ID is required to create a trip");
+      }
+      
       const user = await this.getUser(insertTrip.userId);
       if (!user) {
         throw new Error(`User with ID ${insertTrip.userId} not found`);
       }
       
       // Verify the data is valid
-      if (!insertTrip.destination || !insertTrip.tripType || 
+      if (!insertTrip.destination || !insertTrip.countryOfOrigin || 
           !insertTrip.departureDate || !insertTrip.returnDate) {
         throw new Error("Missing required trip fields");
       }
       
-      // Insert the trip with explicit typing of priorities as jsonb
+      // Insert the trip with only the fields that exist in the database schema
       const results = await db.insert(trips).values({
-        ...insertTrip,
-        priorities: insertTrip.priorities as any // Cast to any to handle jsonb type
+        userId: insertTrip.userId,
+        destination: insertTrip.destination,
+        countryOfOrigin: insertTrip.countryOfOrigin,
+        departureDate: insertTrip.departureDate,
+        returnDate: insertTrip.returnDate,
+        travelers: insertTrip.travelers
       }).returning();
       
       if (!results || results.length === 0) {
