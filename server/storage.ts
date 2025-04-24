@@ -113,17 +113,18 @@ export class DatabaseStorage implements IStorage {
   
   // Seed insurance plans for Colombia and Mexico
   async seedDataIfNeeded(): Promise<void> {
-    // Check if plans already exist
-    const existingPlans = await db.select().from(insurancePlans);
-    
-    if (existingPlans.length === 0) {
-      // Colombia and Mexico specific insurance plans
-      const plans = [
-        {
+    try {
+      // Check if plans already exist
+      const existingPlans = await db.select().from(insurancePlans);
+      
+      if (existingPlans.length === 0) {
+        console.log('No existing plans found, seeding database...');
+        
+        // Insert Colombia plans
+        await db.insert(insurancePlans).values({
           name: "Seguro Mundial Premium",
           provider: "Seguros Mundial",
           basePrice: 99,
-          description: "Cobertura completa para viajeros colombianos",
           medicalCoverage: 250000,
           tripCancellation: "100% del costo del viaje",
           baggageProtection: 2500,
@@ -131,13 +132,14 @@ export class DatabaseStorage implements IStorage {
           adventureActivities: true,
           rentalCarCoverage: 50000,
           rating: "4.7",
-          reviews: 182
-        },
-        {
+          reviews: 182,
+          country: "Colombia"
+        });
+
+        await db.insert(insurancePlans).values({
           name: "Assist Card Oro",
           provider: "Assist Card",
           basePrice: 85,
-          description: "Protección premium para viajeros latinoamericanos",
           medicalCoverage: 150000,
           tripCancellation: "100% del costo del viaje",
           baggageProtection: 1800,
@@ -145,13 +147,15 @@ export class DatabaseStorage implements IStorage {
           adventureActivities: true,
           rentalCarCoverage: 35000,
           rating: "4.6",
-          reviews: 245
-        },
-        {
+          reviews: 245,
+          country: "Colombia"
+        });
+
+        // Insert Mexico plans
+        await db.insert(insurancePlans).values({
           name: "GNP Básico",
           provider: "GNP Seguros",
           basePrice: 65,
-          description: "Cobertura esencial para viajeros mexicanos",
           medicalCoverage: 100000,
           tripCancellation: "75% del costo del viaje",
           baggageProtection: 1000,
@@ -159,13 +163,14 @@ export class DatabaseStorage implements IStorage {
           adventureActivities: false,
           rentalCarCoverage: 0,
           rating: "4.2",
-          reviews: 156
-        },
-        {
+          reviews: 156,
+          country: "Mexico"
+        });
+
+        await db.insert(insurancePlans).values({
           name: "AXA Elite",
           provider: "AXA Seguros",
           basePrice: 129,
-          description: "Protección elite para viajeros exigentes",
           medicalCoverage: 500000,
           tripCancellation: "100% del costo del viaje",
           baggageProtection: 3000,
@@ -173,72 +178,16 @@ export class DatabaseStorage implements IStorage {
           adventureActivities: true,
           rentalCarCoverage: 75000,
           rating: "4.8",
-          reviews: 203
-        },
-        {
-          name: "Allianz Básico",
-          provider: "Allianz",
-          basePrice: 60,
-          description: "Cobertura básica para viajeros con presupuesto ajustado",
-          medicalCoverage: 50000,
-          tripCancellation: "50% del costo del viaje",
-          baggageProtection: 750,
-          emergencyEvacuation: 100000,
-          adventureActivities: false,
-          rentalCarCoverage: 0,
-          rating: "3.9",
-          reviews: 112
-        },
-        {
-          name: "Liberty Plus",
-          provider: "Liberty Seguros",
-          basePrice: 89,
-          description: "Cobertura mejorada para viajeros frecuentes",
-          medicalCoverage: 200000,
-          tripCancellation: "100% del costo del viaje",
-          baggageProtection: 2000,
-          emergencyEvacuation: 400000,
-          adventureActivities: true,
-          rentalCarCoverage: 40000,
-          rating: "4.5",
-          reviews: 178
-        },
-        {
-          name: "Mapfre Premium",
-          provider: "Mapfre",
-          basePrice: 109,
-          description: "Protección integral para viajeros latinoamericanos",
-          medicalCoverage: 300000,
-          tripCancellation: "100% del costo del viaje",
-          baggageProtection: 2500,
-          emergencyEvacuation: 550000,
-          adventureActivities: true,
-          rentalCarCoverage: 60000,
-          rating: "4.7",
-          reviews: 215
-        },
-        {
-          name: "HDI Básico",
-          provider: "HDI Seguros",
-          basePrice: 69,
-          description: "Cobertura esencial a precio accesible",
-          medicalCoverage: 75000,
-          tripCancellation: "60% del costo del viaje",
-          baggageProtection: 900,
-          emergencyEvacuation: 175000,
-          adventureActivities: false,
-          rentalCarCoverage: 0,
-          rating: "4.0",
-          reviews: 133
-        }
-      ];
-      
-      // Insert plans
-      for (const plan of plans) {
-        await db.insert(insurancePlans).values(plan);
+          reviews: 203,
+          country: "Mexico"
+        });
+        
+        console.log('Database seeded with insurance plans for Colombia and Mexico');
+      } else {
+        console.log('Plans already exist, skipping seed');
       }
-      
-      console.log('Database seeded with insurance plans for Colombia and Mexico');
+    } catch (error) {
+      console.error('Error seeding database:', error);
     }
   }
 }

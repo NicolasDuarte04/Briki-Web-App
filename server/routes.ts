@@ -6,6 +6,9 @@ import { z } from "zod";
 import { insertTripSchema, insertOrderSchema } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Seed data if needed - before setting up auth and other routes
+  await storage.seedDataIfNeeded();
+  
   // sets up /api/register, /api/login, /api/logout, /api/user
   setupAuth(app);
 
