@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
+import { InsurancePlan, Trip } from "@shared/schema";
 
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
@@ -69,15 +70,16 @@ export default function CheckoutPage() {
   const [showSuccess, setShowSuccess] = useState(false);
   
   // Fetch selected insurance plan
-  const { data: plan, isLoading: planLoading } = useQuery({
+  const { data: plan, isLoading: planLoading } = useQuery<InsurancePlan>({
     queryKey: [`/api/insurance-plans/${planId}`],
     enabled: !!planId,
   });
   
   // Fetch latest trip data
-  const { data: trips, isLoading: tripsLoading } = useQuery({
+  const { data: trips, isLoading: tripsLoading } = useQuery<Trip[]>({
     queryKey: ["/api/trips"],
     enabled: !!user,
+    initialData: [],
   });
   
   // Get the most recent trip
