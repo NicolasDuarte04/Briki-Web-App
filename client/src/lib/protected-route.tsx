@@ -1,6 +1,7 @@
 import { useAuth } from "@/hooks/use-auth";
 import { Loader2 } from "lucide-react";
-import { Redirect, Route } from "wouter";
+import { Redirect, Route, useLocation } from "wouter";
+import { useEffect } from "react";
 
 export function ProtectedRoute({
   path,
@@ -9,7 +10,20 @@ export function ProtectedRoute({
   path: string;
   component: () => React.JSX.Element;
 }) {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, refetchUser } = useAuth();
+  const [, navigate] = useLocation();
+  
+  useEffect(() => {
+    // If not loading and no user, try to refetch once before redirecting
+    if (!isLoading && !user) {
+      refetchUser().then((result) => {
+        // No need to navigate here, the component will re-render with the updated user state
+      }).catch(() => {
+        // Only navigate on error to prevent double redirects
+        navigate("/auth");
+      });
+    }
+  }, [user, isLoading, refetchUser, navigate]);
 
   if (isLoading) {
     return (
