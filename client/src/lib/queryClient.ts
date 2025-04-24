@@ -25,10 +25,13 @@ export async function apiRequest(
       // Add cache control headers to prevent caching of auth responses
       "Cache-Control": "no-cache",
       "Pragma": "no-cache",
-      "Accept": "application/json"
+      "Accept": "application/json",
+      // Explicitly indicate we want to support authentication cookies
+      "X-Requested-With": "XMLHttpRequest"
     },
     body: data ? JSON.stringify(data) : undefined,
     credentials: "include" as RequestCredentials,
+    mode: 'cors' as RequestMode,
   };
   
   try {
