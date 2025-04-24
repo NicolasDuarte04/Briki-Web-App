@@ -104,17 +104,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         
         console.log("Login response status:", response.status);
         
-        // Handle both success and error cases by first getting the JSON data
-        const responseData = await response.json().catch(() => ({ message: response.statusText || "Login failed" }));
+        // Try to parse the response as JSON
+        let responseData;
+        try {
+          responseData = await response.json();
+          console.log("Login response data:", responseData);
+        } catch (parseError) {
+          console.error("Error parsing login response:", parseError);
+          responseData = { message: response.statusText || "Login failed" };
+        }
         
         if (!response.ok) {
-          throw new Error(responseData.message || "Login failed");
+          const errorMessage = typeof responseData === 'object' && responseData && 'message' in responseData
+            ? responseData.message
+            : "Login failed";
+          console.error("Login error message:", errorMessage);
+          throw new Error(errorMessage);
         }
         
         console.log("Login successful, auth data received");
         return responseData as TokenResponse;
-      } catch (error) {
-        console.error("Login error:", error);
+      } catch (error: any) {
+        console.error("Login error:", error.message || error);
         throw error;
       }
     },
@@ -157,17 +168,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         
         console.log("Registration response status:", response.status);
         
-        // Handle both success and error cases by first getting the JSON data
-        const responseData = await response.json().catch(() => ({ message: response.statusText || "Registration failed" }));
+        // Try to parse the response as JSON
+        let responseData;
+        try {
+          responseData = await response.json();
+          console.log("Registration response data:", responseData);
+        } catch (parseError) {
+          console.error("Error parsing registration response:", parseError);
+          responseData = { message: response.statusText || "Registration failed" };
+        }
         
         if (!response.ok) {
-          throw new Error(responseData.message || "Registration failed");
+          const errorMessage = typeof responseData === 'object' && responseData && 'message' in responseData
+            ? responseData.message
+            : "Registration failed";
+          console.error("Registration error message:", errorMessage);
+          throw new Error(errorMessage);
         }
         
         console.log("Registration successful, auth data received");
         return responseData as TokenResponse;
-      } catch (error) {
-        console.error("Registration error:", error);
+      } catch (error: any) {
+        console.error("Registration error:", error.message || error);
         throw error;
       }
     },
