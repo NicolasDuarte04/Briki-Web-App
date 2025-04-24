@@ -1,18 +1,22 @@
-import pg from 'pg';
+import { Pool } from 'pg';
 import { config } from './config';
 
-// Create a PostgreSQL connection pool
-const pool = new pg.Pool({
+// Create a new PostgreSQL pool with appropriate SSL configuration
+const pool = new Pool({
   connectionString: config.database.url,
+  ...(config.database.ssl && { 
+    ssl: { rejectUnauthorized: false } 
+  })
 });
 
-// Test the database connection
-pool.query('SELECT NOW()', (err, res) => {
-  if (err) {
-    console.error('Database connection error:', err.message);
-  } else {
-    console.log('Database connected successfully at:', res.rows[0].now);
-  }
-});
+// Test database connection
+pool.connect()
+  .then(client => {
+    console.log('✅ Successfully connected to PostgreSQL database');
+    client.release();
+  })
+  .catch(err => {
+    console.error('❌ Error connecting to PostgreSQL database:', err);
+  });
 
 export default pool;

@@ -1,16 +1,64 @@
 import pool from '../config/db';
 import { QUERIES } from './queries';
 import { InsurancePlan, PlanFilterCriteria } from './types';
+import { samplePlans } from './sampleData';
 
 export const PlanRepository = {
   // Initialize the database tables
   async initializeDb(): Promise<void> {
     try {
+      // Create tables if they don't exist
       await pool.query(QUERIES.CREATE_PLANS_TABLE);
       await pool.query(QUERIES.CREATE_INTERACTIONS_TABLE);
       console.log('Database tables initialized successfully');
+      
+      // Seed initial data if needed
+      await this.seedInitialData();
     } catch (error) {
       console.error('Error initializing database tables:', error);
+      throw error;
+    }
+  },
+  
+  // Seed initial insurance plan data
+  async seedInitialData(): Promise<void> {
+    try {
+      // Check if we already have plans in the database
+      const existingPlans = await pool.query('SELECT COUNT(*) FROM insurance_plans');
+      
+      if (parseInt(existingPlans.rows[0].count) > 0) {
+        console.log('Plans already exist, skipping seed');
+        return;
+      }
+      
+      // Insert sample plans
+      for (const plan of samplePlans) {
+        await pool.query(`
+          INSERT INTO insurance_plans (
+            id, name, provider, base_price, medical_coverage, 
+            trip_cancellation, baggage_protection, emergency_evacuation, 
+            adventure_activities, rental_car_coverage, rating, reviews, country
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+        `, [
+          plan.id,
+          plan.name,
+          plan.provider,
+          plan.basePrice,
+          plan.medicalCoverage,
+          plan.tripCancellation,
+          plan.baggageProtection,
+          plan.emergencyEvacuation,
+          plan.adventureActivities,
+          plan.rentalCarCoverage,
+          plan.rating,
+          plan.reviews,
+          plan.country
+        ]);
+      }
+      
+      console.log(`Seeded ${samplePlans.length} insurance plans successfully`);
+    } catch (error) {
+      console.error('Error seeding initial data:', error);
       throw error;
     }
   },
