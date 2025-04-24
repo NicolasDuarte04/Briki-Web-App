@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { Loader2, Bell, Menu, X, User, Settings, LogOut } from "lucide-react";
+import { useLanguage, LanguageSelector } from "@/components/language-selector";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -24,6 +25,7 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [, navigate] = useLocation();
   const { user, isLoading, logoutMutation } = useAuth();
+  const { t } = useLanguage();
   
   const handleLogout = () => {
     logoutMutation.mutate();
@@ -33,8 +35,8 @@ export default function Navbar() {
   const getUserInitials = () => {
     if (!user) return "U";
     
-    if (user.firstName && user.lastName) {
-      return `${user.firstName[0]}${user.lastName[0]}`;
+    if (user.name) {
+      return user.name[0].toUpperCase();
     }
     
     return user.username[0].toUpperCase();
@@ -61,17 +63,18 @@ export default function Navbar() {
           
           <div className="hidden sm:ml-6 sm:flex sm:items-center space-x-8">
             <Link href="/" className={`hover:text-primary px-3 py-2 text-sm font-medium ${isActivePath("/")}`}>
-              Home
+              {t('home')}
             </Link>
             <Link href="/trip-info" className={`hover:text-primary px-3 py-2 text-sm font-medium ${isActivePath("/trip-info")}`}>
-              My Trips
+              {t('myTrips')}
             </Link>
             <Link href="/insurance-plans" className={`hover:text-primary px-3 py-2 text-sm font-medium ${isActivePath("/insurance-plans")}`}>
-              Insurance Plans
+              {t('insurancePlans')}
             </Link>
             <Link href="/" className={`hover:text-primary px-3 py-2 text-sm font-medium ${isActivePath("/support")}`}>
-              Support
+              {t('support')}
             </Link>
+            <LanguageSelector />
           </div>
           
           {isLoading ? (
@@ -174,29 +177,32 @@ export default function Navbar() {
                       className={`block px-3 py-2 rounded-md text-base font-medium ${isActivePath("/") ? "bg-gray-100 text-primary" : "text-gray-500 hover:bg-gray-50 hover:text-primary"}`}
                       onClick={() => setIsOpen(false)}
                     >
-                      Home
+                      {t('home')}
                     </Link>
                     <Link 
                       href="/trip-info" 
                       className={`block px-3 py-2 rounded-md text-base font-medium ${isActivePath("/trip-info") ? "bg-gray-100 text-primary" : "text-gray-500 hover:bg-gray-50 hover:text-primary"}`}
                       onClick={() => setIsOpen(false)}
                     >
-                      My Trips
+                      {t('myTrips')}
                     </Link>
                     <Link 
                       href="/insurance-plans" 
                       className={`block px-3 py-2 rounded-md text-base font-medium ${isActivePath("/insurance-plans") ? "bg-gray-100 text-primary" : "text-gray-500 hover:bg-gray-50 hover:text-primary"}`}
                       onClick={() => setIsOpen(false)}
                     >
-                      Insurance Plans
+                      {t('insurancePlans')}
                     </Link>
                     <Link 
                       href="/" 
                       className={`block px-3 py-2 rounded-md text-base font-medium ${isActivePath("/support") ? "bg-gray-100 text-primary" : "text-gray-500 hover:bg-gray-50 hover:text-primary"}`}
                       onClick={() => setIsOpen(false)}
                     >
-                      Support
+                      {t('support')}
                     </Link>
+                    <div className="mt-2 px-3 py-2">
+                      <LanguageSelector />
+                    </div>
                   </div>
                   
                   {user && (

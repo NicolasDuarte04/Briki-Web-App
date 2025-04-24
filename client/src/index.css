@@ -63,13 +63,18 @@
 @layer components {
   /* Logo styles */
   .briki-logo {
-    @apply text-3xl font-bold tracking-tighter relative;
+    @apply text-4xl font-bold tracking-tighter relative;
+    font-family: sans-serif;
+    letter-spacing: -0.02em;
   }
   
   .briki-logo .checkmark {
-    @apply text-primary absolute -top-1.5 -right-7;
-    /* Position checkmark to replace the dot on the second 'i' */
-    transform: translateX(42px);
+    @apply text-primary absolute;
+    font-size: 2.2rem;
+    top: -5px;
+    right: -4px;
+    /* Remove the dot on the last 'i' by positioning the checkmark over it */
+    transform: translateX(0);
   }
   
   /* Card styles for mobile-first design - iOS inspired with soft shadows */
