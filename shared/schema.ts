@@ -46,6 +46,10 @@ export const insurancePlans = pgTable("insurance_plans", {
   rentalCarCoverage: integer("rental_car_coverage"),
   rating: text("rating"),
   reviews: integer("reviews"),
+  country: text("country").default("all"),
+  popularFeature: text("popular_feature"),
+  providerLogo: text("provider_logo"),
+  exclusions: text("exclusions"),
 });
 
 export const orders = pgTable("orders", {
