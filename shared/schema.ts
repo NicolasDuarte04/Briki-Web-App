@@ -49,6 +49,7 @@ export const orders = pgTable("orders", {
   planId: integer("plan_id").references(() => insurancePlans.id),
   totalAmount: integer("total_amount").notNull(),
   status: text("status").notNull(),
+  paymentIntentId: text("payment_intent_id"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -82,6 +83,7 @@ export const insertOrderSchema = createInsertSchema(orders).pick({
   planId: true,
   totalAmount: true,
   status: true,
+  paymentIntentId: true,
 });
 
 // Types
