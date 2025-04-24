@@ -29,16 +29,18 @@ async function comparePasswords(supplied: string, stored: string) {
 }
 
 export function setupAuth(app: Express) {
+  const isDevelopment = process.env.NODE_ENV === 'development';
   const sessionSettings: session.SessionOptions = {
     secret: process.env.SESSION_SECRET || "briki-travel-insurance-secret",
-    resave: false,
-    saveUninitialized: true, // Changed to true to ensure session is created
+    resave: true,
+    saveUninitialized: true,
     store: storage.sessionStore,
     cookie: {
-      maxAge: 30 * 24 * 60 * 60 * 1000, // Extended to 30 days
-      sameSite: 'lax',
-      secure: false, // Set to false for development
-      httpOnly: true
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+      sameSite: isDevelopment ? 'none' : 'lax',
+      secure: isDevelopment ? false : true,
+      httpOnly: true,
+      path: '/'
     }
   };
 
@@ -93,8 +95,21 @@ export function setupAuth(app: Express) {
     }
   });
 
-  app.post("/api/login", passport.authenticate("local"), (req, res) => {
-    res.status(200).json(req.user);
+  app.post("/api/login", (req, res, next) => {
+    passport.authenticate("local", (err: any, user: Express.User | false, info: any) => {
+      if (err) return next(err);
+      if (!user) {
+        return res.status(401).json({ message: "Invalid username or password" });
+      }
+      req.login(user, (loginErr: any) => {
+        if (loginErr) return next(loginErr);
+        // Add a session regeneration to ensure cookie is set properly
+        req.session.regenerate((regenerateErr: any) => {
+          if (regenerateErr) return next(regenerateErr);
+          return res.status(200).json(user);
+        });
+      });
+    })(req, res, next);
   });
 
   app.post("/api/logout", (req, res, next) => {
