@@ -1,7 +1,7 @@
 import { useAuth } from "@/hooks/use-auth";
 import { Loader2 } from "lucide-react";
 import { Redirect, Route, useLocation } from "wouter";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 
 export function ProtectedRoute({
   path,
@@ -12,30 +12,57 @@ export function ProtectedRoute({
 }) {
   const { user, isLoading, refetchUser } = useAuth();
   const [, navigate] = useLocation();
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [verificationAttempts, setVerificationAttempts] = useState(0);
   
   useEffect(() => {
-    // If not loading and no user, try to refetch once before redirecting
-    if (!isLoading && !user) {
-      refetchUser().then((result) => {
-        // No need to navigate here, the component will re-render with the updated user state
-      }).catch(() => {
-        // Only navigate on error to prevent double redirects
-        navigate("/auth");
-      });
-    }
-  }, [user, isLoading, refetchUser, navigate]);
+    const MAX_ATTEMPTS = 2;
+    
+    const verifyAuth = async () => {
+      // No need to verify if we already have the user
+      if (user) return;
+      
+      // Prevent excessive refetching
+      if (verificationAttempts >= MAX_ATTEMPTS) return;
+      
+      // Only attempt to verify if not already in progress and not loading
+      if (!isVerifying && !isLoading && !user) {
+        try {
+          setIsVerifying(true);
+          console.log("Protected route: Verifying authentication...");
+          
+          const result = await refetchUser();
+          console.log("Auth verification result:", result?.data ? "User found" : "No user");
+          
+          setVerificationAttempts(prev => prev + 1);
+        } catch (error) {
+          console.error("Auth verification failed:", error);
+        } finally {
+          setIsVerifying(false);
+        }
+      }
+    };
+    
+    verifyAuth();
+  }, [user, isLoading, refetchUser, isVerifying, verificationAttempts]);
 
-  if (isLoading) {
+  // Show loading state while initial loading or during verification
+  if (isLoading || isVerifying) {
     return (
       <Route path={path}>
-        <div className="flex items-center justify-center min-h-screen">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <div className="flex flex-col items-center justify-center min-h-screen">
+          <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+          <p className="text-sm text-muted-foreground">
+            {isVerifying ? "Verifying your session..." : "Loading..."}
+          </p>
         </div>
       </Route>
     );
   }
 
+  // After verification attempts, if still no user, redirect to auth
   if (!user) {
+    console.log("Protected route: No authenticated user found, redirecting to auth");
     return (
       <Route path={path}>
         <Redirect to="/auth" />
@@ -43,5 +70,7 @@ export function ProtectedRoute({
     );
   }
 
+  // User is authenticated, render the component
+  console.log("Protected route: User authenticated, rendering component");
   return <Route path={path} component={Component} />;
 }
