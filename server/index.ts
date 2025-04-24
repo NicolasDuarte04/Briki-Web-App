@@ -7,14 +7,22 @@ const app = express();
 
 // Setup CORS with proper credentials support
 app.use(cors({
-  origin: ['http://localhost:5000', 'https://briki.replit.app'], 
+  origin: true, // Allow requests from any origin in development
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cache-Control', 'Pragma'],
+  exposedHeaders: ['Set-Cookie']
 }));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// Set security headers for consistent behavior
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Cross-Origin-Resource-Policy', 'same-site');
+  next();
+});
 
 app.use((req, res, next) => {
   const start = Date.now();

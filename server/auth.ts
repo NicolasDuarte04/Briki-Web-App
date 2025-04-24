@@ -75,22 +75,48 @@ export function setupAuth(app: Express) {
   });
 
   app.post("/api/register", async (req, res, next) => {
+    console.log('POST /api/register - Registration attempt for username:', req.body.username);
+    
     try {
+      // Validate required fields
+      if (!req.body.username || !req.body.password) {
+        console.log('POST /api/register - Missing required fields');
+        return res.status(400).json({ message: "Username and password are required" });
+      }
+      
       const existingUser = await storage.getUserByUsername(req.body.username);
       if (existingUser) {
-        return res.status(400).send("Username already exists");
+        console.log('POST /api/register - Username already exists:', req.body.username);
+        return res.status(400).json({ message: "Username already exists" });
       }
 
+      console.log('POST /api/register - Creating new user:', req.body.username);
       const user = await storage.createUser({
         ...req.body,
         password: await hashPassword(req.body.password),
       });
+      console.log('POST /api/register - User created successfully, ID:', user.id);
 
+      console.log('POST /api/register - Logging in the new user');
       req.login(user, (err) => {
-        if (err) return next(err);
-        res.status(201).json(user);
+        if (err) {
+          console.log('POST /api/register - Login error after registration:', err);
+          return next(err);
+        }
+        
+        // Save the session before sending the response
+        req.session.save((saveErr) => {
+          if (saveErr) {
+            console.log('POST /api/register - Session save error:', saveErr);
+            return next(saveErr);
+          }
+          
+          console.log('POST /api/register - Registration and login successful, session ID:', req.sessionID);
+          res.status(201).json(user);
+        });
       });
     } catch (err) {
+      console.error('POST /api/register - Error during registration:', err);
       next(err);
     }
   });
