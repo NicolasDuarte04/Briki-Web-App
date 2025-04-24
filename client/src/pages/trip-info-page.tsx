@@ -50,20 +50,20 @@ const tripFormSchema = z.object({
   }),
   travelers: z.string({
     required_error: "Please select number of travelers.",
-  }),
+  }).transform(val => parseInt(val)), // Transform to number for API
   primaryAge: z.string({
     required_error: "Please enter your age.",
-  }),
-  hasMedicalConditions: z.string({
+  }).transform(val => parseInt(val)), // Transform to number for API
+  hasMedicalConditions: z.enum(["yes", "no"], {
     required_error: "Please indicate if you have medical conditions.",
-  }),
+  }).transform(val => val === "yes"), // Transform to boolean for API
   priorities: z.object({
-    medical: z.boolean().optional(),
-    cancellation: z.boolean().optional(),
-    baggage: z.boolean().optional(),
-    emergency: z.boolean().optional(),
-    activities: z.boolean().optional(),
-    rental: z.boolean().optional(),
+    medical: z.boolean().default(false),
+    cancellation: z.boolean().default(false),
+    baggage: z.boolean().default(false),
+    emergency: z.boolean().default(false),
+    activities: z.boolean().default(false),
+    rental: z.boolean().default(false),
   }),
 }).refine((data) => {
   return data.returnDate >= data.departureDate;
@@ -78,7 +78,7 @@ export default function TripInfoPage() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
   
-  const form = useForm<TripFormValues>({
+  const form = useForm<z.input<typeof tripFormSchema>>({
     resolver: zodResolver(tripFormSchema),
     defaultValues: {
       travelers: "1",
@@ -103,21 +103,23 @@ export default function TripInfoPage() {
           throw new Error("Authentication required. Please log in to save trip details.");
         }
         
-        // Transform data to match API expectations
+        // The schema now transforms the data to the correct types
         const apiData = {
           destination: tripData.destination,
           tripType: tripData.tripType,
           departureDate: format(tripData.departureDate, "yyyy-MM-dd"),
           returnDate: format(tripData.returnDate, "yyyy-MM-dd"),
-          travelers: parseInt(tripData.travelers),
-          primaryAge: parseInt(tripData.primaryAge),
-          hasMedicalConditions: tripData.hasMedicalConditions === "yes",
+          travelers: tripData.travelers, // Already transformed by schema
+          primaryAge: tripData.primaryAge, // Already transformed by schema
+          hasMedicalConditions: tripData.hasMedicalConditions, // Already transformed by schema
           priorities: tripData.priorities,
         };
         
+        console.log("Sending trip data to API:", apiData);
         const res = await apiRequest("POST", "/api/trips", apiData);
         return await res.json();
       } catch (error) {
+        console.error("Error submitting trip data:", error);
         if (error instanceof Error && error.message.includes("Authentication required")) {
           // If it's an auth error, redirect to login
           navigate("/auth");
@@ -142,8 +144,9 @@ export default function TripInfoPage() {
     },
   });
   
-  function onSubmit(data: TripFormValues) {
-    createTripMutation.mutate(data);
+  function onSubmit(data: z.input<typeof tripFormSchema>) {
+    // The form data will be transformed by the schema before being passed to the mutation
+    createTripMutation.mutate(tripFormSchema.parse(data) as TripFormValues);
   }
 
   return (
