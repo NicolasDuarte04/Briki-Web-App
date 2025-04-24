@@ -14,13 +14,18 @@ export async function apiRequest(
 ): Promise<Response> {
   console.log(`API request: ${method} ${url}`, data);
   
+  // Get any existing cookies
+  const cookies = document.cookie;
+  console.log(`Cookies before ${method} ${url}:`, cookies);
+  
   const requestOptions = {
     method,
     headers: {
       ...(data ? { "Content-Type": "application/json" } : {}),
       // Add cache control headers to prevent caching of auth responses
       "Cache-Control": "no-cache",
-      "Pragma": "no-cache"
+      "Pragma": "no-cache",
+      "Accept": "application/json"
     },
     body: data ? JSON.stringify(data) : undefined,
     credentials: "include" as RequestCredentials,
@@ -29,6 +34,17 @@ export async function apiRequest(
   try {
     const res = await fetch(url, requestOptions);
     console.log(`API response: ${method} ${url} status:`, res.status);
+    
+    // Check for and log Set-Cookie headers
+    const setCookieHeader = res.headers.get('set-cookie');
+    if (setCookieHeader) {
+      console.log(`Set-Cookie header received from ${method} ${url}:`, setCookieHeader);
+    }
+    
+    // Log cookies after response
+    setTimeout(() => {
+      console.log(`Cookies after ${method} ${url}:`, document.cookie);
+    }, 100);
     
     await throwIfResNotOk(res);
     return res;
@@ -46,16 +62,32 @@ export const getQueryFn: <T>(options: {
   async ({ queryKey }) => {
     console.log(`Query request: ${queryKey[0]}`);
     
+    // Get any existing cookies
+    const cookies = document.cookie;
+    console.log(`Cookies before query ${queryKey[0]}:`, cookies);
+    
     try {
       const res = await fetch(queryKey[0] as string, {
         credentials: "include",
         headers: {
           "Cache-Control": "no-cache",
-          "Pragma": "no-cache"
+          "Pragma": "no-cache",
+          "Accept": "application/json"
         }
       });
       
       console.log(`Query response: ${queryKey[0]} status:`, res.status);
+      
+      // Check for and log Set-Cookie headers
+      const setCookieHeader = res.headers.get('set-cookie');
+      if (setCookieHeader) {
+        console.log(`Set-Cookie header received from query ${queryKey[0]}:`, setCookieHeader);
+      }
+      
+      // Log cookies after response
+      setTimeout(() => {
+        console.log(`Cookies after query ${queryKey[0]}:`, document.cookie);
+      }, 100);
 
       if (unauthorizedBehavior === "returnNull" && res.status === 401) {
         console.log(`Query unauthorized: ${queryKey[0]}`);
