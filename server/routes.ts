@@ -1,7 +1,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth } from "./auth";
+import { setupAuth, userSessions, requireAuth } from "./auth";
 import { z } from "zod";
 import { insertTripSchema, insertOrderSchema, User } from "@shared/schema";
 import Stripe from "stripe";
@@ -13,46 +13,10 @@ if (!process.env.STRIPE_SECRET_KEY) {
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-// Map to store user sessions
-const userSessions = new Map<string, number>();
-
 // Get user from token middleware
 interface AuthenticatedRequest extends Request {
   user?: User;
 }
-
-const requireAuth = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  try {
-    // Get token from header
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      console.log('Auth middleware - No token provided');
-      return res.status(401).json({ message: 'Authentication required' });
-    }
-    
-    const token = authHeader.split(' ')[1];
-    const userId = userSessions.get(token);
-    
-    if (!userId) {
-      console.log('Auth middleware - Invalid token');
-      return res.status(401).json({ message: 'Invalid token' });
-    }
-    
-    // Retrieve the user
-    const user = await storage.getUser(userId);
-    if (!user) {
-      console.log('Auth middleware - User not found for token');
-      return res.status(401).json({ message: 'User not found' });
-    }
-    
-    // Set user in request
-    req.user = user;
-    next();
-  } catch (error) {
-    console.error('Auth middleware error:', error);
-    return res.status(500).json({ message: 'Authentication error' });
-  }
-};
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Seed data if needed - before setting up auth and other routes

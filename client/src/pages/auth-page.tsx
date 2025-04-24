@@ -3,7 +3,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, SubmitHandler } from "react-hook-form";
 import { insertUserSchema } from "@shared/schema";
 
 import { Button } from "@/components/ui/button";
@@ -63,19 +63,20 @@ export default function AuthPage() {
       password: "",
       confirmPassword: "",
       email: "",
-      terms: false,
+      terms: true as true, // Type assertion to satisfy the literal true requirement
+      name: null,
     },
   });
   
   // Handle form submissions
-  const onLoginSubmit = (values: LoginFormValues) => {
+  const onLoginSubmit: SubmitHandler<LoginFormValues> = (values) => {
     loginMutation.mutate({
       username: values.username,
       password: values.password,
     });
   };
   
-  const onRegisterSubmit = (values: RegisterFormValues) => {
+  const onRegisterSubmit: SubmitHandler<RegisterFormValues> = (values) => {
     registerMutation.mutate({
       username: values.username,
       password: values.password,
