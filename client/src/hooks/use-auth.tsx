@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext } from "react";
+import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 import {
   useQuery,
   useMutation,
@@ -8,13 +8,18 @@ import { insertUserSchema, User as SelectUser, InsertUser } from "@shared/schema
 import { getQueryFn, apiRequest, queryClient } from "../lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
+type TokenResponse = {
+  user: SelectUser;
+  token: string;
+};
+
 type AuthContextType = {
   user: SelectUser | null;
   isLoading: boolean;
   error: Error | null;
-  loginMutation: UseMutationResult<SelectUser, Error, LoginData>;
-  logoutMutation: UseMutationResult<null, Error, void>; // Changed return type to null
-  registerMutation: UseMutationResult<SelectUser, Error, InsertUser>;
+  loginMutation: UseMutationResult<TokenResponse, Error, LoginData>;
+  logoutMutation: UseMutationResult<null, Error, void>;
+  registerMutation: UseMutationResult<TokenResponse, Error, InsertUser>;
   refetchUser: () => Promise<any>;
 };
 
@@ -23,6 +28,11 @@ type LoginData = Pick<InsertUser, "username" | "password">;
 export const AuthContext = createContext<AuthContextType | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
+  const [authToken, setAuthToken] = useState<string | null>(() => {
+    // Try to get token from localStorage on initial load
+    return localStorage.getItem('auth_token');
+  });
+  
   const {
     data: user,
     error,
@@ -32,10 +42,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     queryKey: ["/api/user"],
     queryFn: async ({ queryKey }) => {
       try {
-        console.log("Fetching user data...");
+        // If we don't have a token, the user is not authenticated
+        if (!authToken) {
+          console.log("No auth token available, user not authenticated");
+          return null;
+        }
+        
+        console.log("Fetching user data with token...");
         const res = await fetch(queryKey[0] as string, {
-          credentials: "include",
           headers: {
+            "Authorization": `Bearer ${authToken}`,
             "Cache-Control": "no-cache",
             "Pragma": "no-cache"
           }
@@ -44,7 +60,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.log("User data response status:", res.status);
         
         if (res.status === 401) {
-          console.log("User not authenticated (401)");
+          console.log("Token invalid or expired (401)");
+          // Clear invalid token
+          localStorage.removeItem('auth_token');
+          setAuthToken(null);
           return null;
         }
         
@@ -65,7 +84,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     staleTime: 30 * 1000, // 30 seconds
     refetchOnWindowFocus: true,
     refetchOnMount: true,
-    retry: 2, // Increase retry attempts
+    retry: 2,
+    enabled: !!authToken, // Only run query if we have a token
   });
 
   const loginMutation = useMutation({
