@@ -104,15 +104,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         
         console.log("Login response status:", response.status);
         
+        // Handle both success and error cases by first getting the JSON data
+        const responseData = await response.json().catch(() => ({ message: response.statusText || "Login failed" }));
+        
         if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(errorText || response.statusText || "Login failed");
+          throw new Error(responseData.message || "Login failed");
         }
         
-        // Parse response which should now include {user, token}
-        const authData = await response.json();
         console.log("Login successful, auth data received");
-        return authData as TokenResponse;
+        return responseData as TokenResponse;
       } catch (error) {
         console.error("Login error:", error);
         throw error;
@@ -157,15 +157,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         
         console.log("Registration response status:", response.status);
         
+        // Handle both success and error cases by first getting the JSON data
+        const responseData = await response.json().catch(() => ({ message: response.statusText || "Registration failed" }));
+        
         if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(errorText || response.statusText || "Registration failed");
+          throw new Error(responseData.message || "Registration failed");
         }
         
-        // Parse response which should now include {user, token}
-        const authData = await response.json();
         console.log("Registration successful, auth data received");
-        return authData as TokenResponse;
+        return responseData as TokenResponse;
       } catch (error) {
         console.error("Registration error:", error);
         throw error;
