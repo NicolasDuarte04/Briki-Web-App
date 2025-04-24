@@ -111,9 +111,33 @@ export class DatabaseStorage implements IStorage {
     return results[0];
   }
   
-  // Seed insurance plans for Colombia and Mexico
+  // Seed test data including users and insurance plans
   async seedDataIfNeeded(): Promise<void> {
     try {
+      // First check and seed test user if needed
+      const testUser = await this.getUserByUsername("demo");
+      if (!testUser) {
+        // Import the hashedPassword function from auth.ts
+        const { scrypt, randomBytes } = await import('crypto');
+        const { promisify } = await import('util');
+        const scryptAsync = promisify(scrypt);
+        
+        const hashPassword = async (password: string) => {
+          const salt = randomBytes(16).toString("hex");
+          const buf = (await scryptAsync(password, salt, 64)) as Buffer;
+          return `${buf.toString("hex")}.${salt}`;
+        };
+        
+        console.log('Creating test user: demo / test123');
+        await this.createUser({
+          username: "demo",
+          password: await hashPassword("test123"),
+          email: "demo@example.com",
+          name: "Demo User"
+        });
+        console.log('Test user created successfully');
+      }
+      
       // Check if plans already exist
       const existingPlans = await db.select().from(insurancePlans);
       

@@ -70,20 +70,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginData) => {
+      console.log("Login attempt for:", credentials.username);
       try {
-        const response = await fetch("/api/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(credentials),
-          credentials: "include"
-        });
+        // Use apiRequest to ensure consistency with other requests
+        const response = await apiRequest("POST", "/api/login", credentials);
+        console.log("Login response status:", response.status);
         
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.message || `Login failed with status ${response.status}`);
-        }
-        
+        // Parse response
         const userData = await response.json();
+        console.log("Login successful, user data received");
         return userData;
       } catch (error) {
         console.error("Login error:", error);
@@ -111,20 +106,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const registerMutation = useMutation({
     mutationFn: async (credentials: InsertUser) => {
+      console.log("Registration attempt for:", credentials.username);
       try {
-        const response = await fetch("/api/register", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(credentials),
-          credentials: "include"
-        });
+        // Use apiRequest to ensure consistency with other requests
+        const response = await apiRequest("POST", "/api/register", credentials);
+        console.log("Registration response status:", response.status);
         
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.message || `Registration failed with status ${response.status}`);
-        }
-        
+        // Parse response
         const userData = await response.json();
+        console.log("Registration successful, user data received");
         return userData;
       } catch (error) {
         console.error("Registration error:", error);
@@ -152,16 +142,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
+      console.log("Logout attempt");
       try {
-        const response = await fetch("/api/logout", {
-          method: "POST",
-          credentials: "include"
-        });
-        
-        if (!response.ok) {
-          throw new Error(`Logout failed with status ${response.status}`);
-        }
-        
+        // Use apiRequest to ensure consistency with other requests
+        const response = await apiRequest("POST", "/api/logout");
+        console.log("Logout response status:", response.status);
         return null;
       } catch (error) {
         console.error("Logout error:", error);
