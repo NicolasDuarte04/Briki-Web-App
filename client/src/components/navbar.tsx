@@ -56,7 +56,6 @@ export default function Navbar() {
             <Link href="/" className="flex-shrink-0 flex items-center">
               <h1 className="briki-logo">
                 briki
-                <span className="checkmark">✓</span>
               </h1>
             </Link>
           </div>
@@ -166,7 +165,6 @@ export default function Navbar() {
                   <SheetTitle>
                     <h1 className="briki-logo">
                       briki
-                      <span className="checkmark">✓</span>
                     </h1>
                   </SheetTitle>
                 </SheetHeader>

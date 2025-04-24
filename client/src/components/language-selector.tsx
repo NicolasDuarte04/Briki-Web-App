@@ -154,7 +154,7 @@ export function LanguageSelector() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="flex items-center">
           <Globe className="h-4 w-4 mr-1" />
-          <span className="text-sm">{languageFlags[language]}</span>
+          <span className="text-sm">{languageNames[language].substring(0, 2)}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-40">
@@ -164,9 +164,7 @@ export function LanguageSelector() {
             className="flex items-center justify-between cursor-pointer"
             onClick={() => setLanguage(code as Language)}
           >
-            <span>
-              {languageFlags[code as Language]} {name}
-            </span>
+            <span>{name}</span>
             {language === code && <Check className="h-4 w-4" />}
           </DropdownMenuItem>
         ))}
