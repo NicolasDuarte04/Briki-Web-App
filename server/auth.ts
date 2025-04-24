@@ -30,6 +30,8 @@ async function comparePasswords(supplied: string, stored: string) {
 
 export function setupAuth(app: Express) {
   const isDevelopment = process.env.NODE_ENV === 'development';
+  console.log('Auth environment:', isDevelopment ? 'development' : 'production');
+
   const sessionSettings: session.SessionOptions = {
     secret: process.env.SESSION_SECRET || "briki-travel-insurance-secret",
     resave: false, // Don't save session if unmodified
@@ -38,8 +40,8 @@ export function setupAuth(app: Express) {
     name: 'briki.sid', // Custom name to avoid conflicts
     cookie: {
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-      sameSite: 'lax', // Works in both development and production
-      secure: false, // Set to false in development to allow cookie to be sent over http
+      sameSite: isDevelopment ? 'lax' : 'none', // 'lax' in dev, 'none' in production to allow cross-origin
+      secure: !isDevelopment, // false in dev, true in production
       httpOnly: true,
       path: '/'
     }
