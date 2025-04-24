@@ -1,0 +1,379 @@
+openapi: 3.0.0
+info:
+  title: Briki Travel Insurance API
+  description: API for browsing and comparing travel insurance plans
+  version: 1.0.0
+  contact:
+    email: team@brikitravelsecurity.com
+servers:
+  - url: https://api.brikitravelsecurity.com
+    description: Production server
+  - url: http://localhost:8000
+    description: Local development server
+paths:
+  /api/plans:
+    get:
+      summary: Get all insurance plans
+      description: Returns a list of all available insurance plans
+      operationId: getAllPlans
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlanListResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/plans/{id}:
+    get:
+      summary: Get plan by ID
+      description: Returns a single insurance plan by ID
+      operationId: getPlanById
+      parameters:
+        - name: id
+          in: path
+          description: ID of the plan to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlanResponse'
+        '404':
+          description: Plan not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/plans/filter:
+    get:
+      summary: Filter plans
+      description: Returns filtered insurance plans based on criteria
+      operationId: filterPlans
+      parameters:
+        - name: origin
+          in: query
+          description: Origin country
+          schema:
+            type: string
+        - name: destination
+          in: query
+          description: Destination country
+          schema:
+            type: string
+        - name: startDate
+          in: query
+          description: Trip start date
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          description: Trip end date
+          schema:
+            type: string
+            format: date
+        - name: age
+          in: query
+          description: Traveler age
+          schema:
+            type: integer
+        - name: travelersCount
+          in: query
+          description: Number of travelers
+          schema:
+            type: integer
+        - name: minMedicalCoverage
+          in: query
+          description: Minimum medical coverage
+          schema:
+            type: integer
+        - name: includeAdventureActivities
+          in: query
+          description: Include adventure activities coverage
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlanListResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/plans/popular:
+    get:
+      summary: Get popular plans
+      description: Returns most popular insurance plans based on user interactions
+      operationId: getPopularPlans
+      parameters:
+        - name: limit
+          in: query
+          description: Maximum number of plans to return
+          schema:
+            type: integer
+            default: 5
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlanListResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/interactions:
+    post:
+      summary: Record interaction
+      description: Records a user interaction with an insurance plan
+      operationId: recordInteraction
+      requestBody:
+        description: Interaction to record
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Interaction'
+      responses:
+        '201':
+          description: Interaction recorded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InteractionResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/interactions/plan/{planId}:
+    get:
+      summary: Get plan interactions
+      description: Returns interactions for a specific insurance plan
+      operationId: getPlanInteractions
+      parameters:
+        - name: planId
+          in: path
+          description: ID of the plan
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InteractionListResponse'
+        '400':
+          description: Invalid plan ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/interactions/user:
+    get:
+      summary: Get user interactions
+      description: Returns interactions for a specific user or device
+      operationId: getUserInteractions
+      parameters:
+        - name: userId
+          in: query
+          description: User ID
+          schema:
+            type: string
+        - name: deviceId
+          in: query
+          description: Device ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InteractionListResponse'
+        '400':
+          description: Missing userId or deviceId
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    InsurancePlan:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        provider:
+          type: string
+        basePrice:
+          type: integer
+        medicalCoverage:
+          type: integer
+        tripCancellation:
+          type: string
+        baggageProtection:
+          type: integer
+        emergencyEvacuation:
+          type: integer
+        adventureActivities:
+          type: boolean
+        rentalCarCoverage:
+          type: integer
+        rating:
+          type: string
+        reviews:
+          type: integer
+        country:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - provider
+        - basePrice
+        - medicalCoverage
+        - tripCancellation
+        - baggageProtection
+        - adventureActivities
+        - country
+
+    Interaction:
+      type: object
+      properties:
+        planId:
+          type: integer
+          format: int64
+        userId:
+          type: string
+        deviceId:
+          type: string
+        interactionType:
+          type: string
+          enum:
+            - view
+            - selection
+            - comparison
+            - checkout_start
+            - checkout_complete
+        metadata:
+          type: object
+      required:
+        - planId
+        - deviceId
+        - interactionType
+
+    PlanResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: '#/components/schemas/InsurancePlan'
+        error:
+          type: string
+
+    PlanListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/InsurancePlan'
+        error:
+          type: string
+
+    InteractionResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: '#/components/schemas/Interaction'
+        message:
+          type: string
+        error:
+          type: string
+
+    InteractionListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Interaction'
+        error:
+          type: string
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: false
+        error:
+          type: string
