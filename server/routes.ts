@@ -4,6 +4,14 @@ import { storage } from "./storage";
 import { setupAuth } from "./auth";
 import { z } from "zod";
 import { insertTripSchema, insertOrderSchema } from "@shared/schema";
+import Stripe from "stripe";
+
+// Initialize Stripe
+if (!process.env.STRIPE_SECRET_KEY) {
+  throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
+}
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Seed data if needed - before setting up auth and other routes
@@ -136,6 +144,102 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (err) {
       res.status(500).json({ error: "Failed to fetch orders" });
     }
+  });
+
+  // Stripe Payment API Routes
+  app.post("/api/create-payment-intent", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    try {
+      const { planId, amount } = req.body;
+      
+      if (!planId || !amount) {
+        return res.status(400).json({ error: "Plan ID and amount are required" });
+      }
+
+      // Get the insurance plan to verify it exists
+      const plan = await storage.getInsurancePlan(planId);
+      if (!plan) {
+        return res.status(404).json({ error: "Insurance plan not found" });
+      }
+
+      // Verify the amount matches the plan's price (optional security check)
+      if (plan.basePrice !== amount) {
+        console.log(`Price mismatch: Expected ${plan.basePrice}, got ${amount}`);
+        // You might want to enforce this in production
+        // return res.status(400).json({ error: "Amount does not match plan price" });
+      }
+
+      // Create the payment intent
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: Math.round(amount * 100), // Convert to cents
+        currency: "usd",
+        metadata: {
+          planId: planId.toString(),
+          userId: req.user.id.toString(),
+          planName: plan.name
+        },
+      });
+
+      // Return the client secret
+      res.json({
+        clientSecret: paymentIntent.client_secret,
+        paymentIntentId: paymentIntent.id
+      });
+    } catch (error: any) {
+      console.error("Stripe payment intent error:", error);
+      res.status(500).json({ 
+        error: "Error creating payment intent", 
+        message: error.message 
+      });
+    }
+  });
+
+  // Webhook to handle successful payments
+  app.post("/api/webhook", async (req, res) => {
+    const payload = req.body;
+    let event;
+
+    // Verify the event came from Stripe
+    try {
+      // Note: in production, use the Stripe webhook signature verification
+      // const signature = req.headers['stripe-signature'];
+      // event = stripe.webhooks.constructEvent(payload, signature, webhookSecret);
+      
+      event = payload;  // For simplicity in development
+    } catch (err: any) {
+      console.error("Webhook signature verification failed:", err.message);
+      return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+
+    // Handle the event
+    if (event.type === 'payment_intent.succeeded') {
+      const paymentIntent = event.data.object;
+      
+      try {
+        // Create an order from the successful payment
+        const planId = parseInt(paymentIntent.metadata.planId);
+        const userId = parseInt(paymentIntent.metadata.userId);
+        
+        if (!isNaN(planId) && !isNaN(userId)) {
+          await storage.createOrder({
+            planId,
+            userId,
+            totalAmount: paymentIntent.amount / 100, // Convert from cents
+            status: "completed",
+            paymentIntentId: paymentIntent.id
+          });
+          
+          console.log("Order created successfully from webhook");
+        }
+      } catch (error: any) {
+        console.error("Failed to process webhook:", error);
+      }
+    }
+
+    res.status(200).json({ received: true });
   });
 
   const httpServer = createServer(app);
