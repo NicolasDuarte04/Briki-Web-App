@@ -7,6 +7,11 @@ async function throwIfResNotOk(res: Response) {
   }
 }
 
+// Get the auth token from localStorage
+function getAuthToken(): string | null {
+  return localStorage.getItem('auth_token');
+}
+
 export async function apiRequest(
   method: string,
   url: string,
@@ -14,23 +19,22 @@ export async function apiRequest(
 ): Promise<Response> {
   console.log(`API request: ${method} ${url}`, data);
   
-  // Get any existing cookies
-  const cookies = document.cookie;
-  console.log(`Cookies before ${method} ${url}:`, cookies);
+  // Get token from localStorage for authenticated requests
+  const token = getAuthToken();
+  console.log(`Token for ${method} ${url}:`, token ? 'Token exists' : 'No token');
   
   const requestOptions = {
     method,
     headers: {
       ...(data ? { "Content-Type": "application/json" } : {}),
-      // Add cache control headers to prevent caching of auth responses
+      // Add cache control headers to prevent caching
       "Cache-Control": "no-cache",
       "Pragma": "no-cache",
       "Accept": "application/json",
-      // Explicitly indicate we want to support authentication cookies
-      "X-Requested-With": "XMLHttpRequest"
+      // Add auth token if available
+      ...(token ? { "Authorization": `Bearer ${token}` } : {})
     },
     body: data ? JSON.stringify(data) : undefined,
-    credentials: "include" as RequestCredentials,
     mode: 'cors' as RequestMode,
   };
   
@@ -38,16 +42,15 @@ export async function apiRequest(
     const res = await fetch(url, requestOptions);
     console.log(`API response: ${method} ${url} status:`, res.status);
     
-    // Check for and log Set-Cookie headers
-    const setCookieHeader = res.headers.get('set-cookie');
-    if (setCookieHeader) {
-      console.log(`Set-Cookie header received from ${method} ${url}:`, setCookieHeader);
+    // Handle unauthorized responses
+    if (res.status === 401) {
+      console.log('Unauthorized request, token may be invalid');
+      // Clear token if it's invalid
+      if (token) {
+        localStorage.removeItem('auth_token');
+        console.log('Removed invalid token from localStorage');
+      }
     }
-    
-    // Log cookies after response
-    setTimeout(() => {
-      console.log(`Cookies after ${method} ${url}:`, document.cookie);
-    }, 100);
     
     await throwIfResNotOk(res);
     return res;
@@ -65,34 +68,39 @@ export const getQueryFn: <T>(options: {
   async ({ queryKey }) => {
     console.log(`Query request: ${queryKey[0]}`);
     
-    // Get any existing cookies
-    const cookies = document.cookie;
-    console.log(`Cookies before query ${queryKey[0]}:`, cookies);
+    // Get the auth token
+    const token = getAuthToken();
+    console.log(`Token for query ${queryKey[0]}:`, token ? 'Token exists' : 'No token');
     
     try {
-      // Use the apiRequest function to ensure consistent headers
+      // Make authenticated request if token exists
       const res = await fetch(queryKey[0] as string, {
         method: 'GET',
-        credentials: "include",
         mode: 'cors' as RequestMode,
         headers: {
           "Cache-Control": "no-cache",
           "Pragma": "no-cache",
           "Accept": "application/json",
-          "X-Requested-With": "XMLHttpRequest"
+          // Add authorization header if token exists
+          ...(token ? { "Authorization": `Bearer ${token}` } : {})
         }
       });
       
       console.log(`Query response: ${queryKey[0]} status:`, res.status);
       
-      // Log cookies after response
-      setTimeout(() => {
-        console.log(`Cookies after query ${queryKey[0]}:`, document.cookie);
-      }, 100);
-
-      if (unauthorizedBehavior === "returnNull" && res.status === 401) {
+      // Handle authentication errors
+      if (res.status === 401) {
         console.log(`Query unauthorized: ${queryKey[0]}`);
-        return null;
+        
+        // Clear token if it's invalid
+        if (token) {
+          localStorage.removeItem('auth_token');
+          console.log('Removed invalid token from localStorage');
+        }
+        
+        if (unauthorizedBehavior === "returnNull") {
+          return null;
+        }
       }
 
       await throwIfResNotOk(res);
