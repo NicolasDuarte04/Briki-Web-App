@@ -37,7 +37,6 @@ export const insurancePlans = pgTable("insurance_plans", {
   name: text("name").notNull(),
   provider: text("provider").notNull(),
   basePrice: integer("base_price").notNull(),
-  description: text("description").notNull(),
   medicalCoverage: integer("medical_coverage").notNull(),
   tripCancellation: text("trip_cancellation").notNull(),
   baggageProtection: integer("baggage_protection").notNull(),
