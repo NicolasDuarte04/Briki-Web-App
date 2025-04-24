@@ -32,6 +32,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     queryKey: ["/api/user"],
     queryFn: async ({ queryKey }) => {
       try {
+        console.log("Fetching user data...");
         const res = await fetch(queryKey[0] as string, {
           credentials: "include",
           headers: {
@@ -40,25 +41,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
         });
         
+        console.log("User data response status:", res.status);
+        
         if (res.status === 401) {
+          console.log("User not authenticated (401)");
           return null;
         }
         
         if (!res.ok) {
           const errorText = await res.text();
+          console.error(`Error response: ${res.status} - ${errorText || res.statusText}`);
           throw new Error(`${res.status}: ${errorText || res.statusText}`);
         }
         
-        return await res.json();
+        const userData = await res.json();
+        console.log("User authenticated:", userData.username);
+        return userData;
       } catch (err) {
         console.error("Error fetching user:", err);
         return null;
       }
     },
-    staleTime: 60 * 1000, // 1 minute
+    staleTime: 30 * 1000, // 30 seconds
     refetchOnWindowFocus: true,
     refetchOnMount: true,
-    retry: 1,
+    retry: 2, // Increase retry attempts
   });
 
   const loginMutation = useMutation({
