@@ -152,68 +152,146 @@ export default function CompareModal({ open, onOpenChange, plans }: CompareModal
             </TabsList>
             
             <TabsContent value="overview" className="pt-2 pb-6">
-              <div className="space-y-4">
+              <AnimatePresence>
+                <div className="space-y-4">
                 {plans.map((plan, index) => (
-                  <div key={plan.id} className="briki-card p-4 mb-0">
-                    <div className="flex justify-between items-center mb-3">
+                  <motion.div 
+                    key={plan.id} 
+                    className="briki-card p-4 mb-0"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ 
+                      duration: 0.4, 
+                      delay: index * 0.1, 
+                      ease: "easeOut" 
+                    }}
+                  >
+                    <motion.div 
+                      className="flex justify-between items-center mb-3"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.3, delay: 0.2 + index * 0.1 }}
+                    >
                       <div className="flex items-center">
-                        <div className="h-10 w-10 bg-primary/10 rounded-xl flex items-center justify-center">
+                        <motion.div 
+                          className="h-10 w-10 bg-primary/10 rounded-xl flex items-center justify-center"
+                          whileHover={{ scale: 1.1, backgroundColor: "rgba(var(--primary-rgb), 0.2)" }}
+                        >
                           <Shield className="h-5 w-5 text-primary" />
-                        </div>
+                        </motion.div>
                         <div className="ml-3">
                           <h3 className="text-lg font-bold">{plan.name}</h3>
                           <div className="flex items-center space-x-1">
-                            <Star className="h-3 w-3 text-yellow-400 fill-current" />
+                            <motion.div
+                              initial={{ rotate: -30, opacity: 0 }}
+                              animate={{ rotate: 0, opacity: 1 }}
+                              transition={{ duration: 0.4, delay: 0.3 + index * 0.1 }}
+                            >
+                              <Star className="h-3 w-3 text-yellow-400 fill-current" />
+                            </motion.div>
                             <span className="text-xs text-gray-500">{plan.rating}</span>
                           </div>
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-xl font-bold text-primary">${plan.basePrice}</div>
+                        <motion.div 
+                          className="text-xl font-bold text-primary"
+                          initial={{ scale: 0.8, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ duration: 0.4, delay: 0.3 + index * 0.1 }}
+                        >
+                          ${plan.basePrice}
+                        </motion.div>
                       </div>
-                    </div>
+                    </motion.div>
                     
-                    <div className="grid grid-cols-2 gap-3 mb-3">
-                      <div className="flex items-center">
-                        <div className="h-7 w-7 rounded-full bg-blue-50 flex items-center justify-center mr-2">
+                    <motion.div 
+                      className="grid grid-cols-2 gap-3 mb-3"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
+                    >
+                      {/* Medical Coverage */}
+                      <motion.div 
+                        className="flex items-center"
+                        initial={{ x: -20, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ duration: 0.4, delay: 0.4 + index * 0.05 }}
+                        whileHover={{ scale: 1.03, x: 2 }}
+                      >
+                        <motion.div 
+                          className="h-7 w-7 rounded-full bg-blue-50 flex items-center justify-center mr-2"
+                          whileHover={{ scale: 1.1, backgroundColor: "rgba(59, 130, 246, 0.2)" }}
+                        >
                           <Shield className="h-3.5 w-3.5 text-blue-500" />
-                        </div>
+                        </motion.div>
                         <div>
                           <div className="text-xs text-gray-500">Medical</div>
                           <div className="text-sm font-medium">{formatPrice(plan.medicalCoverage)}</div>
                         </div>
-                      </div>
+                      </motion.div>
                       
-                      <div className="flex items-center">
-                        <div className="h-7 w-7 rounded-full bg-blue-50 flex items-center justify-center mr-2">
+                      {/* Trip Cancellation */}
+                      <motion.div 
+                        className="flex items-center"
+                        initial={{ x: 20, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ duration: 0.4, delay: 0.45 + index * 0.05 }}
+                        whileHover={{ scale: 1.03, x: -2 }}
+                      >
+                        <motion.div 
+                          className="h-7 w-7 rounded-full bg-blue-50 flex items-center justify-center mr-2"
+                          whileHover={{ scale: 1.1, backgroundColor: "rgba(59, 130, 246, 0.2)" }}
+                        >
                           <Calendar className="h-3.5 w-3.5 text-blue-500" />
-                        </div>
+                        </motion.div>
                         <div>
                           <div className="text-xs text-gray-500">Cancellation</div>
                           <div className="text-sm font-medium">{plan.tripCancellation}</div>
                         </div>
-                      </div>
+                      </motion.div>
                       
-                      <div className="flex items-center">
-                        <div className="h-7 w-7 rounded-full bg-blue-50 flex items-center justify-center mr-2">
+                      {/* Baggage Protection */}
+                      <motion.div 
+                        className="flex items-center"
+                        initial={{ x: -20, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ duration: 0.4, delay: 0.5 + index * 0.05 }}
+                        whileHover={{ scale: 1.03, x: 2 }}
+                      >
+                        <motion.div 
+                          className="h-7 w-7 rounded-full bg-blue-50 flex items-center justify-center mr-2"
+                          whileHover={{ scale: 1.1, backgroundColor: "rgba(59, 130, 246, 0.2)" }}
+                        >
                           <Briefcase className="h-3.5 w-3.5 text-blue-500" />
-                        </div>
+                        </motion.div>
                         <div>
                           <div className="text-xs text-gray-500">Baggage</div>
                           <div className="text-sm font-medium">{formatPrice(plan.baggageProtection)}</div>
                         </div>
-                      </div>
+                      </motion.div>
                       
-                      <div className="flex items-center">
-                        <div className="h-7 w-7 rounded-full bg-blue-50 flex items-center justify-center mr-2">
+                      {/* Emergency Evacuation */}
+                      <motion.div 
+                        className="flex items-center"
+                        initial={{ x: 20, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ duration: 0.4, delay: 0.55 + index * 0.05 }}
+                        whileHover={{ scale: 1.03, x: -2 }}
+                      >
+                        <motion.div 
+                          className="h-7 w-7 rounded-full bg-blue-50 flex items-center justify-center mr-2"
+                          whileHover={{ scale: 1.1, backgroundColor: "rgba(59, 130, 246, 0.2)" }}
+                        >
                           <AlertTriangle className="h-3.5 w-3.5 text-blue-500" />
-                        </div>
+                        </motion.div>
                         <div>
                           <div className="text-xs text-gray-500">Evacuation</div>
                           <div className="text-sm font-medium">{formatPrice(plan.emergencyEvacuation || undefined)}</div>
                         </div>
-                      </div>
-                    </div>
+                      </motion.div>
+                    </motion.div>
                     
                     {bestValues.basePrice === plan.basePrice && (
                       <div className="briki-badge briki-badge-success">Best Value</div>
@@ -221,9 +299,10 @@ export default function CompareModal({ open, onOpenChange, plans }: CompareModal
                     {bestValues.medicalCoverage === plan.medicalCoverage && (
                       <div className="briki-badge briki-badge-primary ml-2">Best Medical</div>
                     )}
-                  </div>
+                  </motion.div>
                 ))}
-              </div>
+                </div>
+              </AnimatePresence>
             </TabsContent>
             
             <TabsContent value="details" className="pt-2 pb-6">
@@ -234,16 +313,36 @@ export default function CompareModal({ open, onOpenChange, plans }: CompareModal
                       <h3 className="font-semibold">Coverage Details</h3>
                     </div>
                     
-                    <div className="briki-compare-row">
-                      <div className="briki-compare-label">Medical Coverage</div>
+                    <motion.div 
+                      className="briki-compare-row"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3, delay: 0.1 }}
+                      whileHover={{ backgroundColor: "rgba(243, 244, 246, 0.7)" }}
+                    >
+                      <motion.div 
+                        className="briki-compare-label"
+                        initial={{ x: -10, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ duration: 0.3, delay: 0.2 }}
+                      >
+                        Medical Coverage
+                      </motion.div>
                       <div className="briki-compare-value">
-                        {plans.map(plan => (
-                          <span key={plan.id} className={bestValues.medicalCoverage === plan.medicalCoverage ? "font-semibold text-primary" : ""}>
+                        {plans.map((plan, idx) => (
+                          <motion.span 
+                            key={plan.id} 
+                            className={bestValues.medicalCoverage === plan.medicalCoverage ? "font-semibold text-primary" : ""}
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 0.3, delay: 0.2 + idx * 0.1 }}
+                            whileHover={bestValues.medicalCoverage === plan.medicalCoverage ? { scale: 1.05 } : {}}
+                          >
                             {formatPrice(plan.medicalCoverage)}
-                          </span>
+                          </motion.span>
                         ))}
                       </div>
-                    </div>
+                    </motion.div>
                     
                     <div className="briki-compare-row">
                       <div className="briki-compare-label">Trip Cancellation</div>
@@ -363,17 +462,38 @@ export default function CompareModal({ open, onOpenChange, plans }: CompareModal
               <ScrollArea className="h-[60vh]">
                 <div className="space-y-5">
                   {differences.length === 0 ? (
-                    <div className="p-4 bg-gray-50 rounded-xl text-center">
-                      <Info className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                      <p className="text-gray-500">
+                    <motion.div 
+                      className="p-4 bg-gray-50 rounded-xl text-center"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      <motion.div
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ delay: 0.2, duration: 0.4, type: "spring" }}
+                      >
+                        <Info className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                      </motion.div>
+                      <motion.p 
+                        className="text-gray-500"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.4, duration: 0.3 }}
+                      >
                         These plans are similar in all key aspects.
                         Review the details tab for more specific comparisons.
-                      </p>
-                    </div>
+                      </motion.p>
+                    </motion.div>
                   ) : (
-                    <>
+                    <div className="space-y-4">
                       {differences.includes("price") && (
-                        <div className="briki-compare-table">
+                        <motion.div 
+                          className="briki-compare-table"
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.4, delay: 0.1 }}
+                        >
                           <div className="p-4 bg-blue-50 rounded-t-xl">
                             <div className="flex items-center">
                               <DollarSign className="h-5 w-5 text-blue-500 mr-2" />
@@ -386,22 +506,33 @@ export default function CompareModal({ open, onOpenChange, plans }: CompareModal
                           
                           <div className="p-4">
                             <div className="space-y-3">
-                              {plans.map(plan => (
-                                <div key={plan.id} className="flex justify-between items-center">
+                              {plans.map((plan, idx) => (
+                                <motion.div 
+                                  key={plan.id} 
+                                  className="flex justify-between items-center"
+                                  initial={{ opacity: 0, x: -10 }}
+                                  animate={{ opacity: 1, x: 0 }}
+                                  transition={{ duration: 0.3, delay: 0.2 + idx * 0.1 }}
+                                >
                                   <span className="text-sm font-medium">{plan.name}</span>
                                   <span className={`text-sm ${bestValues.basePrice === plan.basePrice ? "font-bold text-green-600" : ""}`}>
                                     {formatPrice(plan.basePrice)}
                                     {bestValues.basePrice === plan.basePrice && " (Best)"}
                                   </span>
-                                </div>
+                                </motion.div>
                               ))}
                             </div>
                           </div>
-                        </div>
+                        </motion.div>
                       )}
                       
                       {differences.includes("medical") && (
-                        <div className="briki-compare-table">
+                        <motion.div 
+                          className="briki-compare-table"
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.4, delay: 0.2 }}
+                        >
                           <div className="p-4 bg-green-50 rounded-t-xl">
                             <div className="flex items-center">
                               <Shield className="h-5 w-5 text-green-500 mr-2" />
@@ -414,22 +545,33 @@ export default function CompareModal({ open, onOpenChange, plans }: CompareModal
                           
                           <div className="p-4">
                             <div className="space-y-3">
-                              {plans.map(plan => (
-                                <div key={plan.id} className="flex justify-between items-center">
+                              {plans.map((plan, idx) => (
+                                <motion.div 
+                                  key={plan.id} 
+                                  className="flex justify-between items-center"
+                                  initial={{ opacity: 0, x: -10 }}
+                                  animate={{ opacity: 1, x: 0 }}
+                                  transition={{ duration: 0.3, delay: 0.3 + idx * 0.1 }}
+                                >
                                   <span className="text-sm font-medium">{plan.name}</span>
                                   <span className={`text-sm ${bestValues.medicalCoverage === plan.medicalCoverage ? "font-bold text-green-600" : ""}`}>
                                     {formatPrice(plan.medicalCoverage)}
                                     {bestValues.medicalCoverage === plan.medicalCoverage && " (Best)"}
                                   </span>
-                                </div>
+                                </motion.div>
                               ))}
                             </div>
                           </div>
-                        </div>
+                        </motion.div>
                       )}
                       
                       {differences.includes("adventure") && (
-                        <div className="briki-compare-table">
+                        <motion.div 
+                          className="briki-compare-table"
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.4, delay: 0.3 }}
+                        >
                           <div className="p-4 bg-orange-50 rounded-t-xl">
                             <div className="flex items-center">
                               <MapPin className="h-5 w-5 text-orange-500 mr-2" />
@@ -442,8 +584,14 @@ export default function CompareModal({ open, onOpenChange, plans }: CompareModal
                           
                           <div className="p-4">
                             <div className="space-y-3">
-                              {plans.map(plan => (
-                                <div key={plan.id} className="flex justify-between items-center">
+                              {plans.map((plan, idx) => (
+                                <motion.div 
+                                  key={plan.id} 
+                                  className="flex justify-between items-center"
+                                  initial={{ opacity: 0, x: -10 }}
+                                  animate={{ opacity: 1, x: 0 }}
+                                  transition={{ duration: 0.3, delay: 0.4 + idx * 0.1 }}
+                                >
                                   <span className="text-sm font-medium">{plan.name}</span>
                                   <span className={`text-sm flex items-center ${plan.adventureActivities ? "text-green-600" : "text-red-500"}`}>
                                     {plan.adventureActivities ? (
@@ -458,15 +606,20 @@ export default function CompareModal({ open, onOpenChange, plans }: CompareModal
                                       </>
                                     )}
                                   </span>
-                                </div>
+                                </motion.div>
                               ))}
                             </div>
                           </div>
-                        </div>
+                        </motion.div>
                       )}
                       
                       {differences.includes("cancellation") && (
-                        <div className="briki-compare-table">
+                        <motion.div 
+                          className="briki-compare-table"
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.4, delay: 0.4 }}
+                        >
                           <div className="p-4 bg-purple-50 rounded-t-xl">
                             <div className="flex items-center">
                               <Calendar className="h-5 w-5 text-purple-500 mr-2" />
@@ -479,20 +632,26 @@ export default function CompareModal({ open, onOpenChange, plans }: CompareModal
                           
                           <div className="p-4">
                             <div className="space-y-3">
-                              {plans.map(plan => (
-                                <div key={plan.id} className="flex justify-between items-center">
+                              {plans.map((plan, idx) => (
+                                <motion.div 
+                                  key={plan.id} 
+                                  className="flex justify-between items-center"
+                                  initial={{ opacity: 0, x: -10 }}
+                                  animate={{ opacity: 1, x: 0 }}
+                                  transition={{ duration: 0.3, delay: 0.5 + idx * 0.1 }}
+                                >
                                   <span className="text-sm font-medium">{plan.name}</span>
                                   <span className={`text-sm ${plan.tripCancellation.includes("100%") ? "font-bold text-green-600" : ""}`}>
                                     {plan.tripCancellation}
                                     {plan.tripCancellation.includes("100%") && " (Best)"}
                                   </span>
-                                </div>
+                                </motion.div>
                               ))}
                             </div>
                           </div>
-                        </div>
+                        </motion.div>
                       )}
-                    </>
+                    </div>
                   )}
                 </div>
               </ScrollArea>
