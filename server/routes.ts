@@ -56,18 +56,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Trip API
   app.post("/api/trips", requireAuth, async (req: AuthenticatedRequest, res: Response) => {
     try {
+      console.log("POST /api/trips - Request body:", req.body);
+      console.log("POST /api/trips - User ID:", req.user?.id);
+      
+      // Make sure we have all required data
       const tripData = insertTripSchema.parse({
         ...req.body,
         userId: req.user!.id
       });
       
+      console.log("POST /api/trips - Parsed trip data:", tripData);
+      
       const trip = await storage.createTrip(tripData);
+      console.log("POST /api/trips - Trip created successfully:", trip);
       res.status(201).json(trip);
     } catch (err) {
+      console.error("POST /api/trips - Error creating trip:", err);
+      
       if (err instanceof z.ZodError) {
-        return res.status(400).json({ error: err.errors });
+        console.error("POST /api/trips - Validation error:", JSON.stringify(err.errors));
+        return res.status(400).json({ 
+          error: "Invalid trip data", 
+          details: err.errors 
+        });
       }
-      res.status(500).json({ error: "Failed to create trip" });
+      
+      // Always return a message the client can display
+      res.status(500).json({ 
+        error: "Failed to create trip", 
+        message: err instanceof Error ? err.message : "Unknown error"
+      });
     }
   });
 
