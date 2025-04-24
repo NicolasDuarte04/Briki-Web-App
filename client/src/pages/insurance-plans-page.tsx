@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { InsurancePlan } from "@shared/schema";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
@@ -67,94 +67,104 @@ export default function InsurancePlansPage() {
       <Navbar />
       
       <div className="flex-grow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-          <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Available Insurance Plans</h1>
-              <p className="mt-2 text-lg text-gray-600">
-                Comparing {filteredPlans.length} plans based on your requirements
-              </p>
+        <div className="briki-mobile-container">
+          <div className="mb-8">
+            <div className="flex items-center mb-4">
+              <Link href="/trip-info" className="text-gray-500">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+                </svg>
+              </Link>
+              <h1 className="briki-logo ml-4">
+                briki
+                <span className="checkmark">✓</span>
+              </h1>
             </div>
-            <div className="mt-4 md:mt-0 flex space-x-3">
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button variant="outline" className="flex items-center space-x-2">
-                    <Filter className="h-4 w-4" />
-                    <span>Filter Plans</span>
-                  </Button>
-                </SheetTrigger>
-                <SheetContent>
-                  <SheetHeader>
-                    <SheetTitle>Filter Plans</SheetTitle>
-                    <SheetDescription>
-                      Customize your search to find the perfect insurance plan.
-                    </SheetDescription>
-                  </SheetHeader>
-                  <div className="py-6 space-y-6">
-                    <div>
-                      <h3 className="text-sm font-medium mb-3">Price Range</h3>
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-xs text-gray-500">
-                          <span>${filterPriceRange[0]}</span>
-                          <span>${filterPriceRange[1]}</span>
-                        </div>
-                        <Input
-                          type="range"
-                          min="0"
-                          max="500"
-                          value={filterPriceRange[1]}
-                          onChange={(e) => setFilterPriceRange([filterPriceRange[0], parseInt(e.target.value)])}
-                          className="w-full"
-                        />
+            <h2 className="text-2xl font-bold text-black">Select a plan</h2>
+            <p className="text-sm text-gray-600 mt-2">
+              Medical expenses up to $200,000 • Trip cancellation • Baggage
+            </p>
+          </div>
+          
+          <div>
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" className="hidden">
+                  <Filter className="h-4 w-4" />
+                  <span>Filter Plans</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent>
+                <SheetHeader>
+                  <SheetTitle>Filter Plans</SheetTitle>
+                  <SheetDescription>
+                    Customize your search to find the perfect insurance plan.
+                  </SheetDescription>
+                </SheetHeader>
+                <div className="py-6 space-y-6">
+                  <div>
+                    <h3 className="text-sm font-medium mb-3">Price Range</h3>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-xs text-gray-500">
+                        <span>${filterPriceRange[0]}</span>
+                        <span>${filterPriceRange[1]}</span>
                       </div>
-                    </div>
-                    
-                    <div className="space-y-3">
-                      <h3 className="text-sm font-medium mb-1">Coverage Features</h3>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox 
-                          id="medical" 
-                          checked={filterMedical}
-                          onCheckedChange={(checked) => setFilterMedical(checked === true)}
-                        />
-                        <label htmlFor="medical" className="text-sm">High Medical Coverage (150k+)</label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox 
-                          id="trip" 
-                          checked={filterTrip}
-                          onCheckedChange={(checked) => setFilterTrip(checked === true)}
-                        />
-                        <label htmlFor="trip" className="text-sm">100% Trip Cancellation</label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox 
-                          id="adventure" 
-                          checked={filterAdventure}
-                          onCheckedChange={(checked) => setFilterAdventure(checked === true)}
-                        />
-                        <label htmlFor="adventure" className="text-sm">Adventure Activities Coverage</label>
-                      </div>
-                    </div>
-                    
-                    <div className="pt-4 flex space-x-2">
-                      <Button onClick={resetFilters} variant="outline" className="w-full">Reset</Button>
-                      <Button className="w-full">Apply</Button>
+                      <Input
+                        type="range"
+                        min="0"
+                        max="500"
+                        value={filterPriceRange[1]}
+                        onChange={(e) => setFilterPriceRange([filterPriceRange[0], parseInt(e.target.value)])}
+                        className="w-full"
+                      />
                     </div>
                   </div>
-                </SheetContent>
-              </Sheet>
-              
-              <Button 
-                variant="outline" 
-                disabled={selectedPlans.length < 2} 
-                onClick={() => setCompareModalOpen(true)}
-                className="flex items-center space-x-2"
-              >
-                <SlidersHorizontal className="h-4 w-4" />
-                <span>Compare {selectedPlans.length > 0 ? `(${selectedPlans.length})` : "Plans"}</span>
-              </Button>
-            </div>
+                  
+                  <div className="space-y-3">
+                    <h3 className="text-sm font-medium mb-1">Coverage Features</h3>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="medical" 
+                        checked={filterMedical}
+                        onCheckedChange={(checked) => setFilterMedical(checked === true)}
+                      />
+                      <label htmlFor="medical" className="text-sm">High Medical Coverage (150k+)</label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="trip" 
+                        checked={filterTrip}
+                        onCheckedChange={(checked) => setFilterTrip(checked === true)}
+                      />
+                      <label htmlFor="trip" className="text-sm">100% Trip Cancellation</label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="adventure" 
+                        checked={filterAdventure}
+                        onCheckedChange={(checked) => setFilterAdventure(checked === true)}
+                      />
+                      <label htmlFor="adventure" className="text-sm">Adventure Activities Coverage</label>
+                    </div>
+                  </div>
+                  
+                  <div className="pt-4 flex space-x-2">
+                    <Button onClick={resetFilters} variant="outline" className="w-full">Reset</Button>
+                    <Button className="w-full">Apply</Button>
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
+            
+            <Button 
+              variant="outline" 
+              disabled={selectedPlans.length < 2} 
+              onClick={() => setCompareModalOpen(true)}
+              className="flex items-center space-x-2"
+            >
+              <SlidersHorizontal className="h-4 w-4" />
+              <span>Compare {selectedPlans.length > 0 ? `(${selectedPlans.length})` : "Plans"}</span>
+            </Button>
           </div>
           
           <TripSummary />
