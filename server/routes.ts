@@ -1,9 +1,9 @@
-import type { Express } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth } from "./auth";
 import { z } from "zod";
-import { insertTripSchema, insertOrderSchema } from "@shared/schema";
+import { insertTripSchema, insertOrderSchema, User } from "@shared/schema";
 import Stripe from "stripe";
 
 // Initialize Stripe
@@ -12,6 +12,47 @@ if (!process.env.STRIPE_SECRET_KEY) {
 }
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+// Map to store user sessions
+const userSessions = new Map<string, number>();
+
+// Get user from token middleware
+interface AuthenticatedRequest extends Request {
+  user?: User;
+}
+
+const requireAuth = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  try {
+    // Get token from header
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.log('Auth middleware - No token provided');
+      return res.status(401).json({ message: 'Authentication required' });
+    }
+    
+    const token = authHeader.split(' ')[1];
+    const userId = userSessions.get(token);
+    
+    if (!userId) {
+      console.log('Auth middleware - Invalid token');
+      return res.status(401).json({ message: 'Invalid token' });
+    }
+    
+    // Retrieve the user
+    const user = await storage.getUser(userId);
+    if (!user) {
+      console.log('Auth middleware - User not found for token');
+      return res.status(401).json({ message: 'User not found' });
+    }
+    
+    // Set user in request
+    req.user = user;
+    next();
+  } catch (error) {
+    console.error('Auth middleware error:', error);
+    return res.status(500).json({ message: 'Authentication error' });
+  }
+};
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Seed data if needed - before setting up auth and other routes
@@ -49,15 +90,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Trip API
-  app.post("/api/trips", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
-
+  app.post("/api/trips", requireAuth, async (req: AuthenticatedRequest, res: Response) => {
     try {
       const tripData = insertTripSchema.parse({
         ...req.body,
-        userId: req.user.id
+        userId: req.user!.id
       });
       
       const trip = await storage.createTrip(tripData);
@@ -70,24 +107,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/trips", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
-
+  app.get("/api/trips", requireAuth, async (req: AuthenticatedRequest, res: Response) => {
     try {
-      const trips = await storage.getTripsByUserId(req.user.id);
+      const trips = await storage.getTripsByUserId(req.user!.id);
       res.json(trips);
     } catch (err) {
       res.status(500).json({ error: "Failed to fetch trips" });
     }
   });
 
-  app.get("/api/trips/:id", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
-
+  app.get("/api/trips/:id", requireAuth, async (req: AuthenticatedRequest, res: Response) => {
     try {
       const tripId = parseInt(req.params.id);
       if (isNaN(tripId)) {
@@ -100,7 +129,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Ensure the trip belongs to the authenticated user
-      if (trip.userId !== req.user.id) {
+      if (trip.userId !== req.user!.id) {
         return res.status(403).json({ error: "Forbidden" });
       }
       
@@ -111,15 +140,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Orders API
-  app.post("/api/orders", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
-
+  app.post("/api/orders", requireAuth, async (req: AuthenticatedRequest, res: Response) => {
     try {
       const orderData = insertOrderSchema.parse({
         ...req.body,
-        userId: req.user.id,
+        userId: req.user!.id,
         status: "completed"
       });
       
@@ -133,13 +158,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/orders", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
-
+  app.get("/api/orders", requireAuth, async (req: AuthenticatedRequest, res: Response) => {
     try {
-      const orders = await storage.getOrdersByUserId(req.user.id);
+      const orders = await storage.getOrdersByUserId(req.user!.id);
       res.json(orders);
     } catch (err) {
       res.status(500).json({ error: "Failed to fetch orders" });
@@ -147,10 +168,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Stripe Payment API Routes
-  app.post("/api/create-payment-intent", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
+  app.post("/api/create-payment-intent", requireAuth, async (req: AuthenticatedRequest, res: Response) => {
 
     try {
       const { planId, amount } = req.body;
@@ -178,7 +196,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         currency: "usd",
         metadata: {
           planId: planId.toString(),
-          userId: req.user.id.toString(),
+          userId: req.user!.id.toString(),
           planName: plan.name
         },
       });
