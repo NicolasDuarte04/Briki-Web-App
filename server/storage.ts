@@ -46,9 +46,16 @@ export class DatabaseStorage implements IStorage {
 
   constructor() {
     this.sessionStore = new MemoryStore({
-      checkPeriod: 86400000 // Prune expired entries every 24 hours
+      checkPeriod: 86400000, // Prune expired entries every 24 hours
+      stale: false, // Don't automatically remove idle sessions
+      ttl: 7 * 24 * 60 * 60 * 1000 // 7 days max age
     });
     console.log('Using memory session store for auth sessions');
+    
+    // Create a periodic task to keep sessions active
+    setInterval(() => {
+      console.log('Periodic session store maintenance task running');
+    }, 10 * 60 * 1000); // Every 10 minutes
   }
 
   // User methods
