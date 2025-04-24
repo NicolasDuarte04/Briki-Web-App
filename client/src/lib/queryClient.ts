@@ -70,22 +70,20 @@ export const getQueryFn: <T>(options: {
     console.log(`Cookies before query ${queryKey[0]}:`, cookies);
     
     try {
+      // Use the apiRequest function to ensure consistent headers
       const res = await fetch(queryKey[0] as string, {
+        method: 'GET',
         credentials: "include",
+        mode: 'cors' as RequestMode,
         headers: {
           "Cache-Control": "no-cache",
           "Pragma": "no-cache",
-          "Accept": "application/json"
+          "Accept": "application/json",
+          "X-Requested-With": "XMLHttpRequest"
         }
       });
       
       console.log(`Query response: ${queryKey[0]} status:`, res.status);
-      
-      // Check for and log Set-Cookie headers
-      const setCookieHeader = res.headers.get('set-cookie');
-      if (setCookieHeader) {
-        console.log(`Set-Cookie header received from query ${queryKey[0]}:`, setCookieHeader);
-      }
       
       // Log cookies after response
       setTimeout(() => {
@@ -98,10 +96,16 @@ export const getQueryFn: <T>(options: {
       }
 
       await throwIfResNotOk(res);
-      const data = await res.json();
-      console.log(`Query data received: ${queryKey[0]}`, 
+      
+      try {
+        const data = await res.json();
+        console.log(`Query data received: ${queryKey[0]}`, 
                   data ? (typeof data === 'object' ? 'object data' : data) : 'no data');
-      return data;
+        return data;
+      } catch (parseError) {
+        console.error(`Error parsing JSON from ${queryKey[0]}:`, parseError);
+        return null;
+      }
     } catch (err) {
       console.error(`Query error: ${queryKey[0]}`, err);
       throw err;

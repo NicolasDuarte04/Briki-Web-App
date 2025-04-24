@@ -34,14 +34,15 @@ export function setupAuth(app: Express) {
 
   const sessionSettings: session.SessionOptions = {
     secret: process.env.SESSION_SECRET || "briki-travel-insurance-secret",
-    resave: false, // Don't save session if unmodified
-    saveUninitialized: false, // Don't create session until something is stored
+    resave: true, // Save the session even if unmodified
+    saveUninitialized: true, // Save new sessions even if they haven't been modified
     store: storage.sessionStore,
     name: 'briki.sid', // Custom name to avoid conflicts
+    rolling: true, // Forces the session identifier cookie to be reset on all responses
     cookie: {
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-      sameSite: isDevelopment ? 'lax' : 'none', // 'lax' in dev, 'none' in production to allow cross-origin
-      secure: !isDevelopment, // false in dev, true in production
+      sameSite: 'lax', // Always use 'lax' for better compatibility
+      secure: false, // Set to false for development environment
       httpOnly: true,
       path: '/'
     }

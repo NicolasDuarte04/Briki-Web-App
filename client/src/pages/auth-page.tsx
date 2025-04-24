@@ -84,6 +84,32 @@ export default function AuthPage() {
     });
   };
   
+  // Force refresh auth status when auth page is loaded
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        // Make a direct fetch request to check authentication status
+        const response = await fetch('/api/user', {
+          credentials: 'include',
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Accept': 'application/json',
+          }
+        });
+        
+        if (response.ok) {
+          console.log("AuthPage: Direct auth check - User is authenticated");
+        } else {
+          console.log("AuthPage: Direct auth check - No authenticated user");
+        }
+      } catch (error) {
+        console.error("AuthPage: Error checking auth status:", error);
+      }
+    };
+    
+    checkAuth();
+  }, []);
+  
   // Redirect if user is logged in
   useEffect(() => {
     if (user) {
@@ -94,13 +120,27 @@ export default function AuthPage() {
     }
   }, [user, navigate]);
   
-  // Update redirect after successful login or registration
+  // Handle login success
   useEffect(() => {
-    if (loginMutation.isSuccess || registerMutation.isSuccess) {
-      console.log("AuthPage: Login/Registration successful, redirecting to home page");
-      navigate("/");
+    if (loginMutation.isSuccess) {
+      console.log("AuthPage: Login successful, redirecting to home page");
+      // Small delay to allow cookie to be set
+      setTimeout(() => {
+        navigate("/");
+      }, 500);
     }
-  }, [loginMutation.isSuccess, registerMutation.isSuccess, navigate]);
+  }, [loginMutation.isSuccess, navigate]);
+  
+  // Handle registration success
+  useEffect(() => {
+    if (registerMutation.isSuccess) {
+      console.log("AuthPage: Registration successful, redirecting to home page");
+      // Small delay to allow cookie to be set
+      setTimeout(() => {
+        navigate("/");
+      }, 500);
+    }
+  }, [registerMutation.isSuccess, navigate]);
 
   return (
     <div className="flex min-h-screen">
