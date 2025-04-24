@@ -142,13 +142,13 @@ export default function Navbar() {
                 onClick={() => navigate("/auth")}
                 className="text-gray-500 hover:text-primary"
               >
-                Sign in
+                {t('signIn')}
               </Button>
               <Button 
                 onClick={() => navigate("/auth")}
                 className="ml-2"
               >
-                Sign up
+                {t('signUp')}
               </Button>
             </div>
           )}
@@ -261,7 +261,7 @@ export default function Navbar() {
                           }}
                           className="w-full mb-2"
                         >
-                          Sign in
+                          {t('signIn')}
                         </Button>
                         <Button
                           onClick={() => {
@@ -270,7 +270,7 @@ export default function Navbar() {
                           }}
                           className="w-full"
                         >
-                          Sign up
+                          {t('signUp')}
                         </Button>
                       </div>
                     </div>
