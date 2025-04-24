@@ -107,8 +107,23 @@ export default function TripInfoPage() {
     mutationFn: async (tripData: TripFormValues) => {
       // Check if the user is logged in first via a quick auth check
       try {
-        const authCheck = await fetch("/api/user", { credentials: "include" });
+        const token = localStorage.getItem('auth_token');
+        
+        if (!token) {
+          console.log("No auth token found, user needs to log in");
+          throw new Error("Authentication required. Please log in to save trip details.");
+        }
+        
+        const authCheck = await fetch("/api/user", { 
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Cache-Control": "no-cache"
+          }
+        });
+        
         if (authCheck.status === 401) {
+          console.log("Auth token invalid or expired");
+          localStorage.removeItem('auth_token'); // Clear invalid token
           throw new Error("Authentication required. Please log in to save trip details.");
         }
         
@@ -125,7 +140,30 @@ export default function TripInfoPage() {
         };
         
         console.log("Sending trip data to API:", apiData);
-        const res = await apiRequest("POST", "/api/trips", apiData);
+        // Get token again to make sure it's the latest
+        const currentToken = localStorage.getItem('auth_token');
+        if (!currentToken) {
+          throw new Error("Authentication token missing");
+        }
+        
+        // Use the token in the request
+        const res = await fetch("/api/trips", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${currentToken}`,
+            "Cache-Control": "no-cache"
+          },
+          body: JSON.stringify(apiData)
+        });
+        
+        console.log("Trip API response status:", res.status);
+        
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => ({ message: res.statusText || "Failed to save trip" }));
+          throw new Error(errorData.message || "Failed to save trip");
+        }
+        
         return await res.json();
       } catch (error) {
         console.error("Error submitting trip data:", error);
