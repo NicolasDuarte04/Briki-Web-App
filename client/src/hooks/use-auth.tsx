@@ -92,26 +92,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     mutationFn: async (credentials: LoginData) => {
       console.log("Login attempt for:", credentials.username);
       try {
-        // Use apiRequest to ensure consistency with other requests
-        const response = await apiRequest("POST", "/api/login", credentials);
+        // Make a direct fetch to control headers exactly
+        const response = await fetch("/api/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Cache-Control": "no-cache"
+          },
+          body: JSON.stringify(credentials)
+        });
+        
         console.log("Login response status:", response.status);
         
-        // Parse response
-        const userData = await response.json();
-        console.log("Login successful, user data received");
-        return userData;
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(errorText || response.statusText || "Login failed");
+        }
+        
+        // Parse response which should now include {user, token}
+        const authData = await response.json();
+        console.log("Login successful, auth data received");
+        return authData as TokenResponse;
       } catch (error) {
         console.error("Login error:", error);
         throw error;
       }
     },
-    onSuccess: (user: SelectUser) => {
-      queryClient.setQueryData(["/api/user"], user);
-      // Ensure we refetch user data after login
-      refetch();
+    onSuccess: (data: TokenResponse) => {
+      // Store token in localStorage
+      localStorage.setItem('auth_token', data.token);
+      setAuthToken(data.token);
+      
+      // Store user data in query cache
+      queryClient.setQueryData(["/api/user"], data.user);
+      
       toast({
         title: "Login successful",
-        description: `Welcome back, ${user.username}!`,
+        description: `Welcome back, ${data.user.username}!`,
       });
     },
     onError: (error: Error) => {
@@ -128,26 +145,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     mutationFn: async (credentials: InsertUser) => {
       console.log("Registration attempt for:", credentials.username);
       try {
-        // Use apiRequest to ensure consistency with other requests
-        const response = await apiRequest("POST", "/api/register", credentials);
+        // Make a direct fetch to control headers exactly
+        const response = await fetch("/api/register", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Cache-Control": "no-cache"
+          },
+          body: JSON.stringify(credentials)
+        });
+        
         console.log("Registration response status:", response.status);
         
-        // Parse response
-        const userData = await response.json();
-        console.log("Registration successful, user data received");
-        return userData;
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(errorText || response.statusText || "Registration failed");
+        }
+        
+        // Parse response which should now include {user, token}
+        const authData = await response.json();
+        console.log("Registration successful, auth data received");
+        return authData as TokenResponse;
       } catch (error) {
         console.error("Registration error:", error);
         throw error;
       }
     },
-    onSuccess: (user: SelectUser) => {
-      queryClient.setQueryData(["/api/user"], user);
-      // Ensure we refetch user data after registration
-      refetch();
+    onSuccess: (data: TokenResponse) => {
+      // Store token in localStorage
+      localStorage.setItem('auth_token', data.token);
+      setAuthToken(data.token);
+      
+      // Store user data in query cache
+      queryClient.setQueryData(["/api/user"], data.user);
+      
       toast({
         title: "Registration successful",
-        description: `Welcome to Briki, ${user.username}!`,
+        description: `Welcome to Briki, ${data.user.username}!`,
       });
     },
     onError: (error: Error) => {
@@ -164,19 +198,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     mutationFn: async () => {
       console.log("Logout attempt");
       try {
-        // Use apiRequest to ensure consistency with other requests
-        const response = await apiRequest("POST", "/api/logout");
-        console.log("Logout response status:", response.status);
+        // Only try to logout on the server if we have a token
+        if (authToken) {
+          const response = await fetch("/api/logout", {
+            method: "POST",
+            headers: {
+              "Authorization": `Bearer ${authToken}`,
+              "Content-Type": "application/json",
+              "Cache-Control": "no-cache"
+            }
+          });
+          console.log("Logout response status:", response.status);
+        }
         return null;
       } catch (error) {
         console.error("Logout error:", error);
-        throw error;
+        // Even if server-side logout fails, we'll still clear local state
+        return null;
       }
     },
     onSuccess: () => {
+      // Clear token from localStorage
+      localStorage.removeItem('auth_token');
+      setAuthToken(null);
+      
+      // Clear user data from query cache
       queryClient.setQueryData(["/api/user"], null);
-      // Invalidate the user query to ensure we refetch after logout
       queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      
       toast({
         title: "Logged out",
         description: "You have been successfully logged out.",
@@ -184,9 +233,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onError: (error: Error) => {
       console.error("Logout mutation error:", error);
+      
+      // Even if there's an error, attempt to clear local auth state
+      localStorage.removeItem('auth_token');
+      setAuthToken(null);
+      queryClient.setQueryData(["/api/user"], null);
+      
       toast({
-        title: "Logout failed",
-        description: error.message || "Could not log out. Please try again.",
+        title: "Logout issue",
+        description: "You've been logged out locally, but there was an issue with the server: " + error.message,
         variant: "destructive",
       });
     },
