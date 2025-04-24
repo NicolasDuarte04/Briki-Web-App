@@ -37,11 +37,9 @@ export const insurancePlans = pgTable("insurance_plans", {
   adventureActivities: boolean("adventure_activities").default(false),
   rentalCarCoverage: integer("rental_car_coverage"),
   rating: text("rating"),
-  reviews: integer("reviews"),
+  reviews: integer("reviews").default(0),
   country: text("country").default("all"),
-  popularFeature: text("popular_feature"),
-  providerLogo: text("provider_logo"),
-  exclusions: text("exclusions"),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const orders = pgTable("orders", {
