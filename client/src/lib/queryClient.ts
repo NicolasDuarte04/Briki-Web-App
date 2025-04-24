@@ -12,15 +12,30 @@ export async function apiRequest(
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
-  const res = await fetch(url, {
+  console.log(`API request: ${method} ${url}`, data);
+  
+  const requestOptions = {
     method,
-    headers: data ? { "Content-Type": "application/json" } : {},
+    headers: {
+      ...(data ? { "Content-Type": "application/json" } : {}),
+      // Add cache control headers to prevent caching of auth responses
+      "Cache-Control": "no-cache",
+      "Pragma": "no-cache"
+    },
     body: data ? JSON.stringify(data) : undefined,
-    credentials: "include",
-  });
-
-  await throwIfResNotOk(res);
-  return res;
+    credentials: "include" as RequestCredentials,
+  };
+  
+  try {
+    const res = await fetch(url, requestOptions);
+    console.log(`API response: ${method} ${url} status:`, res.status);
+    
+    await throwIfResNotOk(res);
+    return res;
+  } catch (err) {
+    console.error(`API error: ${method} ${url}`, err);
+    throw err;
+  }
 }
 
 type UnauthorizedBehavior = "returnNull" | "throw";
@@ -29,16 +44,33 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const res = await fetch(queryKey[0] as string, {
-      credentials: "include",
-    });
+    console.log(`Query request: ${queryKey[0]}`);
+    
+    try {
+      const res = await fetch(queryKey[0] as string, {
+        credentials: "include",
+        headers: {
+          "Cache-Control": "no-cache",
+          "Pragma": "no-cache"
+        }
+      });
+      
+      console.log(`Query response: ${queryKey[0]} status:`, res.status);
 
-    if (unauthorizedBehavior === "returnNull" && res.status === 401) {
-      return null;
+      if (unauthorizedBehavior === "returnNull" && res.status === 401) {
+        console.log(`Query unauthorized: ${queryKey[0]}`);
+        return null;
+      }
+
+      await throwIfResNotOk(res);
+      const data = await res.json();
+      console.log(`Query data received: ${queryKey[0]}`, 
+                  data ? (typeof data === 'object' ? 'object data' : data) : 'no data');
+      return data;
+    } catch (err) {
+      console.error(`Query error: ${queryKey[0]}`, err);
+      throw err;
     }
-
-    await throwIfResNotOk(res);
-    return await res.json();
   };
 
 export const queryClient = new QueryClient({
