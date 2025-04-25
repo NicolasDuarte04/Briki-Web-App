@@ -1,0 +1,53 @@
+We’ve extracted verified data from official public brochures for five real travel insurance providers: AXA, IATI, Assist Card, SURA, and Starr. Each provider’s plan is already formatted as JSON.
+
+Here’s what I need you to do:
+
+---
+
+### 1. Replace Placeholder Plans with Real Ones
+
+- Remove all fake/hardcoded plans like "Turismo Seguro" or "SecurViajes".
+- Import the real plans from a new file called `plansData.js` that contains the five real JSON plan objects (I'll paste them next).
+- Use this array to dynamically populate the PlansScreen and the plan comparison UI.
+
+---
+
+### 2. Display Key Features Professionally
+
+- For each plan card, show:
+  - Plan name
+  - Provider name
+  - Top 3–4 benefits (e.g., “Medical up to $100,000”, “Baggage loss up to $1,500”)
+  - A “More Info” toggle to expand full details (exclusions, extra services, legal assistance, etc.)
+  - An optional tag: **“Data sourced from official AXA brochure”** (or matching provider)
+
+---
+
+### 3. Add Customer-Facing Disclaimer (Professional, Not Deterring)
+
+At the bottom of each plan, or at the bottom of the screen, add this disclaimer in a light gray font:
+
+> **Plan information is based on official public documents from each provider, including brochures and policy summaries. We strive to maintain accuracy and transparency while we finalize formal partnerships with insurers. Please confirm plan details with the provider before purchasing.**
+
+This builds trust without scaring off users.
+
+---
+
+### 4. Plan Comparison Improvements
+
+- When a user selects two or more plans to compare:
+  - Highlight key differences in coverage amounts
+  - Keep formatting clean and scrollable
+  - Use colored badges or bold labels for important perks (e.g., “Evacuation included”, “Sports coverage: Yes”)
+
+---
+
+### 5. Optional Polish (if time allows)
+
+- Add "Save this plan" or "Add to favorites" button (can store locally)
+- Add “Recommended for You” badge to the plan with the highest medical coverage
+- Ensure layout still looks good on iPhone and Android screens
+
+---
+
+### Next: I’ll paste all 5 JSON objects (or you can reference `plansData.js`) now.
