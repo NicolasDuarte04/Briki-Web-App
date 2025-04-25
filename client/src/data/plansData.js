@@ -170,8 +170,61 @@ export const insurancePlans = [
       "Mental illness",
       "Illegal activities"
     ]
+  },
+  {
+    id: 5,
+    name: "Travel Insurance (Standard)",
+    provider: "SURA",
+    basePrice: 145,
+    medicalCoverage: 175000, // Estimated value
+    preExistingConditions: "Covered if complications arise",
+    dentalEmergency: "Included",
+    emergencyTransfer: "To facility or home",
+    hospitalizationDailyCompensation: "After 48h, up to 5 days",
+    postCareMedications: "Covered",
+    homeMedicalCare: "During trip",
+    telephoneMedicalGuidance: "24/7",
+    repatriation: "Full coverage",
+    companionReturnInCaseOfDeath: "Included",
+    internationalEvacuation: "Managed by SURA",
+    hotelExtensionDueToIllness: "Insured + companion",
+    earlyReturnTransport: "Paid if emergency",
+    accidentalDeath: "Beneficiaries compensated",
+    pregnancy: "Covered to week 32",
+    sportAccidents: "Non-professional; protection required",
+    adventureActivities: true, // Based on "sportAccidents" field
+    covidCoverage: true,
+    tripCancellation: {
+      medicalReason: "Covered (with certification)",
+      transportationCompanyFailure: "Covered",
+      jobRelated: "Covered",
+      naturalDisaster: "Covered",
+      pregnancy: "Covered",
+      juryDuty: "Covered",
+      familyDeath: "Covered",
+      partialOrFullTripLoss: "Reimbursed"
+    },
+    baggageAndDocuments: {
+      baggageLoss: "Reimbursed (24h/48h)",
+      baggageDelay: "Reimbursed",
+      stolenDocuments: "Reimbursed"
+    },
+    baggageProtection: 1200, // Estimated value
+    baggageDelay: "Reimbursed",
+    rating: "4.8",
+    reviews: 176,
+    country: "Colombia",
+    extras: [
+      "Legal counseling",
+      "WhatsApp support (24/7)",
+      "USD/COP reimbursement system",
+      "Support phone lines",
+      "Companion escort"
+    ],
+    exclusions: [
+      "See full policy"
+    ]
   }
-  // Will add more plans as you provide them
 ];
 
 // Helper functions to work with the insurance plans data
