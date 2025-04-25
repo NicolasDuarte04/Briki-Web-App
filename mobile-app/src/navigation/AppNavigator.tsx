@@ -2,8 +2,8 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useAuth } from '../contexts/AuthContext';
+import { StyleSheet } from 'react-native';
 
-// Screens - will be created next
 import HomeScreen from '../screens/HomeScreen';
 import AuthScreen from '../screens/AuthScreen';
 import TripInfoScreen from '../screens/TripInfoScreen';
@@ -11,154 +11,159 @@ import InsurancePlansScreen from '../screens/InsurancePlansScreen';
 import CheckoutScreen from '../screens/CheckoutScreen';
 import WeatherRiskScreen from '../screens/WeatherRiskScreen';
 import ProfileScreen from '../screens/ProfileScreen';
-
-// Tab Icons
-import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../utils/theme';
 
-// Define param lists for type safety
-export type AuthStackParamList = {
-  Auth: undefined;
-};
+import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 
+// Define the main stack navigator param list
 export type MainStackParamList = {
-  Home: undefined;
+  Auth: undefined;
+  Main: undefined;
   TripInfo: undefined;
-  InsurancePlans: undefined;
+  InsurancePlans: { tripId?: number; filter?: string };
+  WeatherRisk: { destination?: string };
   Checkout: { planId: number };
-  WeatherRisk: undefined;
   Profile: undefined;
 };
 
-export type TabNavigatorParamList = {
-  HomeTab: undefined;
-  InsuranceTab: undefined;
-  WeatherTab: undefined;
-  ProfileTab: undefined;
-};
+// Create the navigators
+const Stack = createStackNavigator<MainStackParamList>();
+const Tab = createBottomTabNavigator();
 
-// Create navigators
-const AuthStack = createStackNavigator<AuthStackParamList>();
-const MainStack = createStackNavigator<MainStackParamList>();
-const Tab = createBottomTabNavigator<TabNavigatorParamList>();
-
-// Auth navigation when user is not logged in
-const AuthNavigator = () => {
-  return (
-    <AuthStack.Navigator 
-      screenOptions={{
-        headerShown: false,
-      }}
-    >
-      <AuthStack.Screen name="Auth" component={AuthScreen} />
-    </AuthStack.Navigator>
-  );
-};
-
-// Tab navigator for main app functionality
-const TabNavigator = () => {
+// Main tab navigator (after authentication)
+const MainTabNavigator = () => {
   return (
     <Tab.Navigator
-      screenOptions={({ route }) => ({
-        tabBarIcon: ({ focused, color, size }) => {
-          let iconName;
-
-          if (route.name === 'HomeTab') {
-            iconName = focused ? 'home' : 'home-outline';
-          } else if (route.name === 'InsuranceTab') {
-            iconName = focused ? 'shield' : 'shield-outline';
-          } else if (route.name === 'WeatherTab') {
-            iconName = focused ? 'cloud' : 'cloud-outline';
-          } else if (route.name === 'ProfileTab') {
-            iconName = focused ? 'person' : 'person-outline';
-          }
-
-          return <Ionicons name={iconName as any} size={size} color={color} />;
-        },
-        tabBarActiveTintColor: COLORS.primary,
-        tabBarInactiveTintColor: COLORS.textSecondary,
+      screenOptions={{
         headerShown: false,
-      })}
+        tabBarActiveTintColor: COLORS.primary,
+        tabBarInactiveTintColor: COLORS.gray,
+        tabBarStyle: styles.tabBar,
+        tabBarLabelStyle: styles.tabBarLabel,
+      }}
     >
       <Tab.Screen 
-        name="HomeTab" 
+        name="Home" 
         component={HomeScreen} 
-        options={{ title: 'Inicio' }}
+        options={{
+          tabBarLabel: 'Inicio',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="home" color={color} size={size} />
+          ),
+        }}
       />
       <Tab.Screen 
-        name="InsuranceTab" 
+        name="Plans" 
         component={InsurancePlansScreen} 
-        options={{ title: 'Seguros' }}
+        options={{
+          tabBarLabel: 'Seguros',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="shield-check" color={color} size={size} />
+          ),
+        }}
       />
       <Tab.Screen 
-        name="WeatherTab" 
+        name="Weather" 
         component={WeatherRiskScreen} 
-        options={{ title: 'Clima' }}
+        options={{
+          tabBarLabel: 'Clima',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="weather-partly-cloudy" color={color} size={size} />
+          ),
+        }}
       />
       <Tab.Screen 
-        name="ProfileTab" 
+        name="Profile" 
         component={ProfileScreen} 
-        options={{ title: 'Perfil' }}
+        options={{
+          tabBarLabel: 'Perfil',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="person" color={color} size={size} />
+          ),
+        }}
       />
     </Tab.Navigator>
   );
 };
 
-// Main stack navigator for all main screens
-const MainNavigator = () => {
-  return (
-    <MainStack.Navigator
-      screenOptions={{
-        headerTintColor: COLORS.white,
-        headerStyle: {
-          backgroundColor: COLORS.primary,
-        },
-      }}
-    >
-      <MainStack.Screen 
-        name="Home" 
-        component={TabNavigator}
-        options={{ headerShown: false }}
-      />
-      <MainStack.Screen 
-        name="TripInfo" 
-        component={TripInfoScreen}
-        options={{ title: 'Información del Viaje' }}
-      />
-      <MainStack.Screen 
-        name="InsurancePlans" 
-        component={InsurancePlansScreen}
-        options={{ title: 'Planes de Seguro' }}
-      />
-      <MainStack.Screen 
-        name="Checkout" 
-        component={CheckoutScreen}
-        options={{ title: 'Pago' }}
-      />
-      <MainStack.Screen 
-        name="WeatherRisk" 
-        component={WeatherRiskScreen}
-        options={{ title: 'Riesgos Climáticos' }}
-      />
-      <MainStack.Screen 
-        name="Profile" 
-        component={ProfileScreen}
-        options={{ title: 'Mi Perfil' }}
-      />
-    </MainStack.Navigator>
-  );
-};
-
-// Root navigator that handles auth state
+// Main app navigator
 const AppNavigator = () => {
   const { user, isLoading } = useAuth();
 
+  // Show loading screen while checking auth status
   if (isLoading) {
-    // TODO: Return a loading screen component
-    return null;
+    return null; // In a real app, you would show a splash screen here
   }
 
-  return user ? <MainNavigator /> : <AuthNavigator />;
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      {user ? (
+        <>
+          <Stack.Screen name="Main" component={MainTabNavigator} />
+          <Stack.Screen 
+            name="TripInfo" 
+            component={TripInfoScreen}
+            options={{
+              headerShown: true,
+              title: 'Información del Viaje',
+              headerTintColor: COLORS.white,
+              headerStyle: { backgroundColor: COLORS.primary }
+            }}
+          />
+          <Stack.Screen 
+            name="InsurancePlans" 
+            component={InsurancePlansScreen}
+            options={{
+              headerShown: true,
+              title: 'Planes de Seguro',
+              headerTintColor: COLORS.white,
+              headerStyle: { backgroundColor: COLORS.primary }
+            }}
+          />
+          <Stack.Screen 
+            name="WeatherRisk" 
+            component={WeatherRiskScreen}
+            options={{
+              headerShown: true,
+              title: 'Riesgos Climáticos',
+              headerTintColor: COLORS.white,
+              headerStyle: { backgroundColor: COLORS.primary }
+            }}
+          />
+          <Stack.Screen 
+            name="Checkout" 
+            component={CheckoutScreen}
+            options={{
+              headerShown: true,
+              title: 'Finalizar Compra',
+              headerTintColor: COLORS.white,
+              headerStyle: { backgroundColor: COLORS.primary }
+            }}
+          />
+        </>
+      ) : (
+        <Stack.Screen name="Auth" component={AuthScreen} />
+      )}
+    </Stack.Navigator>
+  );
 };
+
+const styles = StyleSheet.create({
+  tabBar: {
+    height: 60,
+    paddingBottom: 5,
+    paddingTop: 5,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border,
+    backgroundColor: COLORS.white,
+  },
+  tabBarLabel: {
+    fontSize: 12,
+  },
+});
 
 export default AppNavigator;

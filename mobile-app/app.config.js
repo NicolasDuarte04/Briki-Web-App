@@ -1,0 +1,54 @@
+import 'dotenv/config';
+
+export default {
+  expo: {
+    name: "Briki Travel Insurance",
+    slug: "briki-travel-insurance",
+    version: "1.0.0",
+    orientation: "portrait",
+    icon: "./assets/icon.png",
+    userInterfaceStyle: "light",
+    splash: {
+      image: "./assets/splash.png",
+      resizeMode: "contain",
+      backgroundColor: "#4B76E5"
+    },
+    updates: {
+      fallbackToCacheTimeout: 0
+    },
+    assetBundlePatterns: [
+      "**/*"
+    ],
+    ios: {
+      supportsTablet: true,
+      bundleIdentifier: "com.briki.travelinsurance",
+      buildNumber: "1.0.0"
+    },
+    android: {
+      adaptiveIcon: {
+        foregroundImage: "./assets/adaptive-icon.png",
+        backgroundColor: "#4B76E5"
+      },
+      package: "com.briki.travelinsurance",
+      versionCode: 1
+    },
+    web: {
+      favicon: "./assets/favicon.png"
+    },
+    extra: {
+      eas: {
+        projectId: "briki-travel-insurance"
+      },
+      apiUrl: process.env.API_URL || "https://api.briki.insurance",
+    },
+    plugins: [
+      [
+        "expo-updates",
+        {
+          username: "briki"
+        }
+      ]
+    ],
+    description: "Intelligent travel insurance comparison platform for Colombia and Mexico markets"
+  }
+};

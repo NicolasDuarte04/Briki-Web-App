@@ -1,136 +1,128 @@
-import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
+import React, { createContext, ReactNode, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useMutation, useQuery } from 'react-query';
-
+import { QueryClient, useQuery, useMutation } from 'react-query';
 import { api } from '../services/api';
-import { User } from '../types/user';
+import { User } from '../types/insurance';
 
-type AuthContextData = {
+interface AuthContextData {
   user: User | null;
   isLoading: boolean;
   error: Error | null;
   login: (username: string, password: string) => Promise<void>;
   register: (username: string, password: string, email: string) => Promise<void>;
   logout: () => Promise<void>;
-};
+}
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
+export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(null);
+  const [error, setError] = useState<Error | null>(null);
 
-  // Fetch current user
-  const { 
-    data: user, 
-    error, 
-    refetch: refetchUser 
-  } = useQuery<User | null, Error>(
-    ['user'],
-    async () => {
+  // Check if user is already logged in on app start
+  useEffect(() => {
+    const loadUser = async () => {
       try {
-        // Check if token exists
         const token = await AsyncStorage.getItem('@Briki:token');
         
-        if (!token) {
-          return null;
+        if (token) {
+          // Get user data from API
+          const response = await api.get('/api/user');
+          setUser(response.data);
         }
-        
-        const response = await api.get('/api/user');
-        return response.data;
-      } catch (error) {
-        // Clear token on auth error
+      } catch (err) {
+        console.error('Error loading user:', err);
+        // Clear any invalid tokens
         await AsyncStorage.removeItem('@Briki:token');
-        return null;
-      }
-    },
-    {
-      onSettled: () => {
+      } finally {
         setIsLoading(false);
-      },
-    }
-  );
-
-  // Login mutation
-  const loginMutation = useMutation(
-    async ({ username, password }: { username: string; password: string }) => {
-      const response = await api.post('/api/login', { username, password });
-      return response.data;
-    },
-    {
-      onSuccess: async (data) => {
-        // Store the token
-        await AsyncStorage.setItem('@Briki:token', data.token);
-        // Update auth header for future requests
-        api.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
-        // Refetch user data
-        refetchUser();
-      },
-    }
-  );
-
-  // Register mutation
-  const registerMutation = useMutation(
-    async ({ username, password, email }: { username: string; password: string; email: string }) => {
-      const response = await api.post('/api/register', { username, password, email });
-      return response.data;
-    },
-    {
-      onSuccess: async (data) => {
-        // Store the token
-        await AsyncStorage.setItem('@Briki:token', data.token);
-        // Update auth header for future requests
-        api.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
-        // Refetch user data
-        refetchUser();
-      },
-    }
-  );
-
-  // Logout mutation
-  const logoutMutation = useMutation(
-    async () => {
-      await api.post('/api/logout');
-    },
-    {
-      onSuccess: async () => {
-        // Clear token
-        await AsyncStorage.removeItem('@Briki:token');
-        // Remove auth header
-        delete api.defaults.headers.common['Authorization'];
-        // Refetch (will return null now)
-        refetchUser();
-      },
-    }
-  );
-
-  // Set token on initial load
-  useEffect(() => {
-    const loadToken = async () => {
-      const token = await AsyncStorage.getItem('@Briki:token');
-      if (token) {
-        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       }
     };
-    
-    loadToken();
+
+    loadUser();
   }, []);
 
+  // Login function
   const login = async (username: string, password: string) => {
-    await loginMutation.mutateAsync({ username, password });
+    try {
+      setError(null);
+      setIsLoading(true);
+      
+      // Call login API
+      const response = await api.post('/api/login', { username, password });
+      const data = response.data;
+      
+      // Save token to AsyncStorage
+      if (data.token) {
+        await AsyncStorage.setItem('@Briki:token', data.token);
+        
+        // Set user
+        setUser(data.user);
+      } else {
+        throw new Error('No se recibió un token válido');
+      }
+    } catch (err: any) {
+      setError(err);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
   };
 
+  // Register function
   const register = async (username: string, password: string, email: string) => {
-    await registerMutation.mutateAsync({ username, password, email });
+    try {
+      setError(null);
+      setIsLoading(true);
+      
+      // Call register API
+      const response = await api.post('/api/register', { username, password, email });
+      const data = response.data;
+      
+      // Save token to AsyncStorage
+      if (data.token) {
+        await AsyncStorage.setItem('@Briki:token', data.token);
+        
+        // Set user
+        setUser(data.user);
+      } else {
+        throw new Error('No se recibió un token válido');
+      }
+    } catch (err: any) {
+      setError(err);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
   };
 
+  // Logout function
   const logout = async () => {
-    await logoutMutation.mutateAsync();
+    try {
+      setError(null);
+      setIsLoading(true);
+      
+      // Call logout API
+      await api.post('/api/logout');
+      
+      // Remove token from AsyncStorage
+      await AsyncStorage.removeItem('@Briki:token');
+      
+      // Clear user
+      setUser(null);
+    } catch (err: any) {
+      setError(err);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <AuthContext.Provider
       value={{
-        user: user || null,
+        user,
         isLoading,
         error,
         login,
@@ -141,14 +133,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       {children}
     </AuthContext.Provider>
   );
-};
+}
 
-export const useAuth = () => {
+export function useAuth() {
   const context = useContext(AuthContext);
-  
   if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
-  
   return context;
-};
+}
