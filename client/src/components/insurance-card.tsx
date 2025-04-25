@@ -78,11 +78,11 @@ export default function InsuranceCard({ plan, isSelected, onToggleSelect, onSele
           />
         </button>
         
-        {/* Top badge - Moved down to avoid covering provider name */}
+        {/* Added as a ribbon on top of card */}
         {getBadgeText() && (
-          <div className="absolute left-0 top-16 z-10">
+          <div className="absolute top-0 right-0 z-10">
             <Badge 
-              className="rounded-r-xl rounded-l-none py-1 px-3 bg-primary text-white font-medium"
+              className="rounded-bl-xl rounded-tr-xl rounded-br-none rounded-tl-none py-1 px-3 bg-primary text-white font-medium"
               variant="default"
             >
               {getBadgeText()}
