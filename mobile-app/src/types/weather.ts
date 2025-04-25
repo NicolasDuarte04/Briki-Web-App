@@ -1,8 +1,8 @@
 export enum RiskLevel {
-  LOW = 'low',
-  MODERATE = 'moderate',
-  HIGH = 'high',
-  EXTREME = 'extreme'
+  LOW = 'Bajo',
+  MODERATE = 'Moderado',
+  HIGH = 'Alto',
+  EXTREME = 'Extremo'
 }
 
 export interface WeatherRiskFactor {
@@ -11,16 +11,18 @@ export interface WeatherRiskFactor {
   description: string;
 }
 
+export interface MonthlyWeatherData {
+  safetyScore: number;
+  weatherRisks: WeatherRiskFactor[];
+}
+
 export interface DestinationRisk {
   country: string;
   city: string;
   safetyScore: number;
   weatherRisks: WeatherRiskFactor[];
   insuranceRecommendation: string;
-  seasons: {
-    [key: number]: { 
-      safetyScore: number;
-      weatherRisks: WeatherRiskFactor[];
-    }
+  seasons?: {
+    [month: number]: MonthlyWeatherData;
   };
 }

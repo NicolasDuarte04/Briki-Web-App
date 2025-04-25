@@ -1,49 +1,66 @@
-import { MD3LightTheme as DefaultTheme } from 'react-native-paper';
+import { MD3DarkTheme, MD3LightTheme } from 'react-native-paper';
 
 export const COLORS = {
-  primary: '#0056b3',
-  primaryLight: '#4d8cce',
-  primaryDark: '#003876',
-  secondary: '#ff9800',
-  secondaryLight: '#ffc947',
-  secondaryDark: '#c66900',
-  accent: '#4caf50',
-  background: '#f8f9fa',
-  surface: '#ffffff',
-  error: '#d32f2f',
-  text: '#212121',
-  textSecondary: '#757575',
-  disabled: '#bdbdbd',
-  border: '#e0e0e0',
-  notification: '#ff9800',
-  card: '#ffffff',
-  black: '#000000',
-  white: '#ffffff',
-  gray: '#9e9e9e',
-  grayLight: '#e0e0e0',
-  grayDark: '#616161',
-  transparent: 'transparent',
+  primary: '#4B76E5',
+  primaryLight: '#8BB2FE',
+  primaryDark: '#1E4AAD',
+  secondary: '#FF8A47',
+  accent: '#01B574',
+  background: '#F7F9FC',
+  surface: '#FFFFFF',
+  text: '#2D3748',
+  textSecondary: '#718096',
+  border: '#E2E8F0',
+  divider: '#EDF2F7',
+  error: '#E53E3E',
+  success: '#01B574',
+  warning: '#ED8936',
+  info: '#4299E1',
   
-  // Risk levels
-  riskLow: '#4caf50',
-  riskModerate: '#ffeb3b',
-  riskHigh: '#ff9800',
-  riskExtreme: '#f44336',
+  // Risk colors
+  riskLow: '#01B574',
+  riskModerate: '#F6AD55',
+  riskHigh: '#F56565',
+  riskExtreme: '#9F1E1E',
+  
+  // Neutral colors
+  white: '#FFFFFF',
+  black: '#000000',
+  gray: '#718096',
+  grayLight: '#A0AEC0',
+  grayDark: '#4A5568',
 };
 
 export const theme = {
-  ...DefaultTheme,
+  ...MD3LightTheme,
   colors: {
-    ...DefaultTheme.colors,
+    ...MD3LightTheme.colors,
     primary: COLORS.primary,
     primaryContainer: COLORS.primaryLight,
     secondary: COLORS.secondary,
-    secondaryContainer: COLORS.secondaryLight,
-    surface: COLORS.surface,
     background: COLORS.background,
+    surface: COLORS.surface,
     error: COLORS.error,
+    text: COLORS.text,
     onSurface: COLORS.text,
-    onBackground: COLORS.text,
-    backdrop: COLORS.black + '80',  // Black with 50% opacity
+    outline: COLORS.border,
   },
+  roundness: 10,
+};
+
+export const darkTheme = {
+  ...MD3DarkTheme,
+  colors: {
+    ...MD3DarkTheme.colors,
+    primary: COLORS.primary,
+    primaryContainer: COLORS.primaryDark,
+    secondary: COLORS.secondary,
+    background: '#1A202C',
+    surface: '#2D3748',
+    error: COLORS.error,
+    text: '#FFFFFF',
+    onSurface: '#FFFFFF',
+    outline: '#4A5568',
+  },
+  roundness: 10,
 };
