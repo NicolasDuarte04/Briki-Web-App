@@ -41,6 +41,49 @@ export const insurancePlans = [
       "Cosmetic surgery, dental (unless accidental)",
       "Pregnancy unless complications arise"
     ]
+  },
+  {
+    id: 2,
+    name: "Total Comfort with Cancellation",
+    provider: "IATI",
+    basePrice: 172,
+    medicalCoverage: 999999, // Unlimited within policy terms
+    emergencyDental: "Covered (urgent cases only)",
+    hospitalizationAbroad: "Covered with advance payment",
+    tripCancellation: "Covered, multiple reasons allowed",
+    tripInterruption: "Covered",
+    baggageProtection: 2000, // Estimated value
+    baggageDelay: "Essentials after 8h delay",
+    personalAccident: {
+      death: "Covered",
+      disability: "Based on severity"
+    },
+    repatriation: "Medical or remains covered",
+    earlyReturn: [
+      "Illness/death of family",
+      "Home/work emergencies",
+      "Border closures/emergency return"
+    ],
+    adventureActivities: true, // Based on "Coverage for sports (non-professional)"
+    covidCoverage: true,
+    legalDefense: "Covered abroad",
+    thirdPartyLiability: "Covered for personal harm",
+    rating: "4.6",
+    reviews: 167,
+    country: "Global",
+    extras: [
+      "Coverage for sports (non-professional)",
+      "Card cancellation, urgent medication shipping",
+      "Delayed delivery for ski/golf equipment",
+      "Reimbursement for missed services due to repatriation"
+    ],
+    exclusions: [
+      "Pre-existing/chronic conditions",
+      "Pregnancy after 7th month",
+      "Extreme sports",
+      "Professional competition",
+      "War zones, pandemics without preventive measures"
+    ]
   }
   // Will add more plans as you provide them
 ];
