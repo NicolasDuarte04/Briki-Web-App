@@ -62,9 +62,9 @@ export default function InsuranceCard({ plan, isSelected, onToggleSelect, onSele
           isSelected ? "ring-2 ring-primary border-transparent" : "border-gray-100"
         )}
       >
-        {/* Like button */}
+        {/* Like button - Moved to middle right instead of top right */}
         <button 
-          className="absolute right-3 top-3 z-10 h-8 w-8 rounded-full bg-white shadow-md flex items-center justify-center transition-colors"
+          className="absolute right-3 top-24 z-10 h-8 w-8 rounded-full bg-white shadow-md flex items-center justify-center transition-colors"
           onClick={(e) => {
             e.stopPropagation();
             setLiked(!liked);
@@ -78,9 +78,9 @@ export default function InsuranceCard({ plan, isSelected, onToggleSelect, onSele
           />
         </button>
         
-        {/* Top badge */}
+        {/* Top badge - Moved down to avoid covering provider name */}
         {getBadgeText() && (
-          <div className="absolute left-0 top-3 z-10">
+          <div className="absolute left-0 top-16 z-10">
             <Badge 
               className="rounded-r-xl rounded-l-none py-1 px-3 bg-primary text-white font-medium"
               variant="default"
@@ -91,7 +91,7 @@ export default function InsuranceCard({ plan, isSelected, onToggleSelect, onSele
         )}
         
         {/* Header section */}
-        <div className="briki-plan-header border-b border-gray-100 pb-3">
+        <div className="briki-plan-header border-b border-gray-100 pb-3 pt-4 px-4">
           <div className="briki-plan-provider">
             <div className={cn(
               "briki-plan-provider-logo shadow-sm",
@@ -108,9 +108,9 @@ export default function InsuranceCard({ plan, isSelected, onToggleSelect, onSele
             </div>
             <div className="ml-3">
               <h3 className="text-lg font-bold">{plan.name}</h3>
-              <div className="flex items-center">
-                <p className="briki-plan-type">{plan.provider}</p>
-                <div className="flex items-center ml-2">
+              <div className="flex flex-col">
+                <p className="briki-plan-type text-sm font-medium text-gray-600">{plan.provider}</p>
+                <div className="flex items-center mt-1">
                   <Star className="h-3 w-3 text-yellow-400 fill-current" />
                   <span className="text-sm ml-0.5 text-gray-600">{plan.rating}</span>
                 </div>
@@ -124,7 +124,7 @@ export default function InsuranceCard({ plan, isSelected, onToggleSelect, onSele
         </div>
         
         {/* Features */}
-        <div className="py-3">
+        <div className="py-3 px-4">
           {/* Popular feature highlight */}
           {getPopularFeature() && (
             <div className="mb-3 bg-blue-50 px-3 py-2 rounded-lg flex items-center">
@@ -189,12 +189,12 @@ export default function InsuranceCard({ plan, isSelected, onToggleSelect, onSele
         </div>
         
         {/* Reviews */}
-        <div className="text-sm text-gray-500 pb-2">
+        <div className="text-sm text-gray-500 pb-2 px-4">
           {plan.reviews} {plan.reviews === 1 ? 'opinión' : 'opiniones'}
         </div>
         
         {/* Actions */}
-        <div className="mt-auto pt-3 border-t border-gray-100 flex flex-col gap-2">
+        <div className="mt-auto pt-3 border-t border-gray-100 flex flex-col gap-2 px-4">
           <div className="flex justify-between items-center">
             <Button
               variant="ghost"
