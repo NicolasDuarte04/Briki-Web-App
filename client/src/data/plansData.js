@@ -128,6 +128,48 @@ export const insurancePlans = [
       "Illegal activity",
       "War, pandemics, alcohol-related incidents"
     ]
+  },
+  {
+    id: 4,
+    name: "Global Travel Assistance",
+    provider: "Assist Card",
+    basePrice: 135,
+    medicalCoverage: 150000, // Plan-specific (estimated value)
+    dentalEmergency: 300, // Per tooth
+    preExistingConditions: "Emergency stabilization only",
+    repatriation: "Injury/death covered",
+    tripCancellation: "Optional add-on",
+    tripInterruption: "For family/medical/death emergencies",
+    baggageProtection: "Based on kg; limits apply",
+    baggageDelay: "After 8h+; essentials covered",
+    transportDelays: "Food/hotel if delayed 6h+",
+    accidentalDeath: {
+      publicTransport: 60000,
+      general: 20000,
+      ageLimit: "Only to age 74"
+    },
+    legalAssistance: "Available abroad",
+    adventureActivities: false, // "Only with upgrade"
+    maternity: "Covered to 26 weeks (extendable)",
+    covidCoverage: true,
+    rating: "4.5",
+    reviews: 221,
+    country: "Global",
+    extraFeatures: [
+      "Escort minors/elderly",
+      "Hotel stay after hospitalization",
+      "Cruise delay coverage",
+      "Home emergency return transport",
+      "Message relay service"
+    ],
+    territorialLimitations: "No coverage in country of issuance",
+    exclusions: [
+      "Extreme sports",
+      "Pregnancy > 26 weeks",
+      "Substance-related incidents",
+      "Mental illness",
+      "Illegal activities"
+    ]
   }
   // Will add more plans as you provide them
 ];
