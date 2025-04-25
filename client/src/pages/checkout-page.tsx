@@ -61,12 +61,14 @@ function StripeCheckoutForm({
   totalAmount, 
   planId, 
   onSuccess, 
-  tripId 
+  tripId,
+  form
 }: { 
   totalAmount: number; 
   planId: number; 
   onSuccess: () => void;
   tripId: number;
+  form: any; // Using 'any' for simplicity, in a real app would properly type this
 }) {
   const stripe = useStripe();
   const elements = useElements();
@@ -77,35 +79,79 @@ function StripeCheckoutForm({
     e.preventDefault();
 
     if (!stripe || !elements) {
+      toast({
+        title: "Payment system not ready",
+        description: "Please wait a moment and try again",
+        variant: "default",
+      });
       return;
     }
 
     setIsProcessing(true);
 
     try {
-      const { error } = await stripe.confirmPayment({
+      // Show processing message
+      toast({
+        title: "Processing payment",
+        description: "Please do not close this window",
+        duration: 6000,
+      });
+      
+      // Confirm the payment with Stripe
+      const { error, paymentIntent } = await stripe.confirmPayment({
         elements,
         confirmParams: {
           return_url: window.location.origin + "/checkout-success",
+          payment_method_data: {
+            billing_details: {
+              name: form.getValues("firstName") + " " + form.getValues("lastName"),
+              email: form.getValues("email"),
+              phone: form.getValues("phone"),
+              address: {
+                line1: form.getValues("address"),
+                city: form.getValues("city"),
+                state: form.getValues("state"),
+                postal_code: form.getValues("zip"),
+                country: form.getValues("country"),
+              }
+            }
+          }
         },
         redirect: "if_required",
       });
 
       if (error) {
-        toast({
-          title: "Payment failed",
-          description: error.message,
-          variant: "destructive",
-        });
+        // Handle specific error cases
+        if (error.type === 'card_error' || error.type === 'validation_error') {
+          toast({
+            title: "Payment failed",
+            description: error.message,
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "An unexpected error occurred",
+            description: "Please try again or use a different payment method",
+            variant: "destructive",
+          });
+        }
         setIsProcessing(false);
       } else {
-        // Payment successful - create an order
+        // Payment succeeded!
+        toast({
+          title: "Payment successful!",
+          description: "Your order has been processed",
+          variant: "default",
+        });
+        
+        // Create an order record
         onSuccess();
       }
     } catch (err: any) {
+      console.error("Payment error:", err);
       toast({
         title: "Payment processing error",
-        description: err.message,
+        description: err.message || "An unknown error occurred",
         variant: "destructive",
       });
       setIsProcessing(false);
