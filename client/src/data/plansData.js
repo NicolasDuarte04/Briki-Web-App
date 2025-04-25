@@ -84,6 +84,50 @@ export const insurancePlans = [
       "Professional competition",
       "War zones, pandemics without preventive measures"
     ]
+  },
+  {
+    id: 3,
+    name: "Standard Travel Insurance",
+    provider: "IATI",
+    basePrice: 120,
+    medicalCoverage: 200000, // €200,000 worldwide
+    dentalExpenses: 350, // €350
+    repatriation: "100% of cost",
+    convalescenceHotel: "Up to €750 (max €75/day)",
+    tripCancellation: "Up to €1,500",
+    tripInterruption: "Included",
+    earlyReturn: [
+      "Death or hospitalization of family",
+      "Major home or business incident"
+    ],
+    baggageProtection: 1000, // €1,000
+    baggageDelay: 120, // €120
+    missedTransportDelay: "Up to €180 after 6h delay",
+    personalAccident: {
+      death: 6000, // €6,000
+      disability: "Up to €6,000"
+    },
+    civilLiability: 60000, // €60,000
+    adventureActivities: false,
+    covidCoverage: true,
+    rating: "4.5",
+    reviews: 142,
+    country: "Global",
+    extraFeatures: [
+      "Assistance for minors",
+      "Emergency return tickets",
+      "Criminal defense abroad (€3,000)",
+      "Advance of funds abroad (€1,000)",
+      "Medication shipment",
+      "Legal claims abroad (€2,000)"
+    ],
+    exclusions: [
+      "Pre-existing conditions",
+      "Pregnancy beyond 24 weeks",
+      "Extreme sports",
+      "Illegal activity",
+      "War, pandemics, alcohol-related incidents"
+    ]
   }
   // Will add more plans as you provide them
 ];
