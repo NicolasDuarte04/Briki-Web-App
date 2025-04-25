@@ -488,6 +488,7 @@ export default function CheckoutPage() {
                               planId={parseInt(planId || "0")}
                               onSuccess={handlePaymentSuccess}
                               tripId={latestTrip?.id || 0}
+                              form={form}
                             />
                           </Elements>
                         ) : (
