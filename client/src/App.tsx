@@ -13,6 +13,7 @@ import AuthPage from "@/pages/auth-page";
 import TripInfoPage from "@/pages/trip-info-page";
 import InsurancePlansPage from "@/pages/insurance-plans-page";
 import CheckoutPage from "@/pages/checkout-page";
+import WeatherRiskPage from "@/pages/weather-risk-page";
 
 function Router() {
   return (
@@ -22,6 +23,7 @@ function Router() {
       <ProtectedRoute path="/trip-info" component={TripInfoPage} />
       <ProtectedRoute path="/insurance-plans" component={InsurancePlansPage} />
       <ProtectedRoute path="/checkout/:planId" component={CheckoutPage} />
+      <Route path="/weather-risk" component={WeatherRiskPage} />
       <Route component={NotFound} />
     </Switch>
   );
