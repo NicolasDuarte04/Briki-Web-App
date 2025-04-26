@@ -1,0 +1,96 @@
+C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app>type package.json
+{
+  "name": "briki-travel-insurance",
+  "version": "1.0.0",
+  "main": "node_modules/expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "eject": "expo eject",
+    "build:android": "eas build -p android",
+    "build:ios": "eas build -p ios",
+    "submit:android": "eas submit -p android",
+    "submit:ios": "eas submit -p ios",
+    "update": "eas update",
+    "lint": "eslint .",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@expo/vector-icons": "^13.0.0",
+    "@react-native-async-storage/async-storage": "1.17.11",
+    "@react-native-community/datetimepicker": "6.7.3",
+    "@react-native-picker/picker": "2.4.8",
+    "@react-navigation/bottom-tabs": "^6.5.7",
+    "@react-navigation/native": "^6.1.18",
+    "@react-navigation/stack": "^6.4.1",
+    "axios": "^1.9.0",
+    "expo": "~48.0.15",
+    "expo-constants": "~14.2.1",
+    "expo-linking": "~4.0.1",
+    "expo-splash-screen": "~0.18.2",
+    "expo-status-bar": "~1.4.4",
+    "expo-updates": "~0.16.4",
+    "react": "18.2.0",
+    "react-native": "0.71.14",
+    "react-native-gesture-handler": "~2.9.0",
+    "react-native-paper": "^5.6.0",
+    "react-native-reanimated": "~2.14.4",
+    "react-native-safe-area-context": "^4.5.0",
+    "react-native-screens": "~3.20.0",
+    "react-native-svg": "13.4.0",
+    "react-query": "^3.39.3"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.0",
+    "@types/react": "~18.0.14",
+    "@types/react-native": "^0.71.6",
+    "@typescript-eslint/eslint-plugin": "^5.59.1",
+    "@typescript-eslint/parser": "^5.59.1",
+    "eslint": "^8.39.0",
+    "eslint-plugin-react": "^7.32.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "typescript": "^4.9.4"
+  },
+  "private": true
+}
+
+C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app>type App.tsx
+import React from 'react';
+import { StatusBar } from 'expo-status-bar';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { NavigationContainer } from '@react-navigation/native';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { Provider as PaperProvider } from 'react-native-paper';
+
+import AppNavigator from './src/navigation/AppNavigator';
+import { AuthProvider } from './src/contexts/AuthContext';
+import { theme } from './src/utils/theme';
+
+// Create a client for react-query
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
+export default function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <PaperProvider theme={theme}>
+        <SafeAreaProvider>
+          <NavigationContainer>
+            <AuthProvider>
+              <AppNavigator />
+            </AuthProvider>
+          </NavigationContainer>
+          <StatusBar style="auto" />
+        </SafeAreaProvider>
+      </PaperProvider>
+    </QueryClientProvider>
+  );
+}

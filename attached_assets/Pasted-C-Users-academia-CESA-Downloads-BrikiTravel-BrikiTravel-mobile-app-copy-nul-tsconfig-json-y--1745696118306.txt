@@ -1,0 +1,75 @@
+C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app>copy nul tsconfig.json /y
+        1 archivo(s) copiado(s).
+
+C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app>echo {
+{
+
+C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app>  "extends": "expo/tsconfig.base",
+""extends":" no se reconoce como un comando interno o externo,
+programa o archivo por lotes ejecutable.
+
+C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app>  "compilerOptions": {
+""compilerOptions":" no se reconoce como un comando interno o externo,
+programa o archivo por lotes ejecutable.
+
+C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app>    "strict": true,
+""strict":" no se reconoce como un comando interno o externo,
+programa o archivo por lotes ejecutable.
+
+C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app>    "baseUrl": ".",
+""baseUrl":" no se reconoce como un comando interno o externo,
+programa o archivo por lotes ejecutable.
+
+C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app>    "paths": {
+""paths":" no se reconoce como un comando interno o externo,
+programa o archivo por lotes ejecutable.
+
+C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app>      "@components/*": ["src/components/*"],
+""@components/*":" no se reconoce como un comando interno o externo,
+programa o archivo por lotes ejecutable.
+
+C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app>      "@screens/*": ["src/screens/*"],
+""@screens/*":" no se reconoce como un comando interno o externo,
+programa o archivo por lotes ejecutable.
+
+C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app>      "@navigation/*": ["src/navigation/*"],
+""@navigation/*":" no se reconoce como un comando interno o externo,
+programa o archivo por lotes ejecutable.
+
+C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app>      "@hooks/*": ["src/hooks/*"],
+""@hooks/*":" no se reconoce como un comando interno o externo,
+programa o archivo por lotes ejecutable.
+
+C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app>      "@contexts/*": ["src/contexts/*"],
+""@contexts/*":" no se reconoce como un comando interno o externo,
+programa o archivo por lotes ejecutable.
+
+C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app>      "@utils/*": ["src/utils/*"],
+""@utils/*":" no se reconoce como un comando interno o externo,
+programa o archivo por lotes ejecutable.
+
+C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app>      "@services/*": ["src/services/*"],
+""@services/*":" no se reconoce como un comando interno o externo,
+programa o archivo por lotes ejecutable.
+
+C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app>      "@types/*": ["src/types/*"],
+""@types/*":" no se reconoce como un comando interno o externo,
+programa o archivo por lotes ejecutable.
+
+C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app>      "@assets/*": ["assets/*"],
+""@assets/*":" no se reconoce como un comando interno o externo,
+programa o archivo por lotes ejecutable.
+
+C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app>      "@data/*": ["src/data/*"]
+""@data/*":" no se reconoce como un comando interno o externo,
+programa o archivo por lotes ejecutable.
+
+C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app>    }
+"}" no se reconoce como un comando interno o externo,
+programa o archivo por lotes ejecutable.
+
+C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app>  }
+"}" no se reconoce como un comando interno o externo,
+programa o archivo por lotes ejecutable.
+
+C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app>    }
