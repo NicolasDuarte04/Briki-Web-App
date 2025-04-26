@@ -275,7 +275,10 @@ const CheckoutScreen = () => {
             <Divider style={styles.divider} />
             
             <View style={styles.coverageItem}>
-              <Text style={styles.coverageLabel}>Cobertura Médica</Text>
+              <View style={styles.coverageLabelContainer}>
+                <MaterialCommunityIcons name="medical-bag" size={16} color={COLORS.primary} />
+                <Text style={styles.coverageLabel}>Cobertura Médica</Text>
+              </View>
               <Text style={styles.coverageValue}>
                 {plan.medicalCoverage >= 1000000 
                   ? `$${(plan.medicalCoverage / 1000000).toFixed(1)}M` 
@@ -284,7 +287,10 @@ const CheckoutScreen = () => {
             </View>
             
             <View style={styles.coverageItem}>
-              <Text style={styles.coverageLabel}>Cancelación</Text>
+              <View style={styles.coverageLabelContainer}>
+                <MaterialCommunityIcons name="calendar-remove" size={16} color={COLORS.primary} />
+                <Text style={styles.coverageLabel}>Cancelación</Text>
+              </View>
               <Text style={styles.coverageValue}>
                 {typeof plan.tripCancellation === 'string' 
                   ? plan.tripCancellation 
@@ -293,20 +299,23 @@ const CheckoutScreen = () => {
             </View>
             
             <View style={styles.coverageItem}>
-              <Text style={styles.coverageLabel}>Equipaje</Text>
+              <View style={styles.coverageLabelContainer}>
+                <MaterialCommunityIcons name="bag-checked" size={16} color={COLORS.primary} />
+                <Text style={styles.coverageLabel}>Equipaje</Text>
+              </View>
               <Text style={styles.coverageValue}>{formatPrice(plan.baggageProtection)}</Text>
             </View>
             
             {plan.adventureActivities && (
               <View style={styles.featuresContainer}>
-                <MaterialCommunityIcons name="check-circle" size={18} color={COLORS.success} />
+                <MaterialCommunityIcons name="shield-check" size={20} color={COLORS.success} />
                 <Text style={styles.featureText}>Deportes de aventura incluidos</Text>
               </View>
             )}
             
             {plan.emergencyEvacuation && (
               <View style={styles.featuresContainer}>
-                <MaterialCommunityIcons name="check-circle" size={18} color={COLORS.success} />
+                <MaterialCommunityIcons name="ambulance" size={20} color={COLORS.success} />
                 <Text style={styles.featureText}>Evacuación de emergencia incluida</Text>
               </View>
             )}
@@ -598,9 +607,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginVertical: 5,
   },
+  coverageLabelContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   coverageLabel: {
     fontSize: 14,
     color: COLORS.text,
+    marginLeft: 6,
   },
   coverageValue: {
     fontSize: 14,
@@ -610,12 +624,14 @@ const styles = StyleSheet.create({
   featuresContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: 12,
+    marginBottom: 4,
+    paddingVertical: 4,
   },
   featureText: {
     fontSize: 14,
     color: COLORS.text,
-    marginLeft: 5,
+    marginLeft: 8,
   },
   selectedTrip: {
     backgroundColor: COLORS.primaryLight + '20',
