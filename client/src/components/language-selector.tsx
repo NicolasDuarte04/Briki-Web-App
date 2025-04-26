@@ -190,6 +190,11 @@ const translations: Translations = {
     november: 'Noviembre',
     december: 'Diciembre',
     
+    // Toast messages
+    tripInfoSaved: 'Información del viaje guardada',
+    findingBestPlans: 'Estamos buscando los mejores seguros para tu viaje.',
+    failedToSaveTrip: 'Error al guardar la información del viaje',
+    
     // Common elements
     yes: 'Sí',
     no: 'No',
@@ -233,7 +238,6 @@ const translations: Translations = {
     
     // Actions and Buttons
     findPlans: 'Buscar planos',
-    selectDestination: 'Selecione seu destino',
     save: 'Salvar',
     continue: 'Continuar',
     back: 'Voltar',
@@ -276,6 +280,11 @@ const translations: Translations = {
     october: 'Outubro',
     november: 'Novembro',
     december: 'Dezembro',
+    
+    // Toast messages
+    tripInfoSaved: 'Informações da viagem salvas',
+    findingBestPlans: 'Estamos procurando os melhores seguros para sua viagem.',
+    failedToSaveTrip: 'Erro ao salvar informações da viagem',
     
     // Common elements
     yes: 'Sim',
