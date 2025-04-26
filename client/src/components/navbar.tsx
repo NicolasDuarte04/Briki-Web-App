@@ -108,11 +108,17 @@ export default function Navbar() {
                       <p className="text-sm font-medium truncate">{user.email}</p>
                     </div>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem className="cursor-pointer">
+                    <DropdownMenuItem 
+                      className="cursor-pointer"
+                      onClick={() => navigate("/profile")}
+                    >
                       <User className="mr-2 h-4 w-4" />
                       <span>Profile</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="cursor-pointer">
+                    <DropdownMenuItem 
+                      className="cursor-pointer" 
+                      onClick={() => navigate("/settings")}
+                    >
                       <Settings className="mr-2 h-4 w-4" />
                       <span>Settings</span>
                     </DropdownMenuItem>
@@ -218,11 +224,25 @@ export default function Navbar() {
                           </div>
                         </div>
                         <div className="mt-3 space-y-1">
-                          <Button variant="ghost" className="w-full justify-start text-gray-500">
+                          <Button 
+                            variant="ghost" 
+                            className="w-full justify-start text-gray-500"
+                            onClick={() => {
+                              navigate("/profile");
+                              setIsOpen(false);
+                            }}
+                          >
                             <User className="mr-2 h-4 w-4" />
                             Your Profile
                           </Button>
-                          <Button variant="ghost" className="w-full justify-start text-gray-500">
+                          <Button 
+                            variant="ghost" 
+                            className="w-full justify-start text-gray-500"
+                            onClick={() => {
+                              navigate("/settings");
+                              setIsOpen(false);
+                            }}
+                          >
                             <Settings className="mr-2 h-4 w-4" />
                             Settings
                           </Button>
