@@ -1,7 +1,19 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const BASE_URL = 'https://api.briki.insurance'; // This will need to be updated with your actual API endpoint
+// For development, use your local server or the Replit URL
+// For production, this would be your deployed API endpoint
+import Constants from 'expo-constants';
+
+// Determine if we're running in development mode
+const isDevelopment = Constants.manifest?.packagerOpts?.dev || __DEV__;
+
+// Set the API base URL based on environment
+const BASE_URL = isDevelopment 
+  ? 'http://localhost:5000'  // Development - update this with your local IP if testing on a physical device
+  : 'https://briki-travel.replit.app'; // Production
+
+console.log('API URL:', BASE_URL);
 
 export const api = axios.create({
   baseURL: BASE_URL,
@@ -13,28 +25,28 @@ export const api = axios.create({
 
 // Request interceptor to add auth token
 api.interceptors.request.use(
-  async (config) => {
+  async (config: any) => {
     try {
       const token = await AsyncStorage.getItem('@Briki:token');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error setting auth token:', error);
     }
     return config;
   },
-  (error) => {
+  (error: any) => {
     return Promise.reject(error);
   }
 );
 
 // Response interceptor for error handling
 api.interceptors.response.use(
-  (response) => {
+  (response: any) => {
     return response;
   },
-  async (error) => {
+  async (error: any) => {
     const originalRequest = error.config;
     
     // If unauthorized and not already retrying
