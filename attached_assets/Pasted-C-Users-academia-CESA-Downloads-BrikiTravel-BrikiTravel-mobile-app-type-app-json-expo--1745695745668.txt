@@ -1,0 +1,91 @@
+C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app>type app.json
+{
+  "expo": {
+    "name": "Briki Travel Insurance",
+    "slug": "briki-travel-insurance",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#4B76E5"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.briki.travelinsurance",
+      "buildNumber": "1.0.0"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#4B76E5"
+      },
+      "package": "com.briki.travelinsurance",
+      "versionCode": 1
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "briki-travel-insurance"
+      }
+    },
+    "plugins": [
+      [
+        "expo-updates",
+        {
+          "username": "briki"
+        }
+      ]
+    ],
+    "description": "Intelligent travel insurance comparison platform for Colombia and Mexico markets"
+  }
+}
+C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app>type babel.config.js
+module.exports = function(api) {
+  api.cache(true);
+  return {
+    presets: ['babel-preset-expo'],
+    plugins: [
+      'react-native-reanimated/plugin',
+      [
+        'module-resolver',
+        {
+          root: ['./src'],
+          extensions: [
+            '.ios.ts',
+            '.android.ts',
+            '.ts',
+            '.ios.tsx',
+            '.android.tsx',
+            '.tsx',
+            '.jsx',
+            '.js',
+            '.json',
+          ],
+          alias: {
+            '@components': './src/components',
+            '@screens': './src/screens',
+            '@navigation': './src/navigation',
+            '@hooks': './src/hooks',
+            '@contexts': './src/contexts',
+            '@utils': './src/utils',
+            '@services': './src/services',
+            '@types': './src/types',
+            '@assets': './assets',
+            '@data': './src/data'
+          },
+        },
+      ],
+    ],
+  };
+};

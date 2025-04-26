@@ -1,0 +1,74 @@
+
+26/04/2025  12:53 p. m.    <DIR>          .
+26/04/2025  01:56 p. m.    <DIR>          ..
+26/04/2025  12:53 p. m.    <DIR>          contexts
+26/04/2025  12:53 p. m.    <DIR>          data
+26/04/2025  12:53 p. m.    <DIR>          navigation
+26/04/2025  12:53 p. m.    <DIR>          screens
+26/04/2025  12:53 p. m.    <DIR>          services
+26/04/2025  12:53 p. m.    <DIR>          types
+26/04/2025  12:53 p. m.    <DIR>          utils
+               0 archivos              0 bytes
+
+ Directorio de C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app\src\contexts
+
+26/04/2025  12:53 p. m.    <DIR>          .
+26/04/2025  12:53 p. m.    <DIR>          ..
+26/04/2025  12:53 p. m.             3.712 AuthContext.tsx
+               1 archivos          3.712 bytes
+
+ Directorio de C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app\src\data
+
+26/04/2025  12:53 p. m.    <DIR>          .
+26/04/2025  12:53 p. m.    <DIR>          ..
+26/04/2025  12:53 p. m.            10.238 weatherRiskData.ts
+               1 archivos         10.238 bytes
+
+ Directorio de C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app\src\navigation
+
+26/04/2025  12:53 p. m.    <DIR>          .
+26/04/2025  12:53 p. m.    <DIR>          ..
+26/04/2025  12:53 p. m.             5.421 AppNavigator.tsx
+               1 archivos          5.421 bytes
+
+ Directorio de C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app\src\screens
+
+26/04/2025  12:53 p. m.    <DIR>          .
+26/04/2025  12:53 p. m.    <DIR>          ..
+26/04/2025  12:53 p. m.             8.547 AuthScreen.tsx
+26/04/2025  12:53 p. m.            21.035 CheckoutScreen.tsx
+26/04/2025  12:53 p. m.            11.010 HomeScreen.tsx
+26/04/2025  12:53 p. m.            26.781 InsurancePlansScreen.tsx
+26/04/2025  12:53 p. m.             8.709 ProfileScreen.tsx
+26/04/2025  12:53 p. m.            25.719 SettingsScreen.tsx
+26/04/2025  12:53 p. m.            16.747 TripInfoScreen.tsx
+26/04/2025  12:53 p. m.            24.837 WeatherRiskScreen.tsx
+               8 archivos        143.385 bytes
+
+ Directorio de C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app\src\services
+
+26/04/2025  12:53 p. m.    <DIR>          .
+26/04/2025  12:53 p. m.    <DIR>          ..
+26/04/2025  12:53 p. m.             1.827 api.ts
+               1 archivos          1.827 bytes
+
+ Directorio de C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app\src\types
+
+26/04/2025  12:53 p. m.    <DIR>          .
+26/04/2025  12:53 p. m.    <DIR>          ..
+26/04/2025  12:53 p. m.             1.053 index.ts
+26/04/2025  12:53 p. m.             1.041 insurance.ts
+26/04/2025  12:53 p. m.               467 user.ts
+26/04/2025  12:53 p. m.               536 weather.ts
+               4 archivos          3.097 bytes
+
+ Directorio de C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app\src\utils
+
+26/04/2025  12:53 p. m.    <DIR>          .
+26/04/2025  12:53 p. m.    <DIR>          ..
+26/04/2025  12:53 p. m.             1.426 theme.ts
+               1 archivos          1.426 bytes
+
+     Total de archivos en la lista:
+              17 archivos        169.106 bytes
+              23 dirs  116.416.307.200 bytes libres
