@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
+import { useLanguage } from "@/components/language-selector";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -86,6 +87,7 @@ type TripFormValues = z.infer<typeof tripFormSchema>;
 export default function TripInfoPage() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
+  const { t } = useLanguage();
   
   const form = useForm<z.infer<typeof tripFormInputSchema>>({
     resolver: zodResolver(tripFormInputSchema),
@@ -201,14 +203,14 @@ export default function TripInfoPage() {
     },
     onSuccess: () => {
       toast({
-        title: "Trip information saved",
-        description: "We're finding the best insurance plans for your trip.",
+        title: t('tripInfoSaved'),
+        description: t('findingBestPlans'),
       });
       navigate("/insurance-plans");
     },
     onError: (error: Error) => {
       toast({
-        title: "Failed to save trip information",
+        title: t('failedToSaveTrip'),
         description: error.message,
         variant: "destructive",
       });
@@ -237,7 +239,7 @@ export default function TripInfoPage() {
                 </svg>
               </Link>
             </div>
-            <h2 className="text-2xl font-bold text-black">Trip details</h2>
+            <h2 className="text-2xl font-bold text-black">{t('tripDetails')}</h2>
           </div>
           
           <div>
@@ -249,11 +251,11 @@ export default function TripInfoPage() {
                     name="countryOfOrigin"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Country of Origin</FormLabel>
+                        <FormLabel>{t('countryOfOrigin')}</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select your country of origin" />
+                              <SelectValue placeholder={`${t('selectDestination')}`} />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -276,11 +278,11 @@ export default function TripInfoPage() {
                     name="destination"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Destination Country</FormLabel>
+                        <FormLabel>{t('destination')}</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select your destination country" />
+                              <SelectValue placeholder={`${t('selectDestination')}`} />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -310,7 +312,7 @@ export default function TripInfoPage() {
                     name="departureDate"
                     render={({ field }) => (
                       <FormItem className="flex flex-col">
-                        <FormLabel>Departure Date</FormLabel>
+                        <FormLabel>{t('departureDate')}</FormLabel>
                         <Popover>
                           <PopoverTrigger asChild>
                             <FormControl>
@@ -324,7 +326,7 @@ export default function TripInfoPage() {
                                 {field.value ? (
                                   format(field.value, "PPP")
                                 ) : (
-                                  <span>Pick a date</span>
+                                  <span>{t('selectDestination')}</span>
                                 )}
                                 <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                               </Button>
@@ -352,7 +354,7 @@ export default function TripInfoPage() {
                     name="returnDate"
                     render={({ field }) => (
                       <FormItem className="flex flex-col">
-                        <FormLabel>Return Date</FormLabel>
+                        <FormLabel>{t('returnDate')}</FormLabel>
                         <Popover>
                           <PopoverTrigger asChild>
                             <FormControl>
@@ -394,11 +396,11 @@ export default function TripInfoPage() {
                     name="travelers"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Number of Travelers</FormLabel>
+                        <FormLabel>{t('numTravelers')}</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select number of travelers" />
+                              <SelectValue placeholder={t('selectNumTravelers')} />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -420,9 +422,9 @@ export default function TripInfoPage() {
                     name="primaryAge"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Age of Primary Traveler</FormLabel>
+                        <FormLabel>{t('primaryTravelerAge')}</FormLabel>
                         <FormControl>
-                          <Input type="number" min="0" max="120" placeholder="Age" {...field} />
+                          <Input type="number" min="0" max="120" placeholder={t('age')} {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
