@@ -38,10 +38,10 @@ import { cn } from "@/lib/utils";
 // Define the base schema (form input)
 const tripFormInputSchema = z.object({
   destination: z.string({
-    required_error: "Please select a destination.",
+    required_error: "Please select a destination country.",
   }),
-  tripType: z.string({
-    required_error: "Please select a trip type.",
+  countryOfOrigin: z.string({
+    required_error: "Please select your country of origin.",
   }),
   departureDate: z.date({
     required_error: "Please select a departure date.",
@@ -130,7 +130,7 @@ export default function TripInfoPage() {
         // Map the form data to match the updated schema
         const apiData = {
           destination: tripData.destination,
-          countryOfOrigin: tripData.tripType, // Use tripType as countryOfOrigin (adapted for new schema)
+          countryOfOrigin: tripData.countryOfOrigin, // Use actual country of origin
           departureDate: format(tripData.departureDate, "yyyy-MM-dd"),
           returnDate: format(tripData.returnDate, "yyyy-MM-dd"),
           travelers: tripData.travelers, // Already transformed by schema
@@ -246,23 +246,24 @@ export default function TripInfoPage() {
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                   <FormField
                     control={form.control}
-                    name="destination"
+                    name="countryOfOrigin"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Destination</FormLabel>
+                        <FormLabel>Country of Origin</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select your destination" />
+                              <SelectValue placeholder="Select your country of origin" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="europe">Europe</SelectItem>
-                            <SelectItem value="asia">Asia</SelectItem>
-                            <SelectItem value="northAmerica">North America</SelectItem>
-                            <SelectItem value="southAmerica">South America</SelectItem>
-                            <SelectItem value="africa">Africa</SelectItem>
-                            <SelectItem value="oceania">Oceania</SelectItem>
+                            <SelectItem value="colombia">Colombia</SelectItem>
+                            <SelectItem value="mexico">Mexico</SelectItem>
+                            <SelectItem value="peru">Peru</SelectItem>
+                            <SelectItem value="argentina">Argentina</SelectItem>
+                            <SelectItem value="chile">Chile</SelectItem>
+                            <SelectItem value="ecuador">Ecuador</SelectItem>
+                            <SelectItem value="brazil">Brazil</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -272,21 +273,31 @@ export default function TripInfoPage() {
                   
                   <FormField
                     control={form.control}
-                    name="tripType"
+                    name="destination"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Trip Type</FormLabel>
+                        <FormLabel>Destination Country</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select trip type" />
+                              <SelectValue placeholder="Select your destination country" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="leisure">Leisure</SelectItem>
-                            <SelectItem value="business">Business</SelectItem>
-                            <SelectItem value="study">Study</SelectItem>
-                            <SelectItem value="mixed">Mixed</SelectItem>
+                            <SelectItem value="spain">Spain</SelectItem>
+                            <SelectItem value="usa">United States</SelectItem>
+                            <SelectItem value="france">France</SelectItem>
+                            <SelectItem value="italy">Italy</SelectItem>
+                            <SelectItem value="uk">United Kingdom</SelectItem>
+                            <SelectItem value="germany">Germany</SelectItem>
+                            <SelectItem value="japan">Japan</SelectItem>
+                            <SelectItem value="canada">Canada</SelectItem>
+                            <SelectItem value="australia">Australia</SelectItem>
+                            <SelectItem value="brazil">Brazil</SelectItem>
+                            <SelectItem value="argentina">Argentina</SelectItem>
+                            <SelectItem value="mexico">Mexico</SelectItem>
+                            <SelectItem value="china">China</SelectItem>
+                            <SelectItem value="thailand">Thailand</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
