@@ -258,21 +258,31 @@ export default function TripInfoPage() {
                   <FormField
                     control={form.control}
                     name="countryOfOrigin"
-                    render={({ field }) => (
+                    render={({ field, fieldState }) => (
                       <FormItem>
                         <FormLabel>{t('countryOfOrigin')}</FormLabel>
-                        <FormControl>
-                          <CountryCombobox 
-                            value={field.value || ""} 
-                            onChange={field.onChange}
-                            placeholder={t('selectCountryOfOrigin')}
-                            label={t('countryOfOrigin')}
-                            emptyMessage={t('noCountryFound')}
-                            searchPlaceholder={t('searchCountry')}
-                            isOrigin={true}
-                          />
-                        </FormControl>
-                        <FormMessage />
+                        <FormAnimationWrapper
+                          isValid={fieldState.isDirty && !fieldState.error}
+                          isInvalid={!!fieldState.error && fieldState.isTouched}
+                          animationType="pulse"
+                        >
+                          <FormControl>
+                            <CountryCombobox 
+                              value={field.value || ""} 
+                              onChange={field.onChange}
+                              placeholder={t('selectCountryOfOrigin')}
+                              label={t('countryOfOrigin')}
+                              emptyMessage={t('noCountryFound')}
+                              searchPlaceholder={t('searchCountry')}
+                              isOrigin={true}
+                            />
+                          </FormControl>
+                        </FormAnimationWrapper>
+                        <AnimatedFormMessage 
+                          isValid={fieldState.isDirty && !fieldState.error}
+                        >
+                          {fieldState.error?.message}
+                        </AnimatedFormMessage>
                       </FormItem>
                     )}
                   />
@@ -280,21 +290,31 @@ export default function TripInfoPage() {
                   <FormField
                     control={form.control}
                     name="destination"
-                    render={({ field }) => (
+                    render={({ field, fieldState }) => (
                       <FormItem>
                         <FormLabel>{t('destination')}</FormLabel>
-                        <FormControl>
-                          <CountryCombobox 
-                            value={field.value || ""} 
-                            onChange={field.onChange}
-                            placeholder={t('selectDestination')}
-                            label={t('destination')}
-                            emptyMessage={t('noCountryFound')}
-                            searchPlaceholder={t('searchCountry')}
-                            isOrigin={false}
-                          />
-                        </FormControl>
-                        <FormMessage />
+                        <FormAnimationWrapper
+                          isValid={fieldState.isDirty && !fieldState.error}
+                          isInvalid={!!fieldState.error && fieldState.isTouched}
+                          animationType="pulse"
+                        >
+                          <FormControl>
+                            <CountryCombobox 
+                              value={field.value || ""} 
+                              onChange={field.onChange}
+                              placeholder={t('selectDestination')}
+                              label={t('destination')}
+                              emptyMessage={t('noCountryFound')}
+                              searchPlaceholder={t('searchCountry')}
+                              isOrigin={false}
+                            />
+                          </FormControl>
+                        </FormAnimationWrapper>
+                        <AnimatedFormMessage 
+                          isValid={fieldState.isDirty && !fieldState.error}
+                        >
+                          {fieldState.error?.message}
+                        </AnimatedFormMessage>
                       </FormItem>
                     )}
                   />
@@ -302,41 +322,58 @@ export default function TripInfoPage() {
                   <FormField
                     control={form.control}
                     name="departureDate"
-                    render={({ field }) => (
+                    render={({ field, fieldState }) => (
                       <FormItem className="flex flex-col">
                         <FormLabel>{t('departureDate')}</FormLabel>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <FormControl>
-                              <Button
-                                variant={"outline"}
-                                className={cn(
-                                  "w-full pl-3 text-left font-normal",
-                                  !field.value && "text-muted-foreground"
-                                )}
-                              >
-                                {field.value ? (
-                                  format(field.value, "PPP")
-                                ) : (
-                                  <span>{t('selectDestination')}</span>
-                                )}
-                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                              </Button>
-                            </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={field.value}
-                              onSelect={field.onChange}
-                              disabled={(date) =>
-                                date < new Date()
-                              }
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
-                        <FormMessage />
+                        <FormAnimationWrapper
+                          isValid={fieldState.isDirty && !fieldState.error}
+                          isInvalid={!!fieldState.error && fieldState.isTouched}
+                          animationType="pulse"
+                        >
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant={"outline"}
+                                  className={cn(
+                                    "w-full pl-3 text-left font-normal",
+                                    !field.value && "text-muted-foreground",
+                                    fieldState.isDirty && !fieldState.error && "border-green-500 hover:border-green-600 focus-visible:ring-green-500/30",
+                                    !!fieldState.error && fieldState.isTouched && "border-destructive hover:border-destructive/90 focus-visible:ring-destructive/30"
+                                  )}
+                                >
+                                  {field.value ? (
+                                    format(field.value, "PPP")
+                                  ) : (
+                                    <span>{t('selectDestination')}</span>
+                                  )}
+                                  <motion.div
+                                    whileHover={{ rotate: 90 }}
+                                    transition={{ duration: 0.3 }}
+                                  >
+                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                  </motion.div>
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                              <Calendar
+                                mode="single"
+                                selected={field.value}
+                                onSelect={field.onChange}
+                                disabled={(date) =>
+                                  date < new Date()
+                                }
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
+                        </FormAnimationWrapper>
+                        <AnimatedFormMessage 
+                          isValid={fieldState.isDirty && !fieldState.error}
+                        >
+                          {fieldState.error?.message}
+                        </AnimatedFormMessage>
                       </FormItem>
                     )}
                   />
@@ -344,41 +381,58 @@ export default function TripInfoPage() {
                   <FormField
                     control={form.control}
                     name="returnDate"
-                    render={({ field }) => (
+                    render={({ field, fieldState }) => (
                       <FormItem className="flex flex-col">
                         <FormLabel>{t('returnDate')}</FormLabel>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <FormControl>
-                              <Button
-                                variant={"outline"}
-                                className={cn(
-                                  "w-full pl-3 text-left font-normal",
-                                  !field.value && "text-muted-foreground"
-                                )}
-                              >
-                                {field.value ? (
-                                  format(field.value, "PPP")
-                                ) : (
-                                  <span>Pick a date</span>
-                                )}
-                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                              </Button>
-                            </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={field.value}
-                              onSelect={field.onChange}
-                              disabled={(date) =>
-                                date < new Date() || (form.watch("departureDate") && date < form.watch("departureDate"))
-                              }
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
-                        <FormMessage />
+                        <FormAnimationWrapper
+                          isValid={fieldState.isDirty && !fieldState.error}
+                          isInvalid={!!fieldState.error && fieldState.isTouched}
+                          animationType="pulse"
+                        >
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant={"outline"}
+                                  className={cn(
+                                    "w-full pl-3 text-left font-normal",
+                                    !field.value && "text-muted-foreground",
+                                    fieldState.isDirty && !fieldState.error && "border-green-500 hover:border-green-600 focus-visible:ring-green-500/30",
+                                    !!fieldState.error && fieldState.isTouched && "border-destructive hover:border-destructive/90 focus-visible:ring-destructive/30"
+                                  )}
+                                >
+                                  {field.value ? (
+                                    format(field.value, "PPP")
+                                  ) : (
+                                    <span>Pick a date</span>
+                                  )}
+                                  <motion.div
+                                    whileHover={{ rotate: 90 }}
+                                    transition={{ duration: 0.3 }}
+                                  >
+                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                  </motion.div>
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                              <Calendar
+                                mode="single"
+                                selected={field.value}
+                                onSelect={field.onChange}
+                                disabled={(date) =>
+                                  date < new Date() || (form.watch("departureDate") && date < form.watch("departureDate"))
+                                }
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
+                        </FormAnimationWrapper>
+                        <AnimatedFormMessage 
+                          isValid={fieldState.isDirty && !fieldState.error}
+                        >
+                          {fieldState.error?.message}
+                        </AnimatedFormMessage>
                       </FormItem>
                     )}
                   />
@@ -456,30 +510,56 @@ export default function TripInfoPage() {
                 <FormField
                   control={form.control}
                   name="hasMedicalConditions"
-                  render={({ field }) => (
+                  render={({ field, fieldState }) => (
                     <FormItem className="space-y-3">
                       <FormLabel>Do you have any pre-existing medical conditions?</FormLabel>
-                      <FormControl>
-                        <RadioGroup
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                          className="flex space-x-6"
-                        >
-                          <FormItem className="flex items-center space-x-2 space-y-0">
-                            <FormControl>
-                              <RadioGroupItem value="yes" />
-                            </FormControl>
-                            <FormLabel className="font-normal">Yes</FormLabel>
-                          </FormItem>
-                          <FormItem className="flex items-center space-x-2 space-y-0">
-                            <FormControl>
-                              <RadioGroupItem value="no" />
-                            </FormControl>
-                            <FormLabel className="font-normal">No</FormLabel>
-                          </FormItem>
-                        </RadioGroup>
-                      </FormControl>
-                      <FormMessage />
+                      <FormAnimationWrapper
+                        isValid={fieldState.isDirty && !fieldState.error}
+                        isInvalid={!!fieldState.error && fieldState.isTouched}
+                        animationType="pulse"
+                      >
+                        <FormControl>
+                          <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex space-x-6"
+                          >
+                            <motion.div
+                              whileHover={{ scale: 1.05 }}
+                              transition={{ duration: 0.2 }}
+                            >
+                              <FormItem className="flex items-center space-x-2 space-y-0">
+                                <FormControl>
+                                  <RadioGroupItem 
+                                    value="yes" 
+                                    className={fieldState.isDirty && field.value === "yes" ? "border-green-500 text-green-500" : ""}
+                                  />
+                                </FormControl>
+                                <FormLabel className="font-normal">Yes</FormLabel>
+                              </FormItem>
+                            </motion.div>
+                            <motion.div
+                              whileHover={{ scale: 1.05 }}
+                              transition={{ duration: 0.2 }}
+                            >
+                              <FormItem className="flex items-center space-x-2 space-y-0">
+                                <FormControl>
+                                  <RadioGroupItem 
+                                    value="no" 
+                                    className={fieldState.isDirty && field.value === "no" ? "border-green-500 text-green-500" : ""}
+                                  />
+                                </FormControl>
+                                <FormLabel className="font-normal">No</FormLabel>
+                              </FormItem>
+                            </motion.div>
+                          </RadioGroup>
+                        </FormControl>
+                      </FormAnimationWrapper>
+                      <AnimatedFormMessage 
+                        isValid={fieldState.isDirty && !fieldState.error}
+                      >
+                        {fieldState.error?.message}
+                      </AnimatedFormMessage>
                     </FormItem>
                   )}
                 />
