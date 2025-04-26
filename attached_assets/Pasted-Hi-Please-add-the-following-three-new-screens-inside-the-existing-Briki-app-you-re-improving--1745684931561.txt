@@ -1,0 +1,57 @@
+Hi! Please add the following three new screens inside the existing Briki app you’re improving:
+
+⸻
+
+	1.	Learn More Section:
+Create a new screen called LearnMoreScreen.
+Write a short, user-friendly explanation of Briki’s purpose:
+
+	•	Briki lets users easily compare and purchase travel insurance from top providers.
+	•	Focus on Briki’s speed (find insurance in under 2 minutes), simplicity, and trusted partnerships.
+	•	Highlight convenience, transparency, and security through Stripe payment.
+	•	Tone must be professional but welcoming and confident.
+
+Add a button linking to this screen from the Home screen (“Learn More about Briki”).
+
+⸻
+
+	2.	Terms and Services Section:
+Create a screen called TermsScreen.
+Write a basic but professional Terms and Services text. Cover:
+
+	•	User obligations (respect app rules, valid information)
+	•	Limitation of liability (Briki is not the insurer)
+	•	No warranty clause (plans depend on providers)
+	•	Purchase agreements (plans sold by third-party insurers)
+	•	Refund policy (subject to each insurer’s terms)
+	•	Intellectual property (Briki app and branding protected)
+	•	Governing law: Colombia and Mexico
+
+Make it understandable, legally solid, and friendly.
+
+Add a footer link to “Terms and Services” from the Home screen.
+
+⸻
+
+	3.	Disclaimer Section (Updated for Trustworthiness):
+Create a screen called DisclaimerScreen.
+Do NOT make it sound like Briki is untrustworthy.
+Instead, emphasize:
+
+	•	Briki responsibly curates plan information from official public sources and trusted partnerships.
+	•	Briki simplifies and empowers the insurance-buying process.
+	•	Coverage terms are displayed transparently for user convenience.
+	•	Final insurance documents are issued securely by the selected provider.
+
+Tone: Trust-building, empowering, professional, and easy to understand.
+
+Add a footer link to “Disclaimer” from the Home screen.
+
+⸻
+
+Design Requirements:
+	•	Match the Briki app’s current visual style (fonts, colors, button margins).
+	•	Keep new screens mobile-optimized and easy to scroll.
+	•	Use simple navigation — Home → Learn More / Terms / Disclaimer.
+
+Thank you!
