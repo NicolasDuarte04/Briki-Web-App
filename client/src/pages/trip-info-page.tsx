@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, Link } from "wouter";
-import { useForm } from "react-hook-form";
+import { useForm, useFormState } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { motion, AnimatePresence } from "framer-motion";
 
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
@@ -34,8 +35,15 @@ import {
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, CheckCircle, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+// Import our new animated components
+import { AnimatedInput } from "@/components/ui/animated-input";
+import { AnimatedButton } from "@/components/ui/animated-button";
+import { AnimatedFormMessage } from "@/components/ui/animated-form-message";
+import { AnimatedSelect } from "@/components/ui/animated-select";
+import { FormAnimationWrapper } from "@/components/ui/form-animation-wrapper";
 
 // Define the base schema (form input)
 const tripFormInputSchema = z.object({
