@@ -11,6 +11,7 @@ import InsurancePlansScreen from '../screens/InsurancePlansScreen';
 import CheckoutScreen from '../screens/CheckoutScreen';
 import WeatherRiskScreen from '../screens/WeatherRiskScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import SettingsScreen from '../screens/SettingsScreen';
 import { COLORS } from '../utils/theme';
 
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
@@ -24,6 +25,7 @@ export type MainStackParamList = {
   WeatherRisk: { destination?: string };
   Checkout: { planId: number };
   Profile: undefined;
+  Settings: undefined;
 };
 
 // Create the navigators
@@ -140,6 +142,16 @@ const AppNavigator = () => {
             options={{
               headerShown: true,
               title: 'Finalizar Compra',
+              headerTintColor: COLORS.white,
+              headerStyle: { backgroundColor: COLORS.primary }
+            }}
+          />
+          <Stack.Screen 
+            name="Settings" 
+            component={SettingsScreen}
+            options={{
+              headerShown: true,
+              title: 'Configuración',
               headerTintColor: COLORS.white,
               headerStyle: { backgroundColor: COLORS.primary }
             }}
