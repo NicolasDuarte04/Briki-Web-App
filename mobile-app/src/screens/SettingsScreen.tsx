@@ -33,9 +33,9 @@ const SettingsScreen = () => {
   const [notifications, setNotifications] = React.useState(true);
   const [emailNotifications, setEmailNotifications] = React.useState(true);
   const [smsNotifications, setSmsNotifications] = React.useState(true);
-  const [language, setLanguage] = React.useState('es');
-  const [currency, setCurrency] = React.useState('usd');
-  const [dateFormat, setDateFormat] = React.useState('dmy');
+  const [language, setLanguage] = React.useState<string>('es');
+  const [currency, setCurrency] = React.useState<string>('usd');
+  const [dateFormat, setDateFormat] = React.useState<string>('dmy');
   const [currentPassword, setCurrentPassword] = React.useState('');
   const [newPassword, setNewPassword] = React.useState('');
   const [confirmPassword, setConfirmPassword] = React.useState('');
@@ -449,7 +449,7 @@ const SettingsScreen = () => {
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Preferencias de idioma</Text>
                 <Text style={styles.label}>Idioma de la aplicación</Text>
-                <RadioButton.Group onValueChange={value => setLanguage(value)} value={language}>
+                <RadioButton.Group onValueChange={(value: string) => setLanguage(value)} value={language}>
                   <RadioButton.Item label="English" value="en" />
                   <RadioButton.Item label="Español" value="es" />
                   <RadioButton.Item label="Português" value="pt" />
@@ -470,7 +470,7 @@ const SettingsScreen = () => {
                 </RadioButton.Group>
                 
                 <Text style={styles.label}>Moneda</Text>
-                <RadioButton.Group onValueChange={value => setCurrency(value)} value={currency}>
+                <RadioButton.Group onValueChange={(value: string) => setCurrency(value)} value={currency}>
                   <RadioButton.Item label="USD ($)" value="usd" />
                   <RadioButton.Item label="EUR (€)" value="eur" />
                   <RadioButton.Item label="COP ($)" value="cop" />
@@ -483,7 +483,7 @@ const SettingsScreen = () => {
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Formato de fecha y hora</Text>
                 <Text style={styles.label}>Formato de fecha</Text>
-                <RadioButton.Group onValueChange={value => setDateFormat(value)} value={dateFormat}>
+                <RadioButton.Group onValueChange={(value: string) => setDateFormat(value)} value={dateFormat}>
                   <RadioButton.Item label="MM/DD/AAAA" value="mdy" />
                   <RadioButton.Item label="DD/MM/AAAA" value="dmy" />
                   <RadioButton.Item label="AAAA-MM-DD" value="ymd" />

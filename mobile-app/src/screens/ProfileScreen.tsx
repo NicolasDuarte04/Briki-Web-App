@@ -126,6 +126,13 @@ const ProfileScreen = () => {
               />
               
               <List.Item
+                title="Configuración"
+                left={() => <List.Icon icon="cog" />}
+                right={() => <List.Icon icon="chevron-right" />}
+                onPress={() => navigation.navigate('Settings')}
+              />
+              
+              <List.Item
                 title="Método de pago"
                 left={() => <List.Icon icon="credit-card" />}
                 right={() => <List.Icon icon="chevron-right" />}
