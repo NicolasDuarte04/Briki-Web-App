@@ -16,6 +16,8 @@ import CheckoutPage from "@/pages/checkout-page";
 import WeatherRiskPage from "@/pages/weather-risk-page";
 import LearnMorePage from "@/pages/learn-more-page";
 import TermsPage from "@/pages/terms-page";
+import ProfilePage from "@/pages/profile-page";
+import SettingsPage from "@/pages/settings-page";
 
 function Router() {
   return (
@@ -28,6 +30,8 @@ function Router() {
       <Route path="/weather-risk" component={WeatherRiskPage} />
       <Route path="/learn-more" component={LearnMorePage} />
       <Route path="/terms" component={TermsPage} />
+      <ProtectedRoute path="/profile" component={ProfilePage} />
+      <ProtectedRoute path="/settings" component={SettingsPage} />
       <Route component={NotFound} />
     </Switch>
   );
