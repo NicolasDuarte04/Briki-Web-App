@@ -73,7 +73,6 @@ export default function Navbar() {
             <Link href="/" className={`hover:text-primary px-3 py-2 text-sm font-medium ${isActivePath("/support")}`}>
               {t('support')}
             </Link>
-            <LanguageSelector />
           </div>
           
           {isLoading ? (
@@ -198,9 +197,6 @@ export default function Navbar() {
                     >
                       {t('support')}
                     </Link>
-                    <div className="mt-2 px-3 py-2">
-                      <LanguageSelector />
-                    </div>
                   </div>
                   
                   {user && (
