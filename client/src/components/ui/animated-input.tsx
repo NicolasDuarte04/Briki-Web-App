@@ -18,13 +18,8 @@ const AnimatedInput = React.forwardRef<HTMLInputElement, AnimatedInputProps>(
       isValid && "border-green-500 focus-visible:ring-green-500/30"
     );
 
-    // Show animation when validation state changes
-    const handleAnimationEnd = (e: React.AnimationEvent) => {
-      // Reset animation to allow it to be played again
-      if (e.currentTarget) {
-        e.currentTarget.style.animation = '';
-      }
-    };
+    // We don't need animation end handler for motion components
+    // as framer-motion handles all the animation states properly
     
     return (
       <motion.div
@@ -35,7 +30,6 @@ const AnimatedInput = React.forwardRef<HTMLInputElement, AnimatedInputProps>(
           invalid: { x: [0, -5, 5, -5, 5, 0] }
         }}
         transition={{ duration: 0.4, ease: "easeInOut" }}
-        onAnimationEnd={handleAnimationEnd}
       >
         <Input 
           ref={ref} 

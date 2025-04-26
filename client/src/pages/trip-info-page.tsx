@@ -386,25 +386,36 @@ export default function TripInfoPage() {
                   <FormField
                     control={form.control}
                     name="travelers"
-                    render={({ field }) => (
+                    render={({ field, fieldState }) => (
                       <FormItem>
                         <FormLabel>{t('numTravelers')}</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormAnimationWrapper
+                          isValid={fieldState.isDirty && !fieldState.error}
+                          isInvalid={!!fieldState.error && fieldState.isTouched}
+                          animationType="pulse"
+                        >
                           <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder={t('selectNumTravelers')} />
-                            </SelectTrigger>
+                            <AnimatedSelect
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                              placeholder={t('selectNumTravelers')}
+                              isValid={fieldState.isDirty && !fieldState.error}
+                              isInvalid={!!fieldState.error && fieldState.isTouched}
+                            >
+                              <SelectItem value="1">1</SelectItem>
+                              <SelectItem value="2">2</SelectItem>
+                              <SelectItem value="3">3</SelectItem>
+                              <SelectItem value="4">4</SelectItem>
+                              <SelectItem value="5">5</SelectItem>
+                              <SelectItem value="6">6+</SelectItem>
+                            </AnimatedSelect>
                           </FormControl>
-                          <SelectContent>
-                            <SelectItem value="1">1</SelectItem>
-                            <SelectItem value="2">2</SelectItem>
-                            <SelectItem value="3">3</SelectItem>
-                            <SelectItem value="4">4</SelectItem>
-                            <SelectItem value="5">5</SelectItem>
-                            <SelectItem value="6">6+</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
+                        </FormAnimationWrapper>
+                        <AnimatedFormMessage 
+                          isValid={fieldState.isDirty && !fieldState.error}
+                        >
+                          {fieldState.error?.message}
+                        </AnimatedFormMessage>
                       </FormItem>
                     )}
                   />
@@ -412,13 +423,31 @@ export default function TripInfoPage() {
                   <FormField
                     control={form.control}
                     name="primaryAge"
-                    render={({ field }) => (
+                    render={({ field, fieldState }) => (
                       <FormItem>
                         <FormLabel>{t('primaryTravelerAge')}</FormLabel>
                         <FormControl>
-                          <Input type="number" min="0" max="120" placeholder={t('age')} {...field} />
+                          <FormAnimationWrapper
+                            isValid={fieldState.isDirty && !fieldState.error}
+                            isInvalid={!!fieldState.error && fieldState.isTouched}
+                            animationType="shake"
+                          >
+                            <AnimatedInput
+                              type="number"
+                              min="0"
+                              max="120"
+                              placeholder={t('age')}
+                              isValid={fieldState.isDirty && !fieldState.error}
+                              isInvalid={!!fieldState.error && fieldState.isTouched}
+                              {...field}
+                            />
+                          </FormAnimationWrapper>
                         </FormControl>
-                        <FormMessage />
+                        <AnimatedFormMessage 
+                          isValid={fieldState.isDirty && !fieldState.error}
+                        >
+                          {fieldState.error?.message}
+                        </AnimatedFormMessage>
                       </FormItem>
                     )}
                   />
@@ -557,18 +586,25 @@ export default function TripInfoPage() {
                 </div>
                 
                 <div>
-                  <Button
+                  <AnimatedButton
                     type="submit"
-                    className="briki-button"
-                    disabled={createTripMutation.isPending}
+                    className="briki-button w-full"
+                    isLoading={createTripMutation.isPending}
+                    loadingText="Finding options..."
+                    successText="Great choices found!"
                   >
-                    {createTripMutation.isPending ? "Finding options..." : "Show my options"}
-                  </Button>
+                    Show my options
+                  </AnimatedButton>
                   
                   <div className="briki-help-link mt-4 flex justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
-                    </svg>
+                    <motion.div
+                      whileHover={{ rotate: [0, -10, 10, -10, 0] }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+                      </svg>
+                    </motion.div>
                     We're here to help!
                   </div>
                 </div>
