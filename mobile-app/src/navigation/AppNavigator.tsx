@@ -49,7 +49,7 @@ const MainTabNavigator = () => {
         component={HomeScreen} 
         options={{
           tabBarLabel: 'Inicio',
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color, size }: { color: string; size: number }) => (
             <MaterialCommunityIcons name="home" color={color} size={size} />
           ),
         }}
@@ -59,7 +59,7 @@ const MainTabNavigator = () => {
         component={InsurancePlansScreen} 
         options={{
           tabBarLabel: 'Seguros',
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color, size }: { color: string; size: number }) => (
             <MaterialCommunityIcons name="shield-check" color={color} size={size} />
           ),
         }}
@@ -69,7 +69,7 @@ const MainTabNavigator = () => {
         component={WeatherRiskScreen} 
         options={{
           tabBarLabel: 'Clima',
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color, size }: { color: string; size: number }) => (
             <MaterialCommunityIcons name="weather-partly-cloudy" color={color} size={size} />
           ),
         }}
@@ -79,7 +79,7 @@ const MainTabNavigator = () => {
         component={ProfileScreen} 
         options={{
           tabBarLabel: 'Perfil',
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color, size }: { color: string; size: number }) => (
             <Ionicons name="person" color={color} size={size} />
           ),
         }}

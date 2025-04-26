@@ -21,13 +21,18 @@ import {
 } from 'react-native-paper';
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { MainStackParamList } from '../navigation/AppNavigator';
+import { User } from '../types';
 
 import { useAuth } from '../contexts/AuthContext';
 import { COLORS } from '../utils/theme';
 
+type SettingsScreenNavigationProp = StackNavigationProp<MainStackParamList>;
+
 const SettingsScreen = () => {
   const { user } = useAuth();
-  const navigation = useNavigation();
+  const navigation = useNavigation<SettingsScreenNavigationProp>();
   
   const [darkMode, setDarkMode] = React.useState(false);
   const [notifications, setNotifications] = React.useState(true);
