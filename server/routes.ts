@@ -164,9 +164,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Insurance plan not found" });
       }
 
+      // Calculate expected price with tax (matching client calculation)
+      const taxesFees = Math.round(plan.basePrice * 0.0825); // 8.25% tax (same as client)
+      const expectedTotal = plan.basePrice + taxesFees;
+      
       // Strict verification for production environment
-      if (Math.abs(plan.basePrice - amount) > 0.01) {
-        console.error(`Price mismatch: Expected ${plan.basePrice}, got ${amount}`);
+      if (Math.abs(expectedTotal - amount) > 0.01) {
+        console.error(`Price mismatch: Expected ${expectedTotal}, got ${amount}`);
         return res.status(400).json({ 
           error: "Amount validation failed", 
           message: "The payment amount does not match the plan price." 
