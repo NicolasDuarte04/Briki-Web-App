@@ -201,10 +201,24 @@ export default function CheckoutPage() {
     queryKey: ["/api/trips"],
     enabled: !!user,
     initialData: [],
+    onSuccess: (data) => {
+      console.log("Trips fetched successfully:", data);
+    },
+    onError: (error) => {
+      console.error("Error fetching trips:", error);
+    }
   });
   
   // Get the most recent trip
   const latestTrip = trips && trips.length > 0 ? trips[trips.length - 1] : null;
+  
+  // Log trip data for debugging
+  useEffect(() => {
+    console.log("Current user:", user);
+    console.log("All trips:", trips);
+    console.log("Latest trip:", latestTrip);
+    console.log("Selected plan:", plan);
+  }, [user, trips, latestTrip, plan]);
   
   // Calculate total amount including taxes
   const basePrice = plan?.basePrice || 0;
