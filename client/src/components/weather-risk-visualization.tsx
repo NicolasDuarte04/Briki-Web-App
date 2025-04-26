@@ -31,6 +31,7 @@ import {
   SelectValue 
 } from '@/components/ui/select';
 import { Progress } from '@/components/ui/progress';
+import { useLanguage } from '@/components/language-selector';
 
 interface WeatherRiskVisualizationProps {
   selectedDestination?: string;
@@ -41,6 +42,7 @@ export function WeatherRiskVisualization({
   selectedDestination,
   onInsuranceRecommendation 
 }: WeatherRiskVisualizationProps) {
+  const { t } = useLanguage();
   const [currentMonth, setCurrentMonth] = useState<number>(new Date().getMonth() + 1);
   const [destination, setDestination] = useState<DestinationRisk | null>(null);
   const [destinations, setDestinations] = useState<DestinationRisk[]>(getDestinationsByMonth(currentMonth));
@@ -136,6 +138,22 @@ export function WeatherRiskVisualization({
   const RiskIndicator = ({ risk }: { risk: WeatherRiskFactor }) => {
     const colorClass = getRiskColor(risk.severity);
     
+    // Add badge color based on risk severity
+    const getBadgeColor = (severity: RiskLevel) => {
+      switch (severity) {
+        case RiskLevel.LOW:
+          return "bg-green-100 text-green-800 hover:bg-green-200";
+        case RiskLevel.MODERATE:
+          return "bg-yellow-100 text-yellow-800 hover:bg-yellow-200";
+        case RiskLevel.HIGH:
+          return "bg-orange-100 text-orange-800 hover:bg-orange-200";
+        case RiskLevel.EXTREME:
+          return "bg-red-100 text-red-800 hover:bg-red-200";
+        default:
+          return "bg-gray-100 text-gray-800 hover:bg-gray-200";
+      }
+    };
+    
     return (
       <motion.div 
         className={`p-3 rounded-lg shadow-sm ${colorClass} flex items-start gap-3 mb-3`}
@@ -153,7 +171,7 @@ export function WeatherRiskVisualization({
         <div>
           <div className="font-medium capitalize">
             {risk.type.replace('_', ' ')}
-            <Badge variant="outline" className="ml-2 capitalize">
+            <Badge className={`ml-2 capitalize ${getBadgeColor(risk.severity)}`}>
               {risk.severity}
             </Badge>
           </div>
@@ -163,55 +181,64 @@ export function WeatherRiskVisualization({
     );
   };
   
+  // Get month name translation based on month number
+  const getMonthName = (monthNumber: number): string => {
+    const monthKeys = [
+      'january', 'february', 'march', 'april', 'may', 'june',
+      'july', 'august', 'september', 'october', 'november', 'december'
+    ];
+    return t(monthKeys[monthNumber - 1]);
+  };
+
   return (
     <div className="space-y-6">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <CloudDrizzle className="h-6 w-6 text-primary" />
-            Riesgos Climáticos
+            {t('weatherRisks')}
           </CardTitle>
           <CardDescription>
-            Visualización de riesgos climáticos y recomendaciones para tu seguro de viaje
+            {t('weatherRisksDescription')}
           </CardDescription>
         </CardHeader>
         
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div>
-              <label className="text-sm font-medium mb-2 block">Mes de viaje</label>
+              <label className="text-sm font-medium mb-2 block">{t('travelMonth')}</label>
               <Select 
                 value={currentMonth.toString()} 
                 onValueChange={handleMonthChange}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Selecciona un mes" />
+                  <SelectValue placeholder={t('selectDestination')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="1">Enero</SelectItem>
-                  <SelectItem value="2">Febrero</SelectItem>
-                  <SelectItem value="3">Marzo</SelectItem>
-                  <SelectItem value="4">Abril</SelectItem>
-                  <SelectItem value="5">Mayo</SelectItem>
-                  <SelectItem value="6">Junio</SelectItem>
-                  <SelectItem value="7">Julio</SelectItem>
-                  <SelectItem value="8">Agosto</SelectItem>
-                  <SelectItem value="9">Septiembre</SelectItem>
-                  <SelectItem value="10">Octubre</SelectItem>
-                  <SelectItem value="11">Noviembre</SelectItem>
-                  <SelectItem value="12">Diciembre</SelectItem>
+                  <SelectItem value="1">{t('january')}</SelectItem>
+                  <SelectItem value="2">{t('february')}</SelectItem>
+                  <SelectItem value="3">{t('march')}</SelectItem>
+                  <SelectItem value="4">{t('april')}</SelectItem>
+                  <SelectItem value="5">{t('may')}</SelectItem>
+                  <SelectItem value="6">{t('june')}</SelectItem>
+                  <SelectItem value="7">{t('july')}</SelectItem>
+                  <SelectItem value="8">{t('august')}</SelectItem>
+                  <SelectItem value="9">{t('september')}</SelectItem>
+                  <SelectItem value="10">{t('october')}</SelectItem>
+                  <SelectItem value="11">{t('november')}</SelectItem>
+                  <SelectItem value="12">{t('december')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             
             <div>
-              <label className="text-sm font-medium mb-2 block">Destino</label>
+              <label className="text-sm font-medium mb-2 block">{t('destination')}</label>
               <Select 
                 value={destination ? `${destination.country.toLowerCase()}-${destination.city.toLowerCase()}` : ''}
                 onValueChange={handleDestinationChange}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Selecciona un destino" />
+                  <SelectValue placeholder={t('selectDestinationView')} />
                 </SelectTrigger>
                 <SelectContent>
                   {destinations.map((d) => (
@@ -235,26 +262,33 @@ export function WeatherRiskVisualization({
                 </h3>
                 <div className="flex items-center gap-2">
                   <Shield className="h-5 w-5 text-blue-500" />
-                  <span className="text-sm font-medium">Índice de seguridad:</span>
+                  <span className="text-sm font-medium">{t('safetyIndex')}:</span>
                   <span className="font-bold">{destination.safetyScore}/100</span>
                 </div>
               </div>
               
               <div>
-                <label className="text-sm font-medium mb-1 block">Nivel de seguridad:</label>
-                <Progress 
-                  value={destination.safetyScore} 
-                  className={`h-2 ${
-                    destination.safetyScore > 80 ? "bg-green-500" :
-                    destination.safetyScore > 60 ? "bg-yellow-500" :
-                    "bg-red-500"
-                  }`}
-                />
+                <label className="text-sm font-medium mb-1 block">{t('safetyLevel')}:</label>
+                <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full ${
+                      destination.safetyScore > 80 ? "bg-green-500" :
+                      destination.safetyScore > 60 ? "bg-yellow-500" :
+                      "bg-red-500"
+                    }`}
+                    style={{ width: `${destination.safetyScore}%` }}
+                  ></div>
+                </div>
+                <div className="flex justify-between mt-1">
+                  <span className={`text-xs font-medium ${destination.safetyScore < 60 ? "text-red-600" : "text-gray-500"}`}>{t('highRisk')}</span>
+                  <span className={`text-xs font-medium ${destination.safetyScore >= 60 && destination.safetyScore <= 80 ? "text-yellow-600" : "text-gray-500"}`}>{t('moderateRisk')}</span>
+                  <span className={`text-xs font-medium ${destination.safetyScore > 80 ? "text-green-600" : "text-gray-500"}`}>{t('lowRisk')}</span>
+                </div>
               </div>
               
               <AnimatePresence>
                 <div className="mt-6">
-                  <h4 className="text-sm font-medium mb-3">Factores de riesgo climático:</h4>
+                  <h4 className="text-sm font-medium mb-3">{t('climateRiskFactors')}:</h4>
                   <motion.div 
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -267,7 +301,7 @@ export function WeatherRiskVisualization({
                       ))
                     ) : (
                       <div className="text-center py-6 text-gray-500">
-                        No hay riesgos climáticos significativos para este destino
+                        {t('noSignificantRisks')}
                       </div>
                     )}
                   </motion.div>
@@ -280,7 +314,7 @@ export function WeatherRiskVisualization({
                     <Shield className="h-5 w-5 text-blue-600" />
                   </div>
                   <div>
-                    <h4 className="font-medium text-blue-700">Recomendación de seguro</h4>
+                    <h4 className="font-medium text-blue-700">{t('insuranceRecommendation')}</h4>
                     <p className="text-sm text-blue-600 mt-1">
                       {destination.insuranceRecommendation}
                     </p>
@@ -291,14 +325,14 @@ export function WeatherRiskVisualization({
           ) : (
             <div className="text-center py-12 text-gray-500">
               <CloudDrizzle className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>Selecciona un destino para ver sus riesgos climáticos</p>
+              <p>{t('selectDestinationView')}</p>
             </div>
           )}
         </CardContent>
         
         <CardFooter className="flex justify-between text-xs text-gray-500 border-t pt-4">
-          <p>Datos actualizados regularmente</p>
-          <p>Fuente: Datos meteorológicos internacionales</p>
+          <p>{t('dataUpdatedRegularly')}</p>
+          <p>{t('dataSource')}</p>
         </CardFooter>
       </Card>
     </div>
