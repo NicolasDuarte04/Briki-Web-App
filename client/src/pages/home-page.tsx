@@ -72,6 +72,7 @@ export default function HomePage() {
                     <Button 
                       variant="secondary"
                       className="w-full px-8 py-3 md:py-4 md:text-lg md:px-10"
+                      onClick={() => navigate("/learn-more")}
                     >
                       Learn More
                     </Button>
