@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { useLanguage } from "@/components/language-selector";
+import { CountryCombobox } from "@/components/country-combobox";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -252,22 +253,17 @@ export default function TripInfoPage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>{t('countryOfOrigin')}</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder={`${t('selectDestination')}`} />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="colombia">Colombia</SelectItem>
-                            <SelectItem value="mexico">Mexico</SelectItem>
-                            <SelectItem value="peru">Peru</SelectItem>
-                            <SelectItem value="argentina">Argentina</SelectItem>
-                            <SelectItem value="chile">Chile</SelectItem>
-                            <SelectItem value="ecuador">Ecuador</SelectItem>
-                            <SelectItem value="brazil">Brazil</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <FormControl>
+                          <CountryCombobox 
+                            value={field.value || ""} 
+                            onChange={field.onChange}
+                            placeholder={t('selectCountryOfOrigin')}
+                            label={t('countryOfOrigin')}
+                            emptyMessage={t('noCountryFound')}
+                            searchPlaceholder={t('searchCountry')}
+                            isOrigin={true}
+                          />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -279,29 +275,17 @@ export default function TripInfoPage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>{t('destination')}</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder={`${t('selectDestination')}`} />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="spain">Spain</SelectItem>
-                            <SelectItem value="usa">United States</SelectItem>
-                            <SelectItem value="france">France</SelectItem>
-                            <SelectItem value="italy">Italy</SelectItem>
-                            <SelectItem value="uk">United Kingdom</SelectItem>
-                            <SelectItem value="germany">Germany</SelectItem>
-                            <SelectItem value="japan">Japan</SelectItem>
-                            <SelectItem value="canada">Canada</SelectItem>
-                            <SelectItem value="australia">Australia</SelectItem>
-                            <SelectItem value="brazil">Brazil</SelectItem>
-                            <SelectItem value="argentina">Argentina</SelectItem>
-                            <SelectItem value="mexico">Mexico</SelectItem>
-                            <SelectItem value="china">China</SelectItem>
-                            <SelectItem value="thailand">Thailand</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <FormControl>
+                          <CountryCombobox 
+                            value={field.value || ""} 
+                            onChange={field.onChange}
+                            placeholder={t('selectDestination')}
+                            label={t('destination')}
+                            emptyMessage={t('noCountryFound')}
+                            searchPlaceholder={t('searchCountry')}
+                            isOrigin={false}
+                          />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}

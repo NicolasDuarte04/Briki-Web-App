@@ -35,22 +35,27 @@ const translations: Translations = {
     destination: 'Destination Country',
     departureDate: 'Departure Date',
     returnDate: 'Return Date',
-    travelers: 'Number of Travelers',
-    primaryAge: 'Age of Primary Traveler',
+    numTravelers: 'Number of Travelers',
+    primaryTravelerAge: 'Age of Primary Traveler',
+    age: 'Age',
     medicalConditions: 'Do you have any pre-existing medical conditions?',
     coveragePriorities: 'Coverage Priorities (select up to 3)',
+    selectCountryOfOrigin: 'Select country of origin',
+    selectDestination: 'Select destination country',
+    selectNumTravelers: 'Select number of travelers',
+    noCountryFound: 'No country found',
+    searchCountry: 'Search country...',
     
     // Insurance coverage types
     medicalCoverage: 'Medical Coverage',
     tripCancellation: 'Trip Cancellation',
-    baggageProtection: 'Baggage Protection',
+    baggageProtection: 'Baggage Protection', 
     emergencyEvacuation: 'Emergency Evacuation',
     adventureActivities: 'Adventure Activities',
     carRental: 'Car Rental Coverage',
     
     // Actions and Buttons
     findPlans: 'Find Plans',
-    selectDestination: 'Select your destination',
     save: 'Save',
     continue: 'Continue',
     back: 'Back',
@@ -94,6 +99,11 @@ const translations: Translations = {
     november: 'November',
     december: 'December',
     
+    // Toast messages
+    tripInfoSaved: 'Trip information saved',
+    findingBestPlans: 'We\'re finding the best insurance plans for your trip.',
+    failedToSaveTrip: 'Failed to save trip information',
+    
     // Common elements
     yes: 'Yes',
     no: 'No',
@@ -116,10 +126,16 @@ const translations: Translations = {
     destination: 'País de Destino',
     departureDate: 'Fecha de salida',
     returnDate: 'Fecha de regreso',
-    travelers: 'Número de viajeros',
-    primaryAge: 'Edad del viajero principal',
+    numTravelers: 'Número de viajeros',
+    primaryTravelerAge: 'Edad del viajero principal',
+    age: 'Edad',
     medicalConditions: '¿Tienes alguna condición médica preexistente?',
     coveragePriorities: 'Prioridades de cobertura (selecciona hasta 3)',
+    selectCountryOfOrigin: 'Selecciona país de origen',
+    selectDestination: 'Selecciona país de destino',
+    selectNumTravelers: 'Selecciona número de viajeros',
+    noCountryFound: 'No se encontraron países',
+    searchCountry: 'Buscar país...',
     
     // Insurance coverage types
     medicalCoverage: 'Cobertura médica',
@@ -131,7 +147,6 @@ const translations: Translations = {
     
     // Actions and Buttons
     findPlans: 'Buscar planes',
-    selectDestination: 'Selecciona tu destino',
     save: 'Guardar',
     continue: 'Continuar',
     back: 'Atrás',
@@ -197,10 +212,16 @@ const translations: Translations = {
     destination: 'País de Destino',
     departureDate: 'Data de saída',
     returnDate: 'Data de retorno',
-    travelers: 'Número de viajantes',
-    primaryAge: 'Idade do viajante principal',
+    numTravelers: 'Número de viajantes',
+    primaryTravelerAge: 'Idade do viajante principal',
+    age: 'Idade',
     medicalConditions: 'Você tem alguma condição médica preexistente?',
     coveragePriorities: 'Prioridades de cobertura (selecione até 3)',
+    selectCountryOfOrigin: 'Selecione país de origem',
+    selectDestination: 'Selecione país de destino',
+    selectNumTravelers: 'Selecione número de viajantes',
+    noCountryFound: 'Nenhum país encontrado',
+    searchCountry: 'Buscar país...',
     
     // Insurance coverage types
     medicalCoverage: 'Cobertura médica',
