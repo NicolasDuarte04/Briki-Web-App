@@ -2,7 +2,7 @@ import React, { createContext, ReactNode, useContext, useState, useEffect } from
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { QueryClient, useQuery, useMutation } from 'react-query';
 import { api } from '../services/api';
-import { User } from '../types/insurance';
+import { User } from '../types';
 
 interface AuthContextData {
   user: User | null;
