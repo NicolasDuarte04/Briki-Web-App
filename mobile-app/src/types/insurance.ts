@@ -1,27 +1,9 @@
-export interface User {
-  id: number;
-  username: string;
-  email: string;
-}
-
-export interface Trip {
-  id: number;
-  userId: number;
-  origin: string;
-  destination: string;
-  startDate: string;
-  endDate: string;
-  travelers: number;
-  primaryAge: number;
-  hasMedicalConditions: boolean;
-  priorities: string[];
-  createdAt?: string;
-}
-
+// Insurance plan type definitions
 export interface InsurancePlan {
   id: number;
   name: string;
   provider: string;
+  logo: any; // For React Native image require
   basePrice: number;
   medicalCoverage: number;
   tripCancellation: string;
@@ -29,27 +11,40 @@ export interface InsurancePlan {
   emergencyEvacuation?: number;
   adventureActivities: boolean;
   rentalCarCoverage?: number;
-  covidCoverage?: boolean;
-  rating: string;
-  reviews: number;
+  features: string[];
+  restrictions: string[];
+  rating?: number;
+  reviews?: number;
   country: string;
-  createdAt?: string;
+  description: string;
+  isSelected?: boolean; // For comparison functionality
 }
 
-export interface Order {
-  id: number;
-  userId: number;
-  planId: number;
-  tripId: number;
+// Trip information for insurance calculation
+export interface TripInfo {
+  origin: string;
+  destination: string;
+  startDate: Date;
+  endDate: Date;
+  travelers: number;
+  includeAdventure?: boolean;
+  travelerAge?: number;
+}
+
+// Insurance plan filter criteria
+export interface FilterCriteria {
+  minMedicalCoverage?: number;
+  maxPrice?: number;
+  providers?: string[];
+  includeAdventure?: boolean;
+  destination?: string;
+}
+
+// Price calculation result
+export interface PriceCalculation {
+  basePricePerDay: number;
+  numberOfDays: number;
+  numberOfTravelers: number;
+  adventureSurcharge: number;
   totalPrice: number;
-  paymentStatus: PaymentStatus;
-  policyNumber?: string;
-  createdAt?: string;
-}
-
-export enum PaymentStatus {
-  PENDING = 'pending',
-  PAID = 'paid',
-  FAILED = 'failed',
-  REFUNDED = 'refunded'
 }
