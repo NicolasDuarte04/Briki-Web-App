@@ -2,12 +2,12 @@
 import { DefaultTheme } from 'react-native-paper';
 
 export const COLORS = {
-  primary: '#1E88E5', // Main brand color
-  primaryDark: '#1565C0', // Darker variant
-  primaryLight: '#BBDEFB', // Lighter variant
-  secondary: '#FF5722', // Secondary action color
-  secondaryDark: '#E64A19',
-  secondaryLight: '#FFCCBC',
+  primary: '#4B76E5', // Briki Blue - Main brand color
+  primaryDark: '#3A5FC8', // Darker variant
+  primaryLight: '#C7D3F7', // Lighter variant
+  secondary: '#F8B400', // Secondary brand color
+  secondaryDark: '#E59E00',
+  secondaryLight: '#FFE9B3',
   accent: '#FF9800', // Highlighting accent
   success: '#4CAF50', // Success state
   warning: '#FFC107', // Warning state
@@ -19,6 +19,8 @@ export const COLORS = {
   surface: '#FFFFFF', // Card or surface background
   white: '#FFFFFF',
   black: '#000000',
+  gray: '#9E9E9E',      // Default gray for neutral risk
+  grayLight: '#F0F0F0', // Light gray for backgrounds
   
   // Text colors
   text: '#212121', // Primary text
@@ -38,7 +40,6 @@ export const COLORS = {
   riskModerate: '#FF9800', // Orange - Moderate risk
   riskHigh: '#F44336',     // Red - High risk
   riskExtreme: '#B71C1C',  // Dark red - Extreme risk
-  gray: '#9E9E9E',         // Default gray for neutral risk
 };
 
 export const FONTS = {
@@ -97,16 +98,27 @@ export const theme = {
   colors: {
     ...DefaultTheme.colors,
     primary: COLORS.primary,
-    accent: COLORS.accent,
+    accent: COLORS.secondary,
     background: COLORS.background,
     surface: COLORS.surface,
     text: COLORS.text,
     error: COLORS.error,
+    onSurface: COLORS.text,
+    notification: COLORS.accent,
   },
   fonts: {
-    regular: FONTS.regular,
-    medium: FONTS.medium,
-    light: FONTS.light,
-    thin: FONTS.light,
+    regular: {
+      fontFamily: FONTS.regular,
+    },
+    medium: {
+      fontFamily: FONTS.medium,
+    },
+    light: {
+      fontFamily: FONTS.light,
+    },
+    thin: {
+      fontFamily: FONTS.light,
+    },
   },
+  roundness: 8,
 };
