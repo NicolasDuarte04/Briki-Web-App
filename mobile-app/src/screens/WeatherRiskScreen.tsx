@@ -363,20 +363,38 @@ const WeatherRiskScreen = () => {
           </View>
         )}
         
-        {/* Disclaimer */}
-        <Card style={styles.disclaimerCard}>
-          <Card.Content>
-            <View style={styles.disclaimerContent}>
-              <Ionicons name="information-circle" size={24} color={COLORS.primary} />
-              <Text style={styles.disclaimerText}>
-                La información de riesgos climáticos está basada en datos meteorológicos históricos y tendencias estacionales. 
-                Los datos se actualizan periódicamente y se proporcionan como referencia para ayudar en la planificación de viajes.
-              </Text>
-            </View>
-          </Card.Content>
-        </Card>
+        {/* Weather Tab Content */}
+        <Animated.View style={weatherContentStyle}>
+          {/* Disclaimer */}
+          <Card style={styles.disclaimerCard}>
+            <Card.Content>
+              <View style={styles.disclaimerContent}>
+                <Ionicons name="information-circle" size={24} color={COLORS.primary} />
+                <Text style={styles.disclaimerText}>
+                  La información de riesgos climáticos está basada en datos meteorológicos históricos y tendencias estacionales. 
+                  Los datos se actualizan periódicamente y se proporcionan como referencia para ayudar en la planificación de viajes.
+                </Text>
+              </View>
+            </Card.Content>
+          </Card>
+        </Animated.View>
         
-        {/* Trip Details */}
+        {/* Safety Tab Content */}
+        <Animated.View style={safetyContentStyle}>
+          <Card style={styles.disclaimerCard}>
+            <Card.Content>
+              <View style={styles.disclaimerContent}>
+                <Ionicons name="shield-checkmark" size={24} color={COLORS.primary} />
+                <Text style={styles.disclaimerText}>
+                  La información de seguridad se basa en datos de fuentes oficiales y actualizaciones de viajeros.
+                  Incluye factores como seguridad sanitaria, criminalidad y riesgos naturales.
+                </Text>
+              </View>
+            </Card.Content>
+          </Card>
+        </Animated.View>
+        
+        {/* Trip Details - Shown in both tabs */}
         <Card style={styles.tripDetailsCard}>
           <Card.Content>
             <Text style={styles.sectionTitle}>Detalles del Viaje</Text>
@@ -418,136 +436,250 @@ const WeatherRiskScreen = () => {
           </Card.Content>
         </Card>
         
-        {/* Weather Risk Visualization */}
-        <Card style={styles.weatherCard}>
-          <Card.Content>
-            <Text style={styles.sectionTitle}>Riesgos Climáticos</Text>
-            
-            <Text style={styles.inputLabel}>Mes de viaje</Text>
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={currentMonth}
-                onValueChange={(value) => handleMonthChange(value)}
-                style={styles.picker}
-              >
-                {getMonths().map((month) => (
-                  <Picker.Item 
-                    key={month.value} 
-                    label={month.label} 
-                    value={month.value} 
+        {/* Weather Tab Specific Content */}
+        <Animated.View style={weatherContentStyle}>
+          {/* Weather Risk Visualization */}
+          <Card style={styles.weatherCard}>
+            <Card.Content>
+              <Text style={styles.sectionTitle}>Riesgos Climáticos</Text>
+              
+              <Text style={styles.inputLabel}>Mes de viaje</Text>
+              <View style={styles.pickerContainer}>
+                <Picker
+                  selectedValue={currentMonth}
+                  onValueChange={(value) => handleMonthChange(value)}
+                  style={styles.picker}
+                >
+                  {getMonths().map((month) => (
+                    <Picker.Item 
+                      key={month.value} 
+                      label={month.label} 
+                      value={month.value} 
+                    />
+                  ))}
+                </Picker>
+              </View>
+              
+              {destination ? (
+                <View style={styles.destinationContainer}>
+                  <View style={styles.destinationHeader}>
+                    <Text style={styles.destinationTitle}>
+                      {destination.city}, {destination.country}
+                    </Text>
+                    
+                    <View style={styles.safetyContainer}>
+                      <MaterialCommunityIcons name="weather-partly-cloudy" size={18} color={COLORS.primary} />
+                      <Text style={styles.safetyLabel}>Índice climático:</Text>
+                      <Text style={styles.safetyScore}>{destination.safetyScore}/100</Text>
+                    </View>
+                  </View>
+                  
+                  <Text style={styles.progressLabel}>Nivel de seguridad climática:</Text>
+                  <ProgressBar 
+                    progress={destination.safetyScore / 100} 
+                    color={
+                      destination.safetyScore > 80 ? COLORS.riskLow :
+                      destination.safetyScore > 60 ? COLORS.riskModerate :
+                      COLORS.riskHigh
+                    }
+                    style={styles.progressBar}
                   />
-                ))}
-              </Picker>
-            </View>
-            
-            {destination ? (
-              <View style={styles.destinationContainer}>
-                <View style={styles.destinationHeader}>
-                  <Text style={styles.destinationTitle}>
-                    {destination.city}, {destination.country}
+                  
+                  <Text style={[styles.sectionSubtitle, { marginTop: 20 }]}>
+                    Factores de riesgo climático:
                   </Text>
                   
-                  <View style={styles.safetyContainer}>
-                    <Ionicons name="shield" size={18} color={COLORS.primary} />
-                    <Text style={styles.safetyLabel}>Índice de seguridad:</Text>
-                    <Text style={styles.safetyScore}>{destination.safetyScore}/100</Text>
-                  </View>
-                </View>
-                
-                <Text style={styles.progressLabel}>Nivel de seguridad:</Text>
-                <ProgressBar 
-                  progress={destination.safetyScore / 100} 
-                  color={
-                    destination.safetyScore > 80 ? COLORS.riskLow :
-                    destination.safetyScore > 60 ? COLORS.riskModerate :
-                    COLORS.riskHigh
-                  }
-                  style={styles.progressBar}
-                />
-                
-                <Text style={[styles.sectionSubtitle, { marginTop: 20 }]}>
-                  Factores de riesgo climático:
-                </Text>
-                
-                {destination.weatherRisks.length > 0 ? (
-                  destination.weatherRisks.map((risk, index) => (
-                    <Animated.View 
-                      key={`${risk.type}-${index}`} 
-                      style={[
-                        styles.riskCard,
-                        { borderColor: getRiskColor(risk.severity) },
-                        index === 0 ? animatedStyle : null // Only animate the first card
-                      ]}
-                    >
-                      <View style={styles.riskHeader}>
-                        <View style={styles.riskIconContainer}>
-                          <MaterialCommunityIcons 
-                            name={getRiskIcon(risk.type)} 
-                            size={24} 
-                            color={getRiskColor(risk.severity)} 
-                          />
+                  {destination.weatherRisks.length > 0 ? (
+                    destination.weatherRisks.map((risk, index) => (
+                      <Animated.View 
+                        key={`${risk.type}-${index}`} 
+                        style={[
+                          styles.riskCard,
+                          { borderColor: getRiskColor(risk.severity) },
+                          index === 0 ? animatedStyle : null // Only animate the first card
+                        ]}
+                      >
+                        <View style={styles.riskHeader}>
+                          <View style={styles.riskIconContainer}>
+                            <MaterialCommunityIcons 
+                              name={getRiskIcon(risk.type)} 
+                              size={24} 
+                              color={getRiskColor(risk.severity)} 
+                            />
+                          </View>
+                          
+                          <View style={styles.riskTitleContainer}>
+                            <Text style={styles.riskTitle}>
+                              {risk.type.replace('_', ' ')}
+                            </Text>
+                            <Chip 
+                              style={[
+                                styles.severityChip,
+                                { backgroundColor: getRiskColor(risk.severity) + '30' }
+                              ]}
+                              textStyle={{ color: getRiskColor(risk.severity) }}
+                            >
+                              {risk.severity}
+                            </Chip>
+                          </View>
                         </View>
                         
-                        <View style={styles.riskTitleContainer}>
-                          <Text style={styles.riskTitle}>
-                            {risk.type.replace('_', ' ')}
-                          </Text>
-                          <Chip 
-                            style={[
-                              styles.severityChip,
-                              { backgroundColor: getRiskColor(risk.severity) + '30' }
-                            ]}
-                            textStyle={{ color: getRiskColor(risk.severity) }}
-                          >
-                            {risk.severity}
-                          </Chip>
-                        </View>
-                      </View>
-                      
-                      <Text style={styles.riskDescription}>{risk.description}</Text>
-                    </Animated.View>
-                  ))
-                ) : (
-                  <View style={styles.emptyRisksContainer}>
-                    <MaterialCommunityIcons name="weather-sunny" size={40} color={COLORS.grayLight} />
-                    <Text style={styles.emptyRisksText}>
-                      No hay riesgos climáticos significativos para este destino
-                    </Text>
-                  </View>
-                )}
-                
-                {/* Insurance Recommendation */}
-                <View style={styles.recommendationCard}>
-                  <View style={styles.recommendationHeader}>
-                    <Ionicons name="shield-checkmark" size={24} color={COLORS.primary} />
-                    <Text style={styles.recommendationTitle}>
-                      Recomendación de seguro
-                    </Text>
-                  </View>
+                        <Text style={styles.riskDescription}>{risk.description}</Text>
+                      </Animated.View>
+                    ))
+                  ) : (
+                    <View style={styles.emptyRisksContainer}>
+                      <MaterialCommunityIcons name="weather-sunny" size={40} color={COLORS.grayLight} />
+                      <Text style={styles.emptyRisksText}>
+                        No hay riesgos climáticos significativos para este destino
+                      </Text>
+                    </View>
+                  )}
                   
-                  <Text style={styles.recommendationText}>
-                    {insuranceRecommendation}
+                  {/* Insurance Recommendation */}
+                  <View style={styles.recommendationCard}>
+                    <View style={styles.recommendationHeader}>
+                      <Ionicons name="shield-checkmark" size={24} color={COLORS.primary} />
+                      <Text style={styles.recommendationTitle}>
+                        Recomendación de seguro
+                      </Text>
+                    </View>
+                    
+                    <Text style={styles.recommendationText}>
+                      {insuranceRecommendation}
+                    </Text>
+                  </View>
+                </View>
+              ) : (
+                <View style={styles.emptyContainer}>
+                  <MaterialCommunityIcons name="weather-cloudy" size={50} color={COLORS.grayLight} />
+                  <Text style={styles.emptyText}>
+                    Selecciona un destino para ver sus riesgos climáticos
                   </Text>
                 </View>
-              </View>
-            ) : (
-              <View style={styles.emptyContainer}>
-                <MaterialCommunityIcons name="weather-cloudy" size={50} color={COLORS.grayLight} />
-                <Text style={styles.emptyText}>
-                  Selecciona un destino para ver sus riesgos climáticos
-                </Text>
-              </View>
+              )}
+            </Card.Content>
+            
+            {destination && (
+              <Card.Actions style={styles.cardActions}>
+                <Button mode="contained" onPress={viewInsurancePlans}>
+                  Ver planes recomendados
+                </Button>
+              </Card.Actions>
             )}
-          </Card.Content>
-          
-          {destination && (
-            <Card.Actions style={styles.cardActions}>
-              <Button mode="contained" onPress={viewInsurancePlans}>
-                Ver planes recomendados
-              </Button>
-            </Card.Actions>
-          )}
-        </Card>
+          </Card>
+        </Animated.View>
+        
+        {/* Safety Tab Specific Content */}
+        <Animated.View style={safetyContentStyle}>
+          <Card style={styles.weatherCard}>
+            <Card.Content>
+              <Text style={styles.sectionTitle}>Riesgos de Seguridad</Text>
+              
+              {destination ? (
+                <View style={styles.destinationContainer}>
+                  <View style={styles.destinationHeader}>
+                    <Text style={styles.destinationTitle}>
+                      {destination.city}, {destination.country}
+                    </Text>
+                    
+                    <View style={styles.safetyContainer}>
+                      <Ionicons name="shield" size={18} color={COLORS.primary} />
+                      <Text style={styles.safetyLabel}>Índice de seguridad:</Text>
+                      <Text style={styles.safetyScore}>{destination.safetyScore}/100</Text>
+                    </View>
+                  </View>
+                  
+                  <Text style={styles.progressLabel}>Nivel de seguridad general:</Text>
+                  <ProgressBar 
+                    progress={destination.safetyScore / 100} 
+                    color={
+                      destination.safetyScore > 80 ? COLORS.riskLow :
+                      destination.safetyScore > 60 ? COLORS.riskModerate :
+                      COLORS.riskHigh
+                    }
+                    style={styles.progressBar}
+                  />
+                  
+                  <Text style={[styles.sectionSubtitle, { marginTop: 20 }]}>
+                    Información de seguridad:
+                  </Text>
+                  
+                  <Animated.View style={styles.riskCard}>
+                    <View style={styles.riskHeader}>
+                      <View style={styles.riskIconContainer}>
+                        <MaterialCommunityIcons 
+                          name="security" 
+                          size={24} 
+                          color={COLORS.primary} 
+                        />
+                      </View>
+                      
+                      <View style={styles.riskTitleContainer}>
+                        <Text style={styles.riskTitle}>
+                          Seguridad general
+                        </Text>
+                      </View>
+                    </View>
+                    
+                    <Text style={styles.riskDescription}>
+                      {destination.safetyScore > 80 
+                        ? `${destination.city} es un destino generalmente seguro para viajeros. Se recomiendan precauciones estándar.` 
+                        : destination.safetyScore > 60 
+                        ? `${destination.city} tiene un nivel moderado de riesgo. Se recomienda estar alerta en zonas turísticas.` 
+                        : `${destination.city} tiene niveles elevados de riesgo en ciertas áreas. Se recomienda investigar zonas específicas antes de viajar.`}
+                    </Text>
+                  </Animated.View>
+                  
+                  <Animated.View style={styles.riskCard}>
+                    <View style={styles.riskHeader}>
+                      <View style={styles.riskIconContainer}>
+                        <MaterialCommunityIcons 
+                          name="hospital-box" 
+                          size={24} 
+                          color={COLORS.primary} 
+                        />
+                      </View>
+                      
+                      <View style={styles.riskTitleContainer}>
+                        <Text style={styles.riskTitle}>
+                          Salud y servicios médicos
+                        </Text>
+                      </View>
+                    </View>
+                    
+                    <Text style={styles.riskDescription}>
+                      {destination.safetyScore > 70 
+                        ? `${destination.city} cuenta con buenos servicios médicos accesibles para turistas. Se recomienda un seguro de viaje con cobertura médica básica.`
+                        : `En ${destination.city} los servicios médicos pueden ser limitados en algunas áreas. Se recomienda un seguro con amplia cobertura médica.`}
+                    </Text>
+                  </Animated.View>
+                  
+                  {/* Insurance Recommendation */}
+                  <View style={styles.recommendationCard}>
+                    <View style={styles.recommendationHeader}>
+                      <Ionicons name="shield-checkmark" size={24} color={COLORS.primary} />
+                      <Text style={styles.recommendationTitle}>
+                        Recomendación de seguro
+                      </Text>
+                    </View>
+                    
+                    <Text style={styles.recommendationText}>
+                      {insuranceRecommendation}
+                    </Text>
+                  </View>
+                </View>
+              ) : (
+                <View style={styles.emptyContainer}>
+                  <Ionicons name="shield-outline" size={50} color={COLORS.grayLight} />
+                  <Text style={styles.emptyText}>
+                    Selecciona un destino para ver información de seguridad
+                  </Text>
+                </View>
+              )}
+            </Card.Content>
+          </Card>
+        </Animated.View>
         
         {/* Footer disclaimer */}
         <View style={styles.footer}>
@@ -572,7 +704,9 @@ const WeatherRiskScreen = () => {
 };
 
 // Styles are now imported from WeatherRiskScreenStyles.ts
-/*const styles = StyleSheet.create({
+/* 
+Old styles removed and moved to WeatherRiskScreenStyles.ts
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
@@ -793,6 +927,7 @@ const WeatherRiskScreen = () => {
     lineHeight: 16,
   },
 });
+*/
 
 // In a real app, this would be fetched from an API
 // For this demo, define it here
