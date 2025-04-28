@@ -8,6 +8,8 @@ import HomeScreen from '../screens/HomeScreen';
 import AuthScreen from '../screens/AuthScreen';
 import TripInfoScreen from '../screens/TripInfoScreen';
 import InsurancePlansScreen from '../screens/InsurancePlansScreen';
+import ComparePlansScreen from '../screens/ComparePlansScreen';
+import PlanDetailsScreen from '../screens/PlanDetailsScreen';
 import CheckoutScreen from '../screens/CheckoutScreen';
 import WeatherRiskScreen from '../screens/WeatherRiskScreen';
 import ProfileScreen from '../screens/ProfileScreen';
@@ -22,6 +24,8 @@ export type MainStackParamList = {
   Main: undefined;
   TripInfo: undefined;
   InsurancePlans: { tripId?: number; filter?: string };
+  ComparePlans: { filterCriteria?: any };
+  PlanDetails: { planId: number };
   WeatherRisk: { destination?: string };
   Checkout: { planId: number };
   Profile: undefined;
@@ -134,6 +138,22 @@ const AppNavigator = () => {
               title: 'Riesgos Climáticos',
               headerTintColor: COLORS.white,
               headerStyle: { backgroundColor: COLORS.primary }
+            }}
+          />
+          <Stack.Screen 
+            name="ComparePlans" 
+            component={ComparePlansScreen}
+            options={{
+              headerShown: false,
+              title: 'Comparar Planes',
+            }}
+          />
+          <Stack.Screen 
+            name="PlanDetails" 
+            component={PlanDetailsScreen}
+            options={{
+              headerShown: false,
+              title: 'Detalles del Plan',
             }}
           />
           <Stack.Screen 

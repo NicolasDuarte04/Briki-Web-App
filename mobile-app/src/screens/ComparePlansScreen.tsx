@@ -27,7 +27,7 @@ import Animated, {
 
 import { MainStackParamList } from '../navigation/AppNavigator';
 import { InsurancePlan } from '../types/insurance';
-import { INSURANCE_PLANS } from '../data/insurancePlansData';
+import { REAL_INSURANCE_PLANS } from '../data/realInsurancePlansData';
 import { COLORS } from '../utils/theme';
 
 type ComparePlansScreenNavigationProp = StackNavigationProp<MainStackParamList>;
@@ -55,9 +55,9 @@ const ComparePlansScreen = () => {
       // Apply any filters from route params if they exist
       if (route.params?.filterCriteria) {
         // Implement filtering logic here
-        setPlans(INSURANCE_PLANS);
+        setPlans(REAL_INSURANCE_PLANS);
       } else {
-        setPlans(INSURANCE_PLANS);
+        setPlans(REAL_INSURANCE_PLANS);
       }
       setIsLoading(false);
     }, 1000);
