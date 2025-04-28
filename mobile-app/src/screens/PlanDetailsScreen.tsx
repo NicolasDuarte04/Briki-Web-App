@@ -25,7 +25,7 @@ import Animated, {
 
 import { MainStackParamList } from '../navigation/AppNavigator';
 import { InsurancePlan } from '../types/insurance';
-import { INSURANCE_PLANS } from '../data/insurancePlansData';
+import { REAL_INSURANCE_PLANS } from '../data/realInsurancePlansData';
 import { COLORS } from '../utils/theme';
 
 type PlanDetailsScreenNavigationProp = StackNavigationProp<MainStackParamList>;
@@ -48,7 +48,7 @@ const PlanDetailsScreen = () => {
     const fetchPlan = () => {
       setIsLoading(true);
       // In a real app, this would be an API call
-      const foundPlan = INSURANCE_PLANS.find(p => p.id === route.params.planId);
+      const foundPlan = REAL_INSURANCE_PLANS.find(p => p.id === route.params.planId);
       
       if (foundPlan) {
         setPlan(foundPlan);
