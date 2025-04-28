@@ -1,0 +1,191 @@
+// --- Imports ---
+import React, { useState, useEffect } from 'react';
+import {
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  View,
+  Text,
+  StatusBar,
+  Platform
+} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { Card, Button, Snackbar, ProgressBar, Chip } from 'react-native-paper';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, withRepeat } from 'react-native-reanimated';
+import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
+import { Picker } from '@react-native-picker/picker';
+
+import { MainStackParamList } from '../navigation/AppNavigator';
+import { RiskLevel, DestinationRisk } from '../types/weather';
+import { COLORS } from '../utils/theme';
+
+// --- ❌ FIXED: We DO NOT import DESTINATIONS anymore! ---
+// import { DESTINATIONS } from '../data/weatherRiskData';
+
+// --- Navigation Typing ---
+type WeatherRiskScreenNavigationProp = StackNavigationProp<MainStackParamList>;
+
+// --- Component Start ---
+const WeatherRiskScreen = () => {
+  const navigation = useNavigation<WeatherRiskScreenNavigationProp>();
+
+  // --- State ---
+  const [currentMonth, setCurrentMonth] = useState<number>(new Date().getMonth() + 1);
+  const [originCountry, setOriginCountry] = useState<string>('colombia');
+  const [selectedDestination, setSelectedDestination] = useState<string | null>(null);
+  const [destination, setDestination] = useState<DestinationRisk | null>(null);
+  const [insuranceRecommendation, setInsuranceRecommendation] = useState<string>('');
+  const [snackVisible, setSnackVisible] = useState(false);
+  const [snackMessage, setSnackMessage] = useState('');
+
+  // --- Animation Setup ---
+  const pulseAnimation = useSharedValue(1);
+
+  useEffect(() => {
+    pulseAnimation.value = withRepeat(
+      withTiming(1.05, { duration: 1000 }),
+      -1,
+      true
+    );
+
+    if (DESTINATIONS.length > 0 && !selectedDestination) {
+      const firstDest = DESTINATIONS[0];
+      setSelectedDestination(`${firstDest.country.toLowerCase()}-${firstDest.city.toLowerCase()}`);
+      updateDestination(`${firstDest.country.toLowerCase()}-${firstDest.city.toLowerCase()}`);
+    }
+  }, []);
+
+  // --- Functions ---
+
+  const updateDestination = (value: string) => {
+    const [country, city] = value.split('-');
+    const found = DESTINATIONS.find(d =>
+      d.country.toLowerCase() === country.toLowerCase() &&
+      d.city.toLowerCase() === city.toLowerCase()
+    );
+    if (found) {
+      if (found.seasons && found.seasons[currentMonth]) {
+        setDestination({
+          ...found,
+          safetyScore: found.seasons[currentMonth].safetyScore,
+          weatherRisks: found.seasons[currentMonth].weatherRisks,
+        });
+      } else {
+        setDestination(found);
+      }
+      setInsuranceRecommendation(found.insuranceRecommendation);
+    }
+  };
+
+  const handleMonthChange = (month: number) => {
+    setCurrentMonth(month);
+    if (selectedDestination) {
+      updateDestination(selectedDestination);
+    }
+  };
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: pulseAnimation.value }],
+  }));
+
+  const getRiskColor = (severity: RiskLevel): string => {
+    switch (severity) {
+      case RiskLevel.LOW: return COLORS.riskLow;
+      case RiskLevel.MODERATE: return COLORS.riskModerate;
+      case RiskLevel.HIGH: return COLORS.riskHigh;
+      case RiskLevel.EXTREME: return COLORS.riskExtreme;
+      default: return COLORS.gray;
+    }
+  };
+
+  const getRiskIcon = (type: string) => {
+    switch (type) {
+      case 'hurricane': return 'weather-hurricane';
+      case 'flood': return 'water';
+      case 'extreme_heat': return 'thermometer-high';
+      case 'wildfire': return 'fire';
+      case 'avalanche': return 'snowflake';
+      case 'blizzard': return 'snowflake-alert';
+      case 'drought': return 'weather-sunny-alert';
+      default: return 'alert-circle';
+    }
+  };
+
+  const viewInsurancePlans = () => {
+    if (destination) {
+      setSnackMessage('Filtrando seguros recomendados para tu destino');
+      setSnackVisible(true);
+      setTimeout(() => {
+        navigation.navigate('InsurancePlans');
+      }, 1500);
+    }
+  };
+
+  const getMonths = () => [
+    { label: 'Enero', value: 1 },
+    { label: 'Febrero', value: 2 },
+    { label: 'Marzo', value: 3 },
+    { label: 'Abril', value: 4 },
+    { label: 'Mayo', value: 5 },
+    { label: 'Junio', value: 6 },
+    { label: 'Julio', value: 7 },
+    { label: 'Agosto', value: 8 },
+    { label: 'Septiembre', value: 9 },
+    { label: 'Octubre', value: 10 },
+    { label: 'Noviembre', value: 11 },
+    { label: 'Diciembre', value: 12 },
+  ];
+
+  // --- Return UI ---
+  return (
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
+      <ScrollView style={styles.scrollView}>
+        {/* YOUR CURRENT UI (Header, Pickers, Cards, Risks, etc.) */}
+      </ScrollView>
+
+      {/* Snackbar for Feedback */}
+      <Snackbar
+        visible={snackVisible}
+        onDismiss={() => setSnackVisible(false)}
+        duration={3000}
+      >
+        {snackMessage}
+      </Snackbar>
+    </SafeAreaView>
+  );
+};
+
+// --- Styles ---
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  header: {
+    padding: 20,
+    backgroundColor: COLORS.white,
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: COLORS.text,
+    marginBottom: 8,
+  },
+  headerSubtitle: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+  },
+  // Add your additional styles here...
+});
+
+// --- Corrected LOCAL DESTINATIONS Array ---
+const DESTINATIONS: DestinationRisk[] = [
+  // Miami, Barcelona, Cancun, Bogotá data here...
+];
+
+export default WeatherRiskScreen;
