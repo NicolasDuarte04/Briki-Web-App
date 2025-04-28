@@ -11,9 +11,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#4B76E5"
     },
-    "updates": {
-      "fallbackToCacheTimeout": 0
-    },
+
     "assetBundlePatterns": [
       "**/*"
     ],
@@ -38,14 +36,7 @@
         "projectId": "briki-travel-insurance"
       }
     },
-    "plugins": [
-      [
-        "expo-updates",
-        {
-          "username": "briki"
-        }
-      ]
-    ],
+    "plugins": [],
     "description": "Intelligent travel insurance comparison platform for Colombia and Mexico markets"
   }
 }
