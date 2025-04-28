@@ -1,0 +1,29 @@
+C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app>npx expo start --tunnel
+Starting project at C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app
+Some dependencies are incompatible with the installed expo version:
+  @react-native-async-storage/async-storage@1.17.12 - expected version: 1.17.11
+  react-native@0.71.7 - expected version: 0.71.14
+Your project may not work correctly until you install the correct versions of the packages.
+Install individual packages by running npx expo install @react-native-async-storage/async-storage@1.17.11 react-native@0.71.14
+Starting Metro Bundler
+metro-file-map: Haste module naming collision: briki-travel-insurance
+  The following files share their name; please adjust your hasteImpl:
+    * <rootDir>\package.json
+    * <rootDir>\briki-travel-backup-disabled\package.json
+
+Failed to construct transformer:  DuplicateError: Duplicated files or mocks. Please check the console for more info
+    at setModule (C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app\node_modules\metro-file-map\src\index.js:510:17)
+    at workerReply (C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app\node_modules\metro-file-map\src\index.js:570:9)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async Promise.all (index 17)
+    at async C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app\node_modules\metro-file-map\src\index.js:344:18
+    at async DependencyGraph.ready (C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app\node_modules\metro\src\node-haste\DependencyGraph.js:99:5)
+    at async Bundler.ready (C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app\node_modules\metro\src\Bundler.js:69:5)
+    at async IncrementalBundler.ready (C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app\node_modules\metro\src\IncrementalBundler.js:287:5)
+    at async Server.ready (C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app\node_modules\metro\src\Server.js:1228:5) {
+  mockPath1: 'package.json',
+  mockPath2: 'briki-travel-backup-disabled\\package.json'
+}
+CommandError: spawn EPERM
+
+C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app>
