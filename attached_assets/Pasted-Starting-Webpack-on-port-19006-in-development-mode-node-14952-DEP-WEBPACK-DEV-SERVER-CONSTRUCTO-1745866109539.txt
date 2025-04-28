@@ -1,0 +1,113 @@
+Starting Webpack on port 19006 in development mode.
+(node:14952) [DEP_WEBPACK_DEV_SERVER_CONSTRUCTOR] DeprecationWarning: Using 'compiler' as the first argument is deprecated. Please use 'options' as the first argument and 'compiler' as the second argument.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:14952) [DEP_WEBPACK_DEV_SERVER_LISTEN] DeprecationWarning: 'listen' is deprecated. Please use the async 'start' or 'startCallback' method.
+▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+█ ▄▄▄▄▄ █ ██▀▀ ▀▄██ ▄▄▄▄▄ █
+█ █   █ █  ▀█ ▀█▀▄█ █   █ █
+█ █▄▄▄█ █▀  █▄█▀▄██ █▄▄▄█ █
+█▄▄▄▄▄▄▄█▄█ ▀▄█▄█▄█▄▄▄▄▄▄▄█
+█  ▀█▄ ▄▀▀█▄█▄▀▄ ███ ▀▄▄ ▄█
+█▀▄█▄ █▄▄▀ ▄█▀█▀  ▀ █▄  ▀██
+█ ██▄█ ▄███▀▄▀█▄▀▄▀▄▀▀▄ ▀██
+███  ▄▀▄▀▄▄█ ▄█▀▄▄▄█▄▀ ▀███
+█▄▄██▄█▄▄ ▄▄█▄▀▄▄ ▄▄▄ ▀ ▄▄█
+█ ▄▄▄▄▄ █▀▄██▀██▀ █▄█ ▀▀▀██
+█ █   █ █▄ ▄▄ ▀▄█▄▄ ▄▄▀ ▀▀█
+█ █▄▄▄█ █▀ ▀ ███▄██▄▀█▀▀ ██
+█▄▄▄▄▄▄▄█▄▄████▄████▄▄▄▄▄▄█
+
+› Metro waiting on exp://192.168.0.20:19000
+› Scan the QR code above with Expo Go (Android) or the Camera app (iOS)
+
+› Web is waiting on http://localhost:19006
+
+› Press a │ open Android
+› Press w │ open web
+
+› Press j │ open debugger
+› Press r │ reload app
+› Press m │ toggle menu
+
+› Press ? │ show all commands
+
+Logs for your project will appear below. Press Ctrl+C to exit.
+metro-file-map: Haste module naming collision: briki-travel-insurance
+  The following files share their name; please adjust your hasteImpl:
+    * <rootDir>\package.json
+    * <rootDir>\briki-travel-insurance-backup\package.json
+
+Failed to construct transformer:  DuplicateError: Duplicated files or mocks. Please check the console for more info
+    at setModule (C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app\node_modules\metro-file-map\src\index.js:510:17)
+    at workerReply (C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app\node_modules\metro-file-map\src\index.js:570:9)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async Promise.all (index 16)
+    at async C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app\node_modules\metro-file-map\src\index.js:344:18
+    at async DependencyGraph.ready (C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app\node_modules\metro\src\node-haste\DependencyGraph.js:99:5)
+    at async Bundler.ready (C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app\node_modules\metro\src\Bundler.js:69:5)
+    at async IncrementalBundler.ready (C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app\node_modules\metro\src\IncrementalBundler.js:287:5)
+    at async Server.ready (C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app\node_modules\metro\src\Server.js:1228:5) {
+  mockPath1: 'package.json',
+  mockPath2: 'briki-travel-insurance-backup\\package.json'
+}
+WARNING in ./App.tsx:25:28
+export 'theme' (imported as 'theme') was not found in './src/utils/theme' (possible exports: COLORS, FONTS, FONT_SIZES, SHADOWS, SPACING)
+  23 |   return (
+  24 |     <QueryClientProvider client={queryClient}>
+> 25 |       <PaperProvider theme={theme}>
+     |                            ^
+  26 |         <SafeAreaProvider>
+  27 |           <NavigationContainer>
+  28 |             <AuthProvider>
+
+ERROR in ./src/screens/HomeScreen.tsx:20
+Module not found: Can't resolve 'expo-haptics'
+  18 | import { Card, Button, ActivityIndicator, Surface } from 'react-native-paper';
+  19 | import { FontAwesome5, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
+> 20 | import * as Haptics from 'expo-haptics';
+  21 |
+  22 | import { MainStackParamList } from '../navigation/AppNavigator';
+  23 | import { useAuth } from '../contexts/AuthContext';
+
+ERROR in ./src/screens/WeatherRiskScreen.tsx
+Module build failed (from ./node_modules/babel-loader/lib/index.js):
+TypeError: Duplicate declaration "DESTINATIONS"
+  932 | // In a real app, this would be fetched from an API
+  933 | // For this demo, define it here
+> 934 | const DESTINATIONS: DestinationRisk[] = [
+      |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  935 |   {
+  936 |     country: 'Estados Unidos',
+  937 |     city: 'Miami',
+    at File.buildCodeFrameError (C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app\node_modules\@babel\core\lib\transformation\file\file.js:193:12)
+    at Scope.checkBlockScopedCollisions (C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app\node_modules\@babel\traverse\lib\scope\index.js:411:27)
+    at Scope.registerBinding (C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app\node_modules\@babel\traverse\lib\scope\index.js:510:16)
+    at Scope.registerDeclaration (C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app\node_modules\@babel\traverse\lib\scope\index.js:462:14)
+    at Object.BlockScoped (C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app\node_modules\@babel\traverse\lib\scope\index.js:274:12)
+    at Object.newFn (C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app\node_modules\@babel\traverse\lib\visitors.js:207:17)
+    at NodePath._call (C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app\node_modules\@babel\traverse\lib\path\context.js:49:20)
+    at NodePath.call (C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app\node_modules\@babel\traverse\lib\path\context.js:35:15)
+    at NodePath.visit (C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app\node_modules\@babel\traverse\lib\path\context.js:88:31)
+    at TraversalContext.visitQueue (C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app\node_modules\@babel\traverse\lib\context.js:90:16)
+    at TraversalContext.visitMultiple (C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app\node_modules\@babel\traverse\lib\context.js:62:17)
+    at TraversalContext.visit (C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app\node_modules\@babel\traverse\lib\context.js:111:19)
+    at traverseNode (C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app\node_modules\@babel\traverse\lib\traverse-node.js:22:17)
+    at traverse (C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app\node_modules\@babel\traverse\lib\index.js:53:34)
+    at NodePath.traverse (C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app\node_modules\@babel\traverse\lib\path\index.js:120:24)
+    at Scope.crawl (C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app\node_modules\@babel\traverse\lib\scope\index.js:678:10)
+    at Scope.init (C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app\node_modules\@babel\traverse\lib\scope\index.js:641:12)
+    at NodePath.setScope (C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app\node_modules\@babel\traverse\lib\path\context.js:126:53)
+    at NodePath.setContext (C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app\node_modules\@babel\traverse\lib\path\context.js:138:12)
+    at new File (C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app\node_modules\@babel\core\lib\transformation\file\file.js:88:8)
+    at normalizeFile (C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app\node_modules\@babel\core\lib\transformation\normalize-file.js:98:10)
+    at normalizeFile.next (<anonymous>)
+    at run (C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app\node_modules\@babel\core\lib\transformation\index.js:22:50)
+    at run.next (<anonymous>)
+    at transform (C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app\node_modules\@babel\core\lib\transform.js:22:33)
+    at transform.next (<anonymous>)
+    at step (C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app\node_modules\gensync\index.js:261:32)
+    at C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app\node_modules\gensync\index.js:273:13
+    at async.call.result.err.err (C:\Users\academia.CESA\Downloads\BrikiTravel1.0\BrikiTravel\mobile-app\node_modules\gensync\index.js:223:11)
+
+web compiled with 2 errors and 1 warning
+
