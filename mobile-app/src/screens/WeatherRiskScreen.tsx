@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   StyleSheet, 
   View, 
@@ -7,7 +7,10 @@ import {
   TouchableOpacity, 
   StatusBar,
   Platform,
-  SafeAreaView
+  SafeAreaView,
+  Dimensions,
+  Image,
+  FlatList
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -19,20 +22,32 @@ import {
   ProgressBar, 
   Chip, 
   IconButton,
-  Snackbar
+  Snackbar,
+  Surface,
+  ActivityIndicator,
+  SegmentedButtons
 } from 'react-native-paper';
 import Animated, { 
   useSharedValue, 
   useAnimatedStyle, 
   withTiming, 
-  withRepeat 
+  withSpring,
+  withSequence,
+  withDelay,
+  withRepeat,
+  Easing,
+  FadeIn,
+  SlideInRight,
+  interpolateColor
 } from 'react-native-reanimated';
-import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
+import { MaterialCommunityIcons, Ionicons, FontAwesome5, Feather } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 
 import { MainStackParamList } from '../navigation/AppNavigator';
 import { RiskLevel, WeatherRiskFactor, DestinationRisk } from '../types/weather';
 import { COLORS } from '../utils/theme';
+
+const { width, height } = Dimensions.get('window');
 
 // Importing the weather risk data
 // In a real app, this would come from an API call
@@ -49,9 +64,17 @@ const WeatherRiskScreen = () => {
   const [insuranceRecommendation, setInsuranceRecommendation] = useState<string>('');
   const [snackVisible, setSnackVisible] = useState(false);
   const [snackMessage, setSnackMessage] = useState('');
-
+  const [activeTab, setActiveTab] = useState('weather');
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Destination carousel ref
+  const flatListRef = useRef<FlatList>(null);
+  
   // Animation values
   const pulseAnimation = useSharedValue(1);
+  const tabIndicatorPosition = useSharedValue(0);
+  const weatherOpacity = useSharedValue(1);
+  const safetyOpacity = useSharedValue(0);
 
   // Start pulse animation on component mount
   useEffect(() => {
@@ -160,6 +183,67 @@ const WeatherRiskScreen = () => {
     }
   };
 
+  // Switch between tabs with animation
+  const switchTab = (tab: string) => {
+    setIsLoading(true);
+    
+    // Animate tab indicator position
+    tabIndicatorPosition.value = withTiming(
+      tab === 'weather' ? 0 : width / 2, 
+      { duration: 300, easing: Easing.bezier(0.25, 0.1, 0.25, 1) }
+    );
+    
+    // Fade out current tab content
+    if (tab === 'weather') {
+      safetyOpacity.value = withTiming(0, { duration: 150 });
+      setTimeout(() => {
+        setActiveTab(tab);
+        // Fade in new tab content
+        weatherOpacity.value = withTiming(1, { duration: 250 });
+        setIsLoading(false);
+      }, 200);
+    } else {
+      weatherOpacity.value = withTiming(0, { duration: 150 });
+      setTimeout(() => {
+        setActiveTab(tab);
+        // Fade in new tab content
+        safetyOpacity.value = withTiming(1, { duration: 250 });
+        setIsLoading(false);
+      }, 200);
+    }
+  };
+  
+  // Animated styles for tab content
+  const weatherContentStyle = useAnimatedStyle(() => {
+    return {
+      opacity: weatherOpacity.value,
+      display: weatherOpacity.value === 0 ? 'none' : 'flex',
+    };
+  });
+  
+  const safetyContentStyle = useAnimatedStyle(() => {
+    return {
+      opacity: safetyOpacity.value,
+      display: safetyOpacity.value === 0 ? 'none' : 'flex',
+    };
+  });
+  
+  // Animated style for tab indicator
+  const tabIndicatorStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ translateX: tabIndicatorPosition.value }],
+    };
+  });
+  
+  // Scroll the destination carousel
+  const scrollToDestination = (index: number) => {
+    flatListRef.current?.scrollToIndex({ 
+      index, 
+      animated: true,
+      viewPosition: 0.5
+    });
+  };
+  
   // Get list of months for the picker
   const getMonths = () => {
     return [
@@ -180,15 +264,103 @@ const WeatherRiskScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
+      <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
       
-      <ScrollView style={styles.scrollView}>
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Riesgos Climáticos de Viaje</Text>
+      {/* Header with gradient background */}
+      <View style={styles.header}>
+        <View style={styles.headerContent}>
+          <Text style={styles.headerTitle}>Riesgos de Viaje</Text>
           <Text style={styles.headerSubtitle}>
-            Consulta los posibles riesgos climáticos en tu destino de viaje para elegir el seguro más adecuado.
+            Analiza los riesgos en tu destino para elegir el seguro adecuado.
           </Text>
         </View>
+        
+        {/* Tab Navigation */}
+        <View style={styles.tabContainer}>
+          <TouchableOpacity 
+            style={[styles.tabButton, activeTab === 'weather' ? styles.activeTab : null]} 
+            onPress={() => switchTab('weather')}
+          >
+            <MaterialCommunityIcons 
+              name="weather-partly-cloudy" 
+              size={24} 
+              color={activeTab === 'weather' ? COLORS.primary : COLORS.textSecondary} 
+            />
+            <Text style={[
+              styles.tabText, 
+              { color: activeTab === 'weather' ? COLORS.primary : COLORS.textSecondary }
+            ]}>
+              Clima
+            </Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={[styles.tabButton, activeTab === 'safety' ? styles.activeTab : null]} 
+            onPress={() => switchTab('safety')}
+          >
+            <Ionicons 
+              name="shield-checkmark-outline" 
+              size={24} 
+              color={activeTab === 'safety' ? COLORS.primary : COLORS.textSecondary} 
+            />
+            <Text style={[
+              styles.tabText, 
+              { color: activeTab === 'safety' ? COLORS.primary : COLORS.textSecondary }
+            ]}>
+              Seguridad
+            </Text>
+          </TouchableOpacity>
+          
+          <Animated.View style={[styles.tabIndicator, tabIndicatorStyle]} />
+        </View>
+      </View>
+      
+      {/* Destination Carousel */}
+      <View style={styles.destinationCarouselContainer}>
+        <Text style={styles.carouselLabel}>Destinos populares</Text>
+        <FlatList
+          ref={flatListRef}
+          data={DESTINATIONS}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item) => `${item.country}-${item.city}`}
+          contentContainerStyle={styles.carouselContent}
+          renderItem={({ item, index }) => (
+            <TouchableOpacity 
+              style={[
+                styles.destinationItem, 
+                selectedDestination === `${item.country.toLowerCase()}-${item.city.toLowerCase()}` ? 
+                  styles.selectedDestinationItem : null
+              ]}
+              onPress={() => {
+                setSelectedDestination(`${item.country.toLowerCase()}-${item.city.toLowerCase()}`);
+                updateDestination(`${item.country.toLowerCase()}-${item.city.toLowerCase()}`);
+              }}
+            >
+              <View style={styles.destinationImageContainer}>
+                <View style={[
+                  styles.riskIndicator,
+                  { 
+                    backgroundColor: 
+                      item.safetyScore > 80 ? COLORS.riskLow :
+                      item.safetyScore > 60 ? COLORS.riskModerate :
+                      COLORS.riskHigh 
+                  }
+                ]} />
+                <Text style={styles.destinationName}>{item.city}</Text>
+                <Text style={styles.destinationCountry}>{item.country}</Text>
+              </View>
+            </TouchableOpacity>
+          )}
+        />
+      </View>
+      
+      <ScrollView style={styles.scrollView}>
+        {isLoading && (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={COLORS.primary} />
+          </View>
+        )}
         
         {/* Disclaimer */}
         <Card style={styles.disclaimerCard}>
