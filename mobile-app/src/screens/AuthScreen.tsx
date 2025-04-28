@@ -426,6 +426,34 @@ const styles = StyleSheet.create({
   snackbar: {
     backgroundColor: COLORS.error,
   },
+  divider: {
+    marginVertical: 20,
+    backgroundColor: COLORS.border,
+  },
+  socialText: {
+    textAlign: 'center',
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    marginBottom: 15,
+  },
+  socialButtonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 10,
+  },
+  socialButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 10,
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 3,
+  },
 });
 
 export default AuthScreen;
