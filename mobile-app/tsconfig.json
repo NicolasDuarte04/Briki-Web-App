@@ -12,9 +12,22 @@
     "esModuleInterop": true,
     "baseUrl": ".",
     "paths": {
-      "*": ["src/*"]
+      "@components/*": ["./src/components/*"],
+      "@screens/*": ["./src/screens/*"],
+      "@navigation/*": ["./src/navigation/*"],
+      "@hooks/*": ["./src/hooks/*"],
+      "@contexts/*": ["./src/contexts/*"],
+      "@utils/*": ["./src/utils/*"],
+      "@services/*": ["./src/services/*"],
+      "@types/*": ["./src/types/*"],
+      "@assets/*": ["./assets/*"],
+      "@data/*": ["./src/data/*"]
     }
   },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx"
+  ],
   "exclude": [
     "node_modules",
     "babel.config.js",

@@ -1,17 +1,17 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-// For development, use your local server or the Replit URL
-// For production, this would be your deployed API endpoint
 import Constants from 'expo-constants';
 
+// Get API URL from app.config.js extra params or use a default
+const apiUrl = Constants.expoConfig?.extra?.apiUrl || 'https://api.briki.insurance';
+
 // Determine if we're running in development mode
-const isDevelopment = Constants.manifest?.packagerOpts?.dev || __DEV__;
+const isDevelopment = Constants.expoConfig?.extra?.isDevelopment || __DEV__;
 
 // Set the API base URL based on environment
 const BASE_URL = isDevelopment 
   ? 'http://localhost:5000'  // Development - update this with your local IP if testing on a physical device
-  : 'https://briki-travel.replit.app'; // Production
+  : apiUrl; // Production
 
 console.log('API URL:', BASE_URL);
 
