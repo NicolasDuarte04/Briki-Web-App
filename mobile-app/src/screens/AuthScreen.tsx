@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   StyleSheet, 
   View, 
@@ -9,19 +9,34 @@ import {
   Platform,
   ScrollView,
   SafeAreaView,
-  ActivityIndicator
+  ActivityIndicator,
+  Dimensions,
+  Animated,
+  StatusBar
 } from 'react-native';
 import { 
   TextInput, 
   Button, 
-  Snackbar 
+  Snackbar, 
+  Surface,
+  Divider
 } from 'react-native-paper';
 import { useAuth } from '../contexts/AuthContext';
 import { COLORS } from '../utils/theme';
+import { FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
+
+const { width, height } = Dimensions.get('window');
 
 const AuthScreen = () => {
   // Login or Register mode
   const [isLogin, setIsLogin] = useState(true);
+  
+  // Animation values
+  const formOpacity = useRef(new Animated.Value(1)).current;
+  const formPosition = useRef(new Animated.Value(0)).current;
+  const logoScale = useRef(new Animated.Value(1)).current;
+  const socialButtonsPosition = useRef(new Animated.Value(50)).current;
+  const socialButtonsOpacity = useRef(new Animated.Value(0)).current;
   
   // Form values
   const [username, setUsername] = useState('');
@@ -41,6 +56,22 @@ const AuthScreen = () => {
   
   // Auth context
   const { login, register, isLoading } = useAuth();
+  
+  // Animate social buttons on mount
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(socialButtonsOpacity, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true
+      }),
+      Animated.timing(socialButtonsPosition, {
+        toValue: 0,
+        duration: 800,
+        useNativeDriver: true
+      })
+    ]).start();
+  }, []);
 
   const validateForm = () => {
     let isValid = true;
@@ -116,7 +147,49 @@ const AuthScreen = () => {
   };
 
   const toggleAuthMode = () => {
+    // Animate form transition
+    Animated.sequence([
+      // Fade out and move form
+      Animated.parallel([
+        Animated.timing(formOpacity, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true
+        }),
+        Animated.timing(formPosition, {
+          toValue: isLogin ? 50 : -50,
+          duration: 200,
+          useNativeDriver: true
+        }),
+        Animated.timing(logoScale, {
+          toValue: 0.8,
+          duration: 200,
+          useNativeDriver: true
+        })
+      ]),
+      // Switch mode and fade in form
+      Animated.parallel([
+        Animated.timing(formOpacity, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true
+        }),
+        Animated.timing(formPosition, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true
+        }),
+        Animated.timing(logoScale, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true
+        })
+      ])
+    ]).start();
+    
+    // Switch mode
     setIsLogin(!isLogin);
+    
     // Reset errors and fields when switching modes
     setError(null);
     setUsernameError(null);
@@ -133,17 +206,37 @@ const AuthScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
+      
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardAvoid}
       >
-        <ScrollView contentContainerStyle={styles.scrollView}>
-          <View style={styles.header}>
+        <ScrollView 
+          contentContainerStyle={styles.scrollView}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Animated Logo */}
+          <Animated.View 
+            style={[
+              styles.header, 
+              { transform: [{ scale: logoScale }] }
+            ]}
+          >
             <Text style={styles.logo}>BRIKI</Text>
             <Text style={styles.tagline}>Seguro de viaje inteligente</Text>
-          </View>
+          </Animated.View>
           
-          <View style={styles.formContainer}>
+          {/* Animated Form Container */}
+          <Animated.View 
+            style={[
+              styles.formContainer,
+              {
+                opacity: formOpacity,
+                transform: [{ translateX: formPosition }]
+              }
+            ]}
+          >
             <Text style={styles.title}>
               {isLogin ? 'Iniciar Sesión' : 'Crear Cuenta'}
             </Text>
@@ -156,6 +249,7 @@ const AuthScreen = () => {
               style={styles.input}
               error={!!usernameError}
               disabled={isLoading}
+              left={<TextInput.Icon icon="account" />}
             />
             {usernameError && <Text style={styles.errorText}>{usernameError}</Text>}
             
@@ -171,6 +265,7 @@ const AuthScreen = () => {
                   autoCapitalize="none"
                   error={!!emailError}
                   disabled={isLoading}
+                  left={<TextInput.Icon icon="email" />}
                 />
                 {emailError && <Text style={styles.errorText}>{emailError}</Text>}
               </>
@@ -185,6 +280,7 @@ const AuthScreen = () => {
               secureTextEntry
               error={!!passwordError}
               disabled={isLoading}
+              left={<TextInput.Icon icon="lock" />}
             />
             {passwordError && <Text style={styles.errorText}>{passwordError}</Text>}
             
@@ -199,6 +295,7 @@ const AuthScreen = () => {
                   secureTextEntry
                   error={!!confirmPasswordError}
                   disabled={isLoading}
+                  left={<TextInput.Icon icon="lock-check" />}
                 />
                 {confirmPasswordError && <Text style={styles.errorText}>{confirmPasswordError}</Text>}
               </>
@@ -210,16 +307,40 @@ const AuthScreen = () => {
               style={styles.button}
               disabled={isLoading}
               loading={isLoading}
+              contentStyle={{ paddingVertical: 6 }}
             >
               {isLogin ? 'Iniciar Sesión' : 'Registrarse'}
             </Button>
+            
+            <Divider style={styles.divider} />
+            
+            {/* Social Login Buttons */}
+            <Animated.View 
+              style={{
+                opacity: socialButtonsOpacity,
+                transform: [{ translateY: socialButtonsPosition }]
+              }}
+            >
+              <Text style={styles.socialText}>O continuar con</Text>
+              <View style={styles.socialButtonsContainer}>
+                <TouchableOpacity style={[styles.socialButton, { backgroundColor: '#4267B2' }]}>
+                  <FontAwesome name="facebook" size={20} color={COLORS.white} />
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.socialButton, { backgroundColor: '#DB4437' }]}>
+                  <FontAwesome name="google" size={20} color={COLORS.white} />
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.socialButton, { backgroundColor: '#000000' }]}>
+                  <FontAwesome name="apple" size={20} color={COLORS.white} />
+                </TouchableOpacity>
+              </View>
+            </Animated.View>
             
             <TouchableOpacity onPress={toggleAuthMode} style={styles.toggleContainer}>
               <Text style={styles.toggleText}>
                 {isLogin ? '¿No tienes una cuenta? Regístrate' : '¿Ya tienes una cuenta? Inicia sesión'}
               </Text>
             </TouchableOpacity>
-          </View>
+          </Animated.View>
         </ScrollView>
       </KeyboardAvoidingView>
       
