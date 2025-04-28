@@ -46,6 +46,7 @@ import { Picker } from '@react-native-picker/picker';
 import { MainStackParamList } from '../navigation/AppNavigator';
 import { RiskLevel, WeatherRiskFactor, DestinationRisk } from '../types/weather';
 import { COLORS } from '../utils/theme';
+import { styles } from './WeatherRiskScreenStyles';
 
 const { width, height } = Dimensions.get('window');
 
@@ -570,7 +571,8 @@ const WeatherRiskScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
+// Styles are now imported from WeatherRiskScreenStyles.ts
+/*const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
