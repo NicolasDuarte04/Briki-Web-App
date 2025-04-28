@@ -12,7 +12,6 @@
     "build:ios": "eas build -p ios",
     "submit:android": "eas submit -p android",
     "submit:ios": "eas submit -p ios",
-    "update": "eas update",
     "lint": "eslint .",
     "type-check": "tsc --noEmit"
   },
@@ -30,7 +29,6 @@
     "expo-linking": "~4.0.1",
     "expo-splash-screen": "~0.18.2",
     "expo-status-bar": "~1.4.4",
-    "expo-updates": "~0.16.4",
     "react": "18.2.0",
     "react-native": "0.71.7",
     "react-native-gesture-handler": "~2.9.0",
