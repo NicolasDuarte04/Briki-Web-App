@@ -1,0 +1,39 @@
+ERROR in ./src/screens/WeatherRiskScreen.tsx
+Module build failed (from ./node_modules/babel-loader/lib/index.js):
+TypeError: Duplicate declaration "DESTINATIONS"
+  623 | // In a real app, this would be fetched from an API
+  624 | // For this demo, define it here
+> 625 | const DESTINATIONS: DestinationRisk[] = [
+      |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  626 |   {
+  627 |     country: 'Estados Unidos',
+  628 |     city: 'Miami',
+    at File.buildCodeFrameError (C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app\node_modules\@babel\core\lib\transformation\file\file.js:193:12)
+    at Scope.checkBlockScopedCollisions (C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app\node_modules\@babel\traverse\lib\scope\index.js:411:27)
+    at Scope.registerBinding (C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app\node_modules\@babel\traverse\lib\scope\index.js:510:16)
+    at Scope.registerDeclaration (C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app\node_modules\@babel\traverse\lib\scope\index.js:462:14)
+    at Object.BlockScoped (C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app\node_modules\@babel\traverse\lib\scope\index.js:274:12)
+    at Object.newFn (C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app\node_modules\@babel\traverse\lib\visitors.js:207:17)
+    at NodePath._call (C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app\node_modules\@babel\traverse\lib\path\context.js:49:20)
+    at NodePath.call (C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app\node_modules\@babel\traverse\lib\path\context.js:35:15)
+    at NodePath.visit (C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app\node_modules\@babel\traverse\lib\path\context.js:88:31)
+    at TraversalContext.visitQueue (C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app\node_modules\@babel\traverse\lib\context.js:90:16)
+    at TraversalContext.visitMultiple (C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app\node_modules\@babel\traverse\lib\context.js:62:17)
+    at TraversalContext.visit (C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app\node_modules\@babel\traverse\lib\context.js:111:19)
+    at traverseNode (C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app\node_modules\@babel\traverse\lib\traverse-node.js:22:17)
+    at traverse (C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app\node_modules\@babel\traverse\lib\index.js:53:34)
+    at NodePath.traverse (C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app\node_modules\@babel\traverse\lib\path\index.js:120:24)
+    at Scope.crawl (C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app\node_modules\@babel\traverse\lib\scope\index.js:678:10)
+    at Scope.init (C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app\node_modules\@babel\traverse\lib\scope\index.js:641:12)
+    at NodePath.setScope (C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app\node_modules\@babel\traverse\lib\path\context.js:126:53)
+    at NodePath.setContext (C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app\node_modules\@babel\traverse\lib\path\context.js:138:12)
+    at new File (C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app\node_modules\@babel\core\lib\transformation\file\file.js:88:8)
+    at normalizeFile (C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app\node_modules\@babel\core\lib\transformation\normalize-file.js:98:10)
+    at normalizeFile.next (<anonymous>)
+    at run (C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app\node_modules\@babel\core\lib\transformation\index.js:22:50)
+    at run.next (<anonymous>)
+    at transform (C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app\node_modules\@babel\core\lib\transform.js:22:33)
+    at transform.next (<anonymous>)
+    at step (C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app\node_modules\gensync\index.js:261:32)
+    at C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app\node_modules\gensync\index.js:273:13
+    at async.call.result.err.err (C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app\node_modules\gensync\index.js:223:11)
