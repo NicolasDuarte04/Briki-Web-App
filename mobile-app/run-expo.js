@@ -47,7 +47,7 @@ console.log('\n🔧 Expo server is starting on port 19006...');
 console.log('\n🌐 Using Expo Web mode for Replit compatibility');
 
 // Start the Expo server in web mode with development settings
-const expo = spawn('npx', ['expo', 'start', '--web', '--port', '19006', '--dev', '--no-minify'], {
+const expo = spawn('npx', ['expo', 'start', '-c', '--web', '--port', '19006', '--dev', '--no-minify'], {
   stdio: 'inherit',
   cwd: __dirname,
   env: {
@@ -55,7 +55,8 @@ const expo = spawn('npx', ['expo', 'start', '--web', '--port', '19006', '--dev',
     EXPO_NO_UPDATES: 'true', // Disable updates check in development
     NODE_ENV: 'development',
     REACT_NATIVE_PACKAGER_HOSTNAME: serverIP, // Set explicit hostname
-    EXPO_PACKAGER_PROXY_URL: `http://${serverIP}:19006` // Force web URL
+    EXPO_PACKAGER_PROXY_URL: `http://${serverIP}:19006`, // Force web URL
+    EXPO_PUBLIC_PLATFORM: 'web'  // Tell the app we're in web mode
   }
 });
 

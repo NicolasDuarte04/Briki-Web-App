@@ -1,124 +1,119 @@
-// Common theme colors and styles for consistent UI across the app
-import { DefaultTheme } from 'react-native-paper';
+/**
+ * Briki Travel Insurance App Theme
+ * 
+ * This file defines the app color palette, typography, and spacing
+ */
 
+// Brand colors
 export const COLORS = {
-  primary: '#4B76E5', // Briki Blue - Main brand color
-  primaryDark: '#3A5FC8', // Darker variant
-  primaryLight: '#C7D3F7', // Lighter variant
-  secondary: '#F8B400', // Secondary brand color
-  secondaryDark: '#E59E00',
-  secondaryLight: '#FFE9B3',
-  accent: '#FF9800', // Highlighting accent
-  success: '#4CAF50', // Success state
-  warning: '#FFC107', // Warning state
-  error: '#F44336', // Error state
-  info: '#2196F3', // Information state
+  // Primary colors
+  primary: '#4B76E5', // Briki Blue
+  primaryLight: '#6B9CF5',
+  primaryDark: '#2A55CC',
   
-  // Neutral colors
-  background: '#F5F7FA', // App background
-  surface: '#FFFFFF', // Card or surface background
-  white: '#FFFFFF',
-  black: '#000000',
-  gray: '#9E9E9E',      // Default gray for neutral risk
-  grayLight: '#F0F0F0', // Light gray for backgrounds
+  // Secondary colors
+  secondary: '#F8B400', // Briki Yellow
+  secondaryLight: '#FFC933',
+  secondaryDark: '#E59A00',
   
   // Text colors
-  text: '#212121', // Primary text
-  textSecondary: '#757575', // Secondary text
-  textDisabled: '#9E9E9E', // Disabled text
+  text: '#333333',
+  textLight: '#666666',
+  textMuted: '#999999',
   
-  // Border and dividers
+  // UI colors
+  background: '#FFFFFF',
+  backgroundLight: '#F9FAFC',
+  card: '#FFFFFF',
   border: '#E0E0E0',
-  divider: '#EEEEEE',
   
-  // Overlay and shadows
-  overlay: 'rgba(0, 0, 0, 0.5)',
-  shadow: 'rgba(0, 0, 0, 0.12)',
+  // Status colors
+  success: '#4CAF50',
+  warning: '#FFC107',
+  error: '#F44336',
+  info: '#2196F3',
   
-  // Risk levels for weather risk indicators
-  riskLow: '#4CAF50',      // Green - Low risk
-  riskModerate: '#FF9800', // Orange - Moderate risk
-  riskHigh: '#F44336',     // Red - High risk
-  riskExtreme: '#B71C1C',  // Dark red - Extreme risk
+  // Risk level colors
+  riskVeryLow: '#4CAF50',  // Green
+  riskLow: '#8BC34A',      // Light Green
+  riskModerate: '#FFC107', // Amber
+  riskHigh: '#FF9800',     // Orange
+  riskVeryHigh: '#F44336', // Red
+  
+  // Other
+  white: '#FFFFFF',
+  black: '#000000',
+  transparent: 'transparent'
 };
 
+// Typography
 export const FONTS = {
   regular: 'System',
-  medium: 'System-Medium',
-  bold: 'System-Bold',
-  light: 'System-Light',
+  medium: 'System',
+  bold: 'System',
+  light: 'System'
 };
 
+// Font sizes
 export const FONT_SIZES = {
-  xs: 12,
-  sm: 14,
-  md: 16,
-  lg: 18,
-  xl: 20,
-  xxl: 24,
-  xxxl: 32,
+  xs: 10,
+  small: 12,
+  medium: 14,
+  large: 16,
+  xl: 18,
+  xxl: 20,
+  xxxl: 24,
+  title: 28,
+  headline: 32
 };
 
+// Spacing
 export const SPACING = {
   xs: 4,
-  sm: 8,
-  md: 16,
-  lg: 24,
+  small: 8,
+  medium: 16,
+  large: 24,
   xl: 32,
   xxl: 48,
+  xxxl: 64
 };
 
+// Shadows (platform agnostic)
 export const SHADOWS = {
   small: {
-    shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 3,
     elevation: 2,
   },
   medium: {
-    shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.15,
     shadowRadius: 6,
     elevation: 4,
   },
   large: {
-    shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.2,
     shadowRadius: 12,
     elevation: 8,
-  },
+  }
 };
 
-// Create a theme object for React Native Paper
+// Combined theme
 export const theme = {
-  ...DefaultTheme,
-  colors: {
-    ...DefaultTheme.colors,
-    primary: COLORS.primary,
-    accent: COLORS.secondary,
-    background: COLORS.background,
-    surface: COLORS.surface,
-    text: COLORS.text,
-    error: COLORS.error,
-    onSurface: COLORS.text,
-    notification: COLORS.accent,
-  },
-  fonts: {
-    regular: {
-      fontFamily: FONTS.regular,
-    },
-    medium: {
-      fontFamily: FONTS.medium,
-    },
-    light: {
-      fontFamily: FONTS.light,
-    },
-    thin: {
-      fontFamily: FONTS.light,
-    },
-  },
-  roundness: 8,
+  colors: COLORS,
+  fonts: FONTS,
+  fontSizes: FONT_SIZES,
+  spacing: SPACING,
+  shadows: SHADOWS,
+  // Web-specific overrides
+  web: {
+    fontFamily: {
+      regular: 'Inter, system-ui, sans-serif',
+      medium: 'Inter, system-ui, sans-serif',
+      bold: 'Inter, system-ui, sans-serif',
+      light: 'Inter, system-ui, sans-serif'
+    }
+  }
 };

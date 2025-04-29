@@ -1,37 +1,80 @@
 import React from 'react';
-import { StatusBar } from 'expo-status-bar';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { NavigationContainer } from '@react-navigation/native';
-import { QueryClient, QueryClientProvider } from 'react-query';
-import { Provider as PaperProvider } from 'react-native-paper';
-
-import AppNavigator from './src/navigation/AppNavigator';
+import WebApp from './src/WebApp';
 import { AuthProvider } from './src/contexts/AuthContext';
-import { theme } from './src/utils/theme';
 
-// Create a client for react-query
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 1,
-      refetchOnWindowFocus: false,
-    },
-  },
-});
+// Detect if we're in a web environment
+const isWeb = typeof document !== 'undefined';
 
+// Main application component
 export default function App() {
+  // If we're running in web mode (like in Replit), use the web-optimized version
+  if (isWeb) {
+    console.log('📱 Running Briki Travel App in Web mode');
+    return <WebApp />;
+  }
+  
+  // For native mobile environments, we'll use the standard navigation setup
+  // This would normally include React Navigation and native components
   return (
-    <QueryClientProvider client={queryClient}>
-      <PaperProvider theme={theme}>
-        <SafeAreaProvider>
-          <NavigationContainer>
-            <AuthProvider>
-              <AppNavigator />
-            </AuthProvider>
-          </NavigationContainer>
-          <StatusBar style="auto" />
-        </SafeAreaProvider>
-      </PaperProvider>
-    </QueryClientProvider>
+    <AuthProvider>
+      <NativeAppPlaceholder />
+    </AuthProvider>
   );
+}
+
+// Placeholder component for native app integration
+// In a complete implementation, this would be replaced with your
+// full React Navigation setup
+function NativeAppPlaceholder() {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Briki Travel Insurance</Text>
+      <Text style={styles.subtitle}>Mobile application</Text>
+      <Text style={styles.message}>
+        Loading native navigation...
+      </Text>
+    </View>
+  );
+}
+
+// Basic styles for the placeholder
+const styles = {
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#4B76E5', // Briki Blue
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 18,
+    color: '#FFFFFF',
+    marginBottom: 24,
+  },
+  message: {
+    fontSize: 16,
+    color: '#FFFFFF',
+    textAlign: 'center',
+    paddingHorizontal: 32,
+  },
+};
+
+// Import these here to prevent errors in web mode
+// These would be used in the full native implementation
+let View, Text;
+try {
+  // Try to import from react-native
+  const ReactNative = require('react-native');
+  View = ReactNative.View;
+  Text = ReactNative.Text;
+} catch (e) {
+  // Fallback to our web components if react-native is not available
+  const WebPlatform = require('./src/web-platform').default;
+  View = WebPlatform.View;
+  Text = WebPlatform.Text;
 }
