@@ -1,12 +1,49 @@
 import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
+
+// Use a polyfill for AsyncStorage in web environments or when module can't be loaded
+const AsyncStorage = {
+  getItem: async (key: string) => {
+    try {
+      // Try to use the actual AsyncStorage if available
+      const realAsyncStorage = require('@react-native-async-storage/async-storage').default;
+      return await realAsyncStorage.getItem(key);
+    } catch (e) {
+      // Fallback to localStorage in web or return null in other environments
+      if (typeof localStorage !== 'undefined') {
+        return localStorage.getItem(key);
+      }
+      return null;
+    }
+  },
+  setItem: async (key: string, value: string) => {
+    try {
+      const realAsyncStorage = require('@react-native-async-storage/async-storage').default;
+      return await realAsyncStorage.setItem(key, value);
+    } catch (e) {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem(key, value);
+      }
+    }
+  },
+  removeItem: async (key: string) => {
+    try {
+      const realAsyncStorage = require('@react-native-async-storage/async-storage').default;
+      return await realAsyncStorage.removeItem(key);
+    } catch (e) {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.removeItem(key);
+      }
+    }
+  }
+};
 
 // Get API URL from app.config.js extra params or use a default
 const apiUrl = Constants.expoConfig?.extra?.apiUrl || 'https://api.briki.insurance';
 
 // Determine if we're running in development mode
-const isDevelopment = Constants.expoConfig?.extra?.isDevelopment || __DEV__;
+const isDevelopment = Constants.expoConfig?.extra?.isDevelopment || 
+  process.env.NODE_ENV === 'development';
 
 // Set the API base URL based on environment
 const BASE_URL = isDevelopment 
