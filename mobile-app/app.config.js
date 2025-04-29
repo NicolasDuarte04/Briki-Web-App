@@ -48,7 +48,18 @@ module.exports = ({ config: _, ...props }) => {
     return {
       ...config,
       // Explicitly set no plugins for development mode
-      plugins: []
+      plugins: [],
+      // Add web-specific configuration for Replit compatibility
+      web: {
+        ...config.web,
+        favicon: './assets/favicon.png',
+        name: 'Briki Travel Insurance',
+        shortName: 'Briki',
+        backgroundColor: '#4B76E5',
+        themeColor: '#4B76E5',
+        lang: 'es',
+        bundler: 'metro'
+      }
     };
   } else {
     // For production builds, include the expo-updates plugin with proper configuration
@@ -61,7 +72,18 @@ module.exports = ({ config: _, ...props }) => {
             username: "briki"
           }
         ]
-      ]
+      ],
+      // Add web-specific configuration for production
+      web: {
+        ...config.web,
+        favicon: './assets/favicon.png',
+        name: 'Briki Travel Insurance',
+        shortName: 'Briki',
+        backgroundColor: '#4B76E5',
+        themeColor: '#4B76E5',
+        lang: 'es',
+        bundler: 'metro'
+      }
     };
   }
 };
