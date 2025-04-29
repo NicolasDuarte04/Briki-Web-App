@@ -369,25 +369,23 @@ function WeatherRiskWebView() {
 }
 
 // Helper functions for the weather risk screen
-function getRiskLevelText(level) {
+function getRiskLevelText(level: RiskLevel): string {
   switch (level) {
-    case 1: return 'Very Low Risk';
-    case 2: return 'Low Risk';
-    case 3: return 'Moderate Risk';
-    case 4: return 'High Risk';
-    case 5: return 'Very High Risk';
-    default: return 'Unknown Risk';
+    case RiskLevel.LOW: return 'Bajo';
+    case RiskLevel.MODERATE: return 'Moderado';
+    case RiskLevel.HIGH: return 'Alto';
+    case RiskLevel.EXTREME: return 'Extremo';
+    default: return 'Desconocido';
   }
 }
 
-function getRiskColorForWeb(level) {
+function getRiskColorForWeb(level: RiskLevel): string {
   switch (level) {
-    case 1: return theme.colors.riskVeryLow;
-    case 2: return theme.colors.riskLow;
-    case 3: return theme.colors.riskModerate;
-    case 4: return theme.colors.riskHigh;
-    case 5: return theme.colors.riskVeryHigh;
-    default: return theme.colors.textMuted;
+    case RiskLevel.LOW: return theme.COLORS.riskLow;
+    case RiskLevel.MODERATE: return theme.COLORS.riskModerate;
+    case RiskLevel.HIGH: return theme.COLORS.riskHigh;
+    case RiskLevel.EXTREME: return theme.COLORS.riskExtreme;
+    default: return theme.colors.textMuted || '#9E9E9E';
   }
 }
 
