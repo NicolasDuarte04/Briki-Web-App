@@ -39,14 +39,7 @@
       },
       "apiUrl": "https://api.briki.insurance"
     },
-    "plugins": [
-      [
-        "expo-updates",
-        {
-          "username": "briki"
-        }
-      ]
-    ],
+    "plugins": [],
     "description": "Intelligent travel insurance comparison platform for Colombia and Mexico markets"
   }
 }
