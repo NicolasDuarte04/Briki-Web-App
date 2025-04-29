@@ -75,7 +75,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       const response = await api.post('/auth/login', { username, password });
       
       // Store the token
-      await AsyncStorage.setItem('@Briki:token', response.data.token);
+      await storage.setItem('@Briki:token', response.data.token);
       
       // Set the user
       setUser(response.data.user);
@@ -94,7 +94,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setLoading(true);
       
       // Remove the token from storage
-      await AsyncStorage.removeItem('@Briki:token');
+      await storage.removeItem('@Briki:token');
       
       // Clear the user
       setUser(null);
@@ -115,7 +115,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       const response = await api.post('/auth/register', { username, email, password });
       
       // Store the token
-      await AsyncStorage.setItem('@Briki:token', response.data.token);
+      await storage.setItem('@Briki:token', response.data.token);
       
       // Set the user
       setUser(response.data.user);
