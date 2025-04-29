@@ -20,7 +20,7 @@ export const DESTINATIONS: DestinationRisk[] = [
     ],
     insuranceRecommendation: 'Recomendamos un seguro con cobertura para cancelaciones y retrasos por clima extremo, especialmente durante la temporada de huracanes.',
     seasons: {
-      1: { 
+      1: {
         safetyScore: 88,
         weatherRisks: [
           {
@@ -30,7 +30,7 @@ export const DESTINATIONS: DestinationRisk[] = [
           }
         ]
       },
-      6: { 
+      6: {
         safetyScore: 70,
         weatherRisks: [
           {
@@ -43,9 +43,9 @@ export const DESTINATIONS: DestinationRisk[] = [
             severity: RiskLevel.HIGH,
             description: 'Temperaturas muy altas con índices de humedad elevados.'
           }
-        ] 
+        ]
       },
-      9: { 
+      9: {
         safetyScore: 65,
         weatherRisks: [
           {
@@ -58,7 +58,7 @@ export const DESTINATIONS: DestinationRisk[] = [
             severity: RiskLevel.HIGH,
             description: 'Riesgo de inundaciones por lluvias intensas y mareas de tormenta.'
           }
-        ] 
+        ]
       }
     }
   },
@@ -75,7 +75,7 @@ export const DESTINATIONS: DestinationRisk[] = [
     ],
     insuranceRecommendation: 'Un seguro básico es suficiente, pero considere cobertura médica para golpes de calor durante el verano.',
     seasons: {
-      1: { 
+      1: {
         safetyScore: 90,
         weatherRisks: [
           {
@@ -85,7 +85,7 @@ export const DESTINATIONS: DestinationRisk[] = [
           }
         ]
       },
-      7: { 
+      7: {
         safetyScore: 75,
         weatherRisks: [
           {
@@ -98,7 +98,7 @@ export const DESTINATIONS: DestinationRisk[] = [
             severity: RiskLevel.MODERATE,
             description: 'Riesgo de incendios forestales en áreas periféricas durante períodos secos.'
           }
-        ] 
+        ]
       }
     }
   },
@@ -115,7 +115,7 @@ export const DESTINATIONS: DestinationRisk[] = [
     ],
     insuranceRecommendation: 'Recomendamos un seguro con cobertura para cancelaciones y retrasos, especialmente durante la temporada de tifones.',
     seasons: {
-      4: { 
+      4: {
         safetyScore: 85,
         weatherRisks: [
           {
@@ -125,7 +125,7 @@ export const DESTINATIONS: DestinationRisk[] = [
           }
         ]
       },
-      9: { 
+      9: {
         safetyScore: 60,
         weatherRisks: [
           {
@@ -138,7 +138,7 @@ export const DESTINATIONS: DestinationRisk[] = [
             severity: RiskLevel.MODERATE,
             description: 'Riesgo de fuertes lluvias e inundaciones en algunas áreas.'
           }
-        ] 
+        ]
       }
     }
   },
@@ -160,7 +160,7 @@ export const DESTINATIONS: DestinationRisk[] = [
     ],
     insuranceRecommendation: 'Recomendamos un seguro premium con amplia cobertura para cancelaciones, evacuaciones de emergencia y atención médica, especialmente durante la temporada de huracanes.',
     seasons: {
-      1: { 
+      1: {
         safetyScore: 88,
         weatherRisks: [
           {
@@ -170,7 +170,7 @@ export const DESTINATIONS: DestinationRisk[] = [
           }
         ]
       },
-      8: { 
+      8: {
         safetyScore: 60,
         weatherRisks: [
           {
@@ -188,7 +188,7 @@ export const DESTINATIONS: DestinationRisk[] = [
             severity: RiskLevel.HIGH,
             description: 'Calor extremo con alta humedad que puede causar problemas de salud.'
           }
-        ] 
+        ]
       }
     }
   },
@@ -205,7 +205,7 @@ export const DESTINATIONS: DestinationRisk[] = [
     ],
     insuranceRecommendation: 'Un seguro con cobertura para cancelaciones y cambios de alojamiento es esencial, especialmente en temporada de acqua alta.',
     seasons: {
-      7: { 
+      7: {
         safetyScore: 85,
         weatherRisks: [
           {
@@ -215,7 +215,7 @@ export const DESTINATIONS: DestinationRisk[] = [
           }
         ]
       },
-      11: { 
+      11: {
         safetyScore: 55,
         weatherRisks: [
           {
@@ -223,7 +223,7 @@ export const DESTINATIONS: DestinationRisk[] = [
             severity: RiskLevel.EXTREME,
             description: 'Alto riesgo de acqua alta (inundaciones) que pueden afectar significativamente su estancia.'
           }
-        ] 
+        ]
       }
     }
   },
@@ -240,7 +240,7 @@ export const DESTINATIONS: DestinationRisk[] = [
     ],
     insuranceRecommendation: 'Un seguro estándar es suficiente, pero considere cobertura para cambios en el itinerario durante la temporada de lluvias.',
     seasons: {
-      4: { 
+      4: {
         safetyScore: 75,
         weatherRisks: [
           {
@@ -250,11 +250,11 @@ export const DESTINATIONS: DestinationRisk[] = [
           }
         ]
       },
-      7: { 
+      7: {
         safetyScore: 85,
-        weatherRisks: [] 
+        weatherRisks: []
       },
-      10: { 
+      10: {
         safetyScore: 75,
         weatherRisks: [
           {
@@ -262,7 +262,7 @@ export const DESTINATIONS: DestinationRisk[] = [
             severity: RiskLevel.MODERATE,
             description: 'Segunda temporada de lluvias con posibilidad de tormentas intensas e inundaciones localizadas.'
           }
-        ] 
+        ]
       }
     }
   },
@@ -273,7 +273,7 @@ export const DESTINATIONS: DestinationRisk[] = [
     weatherRisks: [],
     insuranceRecommendation: 'Un seguro básico es suficiente para Buenos Aires, ya que no presenta riesgos climáticos extremos en la mayoría de los meses.',
     seasons: {
-      1: { 
+      1: {
         safetyScore: 75,
         weatherRisks: [
           {
@@ -283,9 +283,9 @@ export const DESTINATIONS: DestinationRisk[] = [
           }
         ]
       },
-      7: { 
+      7: {
         safetyScore: 85,
-        weatherRisks: [] 
+        weatherRisks: []
       }
     }
   },
@@ -302,7 +302,7 @@ export const DESTINATIONS: DestinationRisk[] = [
     ],
     insuranceRecommendation: 'Un seguro estándar es suficiente, pero si planea viajar a regiones andinas, considere cobertura para cancelaciones durante la temporada de lluvias.',
     seasons: {
-      2: { 
+      2: {
         safetyScore: 78,
         weatherRisks: [
           {
@@ -312,9 +312,9 @@ export const DESTINATIONS: DestinationRisk[] = [
           }
         ]
       },
-      7: { 
+      7: {
         safetyScore: 85,
-        weatherRisks: [] 
+        weatherRisks: []
       }
     }
   }
