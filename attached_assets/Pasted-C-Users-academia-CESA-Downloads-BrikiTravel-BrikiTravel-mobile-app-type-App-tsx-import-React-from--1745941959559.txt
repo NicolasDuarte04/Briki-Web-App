@@ -1,0 +1,92 @@
+C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app>type App.tsx
+import React from 'react';
+import WebApp from './src/WebApp';
+import { AuthProvider } from './src/contexts/AuthContext';
+
+// Detect if we're in a web environment
+const isWeb = typeof document !== 'undefined';
+
+// Main application component
+export default function App() {
+  // If we're running in web mode (like in Replit), use the web-optimized version
+  if (isWeb) {
+    console.log('­ƒô▒ Running Briki Travel App in Web mode');
+    return <WebApp />;
+  }
+
+  // For native mobile environments, we'll use the standard navigation setup
+  // This would normally include React Navigation and native components
+  return (
+    <AuthProvider>
+      <NativeAppPlaceholder />
+    </AuthProvider>
+  );
+}
+
+// Placeholder component for native app integration
+// In a complete implementation, this would be replaced with your
+// full React Navigation setup
+function NativeAppPlaceholder() {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Briki Travel Insurance</Text>
+      <Text style={styles.subtitle}>Mobile application</Text>
+      <Text style={styles.message}>
+        Loading native navigation...
+      </Text>
+    </View>
+  );
+}
+
+// Basic styles for the placeholder
+const styles = {
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#4B76E5', // Briki Blue
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 18,
+    color: '#FFFFFF',
+    marginBottom: 24,
+  },
+  message: {
+    fontSize: 16,
+    color: '#FFFFFF',
+    textAlign: 'center',
+    paddingHorizontal: 32,
+  },
+};
+
+// Import these here to prevent errors in web mode
+// These would be used in the full native implementation
+let View, Text;
+try {
+  // Try to import from react-native
+  const ReactNative = require('react-native');
+  View = ReactNative.View;
+  Text = ReactNative.Text;
+} catch (e) {
+  // Fallback to our web components if react-native is not available
+  const WebPlatform = require('./src/web-platform').default;
+  View = WebPlatform.View;
+  Text = WebPlatform.Text;
+}
+C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app>dir src\WebApp.tsx
+ El volumen de la unidad C no tiene etiqueta.
+ El número de serie del volumen es: 36E7-EB8F
+
+ Directorio de C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app\src
+
+28/04/2025  08:56 p. m.            16.376 WebApp.tsx
+               1 archivos         16.376 bytes
+               0 dirs  111.116.820.480 bytes libres
+
+C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app>
