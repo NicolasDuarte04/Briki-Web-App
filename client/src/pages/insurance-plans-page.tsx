@@ -39,7 +39,7 @@ export default function InsurancePlansPage() {
   
   // Get insurance plans
   const { data: plans = [], isLoading, error } = useQuery<InsurancePlan[]>({
-    queryKey: ["/api/insurance-plans"],
+    queryKey: ["/api/plans"],
   });
   
   // Filter plans based on criteria
