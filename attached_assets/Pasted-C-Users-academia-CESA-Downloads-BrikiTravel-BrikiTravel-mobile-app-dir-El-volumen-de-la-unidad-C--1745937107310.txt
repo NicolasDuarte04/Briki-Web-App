@@ -1,0 +1,54 @@
+C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app>dir
+ El volumen de la unidad C no tiene etiqueta.
+ El número de serie del volumen es: 36E7-EB8F
+
+ Directorio de C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app
+
+28/04/2025  09:34 p. m.    <DIR>          .
+28/04/2025  09:34 p. m.    <DIR>          ..
+28/04/2025  10:53 a. m.    <DIR>          .expo
+28/04/2025  08:56 p. m.               601 .gitignore
+28/04/2025  08:56 p. m.             1.532 app.config.js
+28/04/2025  08:55 p. m.               470 App.js
+28/04/2025  08:56 p. m.             1.125 app.json
+28/04/2025  08:56 p. m.             2.112 App.tsx
+28/04/2025  09:30 p. m.    <DIR>          assets
+28/04/2025  08:56 p. m.               931 babel.config.js
+28/04/2025  08:56 p. m.    <DIR>          briki-travel-insurance
+28/04/2025  08:56 p. m.               888 eas.json
+28/04/2025  09:40 p. m.    <DIR>          node_modules
+28/04/2025  09:40 p. m.           596.786 package-lock.json
+28/04/2025  08:56 p. m.             1.770 package.json
+28/04/2025  08:56 p. m.             1.423 README.md
+28/04/2025  08:56 p. m.             2.239 run-expo.js
+28/04/2025  08:56 p. m.    <DIR>          server
+28/04/2025  09:28 p. m.    <DIR>          src
+28/04/2025  08:55 p. m.               892 start-expo.js
+28/04/2025  08:56 p. m.               921 tsconfig.json
+28/04/2025  08:56 p. m.             1.155 web-index.js
+              14 archivos        612.845 bytes
+               8 dirs  110.204.518.400 bytes libres
+
+C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app>dir src
+ El volumen de la unidad C no tiene etiqueta.
+ El número de serie del volumen es: 36E7-EB8F
+
+ Directorio de C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app\src
+
+28/04/2025  09:28 p. m.    <DIR>          .
+28/04/2025  09:34 p. m.    <DIR>          ..
+28/04/2025  08:56 p. m.    <DIR>          assets
+29/04/2025  12:03 a. m.    <DIR>          components
+28/04/2025  08:56 p. m.    <DIR>          contexts
+28/04/2025  08:56 p. m.    <DIR>          data
+28/04/2025  08:56 p. m.    <DIR>          navigation
+28/04/2025  09:27 p. m.    <DIR>          screens
+28/04/2025  08:56 p. m.    <DIR>          services
+28/04/2025  08:56 p. m.    <DIR>          types
+28/04/2025  09:28 p. m.    <DIR>          utils
+28/04/2025  08:56 p. m.             6.596 web-platform.tsx
+28/04/2025  08:56 p. m.            16.376 WebApp.tsx
+               2 archivos         22.972 bytes
+              11 dirs  110.204.518.400 bytes libres
+
+C:\Users\academia.CESA\Downloads\BrikiTravel\BrikiTravel\mobile-app>
