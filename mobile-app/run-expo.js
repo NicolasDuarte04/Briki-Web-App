@@ -47,7 +47,7 @@ console.log('\n🔧 Expo server is starting on port 19006...');
 console.log('\n🌐 Using Expo Web mode for Replit compatibility');
 
 // Start the Expo server in web mode with development settings
-const expo = spawn('npx', ['expo', 'start', '-c', '--web', '--port', '19006', '--dev', '--no-minify'], {
+const expo = spawn('npx', ['expo', 'start', '-c', '--web', '--port', '19006'], {
   stdio: 'inherit',
   cwd: __dirname,
   env: {

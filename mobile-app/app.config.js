@@ -10,9 +10,8 @@ const config = {
     resizeMode: "contain",
     backgroundColor: "#4B76E5"
   },
-  updates: {
-    fallbackToCacheTimeout: 0
-  },
+  // Disable updates in base config
+  updates: null,
   assetBundlePatterns: [
     "**/*"
   ],
@@ -41,49 +40,22 @@ const config = {
   description: "Intelligent travel insurance comparison platform for Colombia and Mexico markets"
 };
 
-// Default configuration with required expo-updates config for development environment
+// Default configuration without expo-updates for Replit compatibility
 module.exports = ({ config: _, ...props }) => {
-  if (props.mode === 'development') {
-    // For development, use a simplified config without expo-updates
-    return {
-      ...config,
-      // Explicitly set no plugins for development mode
-      plugins: [],
-      // Add web-specific configuration for Replit compatibility
-      web: {
-        ...config.web,
-        favicon: './assets/favicon.png',
-        name: 'Briki Travel Insurance',
-        shortName: 'Briki',
-        backgroundColor: '#4B76E5',
-        themeColor: '#4B76E5',
-        lang: 'es',
-        bundler: 'metro'
-      }
-    };
-  } else {
-    // For production builds, include the expo-updates plugin with proper configuration
-    return {
-      ...config,
-      plugins: [
-        [
-          "expo-updates",
-          {
-            username: "briki"
-          }
-        ]
-      ],
-      // Add web-specific configuration for production
-      web: {
-        ...config.web,
-        favicon: './assets/favicon.png',
-        name: 'Briki Travel Insurance',
-        shortName: 'Briki',
-        backgroundColor: '#4B76E5',
-        themeColor: '#4B76E5',
-        lang: 'es',
-        bundler: 'metro'
-      }
-    };
-  }
-};
+  return {
+    ...config,
+    // Completely remove plugins to avoid expo-updates issues
+    disablePlugins: ['expo-updates'],
+    // Add web-specific configuration for Replit compatibility
+    web: {
+      ...config.web,
+      favicon: './assets/favicon.png',
+      name: 'Briki Travel Insurance',
+      shortName: 'Briki',
+      backgroundColor: '#4B76E5',
+      themeColor: '#4B76E5',
+      lang: 'es',
+      bundler: 'metro'
+    }
+  };
+}
