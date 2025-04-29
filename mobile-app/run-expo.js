@@ -41,10 +41,15 @@ qrcode.generate(url, { small: true });
 console.log(`\n📋 Or manually enter this URL in Expo Go: ${url}`);
 console.log('\n🔧 Expo server is starting on port 19000...');
 
-// Start the Expo server
-const expo = spawn('npx', ['expo', 'start', '--port', '19000'], {
+// Start the Expo server with development mode explicitly enabled
+const expo = spawn('npx', ['expo', 'start', '--port', '19000', '--dev', '--no-minify'], {
   stdio: 'inherit',
-  cwd: __dirname
+  cwd: __dirname,
+  env: {
+    ...process.env,
+    EXPO_NO_UPDATES: 'true', // Disable updates check in development
+    NODE_ENV: 'development'
+  }
 });
 
 expo.on('error', (err) => {
