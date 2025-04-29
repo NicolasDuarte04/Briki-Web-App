@@ -24,8 +24,9 @@ if (!serverIP) {
   serverIP = 'localhost';
 }
 
-// Create a URL to be used for the QR code
-const url = `exp://${serverIP}:19000`;
+// Create URLs to be used for both native and web viewing
+const nativeUrl = `exp://${serverIP}:19000`;
+const webUrl = `http://${serverIP}:19006`;
 
 // Display Briki Travel Insurance header
 console.log('\n===================================');
@@ -36,19 +37,25 @@ console.log('Starting Expo development server...\n');
 
 // Show the QR code for direct scanning
 console.log('\n📱 Scan this QR code with the Expo Go app on your phone:');
-qrcode.generate(url, { small: true });
+qrcode.generate(nativeUrl, { small: true });
 
-console.log(`\n📋 Or manually enter this URL in Expo Go: ${url}`);
-console.log('\n🔧 Expo server is starting on port 19000...');
+console.log(`\n📋 Native mode URL (for Expo Go): ${nativeUrl}`);
+console.log(`\n🌐 Web mode URL (for browsers): ${webUrl}`);
+console.log('\n🔧 Expo server is starting on port 19006...');
 
-// Start the Expo server with development mode explicitly enabled
-const expo = spawn('npx', ['expo', 'start', '--port', '19000', '--dev', '--no-minify'], {
+// Set WEB mode explicitly for Replit compatibility
+console.log('\n🌐 Using Expo Web mode for Replit compatibility');
+
+// Start the Expo server in web mode with development settings
+const expo = spawn('npx', ['expo', 'start', '--web', '--port', '19006', '--dev', '--no-minify'], {
   stdio: 'inherit',
   cwd: __dirname,
   env: {
     ...process.env,
     EXPO_NO_UPDATES: 'true', // Disable updates check in development
-    NODE_ENV: 'development'
+    NODE_ENV: 'development',
+    REACT_NATIVE_PACKAGER_HOSTNAME: serverIP, // Set explicit hostname
+    EXPO_PACKAGER_PROXY_URL: `http://${serverIP}:19006` // Force web URL
   }
 });
 

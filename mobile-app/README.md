@@ -1,51 +1,38 @@
 # Briki Travel Insurance Mobile App
 
-A cutting-edge mobile travel insurance platform delivering intelligent, personalized travel protection through innovative AI-powered technologies.
+## Overview
+This is a mobile application built with React Native and Expo for comparing travel insurance plans. It features weather risk assessment, personalized recommendations, and seamless insurance purchasing flow.
 
-## Project Structure
+## Development in Replit
+Due to Replit's environment limitations with React Native and Expo, this project uses a special configuration:
 
-This is an Expo project with React Native organized as follows:
+1. **Web Version**: The app can be previewed in web mode using Expo's web compatibility features.
+2. **Replit Compatibility**: Custom scripts are set up to run Expo in Replit's environment.
+3. **Dual Mode Development**: The codebase supports both mobile and web views.
 
-- `assets/`: Contains all static assets like images, fonts, etc.
-- `src/`: Main source code
-  - `components/`: Reusable UI components
-  - `contexts/`: React contexts for state management
-  - `data/`: Static data files and models
-  - `navigation/`: Navigation configurations
-  - `screens/`: Main application screens
-  - `services/`: API and other service integrations
-  - `types/`: TypeScript type definitions
-  - `utils/`: Utility functions and helpers
-
-## Features
-
-- Authentication (Login/Registration)
-- Trip information input and storage
+## Key Features
+- Weather risk assessment by destination
 - Insurance plan comparison
-- Weather risk assessment
-- Checkout process with Stripe integration
-- User profile management
+- Personalized recommendations
+- User authentication
+- Secure checkout process
 
 ## Running the App
+- In Replit: Use the "Start Expo App" workflow or run `npm run replit`
+- Locally: Use `npm start` or `expo start`
 
-1. Install dependencies:
-```
-npm install
-```
-
-2. Start the development server:
-```
-npm start
-```
-
-3. Scan the QR code with the Expo Go app on your mobile device or run on an emulator.
+## App Structure
+- `/src/screens` - Main application screens
+- `/src/components` - Reusable UI components
+- `/src/contexts` - Context providers (Auth, etc.)
+- `/src/data` - Data models and static data
+- `/src/utils` - Utility functions and theme
+- `/src/navigation` - Navigation configuration
 
 ## Tech Stack
-
-- TypeScript and React Native
-- Expo development platform
+- React Native / Expo
+- TypeScript
 - React Navigation
-- React Native Paper UI components
-- Axios for API requests
-- React Query for data fetching
-- Reanimated for animations
+- React Native Paper (UI components)
+- React Native Reanimated (Animations)
+- Axios (API requests)

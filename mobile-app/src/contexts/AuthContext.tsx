@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { storage } from '../utils/storage';
 import { api } from '../services/api';
 
 // Type definitions
@@ -47,7 +47,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const loadUser = async () => {
       try {
         setLoading(true);
-        const token = await AsyncStorage.getItem('@Briki:token');
+        const token = await storage.getItem('@Briki:token');
         
         if (token) {
           // Try to get user data with the stored token
@@ -56,7 +56,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         }
       } catch (error) {
         // If there's an error, clear the stored token
-        await AsyncStorage.removeItem('@Briki:token');
+        await storage.removeItem('@Briki:token');
         setUser(null);
       } finally {
         setLoading(false);
