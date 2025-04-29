@@ -1,116 +1,367 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, SafeAreaView, ScrollView } from './web-platform';
 import { AuthProvider } from './contexts/AuthContext';
 import { theme } from './utils/theme';
 
 // Import the WeatherRiskScreen content
-import { weatherRiskData } from './data/weatherRiskData';
+import { DESTINATIONS, DestinationRisk, RiskLevel } from './data/weatherRiskData';
 
 // Web-friendly implementation of the Weather Risk screen
 function WeatherRiskWebView() {
+  const [currentMonth, setCurrentMonth] = useState<number>(new Date().getMonth() + 1);
+  const [selectedDestination, setSelectedDestination] = useState<string | null>(null);
+  const [destination, setDestination] = useState<DestinationRisk | null>(null);
+  
+  // Initialize with first destination
+  useEffect(() => {
+    if (DESTINATIONS.length > 0 && !selectedDestination) {
+      const firstDest = DESTINATIONS[0];
+      setSelectedDestination(`${firstDest.country.toLowerCase()}-${firstDest.city.toLowerCase()}`);
+      updateDestination(`${firstDest.country.toLowerCase()}-${firstDest.city.toLowerCase()}`);
+    }
+  }, []);
+
+  // Update destination when selection changes
+  const updateDestination = (value: string) => {
+    const [country, city] = value.split('-');
+    
+    const found = DESTINATIONS.find(d => 
+      d.country.toLowerCase() === country.toLowerCase() &&
+      d.city.toLowerCase() === city.toLowerCase()
+    );
+    
+    if (found) {
+      // If the destination has specific data for the month, use that
+      if (found.seasons && found.seasons[currentMonth]) {
+        setDestination({
+          ...found,
+          safetyScore: found.seasons[currentMonth].safetyScore,
+          weatherRisks: found.seasons[currentMonth].weatherRisks,
+        });
+      } else {
+        setDestination(found);
+      }
+    }
+  };
+
+  // Handle month change
+  const handleMonthChange = (month: number) => {
+    setCurrentMonth(month);
+    
+    // Update destination data for new month
+    if (selectedDestination) {
+      updateDestination(selectedDestination);
+    }
+  };
+
+  // Get month name for the picker
+  const getMonthName = (monthNum: number): string => {
+    const months = [
+      'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+      'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    ];
+    return months[monthNum - 1];
+  };
+
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.backgroundLight }}>
-      <ScrollView 
-        contentContainerStyle={{ padding: theme.spacing.medium }}
-      >
-        <View style={{ marginBottom: theme.spacing.large }}>
+    <SafeAreaView style={{ 
+      flex: 1, 
+      backgroundColor: theme.colors.background || '#f5f7fa'
+    }}>
+      <ScrollView contentContainerStyle={{ padding: theme.spacing.medium || 16 }}>
+        <View style={{ marginBottom: theme.spacing.large || 24 }}>
           <Text style={{ 
-            fontSize: theme.fontSizes.headline, 
+            fontSize: theme.fontSizes.xxl || 24, 
             fontWeight: 'bold',
             color: theme.colors.primary,
-            marginBottom: theme.spacing.medium
+            marginBottom: theme.spacing.medium || 16
           }}>
-            Weather Risk Analyzer
+            Analizador de Riesgos Climáticos
           </Text>
           
           <Text style={{ 
-            fontSize: theme.fontSizes.medium, 
-            color: theme.colors.textLight,
-            marginBottom: theme.spacing.large
+            fontSize: theme.fontSizes.md || 16, 
+            color: theme.colors.textSecondary || '#757575',
+            marginBottom: theme.spacing.large || 24
           }}>
-            Evaluate weather-related risks for your travel destinations and find the right insurance coverage.
+            Evalúa los riesgos climáticos en tu destino para elegir el seguro adecuado.
           </Text>
           
-          {/* Destination Cards */}
-          <View style={{ 
-            marginVertical: theme.spacing.medium,
-            display: 'flex', 
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            gap: theme.spacing.medium,
+          {/* Destination Selection */}
+          <View style={{
+            padding: theme.spacing.medium || 16,
+            backgroundColor: theme.colors.white || '#FFFFFF',
+            borderRadius: 8,
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+            marginBottom: theme.spacing.medium || 16
           }}>
-            {weatherRiskData.destinations.map((destination, index) => (
-              <View key={index} style={{
-                backgroundColor: theme.colors.white,
-                borderRadius: 8,
-                padding: theme.spacing.medium,
-                width: 'calc(50% - 8px)',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                marginBottom: theme.spacing.medium
+            <Text style={{ 
+              fontSize: theme.fontSizes.lg || 18, 
+              fontWeight: 'bold',
+              marginBottom: theme.spacing.small || 8
+            }}>
+              Selecciona un destino
+            </Text>
+            
+            <View style={{ marginBottom: theme.spacing.medium || 16 }}>
+              <Text style={{ 
+                fontSize: theme.fontSizes.sm || 14,
+                color: theme.colors.textSecondary || '#757575',
+                marginBottom: 5
               }}>
-                <Text style={{ 
-                  fontSize: theme.fontSizes.large, 
-                  fontWeight: 'bold',
-                  marginBottom: theme.spacing.small
-                }}>
-                  {destination.name}
-                </Text>
-                <Text style={{ color: theme.colors.textLight }}>
-                  {destination.country}
-                </Text>
-                
+                Destino
+              </Text>
+              <select 
+                value={selectedDestination || ''} 
+                onChange={(e) => {
+                  setSelectedDestination(e.target.value);
+                  updateDestination(e.target.value);
+                }}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  borderRadius: '4px',
+                  border: `1px solid ${theme.colors.border || '#e0e0e0'}`,
+                  fontSize: '16px'
+                }}
+              >
+                {DESTINATIONS.map((dest) => (
+                  <option 
+                    key={`${dest.country}-${dest.city}`} 
+                    value={`${dest.country.toLowerCase()}-${dest.city.toLowerCase()}`}
+                  >
+                    {dest.city}, {dest.country}
+                  </option>
+                ))}
+              </select>
+            </View>
+            
+            <View>
+              <Text style={{ 
+                fontSize: theme.fontSizes.sm || 14,
+                color: theme.colors.textSecondary || '#757575',
+                marginBottom: 5
+              }}>
+                Mes de viaje
+              </Text>
+              <select 
+                value={currentMonth} 
+                onChange={(e) => handleMonthChange(parseInt(e.target.value))}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  borderRadius: '4px',
+                  border: `1px solid ${theme.colors.border || '#e0e0e0'}`,
+                  fontSize: '16px'
+                }}
+              >
+                {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
+                  <option key={month} value={month}>
+                    {getMonthName(month)}
+                  </option>
+                ))}
+              </select>
+            </View>
+          </View>
+
+          {/* Weather Risks Display */}
+          {destination && (
+            <View style={{
+              padding: theme.spacing.medium || 16,
+              backgroundColor: theme.colors.white || '#FFFFFF',
+              borderRadius: 8,
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+              marginBottom: theme.spacing.medium || 16
+            }}>
+              <Text style={{ 
+                fontSize: theme.fontSizes.lg || 18, 
+                fontWeight: 'bold',
+                marginBottom: theme.spacing.small || 8
+              }}>
+                Riesgos climáticos para {destination.city}, {destination.country}
+              </Text>
+              
+              <View style={{ marginBottom: theme.spacing.medium || 16 }}>
                 <View style={{ 
-                  marginTop: theme.spacing.medium,
-                  padding: theme.spacing.xs,
-                  backgroundColor: getRiskColorForWeb(destination.riskLevel),
-                  borderRadius: 4,
-                  alignSelf: 'flex-start'
+                  display: 'flex', 
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginBottom: 10
                 }}>
                   <Text style={{ 
-                    color: 'white', 
-                    fontSize: theme.fontSizes.small,
-                    fontWeight: 'bold',
-                    padding: 4
+                    width: 80, 
+                    textAlign: 'right', 
+                    marginRight: 10,
+                    fontSize: theme.fontSizes.sm || 14,
+                    color: theme.colors.textSecondary || '#757575'
                   }}>
-                    {getRiskLevelText(destination.riskLevel)}
+                    Seguridad:
+                  </Text>
+                  <View style={{ 
+                    flex: 1,
+                    height: 8,
+                    backgroundColor: theme.colors.divider || '#EEEEEE',
+                    borderRadius: 4,
+                    overflow: 'hidden'
+                  }}>
+                    <View style={{
+                      width: `${destination.safetyScore}%`,
+                      height: '100%',
+                      backgroundColor: 
+                        destination.safetyScore > 80 ? theme.COLORS.riskLow :
+                        destination.safetyScore > 60 ? theme.COLORS.riskModerate :
+                        theme.COLORS.riskHigh
+                    }}></View>
+                  </View>
+                  <Text style={{ 
+                    width: 40, 
+                    textAlign: 'right', 
+                    marginLeft: 10,
+                    fontSize: theme.fontSizes.sm || 14,
+                    fontWeight: 'bold',
+                    color: theme.colors.text || '#212121'
+                  }}>
+                    {destination.safetyScore}%
                   </Text>
                 </View>
               </View>
-            ))}
-          </View>
-          
-          {/* Risk Factors */}
-          <View style={{ marginTop: theme.spacing.xl }}>
-            <Text style={{ 
-              fontSize: theme.fontSizes.xl, 
-              fontWeight: 'bold',
-              marginBottom: theme.spacing.medium
-            }}>
-              Common Weather Risk Factors
-            </Text>
-            
-            {weatherRiskData.riskFactors.map((factor, index) => (
-              <View key={index} style={{
-                backgroundColor: theme.colors.white,
+              
+              <Text style={{ 
+                fontSize: theme.fontSizes.md || 16, 
+                marginBottom: 10,
+                fontWeight: 'bold',
+                color: theme.colors.text || '#212121'
+              }}>
+                Factores de riesgo
+              </Text>
+              
+              {destination.weatherRisks.length === 0 ? (
+                <Text style={{ 
+                  color: theme.colors.textSecondary || '#757575', 
+                  fontStyle: 'italic' 
+                }}>
+                  No hay riesgos climáticos significativos en este destino durante {getMonthName(currentMonth)}.
+                </Text>
+              ) : (
+                <View>
+                  {destination.weatherRisks.map((risk, index) => (
+                    <View key={index} style={{
+                      marginBottom: theme.spacing.medium || 16,
+                      padding: theme.spacing.medium || 16,
+                      borderRadius: 8,
+                      backgroundColor: `${theme.COLORS[`risk${risk.severity.charAt(0).toUpperCase() + risk.severity.slice(1)}`]}20`,
+                      border: `1px solid ${theme.COLORS[`risk${risk.severity.charAt(0).toUpperCase() + risk.severity.slice(1)}`]}`
+                    }}>
+                      <View style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        marginBottom: 10
+                      }}>
+                        <View style={{
+                          backgroundColor: theme.COLORS[`risk${risk.severity.charAt(0).toUpperCase() + risk.severity.slice(1)}`],
+                          color: 'white',
+                          padding: '4px 8px',
+                          borderRadius: 4,
+                          fontSize: theme.fontSizes.xs || 12,
+                          fontWeight: 'bold',
+                          marginRight: 10
+                        }}>
+                          {risk.severity === RiskLevel.LOW && 'Bajo'}
+                          {risk.severity === RiskLevel.MODERATE && 'Moderado'}
+                          {risk.severity === RiskLevel.HIGH && 'Alto'}
+                          {risk.severity === RiskLevel.EXTREME && 'Extremo'}
+                        </View>
+                        <Text style={{ 
+                          margin: 0, 
+                          fontSize: theme.fontSizes.md || 16,
+                          fontWeight: 'bold',
+                          color: theme.colors.text || '#212121'
+                        }}>
+                          {risk.type === 'hurricane' && 'Huracanes/Tifones'}
+                          {risk.type === 'flood' && 'Inundaciones'}
+                          {risk.type === 'extreme_heat' && 'Calor extremo'}
+                          {risk.type === 'wildfire' && 'Incendios forestales'}
+                          {risk.type === 'blizzard' && 'Ventiscas'}
+                          {risk.type === 'avalanche' && 'Avalanchas'}
+                          {risk.type === 'drought' && 'Sequía'}
+                        </Text>
+                      </View>
+                      <Text style={{ 
+                        margin: 0,
+                        fontSize: theme.fontSizes.sm || 14,
+                        color: theme.colors.text || '#212121'
+                      }}>
+                        {risk.description}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              )}
+              
+              <View style={{
+                marginTop: theme.spacing.medium || 16,
+                padding: theme.spacing.medium || 16,
+                backgroundColor: `${theme.colors.primary}20`,
                 borderRadius: 8,
-                padding: theme.spacing.medium,
-                marginBottom: theme.spacing.medium,
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                borderLeft: `4px solid ${theme.colors.primary}`
               }}>
                 <Text style={{ 
-                  fontSize: theme.fontSizes.large, 
+                  fontSize: theme.fontSizes.md || 16, 
                   fontWeight: 'bold',
-                  marginBottom: theme.spacing.small,
-                  color: theme.colors.text
+                  marginBottom: theme.spacing.xs || 4,
+                  color: theme.colors.primary
                 }}>
-                  {factor.name}
+                  Recomendación de seguro
                 </Text>
-                <Text style={{ color: theme.colors.textLight }}>
-                  {factor.description}
+                <Text style={{ 
+                  margin: 0,
+                  fontSize: theme.fontSizes.sm || 14,
+                  color: theme.colors.text || '#212121'
+                }}>
+                  {destination.insuranceRecommendation}
                 </Text>
               </View>
-            ))}
+            </View>
+          )}
+          
+          <View style={{
+            padding: theme.spacing.medium || 16,
+            backgroundColor: `${theme.colors.info || '#2196F3'}10`,
+            borderRadius: 8,
+            marginBottom: theme.spacing.medium || 16,
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'flex-start'
+          }}>
+            <Text style={{ 
+              color: theme.colors.info || '#2196F3',
+              marginRight: 10,
+              fontSize: 20,
+              fontWeight: 'bold'
+            }}>ℹ️</Text>
+            <Text style={{ 
+              margin: 0,
+              fontSize: theme.fontSizes.sm || 14,
+              color: theme.colors.text || '#212121'
+            }}>
+              La información de riesgos climáticos está basada en datos meteorológicos históricos y tendencias estacionales. 
+              Los datos se actualizan periódicamente y se proporcionan como referencia para ayudar en la planificación de viajes.
+            </Text>
           </View>
+          
+          <button style={{
+            backgroundColor: theme.colors.primary,
+            color: 'white',
+            border: 'none',
+            borderRadius: 4,
+            padding: '10px 15px',
+            fontSize: theme.fontSizes.md || 16,
+            cursor: 'pointer',
+            width: '100%'
+          }}>
+            Ver seguros recomendados para este destino
+          </button>
         </View>
       </ScrollView>
     </SafeAreaView>
