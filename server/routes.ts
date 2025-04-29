@@ -31,6 +31,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication routes
   setupAuth(app);
 
+  // Initialize database with test data
+  try {
+    await storage.seedDataIfNeeded();
+    console.log("Database initialization completed");
+  } catch (error) {
+    console.error("Error during database initialization:", error);
+  }
+
   // Health check endpoint
   app.get("/api/health", (_req, res) => {
     res.json({ status: "ok" });
