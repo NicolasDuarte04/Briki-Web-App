@@ -1,144 +1,143 @@
-import React, { createContext, ReactNode, useContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { QueryClient, useQuery, useMutation } from 'react-query';
 import { api } from '../services/api';
-import { User } from '../types';
+
+// Type definitions
+interface User {
+  id: number;
+  username: string;
+  email: string;
+}
 
 interface AuthContextData {
   user: User | null;
-  isLoading: boolean;
-  error: Error | null;
-  login: (username: string, password: string) => Promise<void>;
-  register: (username: string, password: string, email: string) => Promise<void>;
-  logout: () => Promise<void>;
+  loading: boolean;
+  error: string | null;
+  signIn: (username: string, password: string) => Promise<void>;
+  signOut: () => Promise<void>;
+  register: (username: string, email: string, password: string) => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextData>({} as AuthContextData);
+// Create context with default values
+const AuthContext = createContext<AuthContextData>({
+  user: null,
+  loading: true,
+  error: null,
+  signIn: async () => {},
+  signOut: async () => {},
+  register: async () => {},
+});
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [isLoading, setIsLoading] = useState(true);
+// Custom hook to use the auth context
+export const useAuth = () => useContext(AuthContext);
+
+// Props for the Auth Provider
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+// Auth Provider component
+export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
-  const [error, setError] = useState<Error | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Check if user is already logged in on app start
+  // Get user data from token on mount
   useEffect(() => {
     const loadUser = async () => {
       try {
+        setLoading(true);
         const token = await AsyncStorage.getItem('@Briki:token');
         
         if (token) {
-          // Get user data from API
-          const response = await api.get('/api/user');
+          // Try to get user data with the stored token
+          const response = await api.get('/users/me');
           setUser(response.data);
         }
-      } catch (err) {
-        console.error('Error loading user:', err);
-        // Clear any invalid tokens
+      } catch (error) {
+        // If there's an error, clear the stored token
         await AsyncStorage.removeItem('@Briki:token');
+        setUser(null);
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
 
     loadUser();
   }, []);
 
-  // Login function
-  const login = async (username: string, password: string) => {
+  // Sign in function
+  const signIn = async (username: string, password: string) => {
     try {
+      setLoading(true);
       setError(null);
-      setIsLoading(true);
       
-      // Call login API
-      const response = await api.post('/api/login', { username, password });
-      const data = response.data;
+      const response = await api.post('/auth/login', { username, password });
       
-      // Save token to AsyncStorage
-      if (data.token) {
-        await AsyncStorage.setItem('@Briki:token', data.token);
-        
-        // Set user
-        setUser(data.user);
-      } else {
-        throw new Error('No se recibió un token válido');
-      }
+      // Store the token
+      await AsyncStorage.setItem('@Briki:token', response.data.token);
+      
+      // Set the user
+      setUser(response.data.user);
     } catch (err: any) {
-      setError(err);
+      console.error('Sign in error:', err.response?.data?.message || err.message);
+      setError(err.response?.data?.message || 'Error al iniciar sesión. Inténtalo de nuevo.');
       throw err;
     } finally {
-      setIsLoading(false);
+      setLoading(false);
+    }
+  };
+
+  // Sign out function
+  const signOut = async () => {
+    try {
+      setLoading(true);
+      
+      // Remove the token from storage
+      await AsyncStorage.removeItem('@Briki:token');
+      
+      // Clear the user
+      setUser(null);
+    } catch (err: any) {
+      console.error('Sign out error:', err.message);
+      setError('Error al cerrar sesión.');
+    } finally {
+      setLoading(false);
     }
   };
 
   // Register function
-  const register = async (username: string, password: string, email: string) => {
+  const register = async (username: string, email: string, password: string) => {
     try {
+      setLoading(true);
       setError(null);
-      setIsLoading(true);
       
-      // Call register API
-      const response = await api.post('/api/register', { username, password, email });
-      const data = response.data;
+      const response = await api.post('/auth/register', { username, email, password });
       
-      // Save token to AsyncStorage
-      if (data.token) {
-        await AsyncStorage.setItem('@Briki:token', data.token);
-        
-        // Set user
-        setUser(data.user);
-      } else {
-        throw new Error('No se recibió un token válido');
-      }
+      // Store the token
+      await AsyncStorage.setItem('@Briki:token', response.data.token);
+      
+      // Set the user
+      setUser(response.data.user);
     } catch (err: any) {
-      setError(err);
+      console.error('Register error:', err.response?.data?.message || err.message);
+      setError(err.response?.data?.message || 'Error al registrarse. Inténtalo de nuevo.');
       throw err;
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  // Logout function
-  const logout = async () => {
-    try {
-      setError(null);
-      setIsLoading(true);
-      
-      // Call logout API
-      await api.post('/api/logout');
-      
-      // Remove token from AsyncStorage
-      await AsyncStorage.removeItem('@Briki:token');
-      
-      // Clear user
-      setUser(null);
-    } catch (err: any) {
-      setError(err);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
+  // Context value
+  const value = {
+    user,
+    loading,
+    error,
+    signIn,
+    signOut,
+    register,
   };
 
-  return (
-    <AuthContext.Provider
-      value={{
-        user,
-        isLoading,
-        error,
-        login,
-        register,
-        logout,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-}
+  // Return the provider
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
