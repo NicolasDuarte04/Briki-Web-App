@@ -1,0 +1,601 @@
+import React, { useEffect, useRef } from 'react';
+import { 
+  StyleSheet, 
+  View, 
+  ScrollView, 
+  SafeAreaView, 
+  Platform, 
+  TouchableOpacity, 
+  Dimensions,
+  StatusBar as RNStatusBar
+} from 'react-native';
+import { useLocalSearchParams, router } from 'expo-router';
+import { ThemedText } from '@/components/ThemedText';
+import Animated, { 
+  useSharedValue, 
+  useAnimatedStyle, 
+  withTiming,
+  FadeIn,
+  FadeInDown,
+  SlideInRight,
+  useAnimatedScrollHandler
+} from 'react-native-reanimated';
+import { Ionicons } from '@expo/vector-icons';
+import { StatusBar } from 'expo-status-bar';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+// Import insurance plans data - this would normally come from your data file
+import insurancePlans from './data/insurance-plans';
+import { colors, fonts } from './constants/Styles';
+
+const { width, height } = Dimensions.get('window');
+const COLUMN_WIDTH = Math.min(300, width * 0.8);
+
+export default function ComparePlansScreen() {
+  const params = useLocalSearchParams();
+  const insets = useSafeAreaInsets();
+  const { 
+    fromCountry = 'Origin', 
+    toCountry = 'Destination',
+    tripDuration = '7'
+  } = params;
+
+  const scrollX = useSharedValue(0);
+  const scrollViewRef = useRef(null);
+
+  // Extract the plan IDs from the URL params
+  const planIds = params.planIds?.toString().split(',') || [];
+  // Find the corresponding insurance plans
+  const selectedPlans = planIds.map(id => insurancePlans.find(p => p.id === id)).filter(Boolean);
+
+  // Animation for the initial load
+  const opacity = useSharedValue(0);
+  useEffect(() => {
+    opacity.value = withTiming(1, { duration: 500 });
+  }, []);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value
+  }));
+
+  // Handle horizontal scroll events to create indicators
+  const scrollHandler = useAnimatedScrollHandler((event) => {
+    scrollX.value = event.contentOffset.x;
+  });
+
+  // Calculate best value and best coverage plans
+  const bestValue = selectedPlans.reduce((prev, curr) => 
+    prev.price < curr.price ? prev : curr, selectedPlans[0]);
+
+  const bestCoverage = selectedPlans.reduce((prev, curr) => {
+    const prevTotal = Object.values(prev.coverage).reduce((a, b) => 
+      a + (typeof b === 'number' ? b : 0), 0);
+    const currTotal = Object.values(curr.coverage).reduce((a, b) => 
+      a + (typeof b === 'number' ? b : 0), 0);
+    return prevTotal > currTotal ? prev : curr;
+  }, selectedPlans[0]);
+
+  // Handle navigation back
+  const handleBackPress = () => {
+    router.back();
+  };
+
+  // Format currency values
+  const formatCurrency = (value) => {
+    if (typeof value === 'number') {
+      return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+    return value;
+  };
+
+  if (!selectedPlans || selectedPlans.length === 0) {
+    return (
+      <SafeAreaView style={[
+        styles.container, 
+        { paddingTop: Platform.OS === 'android' ? insets.top : 0 }
+      ]}>
+        <StatusBar style="dark" />
+        <View style={styles.headerContainer}>
+          <TouchableOpacity 
+            style={styles.backButton}
+            onPress={handleBackPress}
+            accessibilityRole="button"
+            accessibilityLabel="Go back to available plans"
+          >
+            <Ionicons name="chevron-back" size={24} color="#4B76E5" />
+          </TouchableOpacity>
+          <View style={styles.header}>
+            <ThemedText style={styles.title}>Compare Plans</ThemedText>
+          </View>
+        </View>
+
+        <Animated.View 
+          entering={FadeIn.delay(200).duration(500)}
+          style={styles.noPlansContainer}
+        >
+          <Ionicons name="information-circle-outline" size={60} color="#4B76E5" style={styles.noPlansIcon} />
+          <ThemedText style={styles.noPlansText}>
+            No plans available to compare. Please go back and select some plans.
+          </ThemedText>
+          <TouchableOpacity 
+            style={styles.backToPlansButton}
+            onPress={handleBackPress}
+            accessibilityRole="button"
+          >
+            <ThemedText style={styles.backToPlansButtonText}>
+              Back to Available Plans
+            </ThemedText>
+          </TouchableOpacity>
+        </Animated.View>
+      </SafeAreaView>
+    );
+  }
+
+  return (
+    <SafeAreaView style={[
+      styles.container, 
+      { paddingTop: Platform.OS === 'android' ? insets.top : 0 }
+    ]}>
+      <StatusBar style="dark" />
+
+      <View style={styles.headerContainer}>
+        <TouchableOpacity 
+          style={styles.backButton}
+          onPress={handleBackPress}
+          accessibilityRole="button"
+          accessibilityLabel="Go back to available plans"
+        >
+          <Ionicons name="chevron-back" size={24} color="#4B76E5" />
+        </TouchableOpacity>
+        <View style={styles.header}>
+          <ThemedText style={styles.title}>Compare Plans</ThemedText>
+          <ThemedText style={styles.subtitle}>
+            {fromCountry} to {toCountry} • {tripDuration} days
+          </ThemedText>
+        </View>
+      </View>
+
+      <Animated.View 
+        entering={FadeInDown.delay(150).springify()}
+        style={styles.instructionsContainer}
+      >
+        <Ionicons name="swap-horizontal" size={18} color="#4B76E5" />
+        <ThemedText style={styles.instructions}>
+          Swipe horizontally to compare all {selectedPlans.length} plans
+        </ThemedText>
+      </Animated.View>
+
+      <Animated.ScrollView 
+        ref={scrollViewRef}
+        horizontal 
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.horizontalScrollContent}
+        decelerationRate="fast"
+        snapToInterval={COLUMN_WIDTH + 16}
+        onScroll={scrollHandler}
+        scrollEventThrottle={16}
+      >
+        <View style={styles.compareGrid}>
+          {/* First column: Category labels */}
+          <Animated.View 
+            entering={SlideInRight.delay(200).springify()}
+            style={styles.labelsColumn}
+          >
+            <View style={styles.labelHeaderPlaceholder} />
+
+            <View style={styles.coverageLabelsContainer}>
+              {Object.keys(selectedPlans[0].coverage).map((key, index) => (
+                <View key={`label-${key}`} style={styles.coverageLabelRow}>
+                  <ThemedText style={styles.coverageCategoryLabel}>
+                    {key}
+                  </ThemedText>
+                </View>
+              ))}
+            </View>
+          </Animated.View>
+
+          {/* Plan columns */}
+          {selectedPlans.map((plan, planIndex) => (
+            <Animated.View 
+              key={plan.id} 
+              entering={SlideInRight.delay(300 + planIndex * 100).springify()}
+              style={[styles.planColumn, animatedStyle]}
+            >
+              <View style={[
+                styles.planHeader,
+                plan === bestValue && styles.bestValueHeader,
+                plan === bestCoverage && styles.bestCoverageHeader
+              ]}>
+                <View style={styles.planHeaderContent}>
+                  <ThemedText style={styles.providerName}>{plan.provider}</ThemedText>
+                  <View style={styles.priceContainer}>
+                    <ThemedText style={styles.price}>${formatCurrency(plan.price)}</ThemedText>
+                    <ThemedText style={styles.perPerson}>per person</ThemedText>
+                  </View>
+                </View>
+
+                <View style={styles.badgeContainer}>
+                  {plan === bestValue && (
+                    <View style={[styles.badge, styles.bestValueBadge]}>
+                      <Ionicons name="cash-outline" size={12} color="#FFFFFF" style={styles.badgeIcon} />
+                      <ThemedText style={styles.badgeText}>Best Value</ThemedText>
+                    </View>
+                  )}
+                  {plan === bestCoverage && (
+                    <View style={[styles.badge, styles.bestCoverageBadge]}>
+                      <Ionicons name="shield-checkmark-outline" size={12} color="#FFFFFF" style={styles.badgeIcon} />
+                      <ThemedText style={styles.badgeText}>Best Coverage</ThemedText>
+                    </View>
+                  )}
+                </View>
+              </View>
+
+              <View style={styles.coverageList}>
+                {Object.entries(plan.coverage).map(([key, value], index) => {
+                  // Determine if this is the highest value among all plans for this category
+                  const isHighestValue = typeof value === 'number' && 
+                    selectedPlans.every(p => 
+                      typeof p.coverage[key] === 'number' ? p.coverage[key] <= value : true
+                    );
+
+                  return (
+                    <View 
+                      key={`${plan.id}-${key}`} 
+                      style={[
+                        styles.coverageItem,
+                        index % 2 === 0 && styles.coverageItemAlternate
+                      ]}
+                    >
+                      <View style={styles.coverageValueContainer}>
+                        {typeof value === 'number' ? (
+                          <ThemedText style={[
+                            styles.coverageValue,
+                            isHighestValue && styles.highestCoverageValue
+                          ]}>
+                            ${formatCurrency(value)}
+                          </ThemedText>
+                        ) : (
+                          <View style={styles.coverageTextContainer}>
+                            <Ionicons 
+                              name={value === "Included" ? "checkmark-circle" : "close-circle"} 
+                              size={18} 
+                              color={value === "Included" ? "#34C759" : "#FF3B30"} 
+                            />
+                            <ThemedText style={[
+                              styles.coverageTextValue,
+                              value !== "Included" && styles.coverageNotIncluded
+                            ]}>
+                              {value}
+                            </ThemedText>
+                          </View>
+                        )}
+                      </View>
+                    </View>
+                  );
+                })}
+              </View>
+
+              <TouchableOpacity 
+                style={styles.selectButton}
+                onPress={() => {
+                  router.push({
+                    pathname: '/checkout',
+                    params: { 
+                      plan: JSON.stringify(plan),
+                      fromCountry,
+                      toCountry,
+                      tripDuration
+                    }
+                  });
+                }}
+                accessibilityRole="button"
+                accessibilityLabel={`Select ${plan.provider} plan`}
+              >
+                <ThemedText style={styles.selectButtonText}>Select Plan</ThemedText>
+                <Ionicons name="chevron-forward" size={16} color="#FFFFFF" />
+              </TouchableOpacity>
+            </Animated.View>
+          ))}
+        </View>
+      </Animated.ScrollView>
+
+      {/* Pagination dots */}
+      {selectedPlans.length > 1 && (
+        <View style={styles.paginationContainer}>
+          {selectedPlans.map((_, index) => {
+            const dotAnimatedStyle = useAnimatedStyle(() => {
+              const isActive = Math.round(scrollX.value / (COLUMN_WIDTH + 16)) === index;
+              return {
+                width: isActive ? 16 : 8,
+                opacity: isActive ? 1 : 0.5,
+                backgroundColor: isActive ? '#4B76E5' : '#BCC5DC',
+              };
+            });
+
+            return (
+              <Animated.View 
+                key={`dot-${index}`}
+                style={[styles.paginationDot, dotAnimatedStyle]}
+              />
+            );
+          })}
+        </View>
+      )}
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#F8F8FA',
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 8,
+    backgroundColor: '#F8F8FA',
+    zIndex: 10,
+  },
+  backButton: {
+    padding: 8,
+    marginRight: 10,
+    borderRadius: 20,
+    backgroundColor: 'rgba(75, 118, 229, 0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  header: {
+    flex: 1,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: '700',
+    marginBottom: 4,
+    color: '#000000',
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#666666',
+    fontWeight: '400',
+  },
+  instructionsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+    paddingHorizontal: 24,
+    paddingVertical: 8,
+    backgroundColor: 'rgba(75, 118, 229, 0.08)',
+    borderRadius: 8,
+    alignSelf: 'center',
+  },
+  instructions: {
+    fontSize: 14,
+    color: '#4B76E5',
+    marginLeft: 8,
+    fontWeight: '500',
+  },
+  horizontalScrollContent: {
+    paddingHorizontal: 20,
+    paddingBottom: 40,
+  },
+  compareGrid: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 16,
+    paddingBottom: 8,
+  },
+  labelsColumn: {
+    width: 140,
+    borderRadius: 16,
+    marginRight: 0,
+  },
+  labelHeaderPlaceholder: {
+    height: 140,
+    marginBottom: 16,
+  },
+  coverageLabelsContainer: {
+    marginTop: 8,
+  },
+  coverageLabelRow: {
+    height: 64,
+    justifyContent: 'center',
+    paddingLeft: 4,
+    marginBottom: 12,
+  },
+  coverageCategoryLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#555555',
+  },
+  planColumn: {
+    width: COLUMN_WIDTH,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 0,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  planHeader: {
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E5EA',
+    backgroundColor: '#FFFFFF',
+  },
+  bestValueHeader: {
+    backgroundColor: 'rgba(52, 199, 89, 0.05)',
+    borderBottomColor: '#34C759',
+  },
+  bestCoverageHeader: {
+    backgroundColor: 'rgba(75, 118, 229, 0.05)',
+    borderBottomColor: '#4B76E5',
+  },
+  planHeaderContent: {
+    marginBottom: 12,
+  },
+  providerName: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#000000',
+    marginBottom: 8,
+  },
+  priceContainer: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+  },
+  price: {
+    fontSize: 24,
+    color: '#4B76E5',
+    fontWeight: '700',
+    marginRight: 4,
+  },
+  perPerson: {
+    fontSize: 14,
+    color: '#666666',
+    fontWeight: '400',
+  },
+  badgeContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  badge: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 30,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  bestValueBadge: {
+    backgroundColor: '#34C759',
+  },
+  bestCoverageBadge: {
+    backgroundColor: '#4B76E5',
+  },
+  badgeIcon: {
+    marginRight: 4,
+  },
+  badgeText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  coverageList: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 8,
+  },
+  coverageItem: {
+    minHeight: 64,
+    justifyContent: 'center',
+    marginBottom: 12,
+    padding: 12,
+    borderRadius: 8,
+  },
+  coverageItemAlternate: {
+    backgroundColor: 'rgba(242, 242, 247, 0.5)',
+  },
+  coverageValueContainer: {
+    alignItems: 'flex-start',
+  },
+  coverageValue: {
+    fontSize: 18,
+    color: '#000000',
+    fontWeight: '600',
+  },
+  highestCoverageValue: {
+    color: '#34C759',
+    fontWeight: '700',
+  },
+  coverageTextContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  coverageTextValue: {
+    fontSize: 16,
+    marginLeft: 6,
+    color: '#34C759',
+    fontWeight: '500',
+  },
+  coverageNotIncluded: {
+    color: '#FF3B30',
+  },
+  selectButton: {
+    backgroundColor: '#4B76E5',
+    marginHorizontal: 16,
+    marginBottom: 16,
+    paddingVertical: 14,
+    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#4B76E5',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  selectButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+    marginRight: 6,
+  },
+  paginationContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    bottom: 20,
+    left: 0,
+    right: 0,
+    height: 20,
+  },
+  paginationDot: {
+    height: 8,
+    width: 8,
+    borderRadius: 4,
+    marginHorizontal: 4,
+  },
+  noPlansContainer: {
+    flex: 1,
+    paddingHorizontal: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noPlansIcon: {
+    marginBottom: 16,
+  },
+  noPlansText: {
+    fontSize: 16,
+    textAlign: 'center',
+    color: '#666666',
+    marginBottom: 24,
+    lineHeight: 24,
+  },
+  backToPlansButton: {
+    backgroundColor: '#4B76E5',
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    shadowColor: '#4B76E5',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  backToPlansButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+});
