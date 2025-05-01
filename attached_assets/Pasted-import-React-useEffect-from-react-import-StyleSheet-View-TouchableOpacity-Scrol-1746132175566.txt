@@ -1,0 +1,553 @@
+import React, { useEffect } from 'react';
+import {
+  StyleSheet,
+  View,
+  TouchableOpacity,
+  ScrollView,
+  Platform,
+  ActivityIndicator,
+  Dimensions,
+} from 'react-native';
+import ThemedText from '../components/ui/ThemedText';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { router } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { StatusBar } from 'expo-status-bar';
+import { LinearGradient } from 'expo-linear-gradient';
+import Animated, {
+  FadeIn,
+  FadeInUp,
+  SlideInRight,
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withTiming
+} from 'react-native-reanimated';
+import * as Haptics from 'expo-haptics';
+import { useAuth } from '../context/AuthContext';
+
+const { width, height } = Dimensions.get('window');
+const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
+
+export default function ProfileScreen() {
+  const { user, logout, loading, isAuthenticated } = useAuth();
+
+  // Animation values
+  const headerOpacity = useSharedValue(0);
+  const buttonScale = useSharedValue(1);
+
+  useEffect(() => {
+    // Animate header when component mounts
+    headerOpacity.value = withTiming(1, { duration: 800 });
+  }, []);
+
+  const headerStyle = useAnimatedStyle(() => ({
+    opacity: headerOpacity.value
+  }));
+
+  const buttonStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: buttonScale.value }]
+  }));
+
+  const handleLogout = async () => {
+    // Button press animation
+    buttonScale.value = withSequence(
+      withTiming(0.95, { duration: 100 }),
+      withTiming(1, { duration: 100 })
+    );
+
+    // Provide haptic feedback
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
+    try {
+      // Perform logout
+      await logout();
+
+      // Navigate to authentication screen
+      router.replace('/authentication-screen');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
+
+  if (loading) {
+    return (
+      <SafeAreaView style={[styles.container, styles.loadingContainer]}>
+        <ActivityIndicator size="large" color="#4B76E5" />
+        <ThemedText style={styles.loadingText}>Loading...</ThemedText>
+      </SafeAreaView>
+    );
+  }
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <StatusBar style="dark" />
+
+      {/* Header Background Gradient */}
+      <Animated.View style={[styles.headerBackground, headerStyle]}>
+        <LinearGradient
+          colors={['rgba(75, 118, 229, 0.12)', 'rgba(248, 180, 0, 0.08)', 'rgba(255, 255, 255, 0)']}
+          locations={[0, 0.6, 1]}
+          style={styles.headerGradient}
+        />
+      </Animated.View>
+
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {isAuthenticated && user ? (
+          <>
+            {/* Profile Header */}
+            <Animated.View 
+              entering={FadeIn.delay(100).duration(800)}
+              style={styles.profileHeaderContainer}
+            >
+              <View style={styles.avatarContainer}>
+                <LinearGradient
+                  colors={['#4B76E5', '#3D68D8']}
+                  style={styles.avatar}
+                >
+                  <ThemedText style={styles.avatarInitial}>
+                    {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                  </ThemedText>
+                </LinearGradient>
+              </View>
+
+              <Animated.View 
+                entering={FadeInUp.delay(300).duration(500)}
+                style={styles.nameContainer}
+              >
+                <ThemedText style={styles.nameText}>
+                  {user.name || 'Anonymous User'}
+                </ThemedText>
+                <ThemedText style={styles.emailText}>
+                  {user.email || 'Email not available'}
+                </ThemedText>
+              </Animated.View>
+            </Animated.View>
+
+            {/* Profile Info Section */}
+            <Animated.View
+              entering={FadeInUp.delay(500).duration(500)}
+              style={styles.section}
+            >
+              <View style={styles.sectionHeader}>
+                <View style={styles.iconContainer}>
+                  <Ionicons name="person" size={24} color="#4B76E5" />
+                </View>
+                <ThemedText style={styles.sectionTitle}>Account Information</ThemedText>
+              </View>
+
+              <View style={styles.infoCard}>
+                <View style={styles.infoItem}>
+                  <ThemedText style={styles.infoLabel}>User ID</ThemedText>
+                  <ThemedText style={styles.infoValue}>{user.id || 'Not available'}</ThemedText>
+                </View>
+                <View style={styles.divider} />
+
+                <View style={styles.infoItem}>
+                  <ThemedText style={styles.infoLabel}>Full Name</ThemedText>
+                  <ThemedText style={styles.infoValue}>{user.name || 'Not provided'}</ThemedText>
+                </View>
+                <View style={styles.divider} />
+
+                <View style={styles.infoItem}>
+                  <ThemedText style={styles.infoLabel}>Email</ThemedText>
+                  <ThemedText style={styles.infoValue}>{user.email || 'Not provided'}</ThemedText>
+                </View>
+                <View style={styles.divider} />
+
+                <View style={styles.infoItem}>
+                  <ThemedText style={styles.infoLabel}>Account Status</ThemedText>
+                  <View style={styles.statusContainer}>
+                    <View style={styles.statusIndicator} />
+                    <ThemedText style={styles.statusText}>Active</ThemedText>
+                  </View>
+                </View>
+              </View>
+            </Animated.View>
+
+            {/* Settings Section */}
+            <Animated.View
+              entering={FadeInUp.delay(700).duration(500)}
+              style={styles.section}
+            >
+              <View style={styles.sectionHeader}>
+                <View style={[styles.iconContainer, styles.goldIconContainer]}>
+                  <Ionicons name="settings-outline" size={24} color="#F8B400" />
+                </View>
+                <ThemedText style={styles.sectionTitle}>Settings</ThemedText>
+              </View>
+
+              <View style={styles.settingsCard}>
+                <TouchableOpacity 
+                  style={styles.settingItem}
+                  activeOpacity={0.7}
+                  accessibilityRole="button"
+                  accessibilityLabel="Edit profile"
+                >
+                  <View style={styles.settingIconContainer}>
+                    <Ionicons name="create-outline" size={22} color="#4B76E5" />
+                  </View>
+                  <View style={styles.settingContent}>
+                    <ThemedText style={styles.settingTitle}>Edit Profile</ThemedText>
+                    <ThemedText style={styles.settingDescription}>Update your personal information</ThemedText>
+                  </View>
+                  <Ionicons name="chevron-forward" size={20} color="#A0A0A0" />
+                </TouchableOpacity>
+
+                <View style={styles.divider} />
+
+                <TouchableOpacity 
+                  style={styles.settingItem}
+                  activeOpacity={0.7}
+                  accessibilityRole="button"
+                  accessibilityLabel="Change password"
+                >
+                  <View style={styles.settingIconContainer}>
+                    <Ionicons name="lock-closed-outline" size={22} color="#4B76E5" />
+                  </View>
+                  <View style={styles.settingContent}>
+                    <ThemedText style={styles.settingTitle}>Change Password</ThemedText>
+                    <ThemedText style={styles.settingDescription}>Update your security credentials</ThemedText>
+                  </View>
+                  <Ionicons name="chevron-forward" size={20} color="#A0A0A0" />
+                </TouchableOpacity>
+
+                <View style={styles.divider} />
+
+                <TouchableOpacity 
+                  style={styles.settingItem}
+                  activeOpacity={0.7}
+                  accessibilityRole="button"
+                  accessibilityLabel="Notification preferences"
+                >
+                  <View style={styles.settingIconContainer}>
+                    <Ionicons name="notifications-outline" size={22} color="#4B76E5" />
+                  </View>
+                  <View style={styles.settingContent}>
+                    <ThemedText style={styles.settingTitle}>Notifications</ThemedText>
+                    <ThemedText style={styles.settingDescription}>Manage your alert preferences</ThemedText>
+                  </View>
+                  <Ionicons name="chevron-forward" size={20} color="#A0A0A0" />
+                </TouchableOpacity>
+              </View>
+            </Animated.View>
+
+            {/* Logout Button */}
+            <Animated.View
+              entering={SlideInRight.delay(900).springify()}
+              style={styles.logoutContainer}
+            >
+              <AnimatedTouchable 
+                style={[buttonStyle]}
+                onPress={handleLogout}
+                activeOpacity={0.9}
+                accessibilityRole="button"
+                accessibilityLabel="Log out from account"
+              >
+                <LinearGradient
+                  colors={['#FF3B30', '#FF453A']} 
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={styles.logoutButton}
+                >
+                  <ThemedText style={styles.logoutButtonText}>Log Out</ThemedText>
+                  <Ionicons name="log-out-outline" size={20} color="#FFFFFF" style={styles.logoutButtonIcon} />
+                </LinearGradient>
+              </AnimatedTouchable>
+            </Animated.View>
+          </>
+        ) : (
+          // Not authenticated state
+          <Animated.View 
+            entering={FadeIn.delay(200).duration(800)}
+            style={styles.notAuthenticatedContainer}
+          >
+            <View style={styles.notAuthenticatedIconContainer}>
+              <Ionicons name="person-circle-outline" size={80} color="#CCCCCC" />
+            </View>
+
+            <ThemedText style={styles.notAuthenticatedTitle}>
+              Not Signed In
+            </ThemedText>
+
+            <ThemedText style={styles.notAuthenticatedMessage}>
+              Please sign in to view your profile information and manage your account.
+            </ThemedText>
+
+            <AnimatedTouchable
+              entering={FadeInUp.delay(500).duration(500)}
+              style={buttonStyle}
+              onPress={() => router.replace('/authentication-screen')}
+              activeOpacity={0.9}
+              accessibilityRole="button"
+              accessibilityLabel="Go to login"
+            >
+              <LinearGradient
+                colors={['#4B76E5', '#3D68D8']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.loginButton}
+              >
+                <ThemedText style={styles.loginButtonText}>Sign In</ThemedText>
+                <Ionicons name="log-in-outline" size={20} color="#FFFFFF" style={styles.loginButtonIcon} />
+              </LinearGradient>
+            </AnimatedTouchable>
+          </Animated.View>
+        )}
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#F8F8FA',
+  },
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#666666',
+  },
+  headerBackground: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 250,
+    zIndex: -1,
+  },
+  headerGradient: {
+    width: '100%',
+    height: '100%',
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 40,
+  },
+  profileHeaderContainer: {
+    alignItems: 'center',
+    paddingVertical: 24,
+    paddingHorizontal: 24,
+  },
+  avatarContainer: {
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  avatar: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarInitial: {
+    fontSize: 40,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  nameContainer: {
+    alignItems: 'center',
+  },
+  nameText: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#1A1A1A',
+    marginBottom: 4,
+  },
+  emailText: {
+    fontSize: 16,
+    color: '#666666',
+  },
+  section: {
+    paddingHorizontal: 24,
+    marginBottom: 24,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  iconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(75, 118, 229, 0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  goldIconContainer: {
+    backgroundColor: 'rgba(248, 180, 0, 0.1)',
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1A1A1A',
+  },
+  infoCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
+  },
+  infoItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+  },
+  infoLabel: {
+    fontSize: 15,
+    color: '#666666',
+  },
+  infoValue: {
+    fontSize: 15,
+    fontWeight: '500',
+    color: '#1A1A1A',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#E5E5EA',
+    width: '100%',
+  },
+  statusContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  statusIndicator: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#34C759',
+    marginRight: 8,
+  },
+  statusText: {
+    fontSize: 15,
+    fontWeight: '500',
+    color: '#34C759',
+  },
+  settingsCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
+  },
+  settingItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+  },
+  settingIconContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(75, 118, 229, 0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 16,
+  },
+  settingContent: {
+    flex: 1,
+  },
+  settingTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1A1A1A',
+    marginBottom: 2,
+  },
+  settingDescription: {
+    fontSize: 14,
+    color: '#666666',
+  },
+  logoutContainer: {
+    paddingHorizontal: 24,
+    marginTop: 16,
+    marginBottom: 24,
+    shadowColor: '#FF3B30',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  logoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 16,
+    paddingVertical: 16,
+  },
+  logoutButtonText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  logoutButtonIcon: {
+    marginLeft: 8,
+  },
+  notAuthenticatedContainer: {
+    alignItems: 'center',
+    padding: 24,
+    marginTop: 40,
+  },
+  notAuthenticatedIconContainer: {
+    marginBottom: 24,
+  },
+  notAuthenticatedTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#1A1A1A',
+    marginBottom: 12,
+  },
+  notAuthenticatedMessage: {
+    fontSize: 16,
+    color: '#666666',
+    textAlign: 'center',
+    marginBottom: 32,
+    lineHeight: 24,
+  },
+  loginButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+  },
+  loginButtonText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  loginButtonIcon: {
+    marginLeft: 8,
+  },
+});
