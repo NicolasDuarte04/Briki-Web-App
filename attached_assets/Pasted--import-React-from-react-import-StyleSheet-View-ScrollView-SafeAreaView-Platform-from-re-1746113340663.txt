@@ -1,0 +1,187 @@
+
+import React from 'react';
+import { StyleSheet, View, ScrollView, SafeAreaView, Platform } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
+import { ThemedText } from '@/components/ThemedText';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import insurancePlans from './data/insurance-plans';
+import { colors, fonts } from './constants/Styles';
+
+export default function ComparePlansScreen() {
+  const params = useLocalSearchParams();
+  const { fromCountry = 'Origin', toCountry = 'Destination' } = params;
+  const opacity = useSharedValue(0);
+
+  React.useEffect(() => {
+    opacity.value = withTiming(1, { duration: 500 });
+  }, []);
+
+  const planIds = params.planIds?.toString().split(',') || [];
+  const selectedPlans = planIds.map(id => insurancePlans.find(p => p.id === id)).filter(Boolean);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value
+  }));
+
+  if (!selectedPlans || selectedPlans.length === 0) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <ThemedText style={styles.noPlansText}>
+          No plans available to compare. Please go back and select some plans.
+        </ThemedText>
+      </SafeAreaView>
+    );
+  }
+
+  const bestValue = selectedPlans.reduce((prev, curr) => 
+    prev.price < curr.price ? prev : curr, selectedPlans[0]);
+
+  const bestCoverage = selectedPlans.reduce((prev, curr) => 
+    Object.values(prev.coverage).reduce((a: number, b: any) => a + (typeof b === 'number' ? b : 0), 0) >
+    Object.values(curr.coverage).reduce((a: number, b: any) => a + (typeof b === 'number' ? b : 0), 0)
+    ? prev : curr, selectedPlans[0]);
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <ScrollView style={styles.scrollView}>
+        <View style={styles.header}>
+          <ThemedText style={styles.title}>Compare Plans</ThemedText>
+          <ThemedText style={styles.subtitle}>{fromCountry} to {toCountry}</ThemedText>
+        </View>
+
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <View style={styles.compareGrid}>
+            {selectedPlans.map(plan => (
+              <Animated.View key={plan.id} style={[styles.planColumn, animatedStyle]}>
+                <View style={styles.planHeader}>
+                  <ThemedText style={styles.providerName}>{plan.provider}</ThemedText>
+                  <ThemedText style={styles.price}>${plan.price}</ThemedText>
+                  {plan === bestValue && (
+                    <View style={styles.badge}>
+                      <ThemedText style={styles.badgeText}>Best Value</ThemedText>
+                    </View>
+                  )}
+                  {plan === bestCoverage && (
+                    <View style={[styles.badge, styles.coverageBadge]}>
+                      <ThemedText style={styles.badgeText}>Best Coverage</ThemedText>
+                    </View>
+                  )}
+                </View>
+
+                <View style={styles.coverageList}>
+                  {Object.entries(plan.coverage).map(([key, value]) => (
+                    <View key={key} style={styles.coverageItem}>
+                      <ThemedText style={styles.coverageLabel}>
+                        {key.replace(/([A-Z])/g, ' $1').trim()}
+                      </ThemedText>
+                      <ThemedText style={styles.coverageValue}>
+                        ${typeof value === 'number' ? value.toLocaleString() : value}
+                      </ThemedText>
+                    </View>
+                  ))}
+                </View>
+              </Animated.View>
+            ))}
+          </View>
+        </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  header: {
+    padding: 24,
+  },
+  title: {
+    fontSize: 32,
+    fontFamily: fonts.bold,
+    marginBottom: 8,
+    color: colors.text.primary,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: colors.text.secondary,
+    fontFamily: fonts.regular,
+  },
+  noPlansText: {
+    padding: 24,
+    fontSize: 16,
+    textAlign: 'center',
+    color: colors.text.secondary,
+  },
+  compareGrid: {
+    flexDirection: 'row',
+    padding: 16,
+    gap: 16,
+  },
+  planColumn: {
+    width: 300,
+    backgroundColor: colors.background,
+    borderRadius: 16,
+    padding: 20,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
+  },
+  planHeader: {
+    gap: 8,
+  },
+  providerName: {
+    fontSize: 20,
+    fontFamily: fonts.bold,
+    color: colors.text.primary,
+  },
+  price: {
+    fontSize: 24,
+    color: colors.primary,
+    fontFamily: fonts.bold,
+  },
+  badge: {
+    backgroundColor: colors.primary,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    alignSelf: 'flex-start',
+  },
+  coverageBadge: {
+    backgroundColor: '#4CAF50',
+  },
+  badgeText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontFamily: fonts.bold,
+  },
+  coverageList: {
+    marginTop: 16,
+    gap: 12,
+  },
+  coverageItem: {
+    gap: 4,
+  },
+  coverageLabel: {
+    fontSize: 14,
+    color: colors.text.secondary,
+    fontFamily: fonts.regular,
+  },
+  coverageValue: {
+    fontSize: 16,
+    color: colors.text.primary,
+    fontFamily: fonts.medium,
+  },
+});

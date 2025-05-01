@@ -1,0 +1,253 @@
+
+import React, { useState } from 'react';
+import {
+  View,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  Image,
+  Platform,
+} from 'react-native';
+import { ThemedText } from '@/components/ThemedText';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+type AuthMode = 'login' | 'register';
+
+export default function AuthenticationScreen() {
+  const [mode, setMode] = useState<AuthMode>('login');
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isLoading, setIsLoading] = useState(false);
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+    
+    if (!formData.email) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Invalid email format';
+    }
+    
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+    }
+    
+    if (mode === 'register' && !formData.name) {
+      newErrors.name = 'Name is required';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async () => {
+    if (validateForm()) {
+      try {
+        // Simulate API call with loading state
+        setErrors({});
+        const response = await new Promise((resolve) => 
+          setTimeout(() => resolve({ success: true }), 1000)
+        );
+        
+        if (response.success) {
+          // Store auth state
+          await SecureStore.setItemAsync('userToken', 'dummy-token');
+          // Navigate to main app
+          router.replace('/(tabs)');
+        }
+      } catch (error) {
+        setErrors({
+          ...errors,
+          submit: 'Authentication failed. Please try again.'
+        });
+      }
+    }
+  };
+
+  const handleSocialLogin = async (provider: 'apple' | 'google') => {
+    try {
+      // Here you would integrate with social auth providers
+      console.log(`Logging in with ${provider}`);
+      router.replace('/(tabs)');
+    } catch (error) {
+      setErrors({
+        ...errors,
+        submit: `${provider} login failed. Please try again.`
+      });
+    }
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.logoContainer}>
+          <ThemedText style={styles.logo}>Briki</ThemedText>
+        </View>
+
+        <View style={styles.formContainer}>
+          {mode === 'register' && (
+            <View style={styles.inputGroup}>
+              <TextInput
+                style={styles.input}
+                placeholder="Full Name"
+                value={formData.name}
+                onChangeText={(text) => setFormData({ ...formData, name: text })}
+              />
+              {errors.name && <ThemedText style={styles.errorText}>{errors.name}</ThemedText>}
+            </View>
+          )}
+
+          <View style={styles.inputGroup}>
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
+              value={formData.email}
+              onChangeText={(text) => setFormData({ ...formData, email: text })}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+            {errors.email && <ThemedText style={styles.errorText}>{errors.email}</ThemedText>}
+          </View>
+
+          <View style={styles.inputGroup}>
+            <TextInput
+              style={styles.input}
+              placeholder="Password"
+              value={formData.password}
+              onChangeText={(text) => setFormData({ ...formData, password: text })}
+              secureTextEntry
+            />
+            {errors.password && <ThemedText style={styles.errorText}>{errors.password}</ThemedText>}
+          </View>
+
+          <TouchableOpacity 
+            style={[styles.submitButton, isLoading && styles.submitButtonDisabled]} 
+            onPress={handleSubmit}
+            disabled={isLoading}>
+            <ThemedText style={styles.submitButtonText}>
+              {isLoading 
+                ? 'Please wait...' 
+                : mode === 'login' ? 'Login' : 'Register'}
+            </ThemedText>
+          </TouchableOpacity>
+
+          <View style={styles.socialButtons}>
+            {Platform.OS === 'ios' && (
+              <TouchableOpacity 
+                style={[styles.socialButton, styles.appleButton]}
+                onPress={() => handleSocialLogin('apple')}>
+                <ThemedText style={[styles.socialButtonText, { color: '#FFFFFF' }]}>
+                  Continue with Apple
+                </ThemedText>
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity 
+              style={[styles.socialButton, styles.googleButton]}
+              onPress={() => handleSocialLogin('google')}>
+              <ThemedText style={styles.socialButtonText}>Continue with Google</ThemedText>
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity 
+            style={styles.switchMode}
+            onPress={() => setMode(mode === 'login' ? 'register' : 'login')}>
+            <ThemedText style={styles.switchModeText}>
+              {mode === 'login' 
+                ? "Don't have an account? Register" 
+                : "Already have an account? Login"}
+            </ThemedText>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  scrollContent: {
+    flexGrow: 1,
+    padding: 24,
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginVertical: 48,
+  },
+  logo: {
+    fontSize: 42,
+    fontWeight: 'bold',
+    color: '#4B76E5',
+  },
+  formContainer: {
+    width: '100%',
+    maxWidth: 400,
+    alignSelf: 'center',
+  },
+  inputGroup: {
+    marginBottom: 16,
+  },
+  input: {
+    backgroundColor: '#F5F5F5',
+    borderRadius: 12,
+    padding: 16,
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+  },
+  errorText: {
+    color: '#FF3B30',
+    fontSize: 14,
+    marginTop: 4,
+    marginLeft: 4,
+  },
+  submitButton: {
+    backgroundColor: '#4B76E5',
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  submitButtonText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  socialButtons: {
+    marginTop: 24,
+    gap: 12,
+  },
+  socialButton: {
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+  },
+  appleButton: {
+    backgroundColor: '#000000',
+  },
+  googleButton: {
+    backgroundColor: '#FFFFFF',
+  },
+  socialButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#000000',
+  },
+  switchMode: {
+    marginTop: 24,
+    alignItems: 'center',
+  },
+  switchModeText: {
+    color: '#4B76E5',
+    fontSize: 16,
+  },
+});

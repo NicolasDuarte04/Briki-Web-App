@@ -1,0 +1,276 @@
+
+import React, { useEffect } from 'react';
+import { StyleSheet, View, ScrollView, TouchableOpacity, Platform } from 'react-native';
+import { useFonts, Inter_400Regular, Inter_600SemiBold } from '@expo-google-fonts/inter';
+import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
+import { router } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import MaskedView from '@react-native-masked-view/masked-view';
+import Animated, { 
+  FadeInUp, 
+  useAnimatedStyle, 
+  withSpring, 
+  withRepeat, 
+  withTiming, 
+  withSequence,
+  useSharedValue
+} from 'react-native-reanimated';
+
+export default function HomeScreen() {
+  const [fontsLoaded] = useFonts({
+    Inter_400Regular,
+    Inter_600SemiBold,
+  });
+
+  const pulseAnim = useSharedValue(1);
+
+  useEffect(() => {
+    pulseAnim.value = withRepeat(
+      withSequence(
+        withTiming(1.05, { duration: 1000 }),
+        withTiming(1, { duration: 1000 })
+      ),
+      -1 // Infinite repetition
+    );
+  }, []);
+
+  const pulseStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: pulseAnim.value }]
+  }));
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
+  const handleGetQuote = () => {
+    router.push('/trip-info', {
+      animationEffect: {
+        type: 'slide_from_right',
+        duration: 300
+      }
+    });
+  };
+
+  return (
+    <ThemedView style={styles.container}>
+      <MaskedView
+        style={styles.meshGradient}
+        maskElement={
+          <View style={{ flex: 1, backgroundColor: '#000' }}>
+            <LinearGradient
+              colors={['#4B76E5', '#2B4FA0', '#FFFFFF']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={{ flex: 1 }}
+            />
+          </View>
+        }>
+        <View style={{ flex: 1, backgroundColor: '#4B76E5' }} />
+      </MaskedView>
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        {/* Header/Logo Section */}
+        <Animated.View entering={FadeInUp.delay(100)} style={styles.header}>
+          <ThemedText style={styles.logo}>Briki</ThemedText>
+          <ThemedText style={styles.welcomeText}>Welcome back!</ThemedText>
+        </Animated.View>
+
+        {/* Hero Section */}
+        <Animated.View entering={FadeInUp.delay(200)} style={styles.heroSection}>
+          <ThemedText style={styles.heroTitle}>Travel with peace of mind</ThemedText>
+          <ThemedText style={styles.heroSubtitle}>
+            Compare and choose the best travel insurance for your journey
+          </ThemedText>
+          <Animated.View style={pulseStyle}>
+            <TouchableOpacity style={styles.ctaButton} onPress={handleGetQuote}>
+              <ThemedText style={styles.ctaButtonText}>Get Insured Now</ThemedText>
+            </TouchableOpacity>
+          </Animated.View>
+        </Animated.View>
+
+        {/* About Briki Section */}
+        <Animated.View entering={FadeInUp.delay(300)} style={styles.aboutSection}>
+          <ThemedText style={styles.sectionTitle}>About Briki</ThemedText>
+          <View style={styles.aboutCards}>
+            <Animated.View entering={FadeInUp.delay(400).springify()} style={styles.aboutCard}>
+              <Ionicons name="rocket-outline" size={32} color="#4B76E5" />
+              <ThemedText style={styles.cardTitle}>Our Mission</ThemedText>
+              <ThemedText style={styles.cardText}>Making travel insurance simple and accessible for everyone</ThemedText>
+            </Animated.View>
+
+            <Animated.View entering={FadeInUp.delay(500).springify()} style={styles.aboutCard}>
+              <Ionicons name="flash-outline" size={32} color="#F8B400" />
+              <ThemedText style={styles.cardTitle}>Quick & Easy</ThemedText>
+              <ThemedText style={styles.cardText}>Get insured in minutes with our streamlined process</ThemedText>
+            </Animated.View>
+
+            <Animated.View entering={FadeInUp.delay(600).springify()} style={styles.aboutCard}>
+              <Ionicons name="shield-checkmark-outline" size={32} color="#4B76E5" />
+              <ThemedText style={styles.cardTitle}>Trusted Providers</ThemedText>
+              <ThemedText style={styles.cardText}>Partner with leading insurance companies worldwide</ThemedText>
+            </Animated.View>
+
+            <Animated.View entering={FadeInUp.delay(700).springify()} style={styles.aboutCard}>
+              <Ionicons name="lock-closed-outline" size={32} color="#F8B400" />
+              <ThemedText style={styles.cardTitle}>Secure Payments</ThemedText>
+              <ThemedText style={styles.cardText}>Safe and encrypted transactions guaranteed</ThemedText>
+            </Animated.View>
+          </View>
+        </Animated.View>
+
+        {/* Testimonial Section */}
+        <Animated.View entering={FadeInUp.delay(800)} style={styles.testimonialSection}>
+          <View style={styles.testimonialCard}>
+            <ThemedText style={styles.testimonialText}>
+              "Briki made it so easy to find the right travel insurance. Highly recommended!"
+            </ThemedText>
+            <ThemedText style={styles.testimonialAuthor}>- Sarah M.</ThemedText>
+          </View>
+        </Animated.View>
+      </ScrollView>
+    </ThemedView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  meshGradient: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: '100%',
+    opacity: 0.15,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  header: {
+    paddingHorizontal: 24,
+    paddingTop: Platform.OS === 'ios' ? 60 : 40,
+    paddingBottom: 20,
+    backgroundColor: 'rgba(75, 118, 229, 0.03)',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(75, 118, 229, 0.1)',
+  },
+  logo: {
+    fontSize: 36,
+    fontFamily: 'Inter_600SemiBold',
+    color: '#4B76E5',
+  },
+  welcomeText: {
+    fontSize: 18,
+    color: '#666',
+    marginTop: 4,
+  },
+  heroSection: {
+    padding: 24,
+    alignItems: 'center',
+    marginBottom: 32,
+  },
+  heroTitle: {
+    fontSize: 40,
+    fontFamily: 'Inter_600SemiBold',
+    textAlign: 'center',
+    marginBottom: 16,
+    color: '#1A1A1A',
+    lineHeight: 48,
+  },
+  heroSubtitle: {
+    fontSize: 18,
+    textAlign: 'center',
+    color: '#666',
+    marginBottom: 32,
+    lineHeight: 28,
+  },
+  ctaButton: {
+    backgroundColor: '#4B76E5',
+    paddingHorizontal: 32,
+    paddingVertical: 16,
+    borderRadius: 30,
+    boxShadow: '0px 4px 8px rgba(75, 118, 229, 0.2)',
+    elevation: 4, // Keep elevation for Android
+    minWidth: 200,
+    alignItems: 'center',
+  },
+  ctaButtonText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontFamily: 'Inter_600SemiBold',
+    textAlign: 'center',
+  },
+  sectionTitle: {
+    fontSize: 28,
+    fontFamily: 'Inter_600SemiBold',
+    color: '#1A1A1A',
+    marginBottom: 24,
+    paddingHorizontal: 24,
+  },
+  aboutSection: {
+    marginBottom: 32,
+  },
+  aboutCards: {
+    paddingHorizontal: 24,
+    gap: 16,
+  },
+  aboutCard: {
+    backgroundColor: '#FFFFFF',
+    padding: 24,
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+    marginBottom: 16,
+  },
+  cardTitle: {
+    fontSize: 20,
+    fontFamily: 'Inter_600SemiBold',
+    color: '#1A1A1A',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  cardText: {
+    fontSize: 16,
+    color: '#666',
+    lineHeight: 24,
+  },
+  testimonialSection: {
+    padding: 24,
+    paddingBottom: 48,
+  },
+  testimonialCard: {
+    backgroundColor: '#F8F9FF',
+    padding: 32,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#E5E9FF',
+    shadowColor: '#4B76E5',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 16,
+    elevation: 2,
+  },
+  testimonialText: {
+    fontSize: 20,
+    color: '#1A1A1A',
+    fontStyle: 'italic',
+    lineHeight: 32,
+    textAlign: 'center',
+    fontFamily: 'Inter_400Regular',
+  },
+  testimonialAuthor: {
+    fontSize: 16,
+    color: '#4B76E5',
+    marginTop: 20,
+    textAlign: 'center',
+    fontFamily: 'Inter_600SemiBold',
+  },
+});
