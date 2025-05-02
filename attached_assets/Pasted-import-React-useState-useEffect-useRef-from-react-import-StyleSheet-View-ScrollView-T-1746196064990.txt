@@ -1,0 +1,771 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { StyleSheet, View, ScrollView, TouchableOpacity, SafeAreaView, Platform, ActivityIndicator } from 'react-native';
+import { router, useLocalSearchParams } from 'expo-router';
+import { ThemedText } from '@/components/ThemedText';
+import Animated, { 
+  useSharedValue, 
+  useAnimatedStyle, 
+  withSpring, 
+  withTiming,
+  withSequence,
+  withDelay,
+  FadeIn,
+  FadeInDown,
+  FadeInUp
+} from 'react-native-reanimated';
+import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
+import { StatusBar } from 'expo-status-bar';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
+
+// Real insurance plan data
+const realInsurancePlans = [
+  {
+    id: "assist-card-basic",
+    provider: "Assist Card",
+    rating: 4.2,
+    price: 95,
+    coverage: {
+      "Medical Expenses": 35000,
+      "Trip Cancellation": 1500,
+      "Baggage Loss": 1000,
+      "Trip Delay": 300,
+      "Covid Coverage": "Included"
+    },
+    tag: "Popular"
+  },
+  {
+    id: "axa-premium",
+    provider: "AXA Assistance",
+    rating: 4.7,
+    price: 145,
+    coverage: {
+      "Medical Expenses": 100000,
+      "Trip Cancellation": 3000,
+      "Baggage Loss": 2000,
+      "Trip Delay": 800,
+      "Covid Coverage": "Included"
+    },
+    tag: "Best Value"
+  },
+  {
+    id: "iati-standard",
+    provider: "IATI",
+    rating: 4.3,
+    price: 78,
+    coverage: {
+      "Medical Expenses": 50000,
+      "Trip Cancellation": 2000,
+      "Baggage Loss": 1500,
+      "Trip Delay": 500,
+      "Covid Coverage": "Included"
+    },
+    tag: "Economy"
+  },
+  {
+    id: "starr-basic",
+    provider: "Starr",
+    rating: 4.0,
+    price: 65,
+    coverage: {
+      "Medical Expenses": 25000,
+      "Trip Cancellation": 1000,
+      "Baggage Loss": 800,
+      "Trip Delay": 200,
+      "Covid Coverage": "Not Included"
+    },
+    tag: null
+  },
+  {
+    id: "sura-premium",
+    provider: "SURA",
+    rating: 4.5,
+    price: 115,
+    coverage: {
+      "Medical Expenses": 75000,
+      "Trip Cancellation": 2500,
+      "Baggage Loss": 1800,
+      "Trip Delay": 600,
+      "Covid Coverage": "Included"
+    },
+    tag: null
+  }
+];
+
+const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
+
+export default function AvailablePlansScreen() {
+  const params = useLocalSearchParams();
+  const { fromCountry, toCountry, departureDate, returnDate, travelers, primaryAge, hasMedicalConditions, coveragePriorities } = params;
+
+  const insets = useSafeAreaInsets();
+  const scrollViewRef = useRef(null);
+
+  const fadeAnim = useSharedValue(0);
+  const scaleAnim = useSharedValue(0.95);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate loading state
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+      fadeAnim.value = withTiming(1, { duration: 500 });
+      scaleAnim.value = withSpring(1, { damping: 7 });
+    }, 600);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: fadeAnim.value,
+      transform: [{ scale: scaleAnim.value }]
+    };
+  });
+
+  const [selectedPlans, setSelectedPlans] = useState([]);
+  const buttonScale = useSharedValue(1);
+
+  // Calculate trip duration in days
+  const departureObj = departureDate ? new Date(departureDate) : new Date();
+  const returnObj = returnDate ? new Date(returnDate) : new Date();
+  const tripDuration = Math.ceil((returnObj - departureObj) / (1000 * 60 * 60 * 24));
+
+  const togglePlanSelection = async (planId) => {
+    try {
+      if (Platform.OS !== 'web') {
+        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      }
+
+      buttonScale.value = withSequence(
+        withTiming(0.95, { duration: 100 }),
+        withTiming(1, { duration: 100 })
+      );
+
+      setSelectedPlans(prev => {
+        if (prev.includes(planId)) {
+          return prev.filter(id => id !== planId);
+        }
+        // Limit selection to maximum 3 plans
+        if (prev.length >= 3) return prev;
+        return [...prev, planId];
+      });
+    } catch (error) {
+      console.log('Haptics error:', error);
+    }
+  };
+
+  const handleComparePlans = async () => {
+    if (selectedPlans.length < 2) {
+      return; // Don't proceed if fewer than 2 plans selected
+    }
+
+    try {
+      if (Platform.OS !== 'web') {
+        await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      }
+
+      router.push({
+        pathname: '/compare-plans',
+        params: {
+          planIds: selectedPlans.join(','),
+          fromCountry: fromCountry || 'Origin',
+          toCountry: toCountry || 'Destination',
+          tripDuration: tripDuration.toString()
+        }
+      });
+    } catch (error) {
+      console.log('Navigation error:', error);
+    }
+  };
+
+  const handleBackPress = () => {
+    router.back();
+  };
+
+  const formatCurrency = (amount) => {
+    return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
+
+  const getTagStyles = (tag) => {
+    switch(tag) {
+      case 'Best Value':
+        return {
+          container: styles.bestValueTag,
+          text: { color: '#34C759' }
+        };
+      case 'Popular':
+        return {
+          container: styles.popularTag,
+          text: { color: '#4B76E5' }
+        };
+      case 'Economy':
+        return {
+          container: styles.economyTag,
+          text: { color: '#F8B400' }
+        };
+      default:
+        return {
+          container: {},
+          text: { color: '#333333' }
+        };
+    }
+  };
+
+  const renderCoverageItem = (key, value, isHighPriority) => {
+    const isNotIncluded = value === "Not Included";
+
+    return (
+      <View style={styles.coverageItem}>
+        <Ionicons 
+          name={
+            isNotIncluded 
+              ? "close-circle" 
+              : isHighPriority 
+                ? "checkmark-circle" 
+                : "checkmark-circle-outline"
+          } 
+          size={16} 
+          color={
+            isNotIncluded 
+              ? "#FF3B30" 
+              : isHighPriority 
+                ? "#34C759" 
+                : "#4CAF50"
+          } 
+        />
+        <View style={styles.coverageTextContainer}>
+          <ThemedText style={styles.coverageLabel}>{key}</ThemedText>
+          <ThemedText style={[
+            styles.coverageValue,
+            isNotIncluded && styles.coverageNotIncluded,
+            isHighPriority && styles.coverageHighPriority
+          ]}>
+            {typeof value === 'number' ? `$${formatCurrency(value)}` : value}
+          </ThemedText>
+        </View>
+      </View>
+    );
+  };
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <StatusBar style="dark" />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#4B76E5" />
+          <ThemedText style={styles.loadingText}>Finding the best plans for you...</ThemedText>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  return (
+    <SafeAreaView style={[styles.container, { paddingTop: Platform.OS === 'android' ? insets.top : 0 }]}>
+      <StatusBar style="dark" />
+
+      {/* Header with background gradient */}
+      <View style={styles.headerBackground}>
+        <LinearGradient
+          colors={['rgba(75, 118, 229, 0.08)', 'rgba(255, 255, 255, 0)']}
+          style={styles.headerGradient}
+        />
+      </View>
+
+      <View style={styles.headerContainer}>
+        <TouchableOpacity 
+          style={styles.backButton}
+          onPress={handleBackPress}
+          accessibilityRole="button"
+          accessibilityLabel="Go back to trip details"
+        >
+          <Ionicons name="chevron-back" size={24} color="#4B76E5" />
+        </TouchableOpacity>
+        <Animated.View 
+          entering={FadeInUp.delay(100).duration(400)}
+          style={styles.header}>
+          <ThemedText style={styles.title}>Available Plans</ThemedText>
+          <ThemedText style={styles.subtitle}>
+            {travelers} {parseInt(travelers) === 1 ? 'Traveler' : 'Travelers'} • {fromCountry} to {toCountry}
+          </ThemedText>
+        </Animated.View>
+      </View>
+
+      <ScrollView 
+        ref={scrollViewRef}
+        style={styles.scrollView} 
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 100 }]}
+        keyboardShouldPersistTaps="handled"
+        bounces={true}
+        showsVerticalScrollIndicator={false}
+      >
+        <Animated.View 
+          entering={FadeInDown.delay(200).duration(400)}
+          style={styles.infoCard}>
+          <Ionicons name="information-circle-outline" size={22} color="#4B76E5" />
+          <ThemedText style={styles.infoText}>
+            Plan prices shown are per person for a {tripDuration}-day trip
+          </ThemedText>
+        </Animated.View>
+
+        <View style={styles.plansContainer}>
+          {realInsurancePlans.map((plan, index) => {
+            const tagStyles = plan.tag ? getTagStyles(plan.tag) : {};
+            const isSelected = selectedPlans.includes(plan.id);
+            const priorities = coveragePriorities ? coveragePriorities.split(',') : [];
+
+            return (
+              <Animated.View 
+                key={plan.id} 
+                entering={FadeInDown.delay(300 + index * 100).springify()}
+                style={[
+                  styles.planCard,
+                  isSelected && styles.selectedPlanCard,
+                ]}>
+                <View style={styles.planCardContent}>
+                  <View style={styles.planHeader}>
+                    <View style={styles.providerSection}>
+                      <ThemedText style={styles.providerName}>{plan.provider}</ThemedText>
+                      <View style={styles.ratingContainer}>
+                        <Ionicons name="star" size={16} color="#FFB800" />
+                        <ThemedText style={styles.rating}>{plan.rating.toFixed(1)}</ThemedText>
+                      </View>
+                    </View>
+
+                    {plan.tag && (
+                      <View style={[styles.tagContainer, tagStyles.container]}>
+                        <ThemedText style={[styles.tagText, tagStyles.text]}>{plan.tag}</ThemedText>
+                      </View>
+                    )}
+                  </View>
+
+                  <View style={styles.divider} />
+
+                  <View style={styles.coverageContainer}>
+                    <View style={styles.coverageGrid}>
+                      {Object.entries(plan.coverage).map(([key, value], idx) => {
+                        // Determine if this is a high priority coverage based on user selection
+                        const isHighPriority = 
+                          (key === "Medical Expenses" && priorities.includes('medical')) ||
+                          (key === "Trip Cancellation" && priorities.includes('cancellation')) ||
+                          (key === "Baggage Loss" && priorities.includes('baggage')) ||
+                          (key === "Trip Delay" && priorities.includes('delay'));
+
+                        return renderCoverageItem(key, value, isHighPriority);
+                      })}
+                    </View>
+                  </View>
+
+                  <View style={styles.planFooter}>
+                    <View style={styles.priceContainer}>
+                      <ThemedText style={styles.price}>${formatCurrency(plan.price)}</ThemedText>
+                      <ThemedText style={styles.priceSubtext}>per person</ThemedText>
+                    </View>
+
+                    <View style={styles.buttonContainer}>
+                      <AnimatedTouchable
+                        style={styles.buyButton}
+                        entering={FadeIn.delay(400 + index * 100).duration(400)}
+                        onPress={() => {
+                          try {
+                            if (Platform.OS !== 'web') {
+                              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                            }
+                            router.push({
+                              pathname: '/checkout',
+                              params: { 
+                                plan: JSON.stringify(plan),
+                                travelers: travelers,
+                                tripDuration: tripDuration.toString()
+                              }
+                            });
+                          } catch (error) {
+                            console.log('Navigation error:', error);
+                          }
+                        }}
+                        accessibilityRole="button"
+                        accessibilityLabel={`Select ${plan.provider} plan for $${plan.price}`}
+                        activeOpacity={0.7}>
+                        <LinearGradient
+                          colors={['#4B76E5', '#3D68D8']}
+                          start={{ x: 0, y: 0 }}
+                          end={{ x: 1, y: 0 }}
+                          style={styles.buttonGradient}
+                        >
+                          <ThemedText style={styles.buyButtonText}>Select Plan</ThemedText>
+                          <Ionicons name="chevron-forward" size={16} color="#FFF" />
+                        </LinearGradient>
+                      </AnimatedTouchable>
+
+                      <TouchableOpacity 
+                        style={[
+                          styles.compareToggle,
+                          isSelected && styles.selectedCompareToggle,
+                          selectedPlans.length >= 3 && !isSelected && styles.disabledButton
+                        ]}
+                        accessibilityRole="checkbox"
+                        accessibilityLabel={
+                          isSelected 
+                            ? `Remove ${plan.provider} plan from comparison` 
+                            : `Add ${plan.provider} plan to comparison`
+                        }
+                        accessibilityState={{ checked: isSelected }}
+                        activeOpacity={0.7}
+                        onPress={() => togglePlanSelection(plan.id)}
+                        disabled={selectedPlans.length >= 3 && !isSelected}>
+                        <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
+                          <Ionicons 
+                            name={isSelected ? "checkmark-circle" : "add-circle-outline"} 
+                            size={24} 
+                            color={isSelected ? "#4B76E5" : "#666666"} 
+                          />
+                        </Animated.View>
+                        <ThemedText style={[
+                          styles.compareToggleText,
+                          isSelected && styles.selectedCompareToggleText
+                        ]}>
+                          {isSelected ? 'Added to Compare' : 'Add to Compare'}
+                        </ThemedText>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              </Animated.View>
+            );
+          })}
+        </View>
+      </ScrollView>
+
+      {selectedPlans.length >= 2 && (
+        <Animated.View 
+          entering={FadeIn.duration(300)}
+          style={[
+            styles.compareButtonContainer,
+            { paddingBottom: Math.max(16, insets.bottom) }
+          ]}>
+          <AnimatedTouchable 
+            style={styles.compareButton} 
+            onPress={handleComparePlans}
+            accessibilityRole="button"
+            accessibilityLabel={`Compare ${selectedPlans.length} selected plans`}>
+            <LinearGradient
+              colors={['#4B76E5', '#3D68D8']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.compareButtonGradient}
+            >
+              <ThemedText style={styles.compareButtonText}>
+                Compare {selectedPlans.length} Plans
+              </ThemedText>
+              <Ionicons name="swap-horizontal" size={20} color="#FFFFFF" style={styles.compareButtonIcon} />
+            </LinearGradient>
+          </AnimatedTouchable>
+        </Animated.View>
+      )}
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#F8F8FA',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: '#666666',
+    textAlign: 'center',
+  },
+  headerBackground: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 180,
+    zIndex: -1,
+  },
+  headerGradient: {
+    width: '100%',
+    height: '100%',
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 8,
+    zIndex: 10,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(75, 118, 229, 0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingTop: 12,
+  },
+  header: {
+    flex: 1,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: '700',
+    marginBottom: 4,
+    color: '#1A1A1A',
+  },
+  subtitle: {
+    fontSize: 15,
+    color: '#666666',
+    fontWeight: '400',
+  },
+  infoCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(75, 118, 229, 0.1)',
+    borderRadius: 14,
+    padding: 14,
+    marginBottom: 24,
+    marginTop: 8,
+  },
+  infoText: {
+    marginLeft: 8,
+    fontSize: 14,
+    color: '#4B76E5',
+    flex: 1,
+    lineHeight: 20,
+  },
+  plansContainer: {
+    gap: 24,
+  },
+  planCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  planCardContent: {
+    padding: 20,
+    gap: 16,
+  },
+  selectedPlanCard: {
+    borderColor: '#4B76E5',
+    borderWidth: 2,
+    shadowColor: '#4B76E5',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+    backgroundColor: 'rgba(75, 118, 229, 0.05)',
+  },
+  planHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  providerSection: {
+    flex: 1,
+  },
+  providerName: {
+    fontSize: 22,
+    fontWeight: '600',
+    color: '#1A1A1A',
+    marginBottom: 4,
+  },
+  ratingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  rating: {
+    fontSize: 14,
+    color: '#666666',
+    fontWeight: '500',
+  },
+  tagContainer: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 12,
+    backgroundColor: '#F2F2F7',
+  },
+  bestValueTag: {
+    backgroundColor: 'rgba(52, 199, 89, 0.15)',
+  },
+  popularTag: {
+    backgroundColor: 'rgba(75, 118, 229, 0.15)',
+  },
+  economyTag: {
+    backgroundColor: 'rgba(248, 180, 0, 0.15)',
+  },
+  tagText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#333333',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#E5E5EA',
+    width: '100%',
+  },
+  coverageContainer: {
+    gap: 14,
+  },
+  coverageGrid: {
+    gap: 12,
+  },
+  coverageItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+    paddingVertical: 3,
+  },
+  coverageTextContainer: {
+    flex: 1,
+  },
+  coverageLabel: {
+    fontSize: 14,
+    color: '#666666',
+    marginBottom: 2,
+  },
+  coverageValue: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#1A1A1A',
+  },
+  coverageNotIncluded: {
+    color: '#FF3B30',
+  },
+  coverageHighPriority: {
+    color: '#34C759',
+    fontWeight: '600',
+  },
+  planFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  priceContainer: {
+    gap: 2,
+  },
+  price: {
+    fontSize: 26,
+    fontWeight: '700',
+    color: '#4B76E5',
+  },
+  priceSubtext: {
+    fontSize: 13,
+    color: '#666666',
+  },
+  buttonContainer: {
+    gap: 10,
+    alignItems: 'flex-end',
+  },
+  buyButton: {
+    borderRadius: 12,
+    shadowColor: '#4B76E5',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+    overflow: 'hidden',
+  },
+  buttonGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    gap: 6,
+  },
+  buyButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  compareToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 6,
+    paddingHorizontal: 4,
+  },
+  selectedCompareToggle: {
+    backgroundColor: 'rgba(75, 118, 229, 0.1)',
+    borderRadius: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+  },
+  compareToggleText: {
+    fontSize: 14,
+    color: '#666666',
+  },
+  selectedCompareToggleText: {
+    color: '#4B76E5',
+    fontWeight: '500',
+  },
+  compareButtonContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 8,
+    zIndex: 100,
+  },
+  compareButton: {
+    borderRadius: 14,
+    overflow: 'hidden',
+    width: '100%',
+    shadowColor: '#4B76E5',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  compareButtonGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+  },
+  compareButtonText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  compareButtonIcon: {
+    marginLeft: 8,
+  },
+  disabledButton: {
+    opacity: 0.5,
+  }
+});
