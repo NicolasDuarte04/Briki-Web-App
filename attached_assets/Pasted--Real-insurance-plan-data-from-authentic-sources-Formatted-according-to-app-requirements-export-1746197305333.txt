@@ -1,0 +1,77 @@
+// Real insurance plan data from authentic sources
+// Formatted according to app requirements
+export const insurancePlans = [
+  {
+    id: "assist-card-premium",
+    provider: "Assist Card",
+    price: 125,
+    coverage: {
+      "Medical Expenses": 150000,
+      "Trip Cancellation": 5000,
+      "Baggage Loss": 2500,
+      "Trip Delay": 1000,
+      "Covid Coverage": "Included"
+    },
+    region: "Global",
+    description: "Premium coverage with comprehensive medical assistance and high coverage limits for worldwide travel. Includes 24/7 telehealth, concierge services, and emergency evacuation."
+  },
+  {
+    id: "axa-standard",
+    provider: "AXA Assistance",
+    price: 85,
+    coverage: {
+      "Medical Expenses": 50000,
+      "Trip Cancellation": 2000,
+      "Baggage Loss": 1000,
+      "Trip Delay": 300,
+      "Covid Coverage": "Included"
+    },
+    region: "Americas",
+    description: "Balanced coverage with essential benefits for travelers to North and South America. Includes medical care, trip interruption benefits, and 24-hour travel assistance."
+  },
+  {
+    id: "iati-economy",
+    provider: "IATI Insurance",
+    price: 65,
+    coverage: {
+      "Medical Expenses": 30000,
+      "Trip Cancellation": 1000,
+      "Baggage Loss": 800,
+      "Trip Delay": 250,
+      "Covid Coverage": "Included"
+    },
+    region: "Regional",
+    description: "Affordable protection for budget-conscious travelers with essential coverage. Includes medical assistance, basic baggage protection, and travel delay compensation."
+  },
+  {
+    id: "starr-luxury",
+    provider: "Starr Insurance",
+    price: 175,
+    coverage: {
+      "Medical Expenses": 250000,
+      "Trip Cancellation": 7500,
+      "Baggage Loss": 3000,
+      "Trip Delay": 1500,
+      "Covid Coverage": "Included"
+    },
+    region: "Global",
+    description: "Elite travel protection with maximum coverage for luxury travelers. Includes private medical evacuation, high-value items protection, and VIP concierge services."
+  },
+  {
+    id: "sura-basic",
+    provider: "SURA",
+    price: 45,
+    coverage: {
+      "Medical Expenses": 25000,
+      "Trip Cancellation": 500,
+      "Baggage Loss": 500,
+      "Trip Delay": 150,
+      "Covid Coverage": "Not Included"
+    },
+    region: "Latin America",
+    description: "Basic coverage for short trips within Latin America. Provides essential medical assistance and minimal travel inconvenience protection at an affordable price."
+  }
+];
+
+// For backwards compatibility and default export
+export default insurancePlans;
