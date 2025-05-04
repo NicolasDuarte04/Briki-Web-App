@@ -8,7 +8,8 @@ import {
   TouchableOpacity, 
   Dimensions,
   ActivityIndicator,
-  Alert
+  Alert,
+  FlatList
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { ThemedText } from '../components/ThemedText';
@@ -19,7 +20,8 @@ import Animated, {
   FadeIn,
   FadeInDown,
   SlideInRight,
-  useAnimatedScrollHandler
+  useAnimatedScrollHandler,
+  FadeOut
 } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
@@ -306,6 +308,21 @@ export default function ComparePlansScreen() {
   const firstPlan = selectedPlans[0];
   const coverageCategories = Object.keys(firstPlan.coverage || {});
 
+  // Reference for the tab scroll view
+  const tabScrollRef = useRef(null);
+
+  // Function to scroll the tab into view when active tab changes
+  useEffect(() => {
+    if (tabScrollRef.current && selectedPlans.length > 4) {
+      // Calculate the position to scroll to
+      const tabWidth = 100; // Approximate width of each tab
+      const scrollPosition = Math.max(0, (activeTabIndex * tabWidth) - width / 4);
+      
+      // Scroll the tab view to center the active tab
+      tabScrollRef.current.scrollTo({ x: scrollPosition, animated: true });
+    }
+  }, [activeTabIndex, selectedPlans.length]);
+
   return (
     <SafeAreaView style={[styles.container, { paddingTop: Platform.OS === 'android' ? insets.top : 0 }]}>
       <StatusBar style="dark" />
@@ -337,40 +354,60 @@ export default function ComparePlansScreen() {
         </Animated.View>
       </View>
       
-      {/* Tab Bar Selector */}
-      <Animated.View 
-        entering={FadeInDown.delay(150).duration(400)}
-        style={styles.tabBarContainer}
+      {/* Message for single plan */}
+      {selectedPlans.length === 1 && (
+        <Animated.View 
+          entering={FadeIn.duration(400)}
+          style={styles.singlePlanMessage}
+        >
+          <Ionicons name="information-circle" size={20} color="#FF9500" />
+          <ThemedText style={styles.singlePlanText}>
+            You need 2+ plans to compare. Add more from available plans.
+          </ThemedText>
+        </Animated.View>
+      )}
+      
+      {/* Tab Bar Selector - with horizontal scroll if many plans */}
+      <ScrollView 
+        ref={tabScrollRef}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.tabScrollContainer}
       >
-        {selectedPlans.map((plan, index) => (
-          <TouchableOpacity
-            key={`tab-${plan.id}`}
-            accessibilityRole="tab"
-            accessibilityState={{ selected: activeTabIndex === index }}
-            accessibilityLabel={`${plan.provider} tab`}
-            style={[
-              styles.tab,
-              activeTabIndex === index && styles.activeTab
-            ]}
-            onPress={() => handleTabPress(index)}
-            activeOpacity={0.7}
-          >
-            <ThemedText 
+        <Animated.View 
+          entering={FadeInDown.delay(150).duration(400)}
+          style={styles.tabBarContainer}
+        >
+          {selectedPlans.map((plan, index) => (
+            <TouchableOpacity
+              key={`tab-${plan.id}`}
+              accessibilityRole="tab"
+              accessibilityState={{ selected: activeTabIndex === index }}
+              accessibilityLabel={`${plan.provider} tab`}
               style={[
-                styles.tabText,
-                activeTabIndex === index && styles.activeTabText
+                styles.tab,
+                activeTabIndex === index && styles.activeTab
               ]}
-              numberOfLines={1}
-              ellipsizeMode="tail"
+              onPress={() => handleTabPress(index)}
+              activeOpacity={0.7}
             >
-              {plan.provider}
-            </ThemedText>
-            {activeTabIndex === index && (
-              <View style={styles.activeTabIndicator} />
-            )}
-          </TouchableOpacity>
-        ))}
-      </Animated.View>
+              <ThemedText 
+                style={[
+                  styles.tabText,
+                  activeTabIndex === index && styles.activeTabText
+                ]}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                {plan.provider}
+              </ThemedText>
+              {activeTabIndex === index && (
+                <View style={styles.activeTabIndicator} />
+              )}
+            </TouchableOpacity>
+          ))}
+        </Animated.View>
+      </ScrollView>
 
       <Animated.View 
         entering={FadeInDown.delay(200).springify()}
@@ -457,6 +494,14 @@ export default function ComparePlansScreen() {
                       <ThemedText style={styles.price}>${formatCurrency(plan.price)}</ThemedText>
                       <ThemedText style={styles.perPerson}>per person</ThemedText>
                     </View>
+                    {plan.rating && (
+                      <View style={styles.ratingContainer}>
+                        <Ionicons name="star" size={16} color="#F8B400" />
+                        <ThemedText style={styles.ratingText}>
+                          {typeof plan.rating === 'number' ? plan.rating.toFixed(1) : plan.rating}
+                        </ThemedText>
+                      </View>
+                    )}
                   </View>
 
                   <View style={styles.badgeContainer}>
@@ -653,19 +698,39 @@ const styles = StyleSheet.create({
     color: '#555555', // Increased contrast
     fontWeight: '400',
   },
-  // New Tab Bar Styles
+  // Single plan message
+  singlePlanMessage: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255, 149, 0, 0.1)',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    marginHorizontal: 20,
+    borderRadius: 8,
+    marginBottom: 12,
+  },
+  singlePlanText: {
+    marginLeft: 8,
+    fontSize: 14,
+    color: '#FF9500',
+    fontWeight: '500',
+  },
+  // Tab Bar Styles with scrolling
+  tabScrollContainer: {
+    paddingHorizontal: 20,
+  },
   tabBarContainer: {
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     alignItems: 'center',
-    paddingHorizontal: 20,
     marginBottom: 12,
     marginTop: 4,
   },
   tab: {
     paddingVertical: 8,
     paddingHorizontal: 12,
-    marginHorizontal: 4,
+    marginRight: 8,
     borderRadius: 8,
     minWidth: 80,
     alignItems: 'center',
@@ -814,6 +879,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#555555', // Increased contrast
     fontWeight: '400',
+  },
+  ratingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 4,
+  },
+  ratingText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#555555',
+    marginLeft: 4,
   },
   badgeContainer: {
     flexDirection: 'row',
