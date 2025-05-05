@@ -1,0 +1,92 @@
+// app/context/AuthContext.tsx
+
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+type User = {
+  id: string;
+  name: string;
+  email: string;
+};
+
+type AuthContextType = {
+  user: User | null;
+  login: (token: string, userData: User) => Promise<void>;
+  logout: () => Promise<void>;
+  isAuthenticated: boolean;
+  loading: boolean;
+};
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+const AUTH_KEY = 'auth_data';
+
+function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    checkAuthState();
+  }, []);
+
+  const checkAuthState = async () => {
+    try {
+      const authData = await AsyncStorage.getItem(AUTH_KEY);
+      if (authData) {
+        const { user: storedUser } = JSON.parse(authData);
+        setUser(storedUser);
+      }
+    } catch (error) {
+      console.error('Auth state check failed:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const login = async (token: string, userData: User) => {
+    try {
+      const authData = { token, user: userData };
+      await AsyncStorage.setItem(AUTH_KEY, JSON.stringify(authData));
+      setUser(userData);
+    } catch (error) {
+      console.error('Login failed:', error);
+      throw error;
+    }
+  };
+
+  const logout = async () => {
+    try {
+      await AsyncStorage.removeItem(AUTH_KEY);
+      setUser(null);
+    } catch (error) {
+      console.error('Logout failed:', error);
+      throw error;
+    }
+  };
+
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        login,
+        logout,
+        isAuthenticated: !!user,
+        loading,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+}
+
+// Ensure this works in _layout.tsx or app entry
+export default AuthProvider;
+export { AuthProvider as default, AuthProvider, useAuth };
