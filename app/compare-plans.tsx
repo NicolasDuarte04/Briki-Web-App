@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { 
   StyleSheet, 
   View, 
@@ -27,6 +27,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
+import { usePlanRemovalAnimation } from '../hooks/usePlanRemovalAnimation';
 
 import { insurancePlans } from '../data/insurance-plans';
 
@@ -55,22 +56,9 @@ export default function ComparePlansScreen() {
   const [activeTabIndex, setActiveTabIndex] = useState(0);
 
   // Safely find the corresponding insurance plans
-  const selectedPlans = useMemo(() => {
-    try {
-      if (!selectedPlanIds.length) return [];
-      return selectedPlanIds
-        .map(id => {
-          const plan = insurancePlans.find(p => p.id === id);
-          if (!plan) console.warn(`Plan with ID ${id} not found`);
-          return plan;
-        })
-        .filter(Boolean);
-    } catch (err) {
-      console.error('Error processing selected plans:', err);
-      setError('Failed to load insurance plans. Please try again later.');
-      return [];
-    }
-  }, [selectedPlanIds]);
+  const selectedPlans = selectedPlanIds
+    .map(id => insurancePlans.find(p => p.id === id))
+    .filter(Boolean);
   
   const opacity = useSharedValue(0);
 
@@ -138,68 +126,36 @@ export default function ComparePlansScreen() {
   }));
 
   // Calculate best value and best coverage plans
-  const bestValue = useMemo(() => {
-    if (!selectedPlans || selectedPlans.length === 0) return null;
-    return selectedPlans.reduce((prev, curr) => 
-      prev.price < curr.price ? prev : curr, selectedPlans[0]);
-  }, [selectedPlans]);
+  const bestValue = selectedPlans.length > 0 
+    ? selectedPlans.reduce((prev, curr) => prev.price < curr.price ? prev : curr, selectedPlans[0])
+    : null;
 
-  const bestCoverage = useMemo(() => {
-    if (!selectedPlans || selectedPlans.length === 0) return null;
+  const bestCoverage = selectedPlans.length > 0
+    ? selectedPlans.reduce((prev, curr) => {
+        try {
+          const prevTotal = Object.values(prev.coverage).reduce((a, b) => 
+            a + (typeof b === 'number' ? b : 0), 0);
+          const currTotal = Object.values(curr.coverage).reduce((a, b) => 
+            a + (typeof b === 'number' ? b : 0), 0);
+          return prevTotal > currTotal ? prev : curr;
+        } catch (err) {
+          console.error('Error calculating coverage total:', err);
+          return prev;
+        }
+      }, selectedPlans[0])
+    : null;
 
-    return selectedPlans.reduce((prev, curr) => {
-      try {
-        const prevTotal = Object.values(prev.coverage).reduce((a, b) => 
-          a + (typeof b === 'number' ? b : 0), 0);
-        const currTotal = Object.values(curr.coverage).reduce((a, b) => 
-          a + (typeof b === 'number' ? b : 0), 0);
-        return prevTotal > currTotal ? prev : curr;
-      } catch (err) {
-        console.error('Error calculating coverage total:', err);
-        return prev;
-      }
-    }, selectedPlans[0]);
-  }, [selectedPlans]);
-
-  // Create animated styles for removal animation outside of render loop
-  const planRemovalAnimatedStyles = useMemo(() => {
-    const styles = {};
-    
-    // Only create these styles if we have plans to display
-    if (selectedPlans.length > 0) {
-      selectedPlans.forEach(plan => {
-        styles[plan.id] = useAnimatedStyle(() => {
-          const isRemoving = removingPlanId === plan.id;
-          return {
-            opacity: withTiming(isRemoving ? 0 : 1, { duration: 300 }),
-            transform: [{ scale: withTiming(isRemoving ? 0.9 : 1, { duration: 300 }) }]
-          };
-        });
-      });
-    }
-    
-    return styles;
-  }, [selectedPlans, removingPlanId]);
-
-  // Create pagination dot styles outside of render loop
-  const paginationDotStyles = useMemo(() => {
-    const styles = {};
-    
-    if (selectedPlans.length > 0) {
-      selectedPlans.forEach((_, index) => {
-        styles[index] = useAnimatedStyle(() => {
-          const isActive = Math.round(scrollX.value / (COLUMN_WIDTH + SPACING)) === index;
-          return {
-            width: withTiming(isActive ? 16 : 8, { duration: 250 }),
-            opacity: withTiming(isActive ? 1 : 0.5, { duration: 250 }),
-            backgroundColor: isActive ? '#4B76E5' : '#BCC5DC',
-          };
-        });
-      });
-    }
-    
-    return styles;
-  }, [selectedPlans.length, COLUMN_WIDTH, SPACING, scrollX]);
+  // Single dot animations outside of the render loop
+  const paginationDotAnimations = selectedPlans.map((_, index) => {
+    return useAnimatedStyle(() => {
+      const isActive = Math.round(scrollX.value / (COLUMN_WIDTH + SPACING)) === index;
+      return {
+        width: withTiming(isActive ? 16 : 8, { duration: 250 }),
+        opacity: withTiming(isActive ? 1 : 0.5, { duration: 250 }),
+        backgroundColor: isActive ? '#4B76E5' : '#BCC5DC',
+      };
+    });
+  });
 
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
@@ -607,6 +563,9 @@ export default function ComparePlansScreen() {
               const isPlanBestValue = bestValue && plan.id === bestValue.id;
               const isPlanBestCoverage = bestCoverage && plan.id === bestCoverage.id;
               
+              // Get removal animation style for this specific plan OUTSIDE the JSX
+              const removalStyle = usePlanRemovalAnimation(plan.id, removingPlanId);
+              
               return (
                 <Animated.View 
                   key={plan.id} 
@@ -615,7 +574,7 @@ export default function ComparePlansScreen() {
                   style={[
                     styles.planColumn, 
                     animatedStyle,
-                    planRemovalAnimatedStyles[plan.id], // Using pre-computed style
+                    removalStyle, // Using the pre-computed style for this plan
                     { width: COLUMN_WIDTH } // Responsive width
                   ]}
                 >
@@ -727,10 +686,10 @@ export default function ComparePlansScreen() {
         {/* Pagination dots - shown only when we have multiple plans */}
         {selectedPlans.length > 1 && (
           <View style={styles.paginationContainer}>
-            {selectedPlans.map((_, index) => (
+            {paginationDotAnimations.map((dotStyle, index) => (
               <Animated.View
                 key={`dot-${index}`}
-                style={[styles.paginationDot, paginationDotStyles[index]]} // Using pre-computed style
+                style={[styles.paginationDot, dotStyle]}
               />
             ))}
           </View>
