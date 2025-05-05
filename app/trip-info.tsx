@@ -8,7 +8,8 @@ import {
   KeyboardAvoidingView,
   ActivityIndicator,
   Animated,
-  SafeAreaView
+  SafeAreaView,
+  Alert
 } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import RNPickerSelect from 'react-native-picker-select';
@@ -20,6 +21,8 @@ import { countries } from '@/utils/countries';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { StatusBar } from 'expo-status-bar';
+import { useThemeColor } from '../hooks/useThemeColor';
+import { useThemeContext } from '../context/ThemeContext';
 
 const countryOptions = Array.isArray(countries) 
   ? countries.map(country => ({
@@ -37,6 +40,36 @@ const COVERAGE_OPTIONS = [
 
 export default function TripInfoScreen() {
   const router = useRouter();
+  const { theme } = useThemeContext();
+  const isDarkMode = theme === 'dark';
+  
+  // Get theme colors
+  const backgroundColor = useThemeColor({}, 'background');
+  const cardBackgroundColor = useThemeColor({}, 'card');
+  const textColor = useThemeColor({}, 'text');
+  const textSecondaryColor = useThemeColor({}, 'secondaryText');
+  const borderColor = useThemeColor({}, 'border');
+  const accentColor = useThemeColor({}, 'accent');
+  const placeholderColor = useThemeColor({}, 'placeholder');
+  
+  // Brand colors
+  const BRAND = {
+    primary: '#4B76E5',
+    primaryDark: '#3D68D8',
+    secondary: '#F8B400',
+    success: '#34C759',
+    danger: '#FF3B30',
+  };
+  
+  // Compute derived colors for dark mode
+  const primaryTransparent = isDarkMode 
+    ? 'rgba(75, 118, 229, 0.2)'
+    : 'rgba(75, 118, 229, 0.1)';
+  const switchTrackColor = isDarkMode ? 'rgba(255, 255, 255, 0.2)' : '#D1D1D6';
+  const switchThumbColor = isDarkMode ? '#222' : 'white';
+  const counterBgColor = isDarkMode ? '#3D68D8' : '#4B76E5';
+  const counterDisabledColor = isDarkMode ? 'rgba(75, 118, 229, 0.5)' : '#B1C3F2';
+  
   const [originCountry, setOriginCountry] = useState('');
   const [destinationCountry, setDestinationCountry] = useState('');
   const [departureDate, setDepartureDate] = useState(new Date());
@@ -45,6 +78,7 @@ export default function TripInfoScreen() {
   );
   const [travelers, setTravelers] = useState(1);
   const [primaryAge, setPrimaryAge] = useState('');
+  const [ageError, setAgeError] = useState('');
   const [hasMedicalConditions, setHasMedicalConditions] = useState(false);
   const [coveragePriorities, setCoveragePriorities] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -75,8 +109,27 @@ export default function TripInfoScreen() {
     setShowDatePicker({ departure: false, return: false });
   };
 
+  // Check for age validation
+  useEffect(() => {
+    if (primaryAge) {
+      const age = parseInt(primaryAge, 10);
+      if (age <= 17) {
+        setAgeError('Travelers must be 18 years or older to purchase insurance.');
+      } else {
+        setAgeError('');
+      }
+    } else {
+      setAgeError('');
+    }
+  }, [primaryAge]);
+
   const isFormValid = () => {
-    return originCountry && destinationCountry && departureDate && returnDate;
+    return originCountry && 
+           destinationCountry && 
+           departureDate && 
+           returnDate && 
+           primaryAge && 
+           !ageError;
   };
 
   useEffect(() => {
@@ -86,10 +139,25 @@ export default function TripInfoScreen() {
       useNativeDriver: true,
       friction: 8,
     }).start();
-  }, [originCountry, destinationCountry, departureDate, returnDate]);
+  }, [originCountry, destinationCountry, departureDate, returnDate, primaryAge, ageError]);
 
   const onContinue = async () => {
     if (!isFormValid()) return;
+    
+    // Age restriction check
+    const age = parseInt(primaryAge, 10);
+    if (age <= 17) {
+      if (Platform.OS === 'web') {
+        alert('You must be 18 years or older to purchase travel insurance.');
+      } else {
+        Alert.alert(
+          'Age Restriction',
+          'You must be 18 years or older to purchase travel insurance.',
+          [{ text: 'OK', style: 'default' }]
+        );
+      }
+      return;
+    }
 
     Animated.sequence([
       Animated.timing(buttonScale, {
@@ -210,11 +278,11 @@ export default function TripInfoScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar style="dark" />
+    <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
+      <StatusBar style={isDarkMode ? 'light' : 'dark'} />
       <ScrollView 
         ref={scrollViewRef}
-        style={styles.container} 
+        style={[styles.container, { backgroundColor }]} 
         contentContainerStyle={styles.scrollContentContainer}
       >
         <KeyboardAvoidingView 
@@ -296,13 +364,17 @@ export default function TripInfoScreen() {
                     value={primaryAge}
                     onChangeText={text => setPrimaryAge(text.replace(/[^0-9]/g, ''))}
                     keyboardType="number-pad"
-                    style={styles.textInput}
+                    style={[styles.textInput, { backgroundColor: cardBackgroundColor }]}
                     placeholder="Enter primary traveler's age"
-                    placeholderTextColor="#A0A0A0"
-                    outlineColor="#E5E5EA"
-                    activeOutlineColor="#4B76E5"
-                    contentStyle={styles.inputContent}
+                    placeholderTextColor={placeholderColor}
+                    outlineColor={borderColor}
+                    activeOutlineColor={BRAND.primary}
+                    contentStyle={[styles.inputContent, { color: textColor }]}
+                    error={!!ageError}
                   />
+                  {ageError ? (
+                    <ThemedText style={styles.errorText}>{ageError}</ThemedText>
+                  ) : null}
                 </View>
 
                 <View style={styles.toggleContainer}>
