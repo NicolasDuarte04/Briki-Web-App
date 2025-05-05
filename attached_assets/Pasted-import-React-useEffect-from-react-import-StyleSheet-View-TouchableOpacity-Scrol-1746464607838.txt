@@ -32,6 +32,7 @@ const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
 export default function ProfileScreen() {
   const { user, logout, loading, isAuthenticated } = useAuth();
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   // Animation values
   const headerOpacity = useSharedValue(0);
@@ -41,6 +42,13 @@ export default function ProfileScreen() {
     // Animate header when component mounts
     headerOpacity.value = withTiming(1, { duration: 800 });
   }, []);
+  
+  const toggleTheme = () => {
+    // Toggle dark mode state
+    setIsDarkMode(prev => !prev);
+    // Here you would apply the theme changes to your app's theme context
+    // For now, we're just toggling the state
+  };
 
   const headerStyle = useAnimatedStyle(() => ({
     opacity: headerOpacity.value
@@ -239,6 +247,33 @@ export default function ProfileScreen() {
               </View>
             </Animated.View>
 
+            {/* Theme Toggle */}
+            <Animated.View
+              entering={FadeInUp.delay(800).duration(500)}
+              style={styles.section}
+            >
+              <View style={styles.themeCard}>
+                <View style={styles.themeToggleContainer}>
+                  <View style={styles.themeInfoContainer}>
+                    <Ionicons name={isDarkMode ? "moon" : "sunny"} size={24} color={isDarkMode ? "#9E85F4" : "#F8B400"} />
+                    <ThemedText style={styles.themeToggleText}>
+                      {isDarkMode ? "Dark Mode" : "Light Mode"}
+                    </ThemedText>
+                  </View>
+                  <Switch
+                    value={isDarkMode}
+                    onValueChange={toggleTheme}
+                    trackColor={{ false: "#E5E5EA", true: "rgba(158, 133, 244, 0.4)" }}
+                    thumbColor={isDarkMode ? "#9E85F4" : "#4B76E5"}
+                    ios_backgroundColor="#E5E5EA"
+                    accessibilityRole="switch"
+                    accessibilityLabel="Toggle dark mode"
+                    accessibilityHint="Switches between light and dark theme"
+                  />
+                </View>
+              </View>
+            </Animated.View>
+            
             {/* Logout Button */}
             <Animated.View
               entering={SlideInRight.delay(900).springify()}
@@ -552,5 +587,34 @@ const styles = StyleSheet.create({
   },
   loginButtonIcon: {
     marginLeft: 8,
+  },
+  themeCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
+  },
+  themeToggleContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+  },
+  themeInfoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  themeToggleText: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#1A1A1A',
+    marginLeft: 12,
   },
 });
