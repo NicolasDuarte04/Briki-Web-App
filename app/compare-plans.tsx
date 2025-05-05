@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { 
   StyleSheet, 
   View, 
@@ -8,7 +8,8 @@ import {
   TouchableOpacity, 
   Dimensions, 
   ActivityIndicator, 
-  Alert 
+  Alert,
+  ViewStyle 
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { ThemedText } from '../components/ThemedText';
@@ -20,7 +21,8 @@ import Animated, {
   FadeIn, 
   FadeInDown, 
   SlideInRight, 
-  Layout 
+  Layout,
+  AnimatedStyleProp
 } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
@@ -144,6 +146,15 @@ export default function ComparePlansScreen() {
         }
       }, selectedPlans[0])
     : null;
+
+  // Create a map of animated styles for plan removal OUTSIDE the render loop
+  const planRemovalAnimatedStyles = useMemo(() => {
+    const map: Record<string, AnimatedStyleProp<ViewStyle>> = {};
+    selectedPlans.forEach((plan) => {
+      map[plan.id] = usePlanRemovalAnimation(plan.id, removingPlanId);
+    });
+    return map;
+  }, [selectedPlans, removingPlanId]);
 
   // Single dot animations outside of the render loop
   const paginationDotAnimations = selectedPlans.map((_, index) => {
@@ -563,9 +574,6 @@ export default function ComparePlansScreen() {
               const isPlanBestValue = bestValue && plan.id === bestValue.id;
               const isPlanBestCoverage = bestCoverage && plan.id === bestCoverage.id;
               
-              // Get removal animation style for this specific plan OUTSIDE the JSX
-              const removalStyle = usePlanRemovalAnimation(plan.id, removingPlanId);
-              
               return (
                 <Animated.View 
                   key={plan.id} 
@@ -574,7 +582,7 @@ export default function ComparePlansScreen() {
                   style={[
                     styles.planColumn, 
                     animatedStyle,
-                    removalStyle, // Using the pre-computed style for this plan
+                    planRemovalAnimatedStyles[plan.id], // Using the pre-computed style from the map
                     { width: COLUMN_WIDTH } // Responsive width
                   ]}
                 >
