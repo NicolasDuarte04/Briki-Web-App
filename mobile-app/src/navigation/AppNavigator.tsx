@@ -14,6 +14,7 @@ import CheckoutScreen from '../screens/CheckoutScreen';
 import CompareScreen from '../screens/CompareScreen';
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
+import ActivePlansScreen from '../../app/active-plans';
 
 import { COLORS } from '../utils/theme';
 import { useAuth } from '../contexts/AuthContext';
@@ -24,7 +25,8 @@ export type MainStackParamList = {
   InsurancePlans: undefined;
   WeatherRisk: undefined;
   Profile: undefined;
-  PlanDetails: { planId: number };
+  ActivePlans: undefined;
+  PlanDetails: { planId: number | string };
   Compare: { planIds: number[] };
   Checkout: { planId: number };
   Login: undefined;
@@ -59,6 +61,26 @@ const TabNavigator = () => {
         }}
       />
       <Tab.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{
+          tabBarLabel: 'Perfil',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="person-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="ActivePlans"
+        component={ActivePlansScreen}
+        options={{
+          tabBarLabel: 'My Plans',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="document-text-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tab.Screen
         name="InsurancePlans"
         component={InsurancePlansScreen}
         options={{
@@ -75,16 +97,6 @@ const TabNavigator = () => {
           tabBarLabel: 'Riesgos',
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="weather-cloudy-alert" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Profile"
-        component={ProfileScreen}
-        options={{
-          tabBarLabel: 'Perfil',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person-outline" size={size} color={color} />
           ),
         }}
       />
@@ -131,6 +143,11 @@ const AppNavigator = () => {
             name="Checkout" 
             component={CheckoutScreen} 
             options={{ title: 'Checkout' }} 
+          />
+          <Stack.Screen 
+            name="ActivePlans" 
+            component={ActivePlansScreen} 
+            options={{ title: 'My Active Plans', headerShown: true }} 
           />
         </>
       ) : (
