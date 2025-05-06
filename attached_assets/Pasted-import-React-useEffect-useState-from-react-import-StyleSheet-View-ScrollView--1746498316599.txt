@@ -1,0 +1,430 @@
+import React, { useEffect, useState } from 'react';
+import { 
+  StyleSheet, 
+  View, 
+  ScrollView, 
+  TouchableOpacity, 
+  Image,
+  SafeAreaView, 
+  Dimensions,
+  Platform
+} from 'react-native';
+import { router } from 'expo-router';
+import { ThemedText } from '../../components/ThemedText';
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import Animated, { 
+  FadeInUp, 
+  useAnimatedStyle, 
+  useSharedValue, 
+  withRepeat, 
+  withSequence, 
+  withTiming 
+} from 'react-native-reanimated';
+import { StatusBar } from 'expo-status-bar';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useThemeColor } from '../../hooks/useThemeColor';
+import { useThemeContext } from '../context/ThemeContext';
+
+const { width } = Dimensions.get('window');
+const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
+
+export default function HomeScreen() {
+  const insets = useSafeAreaInsets();
+  const { theme } = useThemeContext();
+  const isDarkMode = theme === 'dark';
+
+  // Get theme colors
+  const backgroundColor = useThemeColor({}, 'background');
+  const cardBackgroundColor = useThemeColor({}, 'card');
+  const textColor = useThemeColor({}, 'text');
+  const textSecondaryColor = useThemeColor({}, 'secondaryText');
+  const borderColor = useThemeColor({}, 'border');
+  const accentColor = useThemeColor({}, 'accent');
+
+  // Brand colors
+  const BRAND = {
+    primary: '#4B76E5',
+    primaryDark: '#3D68D8',
+    secondary: '#F8B400',
+  };
+
+  const pulseAnim = useSharedValue(1);
+  const [popularDestinations, setPopularDestinations] = useState([
+    { id: 1, name: 'Cancun', region: 'Mexico', image: require('../assets/destinations/cancun.jpg') },
+    { id: 2, name: 'Cartagena', region: 'Colombia', image: require('../assets/destinations/cartagena.jpg') },
+    { id: 3, name: 'Mexico City', region: 'Mexico', image: require('../assets/destinations/mexico-city.jpg') },
+    { id: 4, name: 'Bogotá', region: 'Colombia', image: require('../assets/destinations/bogota.jpg') },
+  ]);
+
+  // Animation for CTA button pulse
+  useEffect(() => {
+    pulseAnim.value = withRepeat(
+      withSequence(
+        withTiming(1.05, { duration: 1500 }),
+        withTiming(1, { duration: 1500 })
+      ),
+      -1, // Infinite repetition
+      true // Reverse
+    );
+  }, []);
+
+  const pulseStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: pulseAnim.value }]
+  }));
+
+  const handleGetStarted = () => {
+    router.push('/trip-info');
+  };
+
+  return (
+    <SafeAreaView style={[styles.container, { 
+      backgroundColor, 
+      paddingTop: Platform.OS === 'android' ? insets.top : 0
+    }]}>
+      <StatusBar style={isDarkMode ? "light" : "dark"} />
+
+      <ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Header */}
+        <Animated.View entering={FadeInUp.delay(100).springify()}>
+          <View style={styles.header}>
+            <ThemedText style={[styles.logo, { color: BRAND.primary }]}>Briki</ThemedText>
+            <ThemedText style={[styles.welcomeText, { color: textSecondaryColor }]}>Your travel companion</ThemedText>
+          </View>
+        </Animated.View>
+
+        {/* Hero Section */}
+        <Animated.View entering={FadeInUp.delay(200).springify()}>
+          <View style={styles.heroSection}>
+            <ThemedText style={[styles.heroTitle, { color: textColor }]}>
+              Travel with <ThemedText style={{ color: BRAND.primary, fontWeight: '700' }}>peace of mind</ThemedText>
+            </ThemedText>
+            <ThemedText style={[styles.heroSubtitle, { color: textSecondaryColor }]}>
+              Find the perfect travel insurance for your adventures
+            </ThemedText>
+
+            <AnimatedTouchable 
+              style={[
+                styles.ctaButton, 
+                pulseStyle, 
+                isDarkMode ? null : {
+                  shadowColor: BRAND.primary,
+                  shadowOffset: { width: 0, height: 4 },
+                  shadowOpacity: 0.2,
+                  shadowRadius: 8,
+                  elevation: 6
+                }
+              ]}
+              onPress={handleGetStarted}
+            >
+              <LinearGradient
+                colors={[BRAND.primary, BRAND.primaryDark]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.ctaGradient}
+              >
+                <ThemedText style={styles.ctaButtonText}>Get Started</ThemedText>
+                <Ionicons name="arrow-forward" size={20} color="#FFFFFF" style={styles.ctaIcon} />
+              </LinearGradient>
+            </AnimatedTouchable>
+          </View>
+        </Animated.View>
+
+        {/* Features */}
+        <Animated.View entering={FadeInUp.delay(300).springify()}>
+          <View style={styles.featuresSection}>
+            <ThemedText style={[styles.sectionTitle, { color: textColor }]}>Why Choose Briki</ThemedText>
+
+            <View style={styles.featureRow}>
+              <View style={[
+                styles.featureCard, 
+                { 
+                  backgroundColor: cardBackgroundColor, 
+                  borderColor 
+                },
+                isDarkMode ? null : {
+                  shadowColor: 'rgba(0,0,0,0.1)',
+                  shadowOffset: { width: 0, height: 4 },
+                  shadowOpacity: 0.1,
+                  shadowRadius: 8,
+                  elevation: 4
+                }
+              ]}>
+                <View style={[styles.featureIconContainer, { backgroundColor: 'rgba(75, 118, 229, 0.1)' }]}>
+                  <Ionicons name="flash-outline" size={24} color={BRAND.primary} />
+                </View>
+                <ThemedText style={[styles.featureTitle, { color: textColor }]}>Instant Quotes</ThemedText>
+                <ThemedText style={[styles.featureDescription, { color: textSecondaryColor }]}>
+                  Get quotes in seconds from trusted insurance providers
+                </ThemedText>
+              </View>
+
+              <View style={[
+                styles.featureCard, 
+                { 
+                  backgroundColor: cardBackgroundColor, 
+                  borderColor 
+                },
+                isDarkMode ? null : {
+                  shadowColor: 'rgba(0,0,0,0.1)',
+                  shadowOffset: { width: 0, height: 4 },
+                  shadowOpacity: 0.1,
+                  shadowRadius: 8,
+                  elevation: 4
+                }
+              ]}>
+                <View style={[styles.featureIconContainer, { backgroundColor: 'rgba(75, 118, 229, 0.1)' }]}>
+                  <Ionicons name="shield-checkmark-outline" size={24} color={BRAND.primary} />
+                </View>
+                <ThemedText style={[styles.featureTitle, { color: textColor }]}>Quality Coverage</ThemedText>
+                <ThemedText style={[styles.featureDescription, { color: textSecondaryColor }]}>
+                  Compare plans with extensive coverage options
+                </ThemedText>
+              </View>
+            </View>
+
+            <View style={styles.featureRow}>
+              <View style={[
+                styles.featureCard, 
+                { 
+                  backgroundColor: cardBackgroundColor, 
+                  borderColor 
+                },
+                isDarkMode ? null : {
+                  shadowColor: 'rgba(0,0,0,0.1)',
+                  shadowOffset: { width: 0, height: 4 },
+                  shadowOpacity: 0.1,
+                  shadowRadius: 8,
+                  elevation: 4
+                }
+              ]}>
+                <View style={[styles.featureIconContainer, { backgroundColor: 'rgba(75, 118, 229, 0.1)' }]}>
+                  <Ionicons name="document-text-outline" size={24} color={BRAND.primary} />
+                </View>
+                <ThemedText style={[styles.featureTitle, { color: textColor }]}>Easy Process</ThemedText>
+                <ThemedText style={[styles.featureDescription, { color: textSecondaryColor }]}>
+                  Simplified paperwork and quick online checkout
+                </ThemedText>
+              </View>
+
+              <View style={[
+                styles.featureCard, 
+                { 
+                  backgroundColor: cardBackgroundColor, 
+                  borderColor 
+                },
+                isDarkMode ? null : {
+                  shadowColor: 'rgba(0,0,0,0.1)',
+                  shadowOffset: { width: 0, height: 4 },
+                  shadowOpacity: 0.1,
+                  shadowRadius: 8,
+                  elevation: 4
+                }
+              ]}>
+                <View style={[styles.featureIconContainer, { backgroundColor: 'rgba(75, 118, 229, 0.1)' }]}>
+                  <Ionicons name="headset-outline" size={24} color={BRAND.primary} />
+                </View>
+                <ThemedText style={[styles.featureTitle, { color: textColor }]}>24/7 Support</ThemedText>
+                <ThemedText style={[styles.featureDescription, { color: textSecondaryColor }]}>
+                  Get help from our support team anytime, anywhere
+                </ThemedText>
+              </View>
+            </View>
+          </View>
+        </Animated.View>
+
+        {/* Popular Destinations */}
+        <Animated.View entering={FadeInUp.delay(400).springify()}>
+          <View style={styles.destinationsSection}>
+            <ThemedText style={[styles.sectionTitle, { color: textColor }]}>Popular Destinations</ThemedText>
+
+            <ScrollView 
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={styles.destinationsScroll}
+              contentContainerStyle={styles.destinationsScrollContent}
+            >
+              {popularDestinations.map((destination) => (
+                <TouchableOpacity 
+                  key={destination.id} 
+                  style={[
+                    styles.destinationCard,
+                    isDarkMode ? null : {
+                      shadowColor: 'rgba(0,0,0,0.15)',
+                      shadowOffset: { width: 0, height: 6 },
+                      shadowOpacity: 0.2,
+                      shadowRadius: 10,
+                      elevation: 8
+                    }
+                  ]}
+                  onPress={() => {
+                    // Navigate to trip-info with pre-filled destination
+                    router.push({
+                      pathname: '/trip-info',
+                      params: { toCountry: destination.name }
+                    });
+                  }}
+                >
+                  <Image 
+                    source={destination.image} 
+                    style={styles.destinationImage}
+                    resizeMode="cover"
+                  />
+                  <LinearGradient
+                    colors={['transparent', 'rgba(0,0,0,0.8)']}
+                    style={styles.destinationGradient}
+                  >
+                    <ThemedText style={styles.destinationName}>{destination.name}</ThemedText>
+                    <ThemedText style={styles.destinationRegion}>{destination.region}</ThemedText>
+                  </LinearGradient>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        </Animated.View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 30,
+  },
+  header: {
+    padding: 20,
+    paddingTop: 10,
+  },
+  logo: {
+    fontSize: 28,
+    fontWeight: '700',
+  },
+  welcomeText: {
+    fontSize: 14,
+    marginTop: 4,
+  },
+  heroSection: {
+    padding: 20,
+    marginBottom: 20,
+  },
+  heroTitle: {
+    fontSize: 32,
+    fontWeight: '700',
+    marginBottom: 10,
+    lineHeight: 40,
+  },
+  heroSubtitle: {
+    fontSize: 16,
+    lineHeight: 24,
+    marginBottom: 24,
+  },
+  ctaButton: {
+    borderRadius: 16,
+    overflow: 'hidden',
+    marginTop: 10,
+  },
+  ctaGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+  },
+  ctaButtonText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  ctaIcon: {
+    marginLeft: 8,
+  },
+  featuresSection: {
+    padding: 20,
+    marginBottom: 20,
+  },
+  sectionTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    marginBottom: 16,
+  },
+  featureRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  featureCard: {
+    width: '48%',
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+    alignItems: 'center',
+  },
+  featureIconContainer: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+  },
+  featureTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  featureDescription: {
+    fontSize: 13,
+    textAlign: 'center',
+    lineHeight: 18,
+  },
+  destinationsSection: {
+    padding: 20,
+  },
+  destinationsScroll: {
+    marginLeft: -20,
+  },
+  destinationsScrollContent: {
+    paddingLeft: 20,
+    paddingRight: 5,
+  },
+  destinationCard: {
+    width: width * 0.7,
+    height: 180,
+    borderRadius: 16,
+    overflow: 'hidden',
+    marginRight: 15,
+  },
+  destinationImage: {
+    width: '100%',
+    height: '100%',
+  },
+  destinationGradient: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 16,
+    height: '50%',
+    justifyContent: 'flex-end',
+  },
+  destinationName: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  destinationRegion: {
+    color: 'rgba(255, 255, 255, 0.8)',
+    fontSize: 14,
+  },
+});
