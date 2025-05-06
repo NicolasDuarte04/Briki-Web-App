@@ -1,0 +1,1123 @@
+import React, { useEffect, useRef } from 'react';
+import { 
+  StyleSheet, 
+  View, 
+  ScrollView, 
+  TouchableOpacity, 
+  Platform, 
+  Dimensions, 
+  SafeAreaView,
+  ImageBackground,
+  AccessibilityInfo
+} from 'react-native';
+import { useFonts, Inter_400Regular, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
+import { ThemedText } from '../../components/ThemedText';
+import { router } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import Animated, { 
+  FadeInUp, 
+  FadeIn,
+  useAnimatedStyle, 
+  withSpring, 
+  withRepeat, 
+  withTiming, 
+  withSequence,
+  useSharedValue,
+  SlideInRight
+} from 'react-native-reanimated';
+import { StatusBar } from 'expo-status-bar';
+import { useThemeColor } from '../../hooks/useThemeColor';
+import { useThemeContext } from '../context/ThemeContext';
+import { ThemedView } from '../../components/ThemedView';
+
+const { width } = Dimensions.get('window');
+const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
+
+// Define brand colors centrally
+const BRAND = {
+  primary: '#4B76E5',
+  primaryDark: '#3D68D8',
+  secondary: '#F8B400',
+  success: '#34C759',
+  danger: '#FF3B30',
+};
+
+export default function HomeScreen() {
+  const { theme } = useThemeContext();
+  const isDarkMode = theme === 'dark';
+
+  // Get theme colors
+  const backgroundColor = useThemeColor({}, 'background');
+  const cardBackgroundColor = useThemeColor({}, 'card');
+  const textColor = useThemeColor({}, 'text');
+  const textSecondaryColor = useThemeColor({}, 'secondaryText');
+  const borderColor = useThemeColor({}, 'border');
+  const accentColor = useThemeColor({}, 'accent');
+  const tintColor = useThemeColor({}, 'tint');
+
+  // Compute derived colors
+  const primaryTransparent = isDarkMode 
+    ? 'rgba(75, 118, 229, 0.2)' // Higher opacity for better contrast in dark mode
+    : 'rgba(75, 118, 229, 0.1)';
+  const secondaryTransparent = isDarkMode 
+    ? 'rgba(248, 180, 0, 0.2)' // Higher opacity for better contrast in dark mode
+    : 'rgba(248, 180, 0, 0.1)';
+  const shadowColor = isDarkMode ? '#000000' : '#4B76E5';
+  const shadowOpacity = isDarkMode ? 0.4 : 0.2; // Higher opacity for dark mode
+  const overlayColors = isDarkMode 
+    ? ['rgba(18, 18, 18, 0.85)', 'rgba(18, 18, 18, 0.9)', 'rgba(18, 18, 18, 0.97)']
+    : ['rgba(255, 255, 255, 0.85)', 'rgba(255, 255, 255, 0.9)', 'rgba(255, 255, 255, 0.97)'];
+
+  // Divider colors
+  const dividerColor = isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)';
+
+  // Enhanced contrast for text on badges
+  const badgeTextColor = isDarkMode ? '#FFFFFF' : BRAND.primary;
+  const badgeSecondaryTextColor = isDarkMode ? '#FFFFFF' : BRAND.secondary;
+
+  const [fontsLoaded] = useFonts({
+    Inter_400Regular,
+    Inter_600SemiBold,
+    Inter_700Bold
+  });
+
+  const pulseAnim = useSharedValue(1);
+  const scrollViewRef = useRef(null);
+  const dotScales = [useSharedValue(1), useSharedValue(1), useSharedValue(1)];
+
+  // Testimonial paging
+  const testimonials = [
+    {
+      text: '"Briki made it so easy to find the right travel insurance. Their customer service was excellent when we had to make changes to our policy."',
+      author: 'Sarah M.',
+      location: 'Colombia'
+    },
+    {
+      text: '"When my flight was canceled in Mexico, my Briki insurance covered the hotel and new flight. The claims process was surprisingly simple!"',
+      author: "Carlos R.",
+      location: "Mexico"
+    },
+    {
+      text: '"As a frequent traveler, I\'ve tried many services. Briki is by far the most user-friendly with the best rates for international coverage."',
+      author: "Elena T.",
+      location: "Spain"
+    }
+  ];
+
+  const currentTestimonial = useSharedValue(0);
+  const testimonialOpacity = useSharedValue(1);
+
+  useEffect(() => {
+    // Gentle pulse animation for CTA button
+    pulseAnim.value = withRepeat(
+      withSequence(
+        withTiming(1.03, { duration: 1500 }),
+        withTiming(1, { duration: 1500 })
+      ),
+      -1, // Infinite repetition
+      true // Reverse
+    );
+
+    // Auto-rotate testimonials
+    const intervalId = setInterval(() => {
+      testimonialOpacity.value = withTiming(0, { duration: 300 }, () => {
+        const nextIndex = (currentTestimonial.value + 1) % testimonials.length;
+        currentTestimonial.value = nextIndex;
+
+        // Animate dot scales
+        dotScales.forEach((scale, idx) => {
+          scale.value = withSpring(idx === nextIndex ? 1.3 : 1, {
+            damping: 15,
+            stiffness: 120
+          });
+        });
+
+        testimonialOpacity.value = withTiming(1, { duration: 300 });
+      });
+    }, 7000);
+
+    // Announce screen for accessibility
+    if (Platform.OS !== 'web') {
+      // Schedule the announcement slightly delayed to ensure screen is rendered
+      setTimeout(() => {
+        AccessibilityInfo.announceForAccessibility(
+          "Home screen. Compare travel insurance from trusted providers. Swipe to explore content."
+        );
+      }, 1000);
+    }
+
+    return () => clearInterval(intervalId);
+  }, []);
+
+  const pulseStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: pulseAnim.value }]
+  }));
+
+  const testimonialStyle = useAnimatedStyle(() => {
+    return {
+      opacity: testimonialOpacity.value,
+    };
+  });
+
+  const dotAnimatedStyles = dotScales.map((scale, index) => 
+    useAnimatedStyle(() => {
+      const isSelected = Math.floor(currentTestimonial.value) === index;
+      return {
+        transform: [{ scale: scale.value }],
+        opacity: isSelected ? 1 : 0.6,
+      };
+    })
+  );
+
+  if (!fontsLoaded) {
+    return (
+      <View 
+        style={[styles.loadingContainer, { backgroundColor }]}
+        accessibilityRole="progressbar"
+        accessibilityLabel="Loading the application"
+        accessibilityHint="Please wait while the app loads"
+      >
+        <ThemedText style={{ color: textColor }}>Loading...</ThemedText>
+      </View>
+    );
+  }
+
+  const handleGetQuote = () => {
+    router.push('/trip-info');
+  };
+
+  const handleTestimonialDotPress = (index) => {
+    // First update the animation values
+    dotScales.forEach((scale, idx) => {
+      scale.value = withSpring(idx === index ? 1.3 : 1, {
+        damping: 15,
+        stiffness: 120
+      });
+    });
+
+    // Then handle the testimonial transition
+    testimonialOpacity.value = withTiming(0, { duration: 300 }, () => {
+      currentTestimonial.value = index;
+      testimonialOpacity.value = withTiming(1, { duration: 300 });
+    });
+
+    // Announce to screen readers
+    if (Platform.OS !== 'web') {
+      AccessibilityInfo.announceForAccessibility(
+        `Testimonial from ${testimonials[index].author}: ${testimonials[index].text}`
+      );
+    }
+  };
+
+  return (
+    <SafeAreaView 
+      style={[styles.safeArea, { backgroundColor }]}
+      accessibilityRole="none"
+      importantForAccessibility="yes"
+    >
+      <StatusBar style={isDarkMode ? "light" : "dark"} />
+
+      {/* Themed background approach */}
+      <ImageBackground 
+        source={
+          isDarkMode
+            ? require('../assets/backgrounds/blurred-glow-dark.png')
+            : require('../assets/backgrounds/blurred-glow.png')
+        }
+        style={styles.backgroundImage}
+        resizeMode="cover"
+        accessibilityIgnoresInvertColors={true} // Important for accessibility
+      >
+        <LinearGradient
+          colors={overlayColors}
+          locations={[0, 0.6, 1]}
+          style={styles.overlayGradient}
+        />
+
+        <ThemedView style={styles.container}>
+          <ScrollView 
+            ref={scrollViewRef}
+            style={styles.scrollView} 
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+            accessibilityRole="scrollView"
+            accessibilityLabel="Home screen content"
+            importantForAccessibility="yes"
+          >
+            {/* Header/Logo Section */}
+            <Animated.View 
+              entering={FadeInUp.delay(100).springify()} 
+              style={styles.header}
+              accessibilityRole="header"
+            >
+              <View style={styles.headerContent}>
+                <ThemedText 
+                  style={[styles.logo, { color: BRAND.primary }]}
+                  accessibilityRole="header"
+                  accessible={true}
+                >
+                  Briki
+                </ThemedText>
+                <ThemedText 
+                  style={[styles.welcomeText, { 
+                    color: textSecondaryColor,
+                    // Ensure better contrast in dark mode
+                    opacity: isDarkMode ? 0.9 : 0.7
+                  }]}
+                  accessible={true}
+                >
+                  Welcome back!
+                </ThemedText>
+              </View>
+            </Animated.View>
+
+            {/* Hero Section */}
+            <Animated.View 
+              entering={FadeInUp.delay(200).springify()} 
+              style={styles.heroSection}
+              accessibilityRole="summary"
+              accessibilityLabel="Travel insurance summary"
+            >
+              <ThemedText 
+                style={[styles.heroTitle, { color: textColor }]}
+                accessibilityRole="header"
+                accessible={true}
+              >
+                Travel with <ThemedText 
+                               style={[styles.accentText, { color: BRAND.primary }]} 
+                               accessible={false}
+                             >
+                               peace of mind
+                             </ThemedText>
+              </ThemedText>
+              <ThemedText 
+                style={[styles.heroSubtitle, { 
+                  color: textSecondaryColor,
+                  // Increase contrast for better readability
+                  opacity: isDarkMode ? 0.95 : 0.85
+                }]}
+                accessible={true}
+              >
+                Compare and choose the best travel insurance for your journey
+              </ThemedText>
+
+              <AnimatedTouchable 
+                style={[styles.ctaButton, pulseStyle, { 
+                  shadowColor,
+                  shadowOpacity,
+                  elevation: isDarkMode ? 8 : 4 // Higher elevation in dark mode
+                }]}
+                onPress={handleGetQuote}
+                activeOpacity={0.8}
+                accessibilityRole="button"
+                accessibilityLabel="Get insured now"
+                accessibilityHint="Navigate to trip information screen to start your quote"
+              >
+                <LinearGradient
+                  colors={[BRAND.primary, BRAND.primaryDark]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.ctaGradient}
+                >
+                  <ThemedText 
+                    style={[styles.ctaButtonText, { color: '#FFFFFF' }]}
+                    accessible={false} // Parent is already accessible
+                  >
+                    Get Insured Now
+                  </ThemedText>
+                  <Ionicons name="arrow-forward" size={20} color="#FFFFFF" style={styles.ctaIcon} />
+                </LinearGradient>
+              </AnimatedTouchable>
+            </Animated.View>
+
+            {/* Features Highlights */}
+            <Animated.View 
+              entering={FadeInUp.delay(300).springify()} 
+              style={styles.featuresSection}
+              accessibilityRole="summary"
+              accessibilityLabel="Key features"
+            >
+              <View style={styles.featureRow}>
+                <View 
+                  style={styles.featureItem}
+                  accessibilityRole="text"
+                  accessibilityLabel="Instant quotes feature"
+                >
+                  <View style={[styles.featureIconContainer, { backgroundColor: primaryTransparent }]}>
+                    <Ionicons name="flash" size={20} color={BRAND.primary} />
+                  </View>
+                  <ThemedText 
+                    style={[styles.featureText, { color: textSecondaryColor }]}
+                    accessible={false} // Parent is already accessible
+                  >
+                    Instant quotes
+                  </ThemedText>
+                </View>
+                <View 
+                  style={styles.featureItem}
+                  accessibilityRole="text"
+                  accessibilityLabel="Trusted providers feature"
+                >
+                  <View style={[styles.featureIconContainer, { backgroundColor: primaryTransparent }]}>
+                    <Ionicons name="shield-checkmark" size={20} color={BRAND.primary} />
+                  </View>
+                  <ThemedText 
+                    style={[styles.featureText, { color: textSecondaryColor }]}
+                    accessible={false} // Parent is already accessible
+                  >
+                    Trusted providers
+                  </ThemedText>
+                </View>
+                <View 
+                  style={styles.featureItem}
+                  accessibilityRole="text"
+                  accessibilityLabel="Best rates feature"
+                >
+                  <View style={[styles.featureIconContainer, { backgroundColor: primaryTransparent }]}>
+                    <Ionicons name="cash" size={20} color={BRAND.primary} />
+                  </View>
+                  <ThemedText 
+                    style={[styles.featureText, { color: textSecondaryColor }]}
+                    accessible={false} // Parent is already accessible
+                  >
+                    Best rates
+                  </ThemedText>
+                </View>
+              </View>
+            </Animated.View>
+
+            {/* About Briki Section */}
+            <Animated.View 
+              entering={FadeInUp.delay(350).springify()} 
+              style={styles.aboutSection}
+              accessibilityRole="region"
+              accessibilityLabel="Why choose Briki section"
+            >
+              <ThemedText 
+                style={[styles.sectionTitle, { color: textColor }]}
+                accessibilityRole="header"
+                accessible={true}
+              >
+                Why Choose Briki
+              </ThemedText>
+              <View style={styles.aboutCards}>
+                <Animated.View 
+                  entering={FadeInUp.delay(400)} 
+                  style={[styles.aboutCard, { 
+                    backgroundColor: cardBackgroundColor, 
+                    borderColor,
+                    // Enhance shadow for better visibility in dark mode
+                    shadowColor,
+                    shadowOpacity,
+                    elevation: isDarkMode ? 3 : 2
+                  }]}
+                  accessibilityRole="text"
+                  accessibilityLabel="Our mission: Making travel insurance simple and accessible for everyone, everywhere"
+                >
+                  <View style={styles.cardHeader}>
+                    <View style={[styles.iconCircle, { backgroundColor: BRAND.primary }]}>
+                      <Ionicons name="rocket" size={24} color="#FFFFFF" />
+                    </View>
+                    <ThemedText 
+                      style={[styles.cardTitle, { color: textColor }]}
+                      accessible={false} // Parent is already accessible
+                    >
+                      Our Mission
+                    </ThemedText>
+                  </View>
+                  <ThemedText 
+                    style={[styles.cardText, { color: textSecondaryColor }]}
+                    accessible={false} // Parent is already accessible
+                  >
+                    Making travel insurance simple and accessible for everyone, everywhere
+                  </ThemedText>
+                </Animated.View>
+
+                <Animated.View 
+                  entering={FadeInUp.delay(450)} 
+                  style={[styles.aboutCard, { 
+                    backgroundColor: cardBackgroundColor, 
+                    borderColor,
+                    shadowColor,
+                    shadowOpacity,
+                    elevation: isDarkMode ? 3 : 2
+                  }]}
+                  accessibilityRole="text"
+                  accessibilityLabel="Quick and easy: Get fully insured in minutes with our streamlined digital process"
+                >
+                  <View style={styles.cardHeader}>
+                    <View style={[styles.iconCircle, { backgroundColor: BRAND.secondary }]}>
+                      <Ionicons name="flash" size={24} color="#FFFFFF" />
+                    </View>
+                    <ThemedText 
+                      style={[styles.cardTitle, { color: textColor }]}
+                      accessible={false} // Parent is already accessible
+                    >
+                      Quick & Easy
+                    </ThemedText>
+                  </View>
+                  <ThemedText 
+                    style={[styles.cardText, { color: textSecondaryColor }]}
+                    accessible={false} // Parent is already accessible
+                  >
+                    Get fully insured in minutes with our streamlined digital process
+                  </ThemedText>
+                </Animated.View>
+
+                <Animated.View 
+                  entering={FadeInUp.delay(500)} 
+                  style={[styles.aboutCard, { 
+                    backgroundColor: cardBackgroundColor, 
+                    borderColor,
+                    shadowColor,
+                    shadowOpacity,
+                    elevation: isDarkMode ? 3 : 2
+                  }]}
+                  accessibilityRole="text"
+                  accessibilityLabel="Trusted providers: Partner with leading insurance companies worldwide for reliable coverage"
+                >
+                  <View style={styles.cardHeader}>
+                    <View style={[styles.iconCircle, { backgroundColor: BRAND.primary }]}>
+                      <Ionicons name="shield-checkmark" size={24} color="#FFFFFF" />
+                    </View>
+                    <ThemedText 
+                      style={[styles.cardTitle, { color: textColor }]}
+                      accessible={false} // Parent is already accessible
+                    >
+                      Trusted Providers
+                    </ThemedText>
+                  </View>
+                  <ThemedText 
+                    style={[styles.cardText, { color: textSecondaryColor }]}
+                    accessible={false} // Parent is already accessible
+                  >
+                    Partner with leading insurance companies worldwide for reliable coverage
+                  </ThemedText>
+                </Animated.View>
+
+                <Animated.View 
+                  entering={FadeInUp.delay(550)} 
+                  style={[styles.aboutCard, { 
+                    backgroundColor: cardBackgroundColor, 
+                    borderColor,
+                    shadowColor,
+                    shadowOpacity,
+                    elevation: isDarkMode ? 3 : 2
+                  }]}
+                  accessibilityRole="text"
+                  accessibilityLabel="Secure payments: Safe and encrypted transactions guaranteed with top-tier security"
+                >
+                  <View style={styles.cardHeader}>
+                    <View style={[styles.iconCircle, { backgroundColor: BRAND.secondary }]}>
+                      <Ionicons name="lock-closed" size={24} color="#FFFFFF" />
+                    </View>
+                    <ThemedText 
+                      style={[styles.cardTitle, { color: textColor }]}
+                      accessible={false} // Parent is already accessible
+                    >
+                      Secure Payments
+                    </ThemedText>
+                  </View>
+                  <ThemedText 
+                    style={[styles.cardText, { color: textSecondaryColor }]}
+                    accessible={false} // Parent is already accessible
+                  >
+                    Safe and encrypted transactions guaranteed with top-tier security
+                  </ThemedText>
+                </Animated.View>
+              </View>
+            </Animated.View>
+
+            {/* Popular Plans Section */}
+            <Animated.View 
+              entering={FadeInUp.delay(600)} 
+              style={styles.recentlyViewedSection}
+              accessibilityRole="region"
+              accessibilityLabel="Popular insurance plans"
+            >
+              <View style={styles.sectionHeader}>
+                <ThemedText 
+                  style={[styles.sectionTitle, { color: textColor }]}
+                  accessibilityRole="header"
+                  accessible={true}
+                >
+                  Popular Plans
+                </ThemedText>
+                <TouchableOpacity 
+                  style={styles.viewAllButton}
+                  onPress={handleGetQuote}
+                  activeOpacity={0.8}
+                  accessibilityRole="button"
+                  accessibilityLabel="View all plans"
+                  accessibilityHint="Navigate to see all available insurance plans"
+                >
+                  <ThemedText 
+                    style={[styles.viewAllText, { color: BRAND.primary }]}
+                    accessible={false} // Parent is already accessible
+                  >
+                    View All
+                  </ThemedText>
+                  <Ionicons name="chevron-forward" size={14} color={BRAND.primary} />
+                </TouchableOpacity>
+              </View>
+
+              <ScrollView 
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.plansScrollContent}
+                accessibilityRole="scrollView"
+                accessibilityLabel="Popular insurance plans carousel"
+              >
+                <Animated.View entering={SlideInRight.delay(650).springify()}>
+                  <TouchableOpacity 
+                    style={[styles.planCard, { 
+                      backgroundColor: cardBackgroundColor, 
+                      borderColor,
+                      shadowColor,
+                      shadowOpacity,
+                      elevation: isDarkMode ? 4 : 2
+                    }]} 
+                    onPress={handleGetQuote}
+                    activeOpacity={0.8}
+                    accessibilityRole="button"
+                    accessibilityLabel="AXA Assistance Premium Coverage plan, from $145 per person"
+                    accessibilityHint="View details and get a quote for this plan"
+                  >
+                    <View style={styles.planCardTop}>
+                      <ThemedText 
+                        style={[styles.planProvider, { color: textColor }]}
+                        accessible={false} // Parent is already accessible
+                      >
+                        AXA Assistance
+                      </ThemedText>
+                      <View style={[styles.planBadge, { backgroundColor: primaryTransparent }]}>
+                        <ThemedText 
+                          style={[styles.planBadgeText, { color: badgeTextColor }]}
+                          accessible={false} // Parent is already accessible
+                        >
+                          Popular
+                        </ThemedText>
+                      </View>
+                    </View>
+                    <ThemedText 
+                      style={[styles.planName, { color: textColor }]}
+                      accessible={false} // Parent is already accessible
+                    >
+                      Premium Coverage
+                    </ThemedText>
+                    <View style={styles.planFeatures}>
+                      <View style={styles.planFeatureItem}>
+                        <Ionicons name="checkmark-circle" size={16} color={BRAND.success} />
+                        <ThemedText 
+                          style={[styles.planFeatureText, { 
+                            color: textSecondaryColor,
+                            opacity: isDarkMode ? 0.95 : 0.9 // Better contrast
+                          }]}
+                          accessible={false} // Parent is already accessible
+                        >
+                          Medical coverage up to $100,000
+                        </ThemedText>
+                      </View>
+                      <View style={styles.planFeatureItem}>
+                        <Ionicons name="checkmark-circle" size={16} color={BRAND.success} />
+                        <ThemedText 
+                          style={[styles.planFeatureText, { 
+                            color: textSecondaryColor,
+                            opacity: isDarkMode ? 0.95 : 0.9
+                          }]}
+                          accessible={false} // Parent is already accessible
+                        >
+                          COVID-19 included
+                        </ThemedText>
+                      </View>
+                    </View>
+                    <View style={[styles.planFooter, { borderTopColor: dividerColor }]}>
+                      <ThemedText 
+                        style={[styles.planPrice, { color: textColor }]}
+                        accessible={false} // Parent is already accessible
+                      >
+                        From $145
+                      </ThemedText>
+                      <ThemedText 
+                        style={[styles.planPriceSubtext, { 
+                          color: textSecondaryColor,
+                          opacity: isDarkMode ? 0.9 : 0.8
+                        }]}
+                        accessible={false} // Parent is already accessible
+                      >
+                        per person
+                      </ThemedText>
+                    </View>
+                  </TouchableOpacity>
+                </Animated.View>
+
+                <Animated.View entering={SlideInRight.delay(700).springify()}>
+                  <TouchableOpacity 
+                    style={[styles.planCard, { 
+                      backgroundColor: cardBackgroundColor, 
+                      borderColor,
+                      shadowColor,
+                      shadowOpacity,
+                      elevation: isDarkMode ? 4 : 2
+                    }]} 
+                    onPress={handleGetQuote}
+                    activeOpacity={0.8}
+                    accessibilityRole="button"
+                    accessibilityLabel="Allianz Travel Essential Plan, from $89 per person"
+                    accessibilityHint="View details and get a quote for this plan"
+                  >
+                    <View style={styles.planCardTop}>
+                      <ThemedText 
+                        style={[styles.planProvider, { color: textColor }]}
+                        accessible={false} // Parent is already accessible
+                      >
+                        Allianz Travel
+                      </ThemedText>
+                      <View style={[styles.planBadge, { backgroundColor: secondaryTransparent }]}>
+                        <ThemedText 
+                          style={[styles.planBadgeText, { color: badgeSecondaryTextColor }]}
+                          accessible={false} // Parent is already accessible
+                        >
+                          Best Value
+                        </ThemedText>
+                      </View>
+                    </View>
+                    <ThemedText 
+                      style={[styles.planName, { color: textColor }]}
+                      accessible={false} // Parent is already accessible
+                    >
+                      Essential Plan
+                    </ThemedText>
+                    <View style={styles.planFeatures}>
+                      <View style={styles.planFeatureItem}>
+                        <Ionicons name="checkmark-circle" size={16} color={BRAND.success} />
+                        <ThemedText 
+                          style={[styles.planFeatureText, { 
+                            color: textSecondaryColor,
+                            opacity: isDarkMode ? 0.95 : 0.9
+                          }]}
+                          accessible={false} // Parent is already accessible
+                        >
+                          Medical coverage up to $50,000
+                        </ThemedText>
+                      </View>
+                      <View style={styles.planFeatureItem}>
+                        <Ionicons name="checkmark-circle" size={16} color={BRAND.success} />
+                        <ThemedText 
+                          style={[styles.planFeatureText, { 
+                            color: textSecondaryColor,
+                            opacity: isDarkMode ? 0.95 : 0.9
+                          }]}
+                          accessible={false} // Parent is already accessible
+                        >
+                          Trip cancellation protection
+                        </ThemedText>
+                      </View>
+                    </View>
+                    <View style={[styles.planFooter, { borderTopColor: dividerColor }]}>
+                      <ThemedText 
+                        style={[styles.planPrice, { color: textColor }]}
+                        accessible={false} // Parent is already accessible
+                      >
+                        From $89
+                      </ThemedText>
+                      <ThemedText 
+                        style={[styles.planPriceSubtext, { 
+                          color: textSecondaryColor,
+                          opacity: isDarkMode ? 0.9 : 0.8
+                        }]}
+                        accessible={false} // Parent is already accessible
+                      >
+                        per person
+                      </ThemedText>
+                    </View>
+                  </TouchableOpacity>
+                </Animated.View>
+              </ScrollView>
+            </Animated.View>
+
+            {/* Testimonials */}
+            <Animated.View 
+              entering={FadeInUp.delay(750).springify()} 
+              style={styles.testimonialsSection}
+              accessibilityRole="region"
+              accessibilityLabel="Customer testimonials"
+            >
+              <ThemedText 
+                style={[styles.sectionTitle, { color: textColor }]}
+                accessibilityRole="header"
+                accessible={true}
+              >
+                What Our Users Say
+              </ThemedText>
+
+              <View style={[styles.testimonialCard, { 
+                backgroundColor: cardBackgroundColor, 
+                borderColor,
+                // Enhanced shadow for better visibility in dark mode
+                shadowColor,
+                shadowOpacity,
+                elevation: isDarkMode ? 4 : 2
+              }]}>
+                <Animated.View 
+                  style={[styles.testimonialContent, testimonialStyle]}
+                  accessibilityRole="text"
+                  accessibilityLabel={`Testimonial from ${testimonials[Math.floor(currentTestimonial.value)].author}`}
+                >
+                  <ThemedText 
+                    style={[styles.testimonialText, { 
+                      color: textColor,
+                      // Increase contrast for better readability
+                      opacity: isDarkMode ? 1 : 0.9
+                    }]}
+                    accessible={false} // Parent is already accessible
+                  >
+                    {testimonials[Math.floor(currentTestimonial.value)].text}
+                  </ThemedText>
+                  <View style={styles.testimonialFooter}>
+                    <ThemedText 
+                      style={[styles.testimonialAuthor, { color: textColor }]}
+                      accessible={false} // Parent is already accessible
+                    >
+                      {testimonials[Math.floor(currentTestimonial.value)].author}
+                    </ThemedText>
+                    <ThemedText 
+                      style={[styles.testimonialLocation, { 
+                        color: textSecondaryColor,
+                        opacity: isDarkMode ? 0.9 : 0.8
+                      }]}
+                      accessible={false} // Parent is already accessible
+                    >
+                      {testimonials[Math.floor(currentTestimonial.value)].location}
+                    </ThemedText>
+                  </View>
+                </Animated.View>
+
+                <View 
+                  style={styles.testimonialDots}
+                  accessibilityRole="tablist"
+                  accessibilityLabel="Testimonial navigation"
+                >
+                  {testimonials.map((_, index) => (
+                    <Animated.View
+                      key={index}
+                      style={[
+                        styles.testimonialDotContainer,
+                        dotAnimatedStyles[index]
+                      ]}
+                    >
+                      <TouchableOpacity
+                        onPress={() => handleTestimonialDotPress(index)}
+                        style={[
+                          styles.testimonialDot,
+                          { 
+                            backgroundColor: 
+                              Math.floor(currentTestimonial.value) === index
+                                ? BRAND.primary
+                                : isDarkMode 
+                                  ? 'rgba(75, 118, 229, 0.4)'
+                                  : 'rgba(75, 118, 229, 0.3)'
+                          }
+                        ]}
+                        accessibilityRole="tab"
+                        accessibilityLabel={`View testimonial ${index + 1} of ${testimonials.length}`}
+                        accessibilityState={{ selected: Math.floor(currentTestimonial.value) === index }}
+                      />
+                    </Animated.View>
+                  ))}
+                </View>
+              </View>
+            </Animated.View>
+
+          </ScrollView>
+        </ThemedView>
+      </ImageBackground>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  backgroundImage: {
+    flex: 1,
+    width: '100%',
+  },
+  overlayGradient: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+  },
+  container: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 40,
+  },
+  header: {
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    paddingBottom: 16,
+  },
+  headerContent: {
+    alignItems: 'center',
+  },
+  logo: {
+    fontSize: 36,
+    fontFamily: 'Inter_700Bold',
+  },
+  welcomeText: {
+    fontSize: 14,
+    fontFamily: 'Inter_400Regular',
+    marginTop: 4,
+  },
+  heroSection: {
+    paddingHorizontal: 24,
+    paddingTop: 20,
+    paddingBottom: 32,
+    alignItems: 'center',
+  },
+  heroTitle: {
+    fontSize: 32,
+    fontFamily: 'Inter_600SemiBold',
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  accentText: {
+    fontFamily: 'Inter_700Bold',
+  },
+  heroSubtitle: {
+    fontSize: 16,
+    fontFamily: 'Inter_400Regular',
+    textAlign: 'center',
+    lineHeight: 24,
+    marginBottom: 32,
+    paddingHorizontal: 20,
+  },
+  ctaButton: {
+    borderRadius: 16,
+    overflow: 'hidden',
+    width: '85%',
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  ctaGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+  },
+  ctaButtonText: {
+    fontSize: 18,
+    fontFamily: 'Inter_600SemiBold',
+  },
+  ctaIcon: {
+    marginLeft: 8,
+  },
+  featuresSection: {
+    paddingTop: 12,
+    paddingBottom: 32,
+    alignItems: 'center',
+  },
+  featureRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+    paddingHorizontal: 12,
+  },
+  featureItem: {
+    alignItems: 'center',
+    paddingHorizontal: 12,
+  },
+  featureIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+  },
+  featureText: {
+    fontSize: 14,
+    fontFamily: 'Inter_400Regular',
+    textAlign: 'center',
+  },
+  aboutSection: {
+    paddingHorizontal: 24,
+    paddingBottom: 40,
+  },
+  sectionTitle: {
+    fontSize: 22,
+    fontFamily: 'Inter_600SemiBold',
+    marginBottom: 20,
+  },
+  aboutCards: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  aboutCard: {
+    width: '48%',
+    borderRadius: 16,
+    marginBottom: 16,
+    padding: 16,
+    borderWidth: 1,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  iconCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  cardTitle: {
+    fontSize: 15,
+    fontFamily: 'Inter_600SemiBold',
+  },
+  cardText: {
+    fontSize: 14,
+    fontFamily: 'Inter_400Regular',
+    lineHeight: 20,
+  },
+  recentlyViewedSection: {
+    paddingHorizontal: 24,
+    paddingBottom: 32,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  viewAllButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  viewAllText: {
+    fontSize: 14,
+    fontFamily: 'Inter_600SemiBold',
+    marginRight: 4,
+  },
+  plansScrollContent: {
+    paddingLeft: 24,
+    paddingRight: 8,
+  },
+  planCard: {
+    width: 280,
+    borderRadius: 16,
+    marginRight: 16,
+    padding: 16,
+    borderWidth: 1,
+  },
+  planCardTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  planProvider: {
+    fontSize: 14,
+    fontFamily: 'Inter_400Regular',
+  },
+  planBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  planBadgeText: {
+    fontSize: 12,
+    fontFamily: 'Inter_600SemiBold',
+  },
+  planName: {
+    fontSize: 18,
+    fontFamily: 'Inter_600SemiBold',
+    marginBottom: 12,
+  },
+  planFeatures: {
+    marginBottom: 16,
+  },
+  planFeatureItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  planFeatureText: {
+    fontSize: 14,
+    fontFamily: 'Inter_400Regular',
+    marginLeft: 8,
+  },
+  planFooter: {
+    borderTopWidth: 1,
+    paddingTop: 12,
+  },
+  planPrice: {
+    fontSize: 16,
+    fontFamily: 'Inter_700Bold',
+  },
+  planPriceSubtext: {
+    fontSize: 12,
+    fontFamily: 'Inter_400Regular',
+  },
+  testimonialsSection: {
+    paddingHorizontal: 24,
+    paddingBottom: 40,
+  },
+  testimonialCard: {
+    borderRadius: 16,
+    padding: 20,
+    borderWidth: 1,
+  },
+  testimonialContent: {
+    minHeight: 150,
+  },
+  testimonialText: {
+    fontSize: 16,
+    fontFamily: 'Inter_400Regular',
+    lineHeight: 24,
+    fontStyle: 'italic',
+    marginBottom: 16,
+  },
+  testimonialFooter: {
+    marginTop: 'auto',
+  },
+  testimonialAuthor: {
+    fontSize: 16,
+    fontFamily: 'Inter_600SemiBold',
+    marginBottom: 4,
+  },
+  testimonialLocation: {
+    fontSize: 14,
+    fontFamily: 'Inter_400Regular',
+  },
+  testimonialDots: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 16,
+  },
+  testimonialDotContainer: {
+    padding: 8, // Expanded tap area for better touch targets
+  },
+  testimonialDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginHorizontal: 4,
+  },
+});
