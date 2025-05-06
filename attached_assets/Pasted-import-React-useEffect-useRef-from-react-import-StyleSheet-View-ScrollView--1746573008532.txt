@@ -1,0 +1,930 @@
+import React, { useEffect, useRef } from 'react';
+import { 
+  StyleSheet, 
+  View, 
+  ScrollView, 
+  TouchableOpacity, 
+  Platform, 
+  Dimensions, 
+  SafeAreaView,
+  ImageBackground,
+  FlatList,
+  AccessibilityInfo
+} from 'react-native';
+import { useFonts, Inter_400Regular, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
+import { ThemedText } from '../../components/ThemedText';
+import { router } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import Animated, { 
+  FadeInUp, 
+  FadeIn,
+  useAnimatedStyle, 
+  withSpring, 
+  withRepeat, 
+  withTiming, 
+  withSequence,
+  useSharedValue,
+  SlideInRight
+} from 'react-native-reanimated';
+import { StatusBar } from 'expo-status-bar';
+import { useThemeColor } from '../../hooks/useThemeColor';
+import { useThemeContext } from '../context/ThemeContext';
+import { ThemedView } from '../../components/ThemedView';
+import { insurancePlans } from '../data/insurance-plans';
+
+const { width } = Dimensions.get('window');
+const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
+const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
+
+// Define brand colors according to Apple's design guidelines
+const BRAND = {
+  primary: '#4B76E5',
+  primaryDark: '#3D68D8',
+  secondary: '#F8B400',
+  success: '#34C759', // Apple's system green
+  danger: '#FF3B30',  // Apple's system red
+};
+
+export default function HomeScreen() {
+  const { theme } = useThemeContext();
+  const isDarkMode = theme === 'dark';
+
+  // Get theme colors
+  const backgroundColor = useThemeColor({}, 'background');
+  const cardBackgroundColor = useThemeColor({}, 'card');
+  const textColor = useThemeColor({}, 'text');
+  const textSecondaryColor = useThemeColor({}, 'secondaryText');
+  const borderColor = useThemeColor({}, 'border');
+
+  // Apple-style overlay gradients
+  const overlayColors = isDarkMode 
+    ? ['rgba(18, 18, 18, 0.85)', 'rgba(18, 18, 18, 0.92)', 'rgba(18, 18, 18, 0.98)']
+    : ['rgba(255, 255, 255, 0.85)', 'rgba(255, 255, 255, 0.92)', 'rgba(255, 255, 255, 0.98)'];
+
+  // Apple-style derived colors
+  const primaryTransparent = isDarkMode 
+    ? 'rgba(75, 118, 229, 0.18)' 
+    : 'rgba(75, 118, 229, 0.1)';
+  const secondaryTransparent = isDarkMode 
+    ? 'rgba(248, 180, 0, 0.18)' 
+    : 'rgba(248, 180, 0, 0.1)';
+  const dividerColor = isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)';
+  const shadowColor = isDarkMode ? '#000000' : '#4B76E5';
+  const shadowOpacity = isDarkMode ? 0.25 : 0.15; // Apple-style subtle shadows
+
+  const [fontsLoaded] = useFonts({
+    Inter_400Regular,
+    Inter_600SemiBold,
+    Inter_700Bold
+  });
+
+  const pulseAnim = useSharedValue(1);
+  const scrollViewRef = useRef(null);
+  const dotScales = [useSharedValue(1), useSharedValue(1), useSharedValue(1)];
+
+  // Top insurance plans to display
+  const topInsurancePlans = insurancePlans.slice(0, 4);
+
+  // Testimonials
+  const testimonials = [
+    {
+      text: '"Briki made it so easy to find the right travel insurance. Their customer service was excellent when we had to make changes to our policy."',
+      author: 'Sarah M.',
+      location: 'Colombia'
+    },
+    {
+      text: '"When my flight was canceled in Mexico, my Briki insurance covered the hotel and new flight. The claims process was surprisingly simple!"',
+      author: "Carlos R.",
+      location: "Mexico"
+    },
+    {
+      text: '"As a frequent traveler, I\'ve tried many services. Briki is by far the most user-friendly with the best rates for international coverage."',
+      author: "Elena T.",
+      location: "Spain"
+    }
+  ];
+
+  const currentTestimonial = useSharedValue(0);
+  const testimonialOpacity = useSharedValue(1);
+
+  useEffect(() => {
+    // Apple-style spring animations for button highlight
+    pulseAnim.value = withRepeat(
+      withSequence(
+        withTiming(1.02, { duration: 2000 }), // More subtle pulse
+        withTiming(1, { duration: 2000 })
+      ),
+      -1, 
+      true 
+    );
+
+    // Auto-rotate testimonials with Apple-style timing
+    const intervalId = setInterval(() => {
+      testimonialOpacity.value = withTiming(0, { duration: 300 }, () => {
+        const nextIndex = (currentTestimonial.value + 1) % testimonials.length;
+        currentTestimonial.value = nextIndex;
+
+        // Animate dot scales with spring animation (Apple-style)
+        dotScales.forEach((scale, idx) => {
+          scale.value = withSpring(idx === nextIndex ? 1.3 : 1, {
+            damping: 12,
+            stiffness: 100
+          });
+        });
+
+        testimonialOpacity.value = withTiming(1, { duration: 300 });
+      });
+    }, 8000);
+
+    // Announce screen for accessibility (Apple guideline)
+    if (Platform.OS !== 'web') {
+      setTimeout(() => {
+        AccessibilityInfo.announceForAccessibility(
+          "Home screen. Compare travel insurance from trusted providers."
+        );
+      }, 1000);
+    }
+
+    return () => clearInterval(intervalId);
+  }, []);
+
+  const pulseStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: pulseAnim.value }]
+  }));
+
+  const testimonialStyle = useAnimatedStyle(() => {
+    return {
+      opacity: testimonialOpacity.value,
+    };
+  });
+
+  const dotAnimatedStyles = dotScales.map((scale, index) => 
+    useAnimatedStyle(() => {
+      const isSelected = Math.floor(currentTestimonial.value) === index;
+      return {
+        transform: [{ scale: scale.value }],
+        opacity: isSelected ? 1 : 0.6,
+      };
+    })
+  );
+
+  if (!fontsLoaded) {
+    return (
+      <View 
+        style={[styles.loadingContainer, { backgroundColor }]}
+        accessibilityRole="progressbar"
+        accessibilityLabel="Loading the application"
+      >
+        <ThemedText style={{ color: textColor }}>Loading...</ThemedText>
+      </View>
+    );
+  }
+
+  const handleGetQuote = () => {
+    router.push('/trip-info');
+  };
+
+  const handleTestimonialDotPress = (index) => {
+    // Apple-style spring animations
+    dotScales.forEach((scale, idx) => {
+      scale.value = withSpring(idx === index ? 1.3 : 1, {
+        damping: 12,
+        stiffness: 100
+      });
+    });
+
+    // Then handle the testimonial transition
+    testimonialOpacity.value = withTiming(0, { duration: 300 }, () => {
+      currentTestimonial.value = index;
+      testimonialOpacity.value = withTiming(1, { duration: 300 });
+    });
+
+    // Announce to screen readers
+    if (Platform.OS !== 'web') {
+      AccessibilityInfo.announceForAccessibility(
+        `Testimonial from ${testimonials[index].author}: ${testimonials[index].text}`
+      );
+    }
+  };
+
+  // Render item for the horizontal insurance plan list
+  const renderInsurancePlanItem = ({ item: plan, index }) => (
+    <Animated.View 
+      entering={FadeInUp.delay(400 + (index * 80)).springify()}
+      style={{ width: width * 0.7, marginRight: 16 }}
+      accessibilityRole="button"
+      accessibilityLabel={`${plan.provider} insurance plan`}
+      accessibilityHint={`View details for ${plan.provider} plan`}
+    >
+      <ThemedView
+        style={[
+          styles.horizontalPlanCard, 
+          { 
+            backgroundColor: cardBackgroundColor,
+            borderColor: borderColor
+          },
+          !isDarkMode && {
+            shadowColor: 'rgba(0,0,0,0.1)',
+            shadowOffset: { width: 0, height: 3 },
+            shadowOpacity: 0.12,
+            shadowRadius: 8,
+            elevation: 2
+          }
+        ]}
+      >
+        <TouchableOpacity 
+          onPress={() => router.push({
+            pathname: '/plan-details',
+            params: { planId: plan.id }
+          })}
+          style={styles.planCardTouchable}
+        >
+          <View style={styles.planHeader}>
+            <View>
+              <ThemedText style={[styles.planProvider, { color: textColor }]}>
+                {plan.provider}
+              </ThemedText>
+              <View style={styles.ratingContainer}>
+                <Ionicons name="star" size={16} color={BRAND.secondary} />
+                <ThemedText style={[styles.ratingText, { color: textSecondaryColor }]}>
+                  {plan.rating}
+                </ThemedText>
+              </View>
+            </View>
+            <View style={styles.priceContainer}>
+              <ThemedText style={[styles.priceAmount, { color: BRAND.primary }]}>
+                ${plan.price}
+              </ThemedText>
+            </View>
+          </View>
+
+          <View style={[styles.divider, { backgroundColor: dividerColor }]} />
+
+          <View style={styles.coverageHighlight}>
+            <ThemedText style={[styles.coverageText, { color: textSecondaryColor }]}>
+              {plan.region} • Medical: ${plan.coverage["Medical Expenses"].toLocaleString()}
+            </ThemedText>
+          </View>
+
+          <View style={styles.cardActions}>
+            <ThemedText style={[styles.coverageText, { color: textSecondaryColor }]}>
+              {plan.description.substring(0, 80)}...
+            </ThemedText>
+          </View>
+
+          {plan.tag && (
+            <View style={[
+              styles.tagBadge, 
+              { backgroundColor: plan.tag === 'Best Value' ? BRAND.secondary : BRAND.primary }
+            ]}>
+              <ThemedText style={styles.tagText}>{plan.tag}</ThemedText>
+            </View>
+          )}
+        </TouchableOpacity>
+      </ThemedView>
+    </Animated.View>
+  );
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar style={isDarkMode ? "light" : "dark"} />
+
+      {/* Properly implemented blurred background with themed image */}
+      <ImageBackground 
+        source={
+          isDarkMode
+            ? require('../assets/backgrounds/blurred-glow-dark.png')
+            : require('../assets/backgrounds/blurred-glow.png')
+        }
+        style={styles.backgroundImage}
+        resizeMode="cover"
+        accessibilityIgnoresInvertColors={true}
+      >
+        <LinearGradient
+          colors={overlayColors}
+          locations={[0, 0.6, 1]}
+          style={styles.overlayGradient}
+        >
+          <ScrollView 
+            ref={scrollViewRef}
+            style={styles.scrollView} 
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+            accessibilityRole="scrollView"
+            accessibilityLabel="Home screen content"
+          >
+            {/* Header/Logo Section */}
+            <Animated.View 
+              entering={FadeInUp.delay(100).springify()} 
+              style={styles.header}
+              accessibilityRole="header"
+            >
+              <View style={styles.headerContent}>
+                <ThemedText 
+                  style={[styles.logo, { color: BRAND.primary }]}
+                  accessibilityRole="header"
+                >
+                  Briki
+                </ThemedText>
+                <ThemedText 
+                  style={[styles.welcomeText, { 
+                    color: textSecondaryColor,
+                    opacity: isDarkMode ? 0.9 : 0.8 // Better contrast
+                  }]}
+                >
+                  Welcome back!
+                </ThemedText>
+              </View>
+            </Animated.View>
+
+            {/* Hero Section */}
+            <Animated.View 
+              entering={FadeInUp.delay(200).springify()} 
+              style={styles.heroSection}
+              accessibilityRole="summary"
+            >
+              <ThemedText 
+                style={[styles.heroTitle, { color: textColor }]}
+                accessibilityRole="header"
+              >
+                Travel with <ThemedText 
+                               style={[styles.accentText, { color: BRAND.primary }]} 
+                             >
+                               peace of mind
+                             </ThemedText>
+              </ThemedText>
+              <ThemedText 
+                style={[styles.heroSubtitle, { 
+                  color: textSecondaryColor,
+                  opacity: isDarkMode ? 0.95 : 0.85 // Better contrast
+                }]}
+              >
+                Compare and choose the best travel insurance for your journey
+              </ThemedText>
+
+              <AnimatedTouchable 
+                style={[styles.ctaButton, pulseStyle, { 
+                  shadowColor,
+                  shadowOpacity,
+                  elevation: isDarkMode ? 6 : 3 // Apple-style subtle elevation
+                }]}
+                onPress={handleGetQuote}
+                activeOpacity={0.8}
+                accessibilityRole="button"
+                accessibilityLabel="Get insured now"
+                accessibilityHint="Navigate to trip information screen to start your quote"
+              >
+                <LinearGradient
+                  colors={[BRAND.primary, BRAND.primaryDark]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.ctaGradient}
+                >
+                  <ThemedText style={styles.ctaButtonText}>
+                    Get Insured Now
+                  </ThemedText>
+                  <Ionicons name="arrow-forward" size={20} color="#FFFFFF" style={styles.ctaIcon} />
+                </LinearGradient>
+              </AnimatedTouchable>
+            </Animated.View>
+
+            {/* Features Highlights */}
+            <Animated.View 
+              entering={FadeInUp.delay(300).springify()} 
+              style={styles.featuresSection}
+              accessibilityRole="list"
+              accessibilityLabel="Key features"
+            >
+              <View style={styles.featureRow}>
+                <View 
+                  style={styles.featureItem}
+                  accessibilityRole="text"
+                >
+                  <View style={[styles.featureIconContainer, { backgroundColor: primaryTransparent }]}>
+                    <Ionicons name="flash" size={20} color={BRAND.primary} />
+                  </View>
+                  <ThemedText style={[styles.featureText, { color: textSecondaryColor }]}>
+                    Instant quotes
+                  </ThemedText>
+                </View>
+                <View 
+                  style={styles.featureItem}
+                  accessibilityRole="text"
+                >
+                  <View style={[styles.featureIconContainer, { backgroundColor: primaryTransparent }]}>
+                    <Ionicons name="shield-checkmark" size={20} color={BRAND.primary} />
+                  </View>
+                  <ThemedText style={[styles.featureText, { color: textSecondaryColor }]}>
+                    Trusted providers
+                  </ThemedText>
+                </View>
+              </View>
+              <View style={styles.featureRow}>
+                <View 
+                  style={styles.featureItem}
+                  accessibilityRole="text"
+                >
+                  <View style={[styles.featureIconContainer, { backgroundColor: primaryTransparent }]}>
+                    <Ionicons name="globe" size={20} color={BRAND.primary} />
+                  </View>
+                  <ThemedText style={[styles.featureText, { color: textSecondaryColor }]}>
+                    Global coverage
+                  </ThemedText>
+                </View>
+                <View 
+                  style={styles.featureItem}
+                  accessibilityRole="text"
+                >
+                  <View style={[styles.featureIconContainer, { backgroundColor: primaryTransparent }]}>
+                    <Ionicons name="time" size={20} color={BRAND.primary} />
+                  </View>
+                  <ThemedText style={[styles.featureText, { color: textSecondaryColor }]}>
+                    24/7 Support
+                  </ThemedText>
+                </View>
+              </View>
+            </Animated.View>
+
+            {/* Top Insurance Plans Section - HORIZONTAL LAYOUT */}
+            <Animated.View
+              entering={FadeInUp.delay(400).springify()}
+              style={styles.insurancePlansSection}
+              accessibilityRole="region"
+              accessibilityLabel="Top Insurance Plans"
+            >
+              <View style={styles.sectionHeader}>
+                <ThemedText 
+                  style={[styles.sectionHeading, { color: textColor }]}
+                  accessibilityRole="header"
+                >
+                  Top Insurance Plans
+                </ThemedText>
+                <TouchableOpacity 
+                  style={styles.viewAllButton}
+                  onPress={() => router.push('/available-plans')}
+                  accessibilityRole="button"
+                  accessibilityLabel="View all plans"
+                >
+                  <ThemedText style={{ color: BRAND.primary, fontSize: 14, fontWeight: '500' }}>
+                    View All
+                  </ThemedText>
+                </TouchableOpacity>
+              </View>
+
+              {/* Horizontal FlatList for insurance plans */}
+              <AnimatedFlatList
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                data={topInsurancePlans}
+                renderItem={renderInsurancePlanItem}
+                keyExtractor={(item) => item.id.toString()}
+                contentContainerStyle={{ paddingLeft: 20, paddingRight: 4 }}
+                snapToAlignment="start"
+                decelerationRate="fast"
+                snapToInterval={width * 0.7 + 16}
+                accessibilityRole="list"
+                accessibilityLabel="Insurance plans carousel"
+              />
+            </Animated.View>
+
+            {/* Recent Feedback Section */}
+            <Animated.View 
+              entering={FadeInUp.delay(600).springify()} 
+              style={styles.feedbackSection}
+              accessibilityRole="region"
+              accessibilityLabel="Customer testimonials"
+            >
+              <View style={styles.sectionHeader}>
+                <ThemedText 
+                  style={[styles.sectionHeading, { color: textColor }]}
+                  accessibilityRole="header"
+                >
+                  What Customers Say
+                </ThemedText>
+              </View>
+
+              <ThemedView
+                style={[
+                  styles.testimonialCard, 
+                  { 
+                    backgroundColor: cardBackgroundColor,
+                    borderColor 
+                  },
+                  !isDarkMode && {
+                    shadowColor: 'rgba(0,0,0,0.1)',
+                    shadowOffset: { width: 0, height: 3 },
+                    shadowOpacity: 0.12,
+                    shadowRadius: 8,
+                    elevation: 2
+                  }
+                ]}
+                accessibilityRole="text"
+              >
+                <Animated.View 
+                  style={[styles.testimonialContent, testimonialStyle]}
+                  accessibilityLabel={`Testimonial from ${testimonials[Math.floor(currentTestimonial.value)].author}: ${testimonials[Math.floor(currentTestimonial.value)].text}`}
+                >
+                  <ThemedText style={[styles.testimonialText, { color: textColor }]}>
+                    {testimonials[Math.floor(currentTestimonial.value)].text}
+                  </ThemedText>
+                  <View style={styles.testimonialAuthor}>
+                    <ThemedText style={[styles.authorName, { color: textColor }]}>
+                      {testimonials[Math.floor(currentTestimonial.value)].author}
+                    </ThemedText>
+                    <ThemedText style={[styles.authorLocation, { color: textSecondaryColor }]}>
+                      {testimonials[Math.floor(currentTestimonial.value)].location}
+                    </ThemedText>
+                  </View>
+                </Animated.View>
+
+                <View style={styles.dotIndicators}>
+                  {testimonials.map((_, index) => (
+                    <TouchableOpacity 
+                      key={index} 
+                      onPress={() => handleTestimonialDotPress(index)}
+                      accessibilityRole="button"
+                      accessibilityLabel={`View testimonial ${index + 1} of ${testimonials.length}`}
+                      style={styles.dotTouchable}
+                    >
+                      <Animated.View 
+                        style={[
+                          styles.dot, 
+                          { backgroundColor: BRAND.primary },
+                          dotAnimatedStyles[index]
+                        ]}
+                      />
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </ThemedView>
+            </Animated.View>
+
+            {/* Extra section: Quick Tips */}
+            <Animated.View 
+              entering={FadeInUp.delay(700).springify()} 
+              style={styles.tipsSection}
+              accessibilityRole="region"
+              accessibilityLabel="Travel safety tips"
+            >
+              <View style={styles.sectionHeader}>
+                <ThemedText 
+                  style={[styles.sectionHeading, { color: textColor }]}
+                  accessibilityRole="header"
+                >
+                  Travel Safety Tips
+                </ThemedText>
+              </View>
+
+              <ThemedView
+                style={[
+                  styles.tipsCard, 
+                  { 
+                    backgroundColor: cardBackgroundColor,
+                    borderColor 
+                  },
+                  !isDarkMode && {
+                    shadowColor: 'rgba(0,0,0,0.1)',
+                    shadowOffset: { width: 0, height: 3 },
+                    shadowOpacity: 0.12,
+                    shadowRadius: 8,
+                    elevation: 2
+                  }
+                ]}
+                accessibilityRole="list"
+              >
+                <View style={styles.tipItem} accessibilityRole="text">
+                  <View style={[styles.tipIconContainer, { backgroundColor: primaryTransparent }]}>
+                    <Ionicons name="document-text" size={20} color={BRAND.primary} />
+                  </View>
+                  <ThemedText style={[styles.tipText, { color: textSecondaryColor }]}>
+                    Keep digital copies of important travel documents
+                  </ThemedText>
+                </View>
+
+                <View style={[styles.tipDivider, { backgroundColor: dividerColor }]} />
+
+                <View style={styles.tipItem} accessibilityRole="text">
+                  <View style={[styles.tipIconContainer, { backgroundColor: secondaryTransparent }]}>
+                    <Ionicons name="medical" size={20} color={BRAND.secondary} />
+                  </View>
+                  <ThemedText style={[styles.tipText, { color: textSecondaryColor }]}>
+                    Pack a basic first-aid kit for minor emergencies
+                  </ThemedText>
+                </View>
+
+                <View style={[styles.tipDivider, { backgroundColor: dividerColor }]} />
+
+                <View style={styles.tipItem} accessibilityRole="text">
+                  <View style={[styles.tipIconContainer, { backgroundColor: primaryTransparent }]}>
+                    <Ionicons name="globe" size={20} color={BRAND.primary} />
+                  </View>
+                  <ThemedText style={[styles.tipText, { color: textSecondaryColor }]}>
+                    Research local emergency numbers at your destination
+                  </ThemedText>
+                </View>
+              </ThemedView>
+            </Animated.View>
+
+            {/* Version footer */}
+            <View style={styles.versionFooter}>
+              <ThemedText 
+                style={[styles.versionText, { color: textSecondaryColor, opacity: 0.7 }]}
+                accessibilityRole="text"
+              >
+                Briki Travel Insurance v1.0
+              </ThemedText>
+            </View>
+          </ScrollView>
+        </LinearGradient>
+      </ImageBackground>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
+  backgroundImage: {
+    flex: 1,
+    width: '100%',
+  },
+  overlayGradient: {
+    flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 32, // Apple standard padding
+  },
+  header: {
+    paddingTop: 16,
+    paddingHorizontal: 20,
+    paddingBottom: 8,
+  },
+  headerContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  logo: {
+    fontSize: 24, // Apple-style typography
+    fontWeight: '700',
+    letterSpacing: -0.5, // Apple-style tight spacing
+  },
+  welcomeText: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  heroSection: {
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 32,
+  },
+  heroTitle: {
+    fontSize: 32, // Apple-style large header
+    fontWeight: '700',
+    marginBottom: 12,
+    lineHeight: 40,
+    letterSpacing: -0.5, // Apple-style tight spacing
+  },
+  accentText: {
+    fontWeight: '700',
+  },
+  heroSubtitle: {
+    fontSize: 17, // Apple-style subtitle
+    lineHeight: 24,
+    marginBottom: 32,
+    letterSpacing: -0.2, // Apple-style tight spacing
+  },
+  ctaButton: {
+    borderRadius: 16, // Apple-style rounded corners
+    overflow: 'hidden',
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 12,
+  },
+  ctaGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+  },
+  ctaButtonText: {
+    fontSize: 18,
+    fontWeight: '600', // Apple semibold
+    color: '#FFFFFF',
+    letterSpacing: -0.3, // Apple-style tight spacing
+  },
+  ctaIcon: {
+    marginLeft: 8,
+  },
+  featuresSection: {
+    paddingHorizontal: 20,
+    marginBottom: 32,
+  },
+  featureRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  featureItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '48%',
+  },
+  featureIconContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 10,
+  },
+  featureText: {
+    fontSize: 14,
+    fontWeight: '500',
+    letterSpacing: -0.1, // Apple-style tight spacing
+  },
+  insurancePlansSection: {
+    marginBottom: 32,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    marginBottom: 16,
+  },
+  sectionHeading: {
+    fontSize: 20,
+    fontWeight: '600',
+    letterSpacing: -0.4, // Apple-style tight spacing
+  },
+  viewAllButton: {
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+  },
+  horizontalPlanCard: {
+    borderRadius: 16,
+    borderWidth: 1,
+    height: 220, // Fixed height for consistency
+    padding: 16,
+    marginBottom: 8,
+  },
+  planCardTouchable: {
+    flex: 1,
+  },
+  planHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 8,
+  },
+  planProvider: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 4,
+    letterSpacing: -0.2, // Apple-style tight spacing
+  },
+  ratingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  ratingText: {
+    marginLeft: 4,
+    fontSize: 14,
+  },
+  priceContainer: {
+    alignItems: 'flex-end',
+  },
+  priceAmount: {
+    fontSize: 20,
+    fontWeight: '700',
+    letterSpacing: -0.2, // Apple-style tight spacing
+  },
+  divider: {
+    height: 1,
+    marginBottom: 12,
+  },
+  coverageHighlight: {
+    marginBottom: 12,
+  },
+  coverageText: {
+    fontSize: 14,
+    lineHeight: 20,
+    letterSpacing: -0.1, // Apple-style tight spacing
+  },
+  cardActions: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  tagBadge: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderBottomLeftRadius: 8,
+    borderTopRightRadius: 16,
+  },
+  tagText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '600',
+    letterSpacing: -0.1, // Apple-style tight spacing
+  },
+  feedbackSection: {
+    paddingHorizontal: 20,
+    marginBottom: 32,
+  },
+  testimonialCard: {
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 20,
+  },
+  testimonialContent: {
+    minHeight: 150, // Fixed height for better transitions
+  },
+  testimonialText: {
+    fontSize: 16,
+    fontStyle: 'italic',
+    lineHeight: 24,
+    marginBottom: 16,
+    letterSpacing: -0.2, // Apple-style tight spacing
+  },
+  testimonialAuthor: {
+    marginTop: 'auto',
+  },
+  authorName: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 2,
+    letterSpacing: -0.2, // Apple-style tight spacing
+  },
+  authorLocation: {
+    fontSize: 14,
+    letterSpacing: -0.1, // Apple-style tight spacing
+  },
+  dotIndicators: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 16,
+  },
+  dotTouchable: {
+    padding: 8, // Larger touch target
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginHorizontal: 4,
+  },
+  tipsSection: {
+    paddingHorizontal: 20,
+    marginBottom: 24,
+  },
+  tipsCard: {
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 16,
+  },
+  tipItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  tipIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  tipText: {
+    flex: 1,
+    fontSize: 15,
+    lineHeight: 20,
+    letterSpacing: -0.2, // Apple-style tight spacing
+  },
+  tipDivider: {
+    height: 1,
+    marginVertical: 2,
+  },
+  versionFooter: {
+    alignItems: 'center',
+    paddingVertical: 16,
+  },
+  versionText: {
+    fontSize: 13,
+    letterSpacing: -0.1, // Apple-style tight spacing
+  },
+});
