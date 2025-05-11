@@ -264,7 +264,7 @@ export default function TripInfoPage() {
                         <FormAnimationWrapper
                           isValid={fieldState.isDirty && !fieldState.error}
                           isInvalid={!!fieldState.error && fieldState.isTouched}
-                          animationType="pulse"
+                          animationType="glow"
                         >
                           <FormControl>
                             <CountryCombobox 
@@ -296,7 +296,7 @@ export default function TripInfoPage() {
                         <FormAnimationWrapper
                           isValid={fieldState.isDirty && !fieldState.error}
                           isInvalid={!!fieldState.error && fieldState.isTouched}
-                          animationType="pulse"
+                          animationType="glow"
                         >
                           <FormControl>
                             <CountryCombobox 
@@ -328,7 +328,7 @@ export default function TripInfoPage() {
                         <FormAnimationWrapper
                           isValid={fieldState.isDirty && !fieldState.error}
                           isInvalid={!!fieldState.error && fieldState.isTouched}
-                          animationType="pulse"
+                          animationType="glow"
                         >
                           <Popover>
                             <PopoverTrigger asChild>
@@ -387,7 +387,7 @@ export default function TripInfoPage() {
                         <FormAnimationWrapper
                           isValid={fieldState.isDirty && !fieldState.error}
                           isInvalid={!!fieldState.error && fieldState.isTouched}
-                          animationType="pulse"
+                          animationType="glow"
                         >
                           <Popover>
                             <PopoverTrigger asChild>
@@ -446,7 +446,7 @@ export default function TripInfoPage() {
                         <FormAnimationWrapper
                           isValid={fieldState.isDirty && !fieldState.error}
                           isInvalid={!!fieldState.error && fieldState.isTouched}
-                          animationType="pulse"
+                          animationType="glow"
                         >
                           <FormControl>
                             <AnimatedSelect
@@ -456,12 +456,12 @@ export default function TripInfoPage() {
                               isValid={fieldState.isDirty && !fieldState.error}
                               isInvalid={!!fieldState.error && fieldState.isTouched}
                             >
-                              <SelectItem value="1">1</SelectItem>
-                              <SelectItem value="2">2</SelectItem>
-                              <SelectItem value="3">3</SelectItem>
-                              <SelectItem value="4">4</SelectItem>
-                              <SelectItem value="5">5</SelectItem>
-                              <SelectItem value="6">6+</SelectItem>
+                              <SelectItem value="1" className="hover:bg-primary/10 transition-colors duration-150 cursor-pointer">1 Traveler</SelectItem>
+                              <SelectItem value="2" className="hover:bg-primary/10 transition-colors duration-150 cursor-pointer">2 Travelers</SelectItem>
+                              <SelectItem value="3" className="hover:bg-primary/10 transition-colors duration-150 cursor-pointer">3 Travelers</SelectItem>
+                              <SelectItem value="4" className="hover:bg-primary/10 transition-colors duration-150 cursor-pointer">4 Travelers</SelectItem>
+                              <SelectItem value="5" className="hover:bg-primary/10 transition-colors duration-150 cursor-pointer">5 Travelers</SelectItem>
+                              <SelectItem value="6" className="hover:bg-primary/10 transition-colors duration-150 cursor-pointer">6+ Travelers</SelectItem>
                             </AnimatedSelect>
                           </FormControl>
                         </FormAnimationWrapper>
@@ -516,7 +516,7 @@ export default function TripInfoPage() {
                       <FormAnimationWrapper
                         isValid={fieldState.isDirty && !fieldState.error}
                         isInvalid={!!fieldState.error && fieldState.isTouched}
-                        animationType="pulse"
+                        animationType="glow"
                       >
                         <FormControl>
                           <RadioGroup

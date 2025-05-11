@@ -35,6 +35,7 @@ const AnimatedSelectTrigger = React.forwardRef<
 >(({ className, isValid, isInvalid, ...props }, ref) => {
   // Combine regular styling with validation styling
   const triggerClassName = cn(
+    "transition-all duration-200 hover:border-primary/80 focus:border-primary",
     className,
     isInvalid && "border-destructive focus-visible:ring-destructive/30",
     isValid && "border-green-500 focus-visible:ring-green-500/30"
@@ -45,7 +46,7 @@ const AnimatedSelectTrigger = React.forwardRef<
       animate={isInvalid ? "invalid" : isValid ? "valid" : "idle"}
       variants={{
         idle: {},
-        valid: {},
+        valid: { y: [0, -2, 0], scale: [1, 1.02, 1] },
         invalid: { x: [0, -5, 5, -5, 5, 0] }
       }}
       transition={{ duration: 0.4, ease: "easeInOut" }}
@@ -82,7 +83,12 @@ const AnimatedSelect = ({
       >
         <SelectValue placeholder={placeholder} />
       </AnimatedSelectTrigger>
-      <SelectContent className={className}>
+      <SelectContent 
+        className={cn(
+          "shadow-lg border-primary/20 backdrop-blur-sm bg-background/95", 
+          className
+        )}
+      >
         {children}
       </SelectContent>
     </Select>
