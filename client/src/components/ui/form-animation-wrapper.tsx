@@ -7,7 +7,7 @@ interface FormAnimationWrapperProps {
   className?: string;
   isValid?: boolean;
   isInvalid?: boolean;
-  animationType?: "shake" | "bounce" | "pulse" | "none";
+  animationType?: "shake" | "bounce" | "pulse" | "glow" | "none";
 }
 
 export function FormAnimationWrapper({
@@ -31,6 +31,10 @@ export function FormAnimationWrapper({
       invalid: { scale: [1, 0.97, 1.03, 0.97, 1] },
       valid: { scale: [1, 1.03, 1] },
     },
+    glow: {
+      invalid: { boxShadow: ["0 0 0 rgba(239, 68, 68, 0)", "0 0 8px rgba(239, 68, 68, 0.5)", "0 0 0 rgba(239, 68, 68, 0)"] },
+      valid: { boxShadow: ["0 0 0 rgba(34, 197, 94, 0)", "0 0 8px rgba(34, 197, 94, 0.5)", "0 0 0 rgba(34, 197, 94, 0)"] },
+    },
     none: {
       invalid: {},
       valid: {},
@@ -40,9 +44,17 @@ export function FormAnimationWrapper({
   // Select the animation variant
   const selectedVariant = variants[animationType];
 
+  // Enhanced styling for valid/invalid states
+  const wrapperClassName = cn(
+    "relative transition-all duration-300",
+    isValid && "focus-within:ring-2 focus-within:ring-green-200",
+    isInvalid && "focus-within:ring-2 focus-within:ring-red-200",
+    className
+  );
+
   return (
     <motion.div
-      className={cn("relative", className)}
+      className={wrapperClassName}
       animate={isInvalid ? "invalid" : isValid ? "valid" : "idle"}
       variants={{
         idle: {},
@@ -51,6 +63,10 @@ export function FormAnimationWrapper({
       transition={{ 
         duration: isInvalid ? 0.4 : 0.2,
         ease: "easeInOut",
+      }}
+      whileHover={{ 
+        scale: 1.01,
+        transition: { duration: 0.2 }
       }}
     >
       <AnimatePresence>
