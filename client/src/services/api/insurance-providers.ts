@@ -465,6 +465,78 @@ export const normalizeProviderData = (
     }
   });
   
+  // Set defaults if missing or normalize formats for consistency
+  
+  // Ensure numeric fields
+  if (normalizedData.basePrice !== undefined) {
+    if (typeof normalizedData.basePrice === 'string') {
+      // Remove currency symbols and commas
+      const cleanedValue = (normalizedData.basePrice as string)
+        .replace(/[$€£,]/g, '')
+        .trim();
+      
+      const parsed = parseFloat(cleanedValue);
+      if (!isNaN(parsed)) {
+        normalizedData.basePrice = parsed;
+      }
+    }
+  }
+  
+  // Normalize medical coverage
+  if (normalizedData.medicalCoverage !== undefined) {
+    if (typeof normalizedData.medicalCoverage === 'string') {
+      // Handle dollar amounts like "$100,000" or text like "Up to $1,000,000"
+      const matches = (normalizedData.medicalCoverage as string)
+        .match(/\$?([0-9,]+)(?:\s*(?:USD|EUR|GBP))?/);
+      
+      if (matches && matches[1]) {
+        const parsedValue = parseFloat(matches[1].replace(/,/g, ''));
+        if (!isNaN(parsedValue)) {
+          normalizedData.medicalCoverage = parsedValue;
+        }
+      }
+    }
+  }
+  
+  // Normalize trip cancellation
+  if (normalizedData.tripCancellation !== undefined) {
+    if (typeof normalizedData.tripCancellation === 'number') {
+      // If it's a dollar amount, keep as is
+      // Do nothing
+    } else if (typeof normalizedData.tripCancellation === 'string') {
+      // Check if it contains a number with a currency symbol
+      const matches = (normalizedData.tripCancellation as string)
+        .match(/\$?([0-9,]+)(?:\s*(?:USD|EUR|GBP))?/);
+      
+      if (matches && matches[1]) {
+        const parsedValue = parseFloat(matches[1].replace(/,/g, ''));
+        if (!isNaN(parsedValue)) {
+          // If it's a numeric amount, convert to string representation
+          normalizedData.tripCancellation = `Up to $${parsedValue.toLocaleString()}`;
+        }
+      } else {
+        // Text descriptions like "100% of trip cost" are kept as is
+        // If it doesn't contain any identifiable amount, normalize the format
+        if (!(normalizedData.tripCancellation as string).toLowerCase().includes('up to')) {
+          normalizedData.tripCancellation = (normalizedData.tripCancellation as string).trim();
+        }
+      }
+    }
+  } else {
+    // Default value if missing
+    normalizedData.tripCancellation = "Not covered";
+  }
+  
+  // For baggage protection
+  if (normalizedData.baggageProtection === undefined) {
+    normalizedData.baggageProtection = 0; // Default to 0 if not provided
+  }
+  
+  // For adventure activities
+  if (normalizedData.adventureActivities === undefined) {
+    normalizedData.adventureActivities = false; // Default to false if not provided
+  }
+  
   return normalizedData;
 };
 
@@ -693,20 +765,87 @@ export const validatePlan = (plan: Partial<InsurancePlan>): boolean => {
   const requiredFields: (keyof InsurancePlan)[] = ['id', 'name', 'basePrice', 'provider'];
   
   for (const field of requiredFields) {
-    if (plan[field] === undefined || plan[field] === null) {
+    if (plan[field] === undefined || plan[field] === null || plan[field] === '') {
       console.warn(`Plan is missing required field: ${field}`, plan);
       return false;
     }
   }
   
   // Validate numeric fields
-  const numericFields: (keyof InsurancePlan)[] = ['basePrice', 'medicalCoverage', 'emergencyEvacuation'];
+  const numericFields: (keyof InsurancePlan)[] = [
+    'basePrice', 
+    'medicalCoverage', 
+    'emergencyEvacuation', 
+    'baggageProtection',
+    'rentalCarCoverage'
+  ];
   
   for (const field of numericFields) {
-    if (plan[field] !== undefined && typeof plan[field] !== 'number') {
-      console.warn(`Plan field ${field} should be a number`, plan);
-      return false;
+    if (plan[field] !== undefined) {
+      // Convert string numbers to actual numbers if needed
+      if (typeof plan[field] === 'string') {
+        const parsed = parseFloat(plan[field] as string);
+        if (!isNaN(parsed)) {
+          (plan[field] as any) = parsed;
+        } else {
+          console.warn(`Plan field ${field} contains invalid number: ${plan[field]}`, plan);
+          return false;
+        }
+      } else if (typeof plan[field] !== 'number') {
+        console.warn(`Plan field ${field} should be a number`, plan);
+        return false;
+      }
+      
+      // Ensure numeric fields are positive
+      if ((plan[field] as number) < 0) {
+        console.warn(`Plan field ${field} should be positive: ${plan[field]}`, plan);
+        return false;
+      }
     }
+  }
+  
+  // Validate boolean fields
+  const booleanFields: (keyof InsurancePlan)[] = ['adventureActivities'];
+  
+  for (const field of booleanFields) {
+    if (plan[field] !== undefined) {
+      // Convert string booleans to actual booleans if needed
+      if (typeof plan[field] === 'string') {
+        const value = (plan[field] as string).toLowerCase();
+        if (value === 'true' || value === 'yes' || value === '1') {
+          (plan[field] as any) = true;
+        } else if (value === 'false' || value === 'no' || value === '0') {
+          (plan[field] as any) = false;
+        } else {
+          console.warn(`Plan field ${field} contains invalid boolean: ${plan[field]}`, plan);
+          return false;
+        }
+      } else if (typeof plan[field] !== 'boolean') {
+        console.warn(`Plan field ${field} should be a boolean`, plan);
+        return false;
+      }
+    }
+  }
+  
+  // Validate name is reasonable (some APIs return very long names)
+  if (typeof plan.name === 'string' && plan.name.length > 200) {
+    plan.name = plan.name.substring(0, 197) + '...';
+  }
+  
+  // Sanitize provider name
+  if (typeof plan.provider === 'string') {
+    const providerMatch = INSURANCE_PROVIDERS.find(
+      p => p.name.toLowerCase() === plan.provider?.toString().toLowerCase()
+    );
+    
+    if (providerMatch) {
+      plan.provider = providerMatch.name; // Use exact casing from provider config
+    }
+  }
+  
+  // For missing country, default to "all"
+  if (!plan.country) {
+    plan.country = "all";
   }
   
   return true;
