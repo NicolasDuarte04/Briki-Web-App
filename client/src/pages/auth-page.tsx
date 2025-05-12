@@ -53,7 +53,12 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 export default function AuthPage() {
   const [activeTab, setActiveTab] = useState<string>("login");
   const { user, loginMutation, registerMutation } = useAuth();
-  const [, navigate] = useLocation();
+  const [location, navigate] = useLocation();
+  
+  // Debug log for mounting and current location
+  useEffect(() => {
+    console.log("AuthPage mounted, current location:", location);
+  }, [location]);
   
   // Initialize forms
   const loginForm = useForm<LoginFormValues>({
@@ -150,11 +155,21 @@ export default function AuthPage() {
   
   // Handle registration success
   useEffect(() => {
+    console.log("Registration mutation state change:", { 
+      isSuccess: registerMutation.isSuccess,
+      isPending: registerMutation.isPending,
+      isError: registerMutation.isError,
+      error: registerMutation.error
+    });
+    
     if (registerMutation.isSuccess) {
       console.log("AuthPage: Registration successful, redirecting to home page");
-      navigate("/home");
+      // Force a small delay to ensure state has propagated
+      setTimeout(() => {
+        navigate("/home");
+      }, 300);
     }
-  }, [registerMutation.isSuccess, navigate]);
+  }, [registerMutation.isSuccess, registerMutation.isPending, registerMutation.isError, navigate]);
 
   return (
     <div className="flex min-h-screen bg-background">
