@@ -1,421 +1,322 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  Cloud, 
-  CheckCircle, 
-  XCircle, 
   AlertTriangle, 
+  CheckCircle, 
+  HelpCircle, 
+  AlertCircle, 
   Clock, 
-  RefreshCw,
-  Database,
+  RefreshCw, 
+  ServerCrash, 
   Server,
   Activity,
-  Zap
+  InfoIcon
 } from 'lucide-react';
+import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Badge } from '@/components/ui/badge';
-import { useInvalidatePlansCache } from '@/services/caching/insurance-cache';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useProviderStatus } from '@/services/caching/insurance-cache';
 import { INSURANCE_PROVIDERS } from '@/services/api/insurance-providers';
-import { checkRequiredApiKeys } from '@/services/api/api-keys';
-import { useToast } from '@/hooks/use-toast';
+import { ProviderStatusSkeleton } from '@/components/ui/insurance-plan-skeleton';
 
-// Provider connection status type
-interface ProviderStatus {
-  name: string;
-  status: 'connected' | 'error' | 'pending' | 'disabled';
-  responseTime?: number; // ms
-  lastUpdated?: Date;
-  errorMessage?: string;
+interface ProviderStatusCardProps {
+  provider: string;
+  status: 'online' | 'error' | 'offline' | 'unknown';
+  latency?: number | null;
+  errorDetails?: any;
+  lastChecked: Date;
 }
 
-// Mock function to check provider connection (would be real in production)
-const checkProviderConnection = async (
-  providerName: string
-): Promise<ProviderStatus> => {
-  // This would make an actual API call to check connection in production
-  // For demo, we'll simulate random statuses
-  const statuses: ProviderStatus['status'][] = ['connected', 'error', 'pending'];
-  const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
-  const responseTime = Math.floor(Math.random() * 500) + 100; // 100-600ms
-  
-  return {
-    name: providerName,
-    status: randomStatus,
-    responseTime,
-    lastUpdated: new Date(),
-    errorMessage: randomStatus === 'error' ? 'API rate limit exceeded' : undefined
-  };
-};
-
-interface ProviderStatusDashboardProps {
-  refreshInterval?: number; // ms, default 30s
-  compact?: boolean;
-}
-
-export default function ProviderStatusDashboard({ 
-  refreshInterval = 30000,
-  compact = false
-}: ProviderStatusDashboardProps) {
-  const [providerStatuses, setProviderStatuses] = useState<ProviderStatus[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
-  const invalidateCacheMutation = useInvalidatePlansCache();
-  const { toast } = useToast();
-  
-  // Create a local function to safely call the mutation
-  const invalidateCache = () => {
-    invalidateCacheMutation.mutate({});
-  };
-  
-  // Determine which providers are configured with API keys
-  const { missingProviders } = checkRequiredApiKeys();
-  
-  // Refresh all provider connections
-  const refreshConnections = async () => {
-    setLoading(true);
-    
-    try {
-      const statuses = await Promise.all(
-        INSURANCE_PROVIDERS.map(async (provider) => {
-          // If provider has no API key, mark as disabled
-          if (missingProviders.includes(provider.name)) {
-            return {
-              name: provider.name,
-              status: 'disabled' as const,
-              lastUpdated: new Date()
-            };
-          }
-          
-          // Check actual connection
-          return await checkProviderConnection(provider.name);
-        })
-      );
-      
-      setProviderStatuses(statuses);
-      setLastRefresh(new Date());
-    } catch (error) {
-      console.error('Failed to check provider connections:', error);
-      toast({
-        title: 'Connection Check Failed',
-        description: 'Unable to verify provider connections',
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
+/**
+ * Card displaying status for a single provider
+ */
+function ProviderStatusCard({
+  provider,
+  status,
+  latency,
+  errorDetails,
+  lastChecked
+}: ProviderStatusCardProps) {
+  // Color mapping based on status
+  const statusColors = {
+    online: {
+      bg: 'bg-emerald-500',
+      border: 'border-emerald-300',
+      text: 'text-emerald-700',
+      icon: <CheckCircle className="h-4 w-4 text-emerald-600" />,
+      label: 'Online'
+    },
+    error: {
+      bg: 'bg-red-500',
+      border: 'border-red-300',
+      text: 'text-red-700',
+      icon: <AlertTriangle className="h-4 w-4 text-red-600" />,
+      label: 'Error'
+    },
+    offline: {
+      bg: 'bg-gray-500',
+      border: 'border-gray-300',
+      text: 'text-gray-700',
+      icon: <ServerCrash className="h-4 w-4 text-gray-600" />,
+      label: 'Offline'
+    },
+    unknown: {
+      bg: 'bg-yellow-500',
+      border: 'border-yellow-300',
+      text: 'text-yellow-700',
+      icon: <HelpCircle className="h-4 w-4 text-yellow-600" />,
+      label: 'Unknown'
     }
   };
   
-  // Handle manual refresh
-  const handleRefresh = () => {
-    refreshConnections();
-    // Invalidate all plans cache
-    invalidateCache();
-    
-    toast({
-      title: 'Refreshing Provider Connections',
-      description: 'Checking connection status for all providers...',
-    });
-  };
+  const statusColor = statusColors[status];
+  const timeAgo = getTimeAgo(lastChecked);
   
-  // Initialize and set up auto-refresh
+  // Format latency for display
+  const formattedLatency = latency ? `${latency}ms` : 'N/A';
+  
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+    >
+      <Card className="overflow-hidden flex border-primary/20 shadow-glow-sm bg-background/80 backdrop-blur-sm">
+        <div className={`w-2 ${statusColor.bg}`} />
+        <div className="p-4 flex-1">
+          <div className="flex justify-between items-center">
+            <div className="font-semibold">{provider}</div>
+            <Badge variant="outline" className={`${statusColor.text} ${statusColor.border} flex items-center gap-1`}>
+              {statusColor.icon}
+              <span>{statusColor.label}</span>
+            </Badge>
+          </div>
+          
+          <div className="mt-3 text-sm text-foreground/70 space-y-1">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-1">
+                <Activity className="h-3 w-3" />
+                <span>Latency:</span>
+              </div>
+              <span className="font-mono">{formattedLatency}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-1">
+                <Clock className="h-3 w-3" />
+                <span>Checked:</span>
+              </div>
+              <span>{timeAgo}</span>
+            </div>
+          </div>
+          
+          {errorDetails && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="mt-2 text-xs text-red-600 flex items-center gap-1 cursor-help">
+                  <AlertCircle className="h-3 w-3" />
+                  <span className="truncate max-w-[14rem]">
+                    {errorDetails.message || 'Error connecting to provider'}
+                  </span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs" side="bottom">
+                <div className="space-y-1 text-xs">
+                  <div>
+                    <span className="font-semibold">Error:</span> {errorDetails.message}
+                  </div>
+                  {errorDetails.statusCode && (
+                    <div>
+                      <span className="font-semibold">Status:</span> {errorDetails.statusCode}
+                    </div>
+                  )}
+                  {errorDetails.retryable !== undefined && (
+                    <div>
+                      <span className="font-semibold">Retryable:</span> {errorDetails.retryable ? 'Yes' : 'No'}
+                    </div>
+                  )}
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          )}
+        </div>
+      </Card>
+    </motion.div>
+  );
+}
+
+function getTimeAgo(date: Date): string {
+  const now = new Date();
+  const diffMs = now.getTime() - new Date(date).getTime();
+  const diffSec = Math.floor(diffMs / 1000);
+  
+  if (diffSec < 60) return `${diffSec}s ago`;
+  if (diffSec < 3600) return `${Math.floor(diffSec / 60)}m ago`;
+  if (diffSec < 86400) return `${Math.floor(diffSec / 3600)}h ago`;
+  return `${Math.floor(diffSec / 86400)}d ago`;
+}
+
+interface ProviderStatusDashboardProps {
+  refreshInterval?: number;
+}
+
+/**
+ * Dashboard showing the status of all insurance providers
+ */
+export default function ProviderStatusDashboard({ 
+  refreshInterval = 30000 
+}: ProviderStatusDashboardProps) {
+  const { data: statusData, isLoading, refetch, isRefetching } = useProviderStatus();
+  const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
+  
+  // Set up automatic refresh interval
   useEffect(() => {
-    refreshConnections();
-    
-    // Set up auto-refresh
     const intervalId = setInterval(() => {
-      refreshConnections();
+      refetch();
+      setLastRefresh(new Date());
     }, refreshInterval);
     
     return () => clearInterval(intervalId);
-  }, [refreshInterval, missingProviders.length]);
+  }, [refetch, refreshInterval]);
   
-  // Calculate summary metrics
-  const connectedCount = providerStatuses.filter(p => p.status === 'connected').length;
-  const errorCount = providerStatuses.filter(p => p.status === 'error').length;
-  const pendingCount = providerStatuses.filter(p => p.status === 'pending').length;
-  const disabledCount = providerStatuses.filter(p => p.status === 'disabled').length;
+  // Handle manual refresh
+  const handleRefresh = () => {
+    refetch();
+    setLastRefresh(new Date());
+  };
   
-  const connectionRate = providerStatuses.length 
-    ? Math.round((connectedCount / (providerStatuses.length - disabledCount)) * 100) 
-    : 0;
+  // Summary statistics
+  const getStatusSummary = () => {
+    if (!statusData) return { online: 0, error: 0, offline: 0, unknown: INSURANCE_PROVIDERS.length };
+    
+    return Object.values(statusData).reduce((summary: Record<string, number>, providerStatus: any) => {
+      const status = providerStatus?.status || 'unknown';
+      summary[status] = (summary[status] || 0) + 1;
+      return summary;
+    }, { online: 0, error: 0, offline: 0, unknown: 0 });
+  };
   
-  const avgResponseTime = providerStatuses
-    .filter(p => p.status === 'connected' && p.responseTime)
-    .reduce((sum, p) => sum + (p.responseTime || 0), 0) / connectedCount || 0;
+  const statusSummary = getStatusSummary();
   
-  // If compact mode, show minimal view
-  if (compact) {
-    return (
-      <Card>
-        <CardHeader className="pb-2">
-          <div className="flex justify-between items-center">
-            <CardTitle className="text-base">Provider Connections</CardTitle>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={handleRefresh}
-              disabled={loading}
-              className="h-8 w-8 p-0"
-            >
-              <RefreshCw 
-                className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} 
-              />
-              <span className="sr-only">Refresh</span>
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium">Connection Rate:</span>
-              <span className={`text-sm font-bold ${
-                connectionRate >= 90 ? 'text-green-600' : 
-                connectionRate >= 70 ? 'text-amber-600' : 
-                'text-red-600'
-              }`}>{connectionRate}%</span>
-            </div>
-            <div className="flex gap-1.5">
-              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                {connectedCount}
-              </Badge>
-              <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
-                {errorCount}
-              </Badge>
-              <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
-                {pendingCount}
-              </Badge>
-            </div>
-          </div>
-          
-          <Progress 
-            value={connectionRate} 
-            className={`h-2 ${
-              connectionRate >= 90 ? 'bg-green-100' : 
-              connectionRate >= 70 ? 'bg-amber-100' : 
-              'bg-red-100'
-            }`}
-          />
-          
-          <p className="text-xs text-gray-500 mt-2">
-            Last refreshed: {lastRefresh.toLocaleTimeString()}
-          </p>
-        </CardContent>
-      </Card>
-    );
+  // Get providers sorted by status (online first, then error, etc.)
+  const getSortedProviders = () => {
+    if (!statusData) return [];
+    
+    const priorityOrder = { online: 0, error: 1, offline: 2, unknown: 3 };
+    
+    return INSURANCE_PROVIDERS.map(provider => {
+      const status = statusData[provider.name]?.status || 'unknown';
+      
+      return {
+        name: provider.name,
+        status,
+        priority: priorityOrder[status as keyof typeof priorityOrder],
+        details: statusData[provider.name] || {
+          latency: null,
+          lastChecked: new Date(),
+          errorDetails: null
+        }
+      };
+    }).sort((a, b) => a.priority - b.priority);
+  };
+  
+  const sortedProviders = getSortedProviders();
+  
+  if (isLoading) {
+    return <ProviderStatusSkeleton />;
   }
   
-  // Full dashboard view
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex justify-between items-center">
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h3 className="text-lg font-semibold mb-1">Provider API Status</h3>
+          <p className="text-sm text-foreground/70">
+            Real-time status of all insurance provider connections
+          </p>
+        </div>
+        
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={handleRefresh} 
+          disabled={isRefetching}
+          className="flex items-center gap-2"
+        >
+          <RefreshCw className={`h-4 w-4 ${isRefetching ? 'animate-spin' : ''}`} />
+          Refresh
+        </Button>
+      </div>
+      
+      {/* Status summary cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <Card className="p-3 flex items-center gap-2 bg-background/80 backdrop-blur-sm border-primary/20 shadow-glow-sm">
+          <div className="h-8 w-8 rounded-full bg-emerald-100 flex items-center justify-center">
+            <CheckCircle className="h-4 w-4 text-emerald-600" />
+          </div>
           <div>
-            <CardTitle>Insurance Provider Status</CardTitle>
-            <CardDescription>
-              Real-time connection status to insurance data providers
-            </CardDescription>
+            <div className="text-xl font-semibold">{statusSummary.online}</div>
+            <div className="text-xs text-foreground/70">Online</div>
           </div>
-          <Button 
-            variant="outline" 
-            onClick={handleRefresh}
-            disabled={loading}
-            className="gap-2"
-          >
-            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-            {loading ? 'Refreshing...' : 'Refresh All'}
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent>
-        {/* Status summary */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card className="bg-green-50 border-green-200">
-            <CardContent className="p-4">
-              <div className="flex justify-between items-center">
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium text-green-700">Connected</span>
-                  <span className="text-2xl font-bold text-green-800">{connectedCount}</span>
-                </div>
-                <CheckCircle className="h-8 w-8 text-green-500" />
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-red-50 border-red-200">
-            <CardContent className="p-4">
-              <div className="flex justify-between items-center">
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium text-red-700">Errors</span>
-                  <span className="text-2xl font-bold text-red-800">{errorCount}</span>
-                </div>
-                <XCircle className="h-8 w-8 text-red-500" />
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-amber-50 border-amber-200">
-            <CardContent className="p-4">
-              <div className="flex justify-between items-center">
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium text-amber-700">Pending</span>
-                  <span className="text-2xl font-bold text-amber-800">{pendingCount}</span>
-                </div>
-                <Clock className="h-8 w-8 text-amber-500" />
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-gray-50 border-gray-200">
-            <CardContent className="p-4">
-              <div className="flex justify-between items-center">
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium text-gray-700">Disabled</span>
-                  <span className="text-2xl font-bold text-gray-800">{disabledCount}</span>
-                </div>
-                <Cloud className="h-8 w-8 text-gray-400" />
-              </div>
-            </CardContent>
-          </Card>
+        </Card>
+        
+        <Card className="p-3 flex items-center gap-2 bg-background/80 backdrop-blur-sm border-primary/20 shadow-glow-sm">
+          <div className="h-8 w-8 rounded-full bg-red-100 flex items-center justify-center">
+            <AlertTriangle className="h-4 w-4 text-red-600" />
+          </div>
+          <div>
+            <div className="text-xl font-semibold">{statusSummary.error}</div>
+            <div className="text-xs text-foreground/70">Errors</div>
+          </div>
+        </Card>
+        
+        <Card className="p-3 flex items-center gap-2 bg-background/80 backdrop-blur-sm border-primary/20 shadow-glow-sm">
+          <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center">
+            <Server className="h-4 w-4 text-gray-600" />
+          </div>
+          <div>
+            <div className="text-xl font-semibold">{statusSummary.offline}</div>
+            <div className="text-xs text-foreground/70">Offline</div>
+          </div>
+        </Card>
+        
+        <Card className="p-3 flex items-center gap-2 bg-background/80 backdrop-blur-sm border-primary/20 shadow-glow-sm">
+          <div className="h-8 w-8 rounded-full bg-yellow-100 flex items-center justify-center">
+            <HelpCircle className="h-4 w-4 text-yellow-600" />
+          </div>
+          <div>
+            <div className="text-xl font-semibold">{statusSummary.unknown}</div>
+            <div className="text-xs text-foreground/70">Unknown</div>
+          </div>
+        </Card>
+      </div>
+      
+      <div className="flex items-center justify-between">
+        <div className="text-sm text-foreground/70 flex items-center gap-1">
+          <InfoIcon className="h-3 w-3" />
+          <span>Last auto-refresh: {getTimeAgo(lastRefresh)}</span>
         </div>
         
-        {/* Performance metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Activity className="h-5 w-5 text-primary" />
-                  <span className="font-medium">Connection Rate</span>
-                </div>
-                <span className={`text-xl font-bold ${
-                  connectionRate >= 90 ? 'text-green-600' : 
-                  connectionRate >= 70 ? 'text-amber-600' : 
-                  'text-red-600'
-                }`}>{connectionRate}%</span>
-              </div>
-              <Progress 
-                value={connectionRate} 
-                className="mt-2 h-2" 
-              />
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Zap className="h-5 w-5 text-primary" />
-                  <span className="font-medium">Avg Response Time</span>
-                </div>
-                <span className="text-xl font-bold">
-                  {avgResponseTime.toFixed(0)} ms
-                </span>
-              </div>
-              <Progress 
-                value={100 - Math.min(100, avgResponseTime / 10)} 
-                className="mt-2 h-2" 
-              />
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Database className="h-5 w-5 text-primary" />
-                  <span className="font-medium">Data Providers</span>
-                </div>
-                <span className="text-xl font-bold">
-                  {INSURANCE_PROVIDERS.length}
-                </span>
-              </div>
-              <div className="flex justify-between text-sm mt-2">
-                <span className="text-gray-600">
-                  Last Updated: {lastRefresh.toLocaleTimeString()}
-                </span>
-                <span className="text-gray-600">
-                  Auto-refresh: {refreshInterval / 1000}s
-                </span>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="text-sm">
+          <span className="text-foreground/70">Total providers:</span>{' '}
+          <span className="font-semibold">{INSURANCE_PROVIDERS.length}</span>
         </div>
-        
-        {/* Provider details */}
-        <div className="border rounded-lg overflow-hidden">
-          <div className="grid grid-cols-12 gap-2 p-3 bg-gray-100 font-medium text-sm">
-            <div className="col-span-4">Provider</div>
-            <div className="col-span-2">Status</div>
-            <div className="col-span-2">Response Time</div>
-            <div className="col-span-4">Last Updated</div>
-          </div>
-          
-          <div className="max-h-64 overflow-y-auto">
-            {providerStatuses.map((provider, index) => (
-              <motion.div 
-                key={provider.name}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2, delay: index * 0.03 }}
-                className={`grid grid-cols-12 gap-2 p-3 text-sm border-b ${
-                  index % 2 === 0 ? 'bg-gray-50' : 'bg-white'
-                }`}
-              >
-                <div className="col-span-4 font-medium">{provider.name}</div>
-                <div className="col-span-2">
-                  <Badge variant="outline" className={`
-                    ${provider.status === 'connected' ? 'bg-green-50 text-green-700 border-green-200' : 
-                      provider.status === 'error' ? 'bg-red-50 text-red-700 border-red-200' : 
-                      provider.status === 'pending' ? 'bg-amber-50 text-amber-700 border-amber-200' :
-                      'bg-gray-50 text-gray-700 border-gray-200'}
-                  `}>
-                    {provider.status === 'connected' && <CheckCircle className="h-3 w-3 mr-1" />}
-                    {provider.status === 'error' && <XCircle className="h-3 w-3 mr-1" />}
-                    {provider.status === 'pending' && <Clock className="h-3 w-3 mr-1" />}
-                    {provider.status === 'disabled' && <Cloud className="h-3 w-3 mr-1" />}
-                    {provider.status.charAt(0).toUpperCase() + provider.status.slice(1)}
-                  </Badge>
-                </div>
-                <div className="col-span-2">
-                  {provider.responseTime ? `${provider.responseTime} ms` : '-'}
-                </div>
-                <div className="col-span-4 text-gray-600">
-                  {provider.lastUpdated ? provider.lastUpdated.toLocaleTimeString() : '-'}
-                  {provider.errorMessage && (
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <AlertTriangle className="h-3.5 w-3.5 text-amber-500 ml-1 inline-block" />
-                        </TooltipTrigger>
-                        <TooltipContent>{provider.errorMessage}</TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  )}
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </CardContent>
-      <CardFooter className="text-xs text-gray-500">
-        <Server className="h-3.5 w-3.5 mr-1" />
-        Data is refreshed automatically every {refreshInterval / 1000} seconds
-      </CardFooter>
-    </Card>
+      </div>
+      
+      {/* Provider status grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {sortedProviders.map(provider => (
+          <ProviderStatusCard
+            key={provider.name}
+            provider={provider.name}
+            status={provider.status as any}
+            latency={provider.details.latency}
+            errorDetails={provider.details.errorDetails}
+            lastChecked={provider.details.lastChecked}
+          />
+        ))}
+      </div>
+    </div>
   );
 }
