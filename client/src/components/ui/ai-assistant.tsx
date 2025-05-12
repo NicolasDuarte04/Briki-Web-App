@@ -335,7 +335,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.8 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="bg-card border border-border rounded-2xl overflow-hidden shadow-lg max-w-md w-full backdrop-blur-lg"
+            className={`bg-card border border-border rounded-2xl overflow-hidden shadow-lg backdrop-blur-lg ${isMobile ? 'max-w-[95vw] w-[350px]' : 'max-w-md w-full'}`}
             style={{
               boxShadow: "0 10px 25px -5px rgba(59, 130, 246, 0.5), 0 8px 10px -6px rgba(59, 130, 246, 0.3)"
             }}
@@ -382,7 +382,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3 }}
-                    className={`rounded-2xl p-3 max-w-[80%] ${
+                    className={`rounded-2xl p-3 ${isMobile ? 'max-w-[90%]' : 'max-w-[80%]'} ${
                       message.role === 'user' 
                         ? 'bg-blue-600 text-white ml-auto' 
                         : 'bg-gray-800/60 text-white border border-border'
@@ -404,7 +404,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
               ))}
               
               {/* Tips section */}
-              {tips.length > 0 && (
+              {safeTips.length > 0 && (
                 <div className="mt-2 p-3 bg-indigo-950/40 rounded-xl border border-indigo-500/30">
                   <div className="flex items-start space-x-3">
                     <div className="bg-primary/10 p-2 rounded-full flex-shrink-0">
@@ -412,7 +412,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
                         <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                       </svg>
                     </div>
-                    <div className="flex-1">
+                    <div className={`flex-1 ${isMobile ? 'text-sm' : ''}`}>
                       <motion.p
                         key={currentTip}
                         initial={{ opacity: 0 }}
@@ -448,17 +448,21 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
                     <div className="flex space-x-2">
                       <button
                         onClick={() => setCurrentTip((prev) => (prev === 0 ? safeTips.length - 1 : prev - 1))}
-                        className="text-blue-300 hover:text-blue-200 transition-colors text-xs flex items-center"
+                        className={`text-blue-300 hover:text-blue-200 transition-colors flex items-center ${
+                          isMobile ? 'text-[10px] px-2 py-1' : 'text-xs'
+                        }`}
                         disabled={isTyping}
                       >
-                        Previous
+                        {isMobile ? '←' : 'Previous'}
                       </button>
                       <button
                         onClick={() => setCurrentTip((prev) => (prev === safeTips.length - 1 ? 0 : prev + 1))}
-                        className="text-blue-300 hover:text-blue-200 transition-colors text-xs flex items-center"
+                        className={`text-blue-300 hover:text-blue-200 transition-colors flex items-center ${
+                          isMobile ? 'text-[10px] px-2 py-1' : 'text-xs'
+                        }`}
                         disabled={isTyping}
                       >
-                        Next
+                        {isMobile ? '→' : 'Next'}
                       </button>
                     </div>
                   </div>
@@ -473,15 +477,15 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
                   value={userQuery}
                   onChange={(e) => setUserQuery(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleQuerySubmit()}
-                  placeholder="Ask me anything about insurance..."
-                  className="flex-1 bg-gray-800/80 border-gray-700 text-white focus-visible:ring-blue-500"
+                  placeholder={isMobile ? "Ask about insurance..." : "Ask me anything about insurance..."}
+                  className={`flex-1 bg-gray-800/80 border-gray-700 text-white focus-visible:ring-blue-500 ${isMobile ? 'text-sm' : ''}`}
                 />
                 {showVoiceSupport && (
                   <Button
                     onClick={toggleVoiceRecognition}
                     variant="outline"
-                    size="icon"
-                    className={`${isListening ? 'bg-red-500 text-white' : 'bg-gray-800 text-gray-300'} border-gray-700 hover:bg-gray-700`}
+                    size={isMobile ? "sm" : "icon"}
+                    className={`${isListening ? 'bg-red-500 text-white' : 'bg-gray-800 text-gray-300'} border-gray-700 hover:bg-gray-700 ${isMobile ? 'p-1' : ''}`}
                     aria-label={isListening ? "Stop listening" : "Start voice input"}
                   >
                     {isListening ? <MicOff className="h-5 w-5 animate-pulse" /> : <Mic className="h-5 w-5" />}
