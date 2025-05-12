@@ -22,11 +22,11 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { FuturisticBackground } from "@/components/ui/futuristic-background";
 import { 
-  FuturisticTravelIcon, 
-  FuturisticAutoIcon, 
-  FuturisticPetIcon, 
-  FuturisticHealthIcon 
-} from "@/components/icons/futuristic-icons";
+  TravelIcon, 
+  AutoIcon, 
+  PetIcon, 
+  HealthIcon 
+} from "@/components/icons/modern-icons";
 import { BetaDisclaimer } from "@/components/countdown/beta-disclaimer";
 
 const loginSchema = z.object({
@@ -174,7 +174,7 @@ export default function AuthPage() {
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <div className="h-12 w-12 mb-3">
-                  <FuturisticTravelIcon className="h-full w-full" />
+                  <TravelIcon className="h-full w-full" />
                 </div>
                 <span className="text-xs text-foreground/80">Travel</span>
               </motion.div>
@@ -185,7 +185,7 @@ export default function AuthPage() {
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <div className="h-12 w-12 mb-3">
-                  <FuturisticAutoIcon className="h-full w-full" />
+                  <AutoIcon className="h-full w-full" />
                 </div>
                 <span className="text-xs text-foreground/80">Auto</span>
               </motion.div>
