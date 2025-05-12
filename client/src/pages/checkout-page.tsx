@@ -203,17 +203,12 @@ export default function CheckoutPage() {
   const { data: trips, isLoading: tripsLoading } = useQuery<Trip[]>({
     queryKey: ["/api/trips"],
     enabled: !!user,
-    initialData: [],
-    onSuccess: (data) => {
-      console.log("Trips fetched successfully:", data);
-    },
-    onError: (error) => {
-      console.error("Error fetching trips:", error);
-    }
+    initialData: []
   });
   
   // Get the most recent trip
-  const latestTrip = trips && trips.length > 0 ? trips[trips.length - 1] : null;
+  const tripArray = Array.isArray(trips) ? trips : [];
+  const latestTrip = tripArray.length > 0 ? tripArray[tripArray.length - 1] : null;
   
   // Log trip data for debugging
   useEffect(() => {
