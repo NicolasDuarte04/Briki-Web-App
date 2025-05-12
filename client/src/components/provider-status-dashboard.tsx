@@ -190,11 +190,14 @@ export default function ProviderStatusDashboard({
   const getStatusSummary = () => {
     if (!statusData) return { online: 0, error: 0, offline: 0, unknown: INSURANCE_PROVIDERS.length };
     
-    return Object.values(statusData).reduce((summary: Record<string, number>, providerStatus: any) => {
-      const status = providerStatus?.status || 'unknown';
-      summary[status] = (summary[status] || 0) + 1;
-      return summary;
-    }, { online: 0, error: 0, offline: 0, unknown: 0 });
+    return Object.values(statusData as Record<string, any>).reduce(
+      (summary: Record<string, number>, providerStatus: any) => {
+        const status = providerStatus?.status || 'unknown';
+        summary[status] = (summary[status] || 0) + 1;
+        return summary;
+      }, 
+      { online: 0, error: 0, offline: 0, unknown: 0 }
+    );
   };
   
   const statusSummary = getStatusSummary();
@@ -206,13 +209,14 @@ export default function ProviderStatusDashboard({
     const priorityOrder = { online: 0, error: 1, offline: 2, unknown: 3 };
     
     return INSURANCE_PROVIDERS.map(provider => {
-      const status = statusData[provider.name]?.status || 'unknown';
+      const providerStatus = (statusData as Record<string, any>)[provider.name];
+      const status = providerStatus?.status || 'unknown';
       
       return {
         name: provider.name,
         status,
         priority: priorityOrder[status as keyof typeof priorityOrder],
-        details: statusData[provider.name] || {
+        details: providerStatus || {
           latency: null,
           lastChecked: new Date(),
           errorDetails: null

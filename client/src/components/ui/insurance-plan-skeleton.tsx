@@ -175,3 +175,56 @@ export function ProviderStatusSkeleton({ count = 12 }: { count?: number }) {
     </div>
   );
 }
+
+/**
+ * Skeleton loading component for provider detail cards
+ */
+export function ProviderDetailCardSkeleton({ count = 6 }: { count?: number }) {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {Array.from({ length: count }).map((_, index) => (
+        <Card 
+          key={index} 
+          className="overflow-hidden border border-primary/20 shadow-glow-sm bg-background/80 backdrop-blur-sm"
+        >
+          <div className="h-1 w-full bg-gradient-to-r from-gray-200 to-gray-300 animate-pulse"></div>
+          <CardHeader className="pb-2">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-6 w-28" />
+                <Skeleton className="h-5 w-16 rounded-full" />
+              </div>
+              <Skeleton className="h-6 w-20 rounded-full" />
+            </div>
+          </CardHeader>
+          
+          <CardContent className="space-y-4 pb-2">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Skeleton className="h-3 w-16" />
+                <Skeleton className="h-5 w-20" />
+              </div>
+              
+              <div className="space-y-1.5">
+                <Skeleton className="h-3 w-16" />
+                <Skeleton className="h-5 w-16" />
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <Skeleton className="h-3 w-16" />
+                <Skeleton className="h-3 w-8" />
+              </div>
+              <Skeleton className="h-1.5 w-full rounded-full" />
+            </div>
+          </CardContent>
+          
+          <CardFooter>
+            <Skeleton className="h-9 w-full rounded-md" />
+          </CardFooter>
+        </Card>
+      ))}
+    </div>
+  );
+}
