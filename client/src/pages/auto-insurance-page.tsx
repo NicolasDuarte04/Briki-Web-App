@@ -33,7 +33,7 @@ export default function AutoInsurancePage() {
                       className="w-full px-8 py-3 md:py-4 md:text-lg md:px-10"
                       onClick={() => navigate("/auto-quote")}
                     >
-                      Get Quote
+                      Get a Quote
                     </Button>
                   </div>
                   <div className="mt-3 sm:mt-0 sm:ml-3">
@@ -181,7 +181,7 @@ export default function AutoInsurancePage() {
                 onClick={() => navigate("/auto-quote")}
                 className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-primary bg-white hover:bg-gray-50"
               >
-                Get Quote
+                Get a Quote
               </Button>
             </div>
           </div>

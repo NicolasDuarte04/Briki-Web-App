@@ -54,41 +54,43 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto">
           <div className="relative z-10 bg-white pb-8 sm:pb-16 md:pb-20 lg:w-full lg:pb-28 xl:pb-32">
             <div className="mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28">
-              <div className="text-center lg:text-left">
-                <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
-                  <span className="block">Insurance</span>
-                  <span className="block text-primary">simplified</span>
-                </h1>
-                <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
-                  Compare insurance plans across travel, auto, pet, and health categories from top providers. Find the perfect coverage for your needs with just a few clicks.
-                </p>
-                <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
-                  <div className="rounded-md shadow">
-                    <Button 
-                      className="w-full px-8 py-3 md:py-4 md:text-lg md:px-10"
-                      onClick={handleGetStarted}
-                    >
-                      Get Started
-                    </Button>
-                  </div>
-                  <div className="mt-3 sm:mt-0 sm:ml-3">
-                    <Button 
-                      variant="secondary"
-                      className="w-full px-8 py-3 md:py-4 md:text-lg md:px-10"
-                      onClick={() => navigate("/learn-more")}
-                    >
-                      Learn More
-                    </Button>
+              <FadeIn duration={0.6}>
+                <div className="text-center lg:text-left">
+                  <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
+                    <span className="block">Insurance</span>
+                    <span className="block text-primary">simplified</span>
+                  </h1>
+                  <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
+                    Compare insurance plans across travel, auto, pet, and health categories from top providers. Find the perfect coverage for your needs with just a few clicks.
+                  </p>
+                  <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
+                    <div className="rounded-md shadow">
+                      <Button 
+                        className="w-full px-8 py-3 md:py-4 md:text-lg md:px-10"
+                        onClick={handleGetStarted}
+                      >
+                        Get Started
+                      </Button>
+                    </div>
+                    <div className="mt-3 sm:mt-0 sm:ml-3">
+                      <Button 
+                        variant="secondary"
+                        className="w-full px-8 py-3 md:py-4 md:text-lg md:px-10"
+                        onClick={() => navigate("/learn-more")}
+                      >
+                        Learn More
+                      </Button>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </FadeIn>
             </div>
           </div>
           <div className="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2">
             <img 
               className="h-56 w-full object-cover sm:h-72 md:h-96 lg:w-full lg:h-full"
-              src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
-              alt="Person traveling"
+              src="https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+              alt="Insurance protection"
             />
           </div>
         </div>
@@ -98,105 +100,106 @@ export default function HomePage() {
       <div className="bg-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-              Insurance Categories
-            </h2>
-            <p className="mt-3 max-w-2xl mx-auto text-xl text-gray-500 sm:mt-4">
-              Explore different types of insurance to protect what matters most
-            </p>
+            <SlideIn direction="up">
+              <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+                Insurance Categories
+              </h2>
+              <p className="mt-3 max-w-2xl mx-auto text-xl text-gray-500 sm:mt-4">
+                Explore different types of insurance to protect what matters most
+              </p>
+            </SlideIn>
           </div>
           
           <div className="mt-10">
-              {/* Using StaggerChildren for animation */}
-              <StaggerChildren staggerDelay={0.15} className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-                {/* Travel Insurance */}
-                <div 
-                  onClick={() => navigate("/insurance-plans")} 
-                  className="cursor-pointer group relative"
-                  role="button"
-                  aria-label="View travel insurance plans"
-                >
-                  <div className="relative h-64 w-full overflow-hidden rounded-lg bg-white shadow-lg border border-gray-200 hover:border-primary transition-all duration-300 hover:shadow-xl">
-                    <img
-                      src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
-                      alt="Travel Insurance"
-                      className="h-40 w-full object-cover transition duration-300 group-hover:scale-105"
-                    />
-                    <div className="p-4">
-                      <div className="flex flex-col items-center text-center">
-                        <h3 className="text-lg font-bold text-gray-900">{t('travelInsurance')}</h3>
-                        <p className="mt-1 text-sm text-gray-500">Travel with peace of mind knowing you're covered for emergencies and cancellations</p>
-                      </div>
+            <StaggerChildren staggerDelay={0.15} className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+              {/* Travel Insurance */}
+              <div 
+                onClick={() => navigate("/insurance-plans")} 
+                className="cursor-pointer group relative"
+                role="button"
+                aria-label="View travel insurance plans"
+              >
+                <div className="relative h-64 w-full overflow-hidden rounded-lg bg-white shadow-lg border border-gray-200 hover:border-primary transition-all duration-300 hover:shadow-xl">
+                  <img
+                    src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+                    alt="Travel Insurance"
+                    className="h-40 w-full object-cover transition duration-300 group-hover:scale-105"
+                  />
+                  <div className="p-4">
+                    <div className="flex flex-col items-center text-center">
+                      <h3 className="text-lg font-bold text-gray-900">{t('travelInsurance')}</h3>
+                      <p className="mt-1 text-sm text-gray-500">Travel with peace of mind knowing you're covered for emergencies and cancellations</p>
                     </div>
                   </div>
                 </div>
-                
-                {/* Auto Insurance */}
-                <div 
-                  onClick={() => navigate("/auto-insurance")} 
-                  className="cursor-pointer group relative"
-                  role="button"
-                  aria-label="View auto insurance plans"
-                >
-                  <div className="relative h-64 w-full overflow-hidden rounded-lg bg-white shadow-lg border border-gray-200 hover:border-primary transition-all duration-300 hover:shadow-xl">
-                    <img
-                      src="https://images.unsplash.com/photo-1560641545-3a9e73c8e732?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
-                      alt="Auto Insurance"
-                      className="h-40 w-full object-cover transition duration-300 group-hover:scale-105"
-                    />
-                    <div className="p-4">
-                      <div className="flex flex-col items-center text-center">
-                        <h3 className="text-lg font-bold text-gray-900">{t('autoInsurance')}</h3>
-                        <p className="mt-1 text-sm text-gray-500">Protect your vehicle with reliable coverage options for every need</p>
-                      </div>
+              </div>
+              
+              {/* Auto Insurance */}
+              <div 
+                onClick={() => navigate("/auto-insurance")} 
+                className="cursor-pointer group relative"
+                role="button"
+                aria-label="View auto insurance plans"
+              >
+                <div className="relative h-64 w-full overflow-hidden rounded-lg bg-white shadow-lg border border-gray-200 hover:border-primary transition-all duration-300 hover:shadow-xl">
+                  <img
+                    src="https://images.unsplash.com/photo-1560641545-3a9e73c8e732?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+                    alt="Auto Insurance"
+                    className="h-40 w-full object-cover transition duration-300 group-hover:scale-105"
+                  />
+                  <div className="p-4">
+                    <div className="flex flex-col items-center text-center">
+                      <h3 className="text-lg font-bold text-gray-900">{t('autoInsurance')}</h3>
+                      <p className="mt-1 text-sm text-gray-500">Protect your vehicle with reliable coverage options for every need</p>
                     </div>
                   </div>
                 </div>
-                
-                {/* Pet Insurance */}
-                <div 
-                  onClick={() => navigate("/pet-insurance")} 
-                  className="cursor-pointer group relative"
-                  role="button"
-                  aria-label="View pet insurance plans"
-                >
-                  <div className="relative h-64 w-full overflow-hidden rounded-lg bg-white shadow-lg border border-gray-200 hover:border-primary transition-all duration-300 hover:shadow-xl">
-                    <img
-                      src="https://images.unsplash.com/photo-1450778869180-41d0601e046e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
-                      alt="Pet Insurance"
-                      className="h-40 w-full object-cover transition duration-300 group-hover:scale-105"
-                    />
-                    <div className="p-4">
-                      <div className="flex flex-col items-center text-center">
-                        <h3 className="text-lg font-bold text-gray-900">{t('petInsurance')}</h3>
-                        <p className="mt-1 text-sm text-gray-500">Give your pets the protection they deserve with medical and accident coverage</p>
-                      </div>
+              </div>
+              
+              {/* Pet Insurance */}
+              <div 
+                onClick={() => navigate("/pet-insurance")} 
+                className="cursor-pointer group relative"
+                role="button"
+                aria-label="View pet insurance plans"
+              >
+                <div className="relative h-64 w-full overflow-hidden rounded-lg bg-white shadow-lg border border-gray-200 hover:border-primary transition-all duration-300 hover:shadow-xl">
+                  <img
+                    src="https://images.unsplash.com/photo-1450778869180-41d0601e046e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+                    alt="Pet Insurance"
+                    className="h-40 w-full object-cover transition duration-300 group-hover:scale-105"
+                  />
+                  <div className="p-4">
+                    <div className="flex flex-col items-center text-center">
+                      <h3 className="text-lg font-bold text-gray-900">{t('petInsurance')}</h3>
+                      <p className="mt-1 text-sm text-gray-500">Give your pets the protection they deserve with medical and accident coverage</p>
                     </div>
                   </div>
                 </div>
-                
-                {/* Health Insurance */}
-                <div 
-                  onClick={() => navigate("/health-insurance")} 
-                  className="cursor-pointer group relative"
-                  role="button"
-                  aria-label="View health insurance plans"
-                >
-                  <div className="relative h-64 w-full overflow-hidden rounded-lg bg-white shadow-lg border border-gray-200 hover:border-primary transition-all duration-300 hover:shadow-xl">
-                    <img
-                      src="https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
-                      alt="Health Insurance"
-                      className="h-40 w-full object-cover transition duration-300 group-hover:scale-105"
-                    />
-                    <div className="p-4">
-                      <div className="flex flex-col items-center text-center">
-                        <h3 className="text-lg font-bold text-gray-900">{t('healthInsurance')}</h3>
-                        <p className="mt-1 text-sm text-gray-500">Find the perfect health plan for your lifestyle and medical needs</p>
-                      </div>
+              </div>
+              
+              {/* Health Insurance */}
+              <div 
+                onClick={() => navigate("/health-insurance")} 
+                className="cursor-pointer group relative"
+                role="button"
+                aria-label="View health insurance plans"
+              >
+                <div className="relative h-64 w-full overflow-hidden rounded-lg bg-white shadow-lg border border-gray-200 hover:border-primary transition-all duration-300 hover:shadow-xl">
+                  <img
+                    src="https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+                    alt="Health Insurance"
+                    className="h-40 w-full object-cover transition duration-300 group-hover:scale-105"
+                  />
+                  <div className="p-4">
+                    <div className="flex flex-col items-center text-center">
+                      <h3 className="text-lg font-bold text-gray-900">{t('healthInsurance')}</h3>
+                      <p className="mt-1 text-sm text-gray-500">Find the perfect health plan for your lifestyle and medical needs</p>
                     </div>
                   </div>
                 </div>
-              </StaggerChildren>
+              </div>
+            </StaggerChildren>
           </div>
         </div>
       </div>
@@ -205,16 +208,18 @@ export default function HomePage() {
       <div className="bg-gray-50 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-              Popular Plans
-            </h2>
-            <p className="mt-3 max-w-2xl mx-auto text-xl text-gray-500 sm:mt-4">
-              Discover our top-rated insurance plans across all categories
-            </p>
+            <SlideIn direction="up">
+              <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+                Popular Plans
+              </h2>
+              <p className="mt-3 max-w-2xl mx-auto text-xl text-gray-500 sm:mt-4">
+                Discover our top-rated insurance plans across all categories
+              </p>
+            </SlideIn>
           </div>
           
           <div className="mt-10">
-            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            <StaggerChildren staggerDelay={0.1} className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
               {/* Travel Insurance Plan */}
               <div className="group relative">
                 <div className="relative overflow-hidden rounded-lg bg-white shadow-lg border border-gray-200 transition-all hover:border-primary hover:shadow-xl">
@@ -266,7 +271,7 @@ export default function HomePage() {
                         View Details
                       </Button>
                       <Button size="sm" variant="secondary" onClick={() => navigate("/trip-info")} className="w-full">
-                        Get Quote
+                        Get a Quote
                       </Button>
                     </div>
                   </div>
@@ -324,7 +329,7 @@ export default function HomePage() {
                         View Details
                       </Button>
                       <Button size="sm" variant="secondary" onClick={() => navigate("/auto-quote")} className="w-full">
-                        Get Quote
+                        Get a Quote
                       </Button>
                     </div>
                   </div>
@@ -382,7 +387,7 @@ export default function HomePage() {
                         View Details
                       </Button>
                       <Button size="sm" variant="secondary" onClick={() => navigate("/pet-insurance")} className="w-full">
-                        Get Quote
+                        Get a Quote
                       </Button>
                     </div>
                   </div>
@@ -440,13 +445,13 @@ export default function HomePage() {
                         View Details
                       </Button>
                       <Button size="sm" variant="secondary" onClick={() => navigate("/health-insurance")} className="w-full">
-                        Get Quote
+                        Get a Quote
                       </Button>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </StaggerChildren>
           </div>
         </div>
       </div>
@@ -464,7 +469,7 @@ export default function HomePage() {
           </div>
           
           <div className="mt-12">
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
+            <StaggerChildren className="grid grid-cols-1 gap-8 md:grid-cols-4">
               <div className="bg-white shadow rounded-lg px-6 py-8">
                 <div className="flex items-center justify-center h-12 w-12 rounded-md bg-primary text-white mb-5">
                   <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -512,7 +517,7 @@ export default function HomePage() {
                   Our support team is available around the clock to assist you with any questions or claims across all insurance types.
                 </p>
               </div>
-            </div>
+            </StaggerChildren>
           </div>
         </div>
       </div>
@@ -520,29 +525,33 @@ export default function HomePage() {
       {/* CTA Section */}
       <div className="bg-primary">
         <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8 lg:flex lg:items-center lg:justify-between">
-          <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-            <span className="block">Ready to secure what matters most?</span>
-            <span className="block text-blue-100">Compare and save across all insurance types.</span>
-          </h2>
+          <FadeIn>
+            <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+              <span className="block">Ready to secure what matters most?</span>
+              <span className="block text-blue-100">Compare and save across all insurance types.</span>
+            </h2>
+          </FadeIn>
           <div className="mt-8 flex lg:mt-0 lg:flex-shrink-0">
-            <div className="inline-flex rounded-md shadow">
-              <Button 
-                variant="secondary" 
-                onClick={handleGetStarted}
-                className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-primary bg-white hover:bg-gray-50"
-              >
-                Get Started
-              </Button>
-            </div>
-            <div className="ml-3 inline-flex rounded-md shadow">
-              <Button
-                variant="default"
-                className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-                onClick={() => navigate("/learn-more")}
-              >
-                Learn more
-              </Button>
-            </div>
+            <FadeIn delay={0.2}>
+              <div className="inline-flex rounded-md shadow">
+                <Button 
+                  variant="secondary" 
+                  onClick={handleGetStarted}
+                  className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-primary bg-white hover:bg-gray-50"
+                >
+                  Get Started
+                </Button>
+              </div>
+              <div className="ml-3 inline-flex rounded-md shadow">
+                <Button
+                  variant="default"
+                  className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                  onClick={() => navigate("/learn-more")}
+                >
+                  Learn more
+                </Button>
+              </div>
+            </FadeIn>
           </div>
         </div>
       </div>
