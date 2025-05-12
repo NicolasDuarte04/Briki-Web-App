@@ -130,12 +130,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     },
     onSuccess: (data: TokenResponse) => {
+      console.log("Login success callback, storing token:", data.token);
       // Store token in localStorage
       localStorage.setItem('auth_token', data.token);
       setAuthToken(data.token);
       
       // Store user data in query cache
       queryClient.setQueryData(["/api/user"], data.user);
+      
+      // Force token refresh by making an extra API call
+      setTimeout(async () => {
+        try {
+          console.log("Verifying token with fetch...");
+          const verifyResponse = await fetch('/api/user', {
+            headers: {
+              "Authorization": `Bearer ${data.token}`,
+              "Cache-Control": "no-cache",
+            }
+          });
+          if (verifyResponse.ok) {
+            console.log("Token verification successful");
+          } else {
+            console.log("Token verification failed:", verifyResponse.status);
+          }
+        } catch (err) {
+          console.error("Token verification error:", err);
+        }
+      }, 500);
       
       toast({
         title: "Login successful",
@@ -194,12 +215,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     },
     onSuccess: (data: TokenResponse) => {
+      console.log("Registration success callback, storing token:", data.token);
       // Store token in localStorage
       localStorage.setItem('auth_token', data.token);
       setAuthToken(data.token);
       
       // Store user data in query cache
       queryClient.setQueryData(["/api/user"], data.user);
+      
+      // Force token refresh by making an extra API call
+      setTimeout(async () => {
+        try {
+          console.log("Verifying token after registration...");
+          const verifyResponse = await fetch('/api/user', {
+            headers: {
+              "Authorization": `Bearer ${data.token}`,
+              "Cache-Control": "no-cache",
+            }
+          });
+          if (verifyResponse.ok) {
+            console.log("Token verification successful after registration");
+          } else {
+            console.log("Token verification failed after registration:", verifyResponse.status);
+          }
+        } catch (err) {
+          console.error("Token verification error after registration:", err);
+        }
+      }, 500);
       
       toast({
         title: "Registration successful",
