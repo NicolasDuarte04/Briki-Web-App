@@ -324,6 +324,9 @@ export default function CheckoutPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      {/* Beta Disclaimer */}
+      <BetaDisclaimer />
+      
       <Navbar />
       
       {/* Background elements */}
@@ -505,22 +508,8 @@ export default function CheckoutPage() {
                       <CardContent className="pt-6 pb-6">
                         <h2 className="text-xl font-semibold text-gray-900 mb-4">Payment Information</h2>
                         
-                        {clientSecret ? (
-                          <Elements stripe={stripePromise} options={{ clientSecret }}>
-                            <StripeCheckoutForm
-                              totalAmount={totalAmount}
-                              planId={parseInt(planId || "0")}
-                              onSuccess={handlePaymentSuccess}
-                              tripId={latestTrip?.id || 0}
-                              form={form}
-                            />
-                          </Elements>
-                        ) : (
-                          <div className="flex justify-center py-8">
-                            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                            <span className="ml-2">Initializing payment...</span>
-                          </div>
-                        )}
+                        {/* Payment disabled during beta phase */}
+                        <PaymentDisabled />
                       </CardContent>
                     </Card>
                   </form>
