@@ -27,6 +27,7 @@ import PetInsurancePage from "@/pages/pet-insurance-page";
 import HealthInsurancePage from "@/pages/health-insurance-page";
 import AutoQuotePage from "@/pages/auto-quote-page";
 import AIAssistantDemo from "@/pages/ai-assistant-demo";
+import CountdownPage from "@/pages/countdown-page";
 
 function Router() {
   const [location] = useLocation();
@@ -34,7 +35,8 @@ function Router() {
   return (
     <PageTransition>
       <Switch>
-        <Route path="/" component={HomePage} />
+        <Route path="/" component={CountdownPage} />
+        <Route path="/home" component={HomePage} />
         <Route path="/auth" component={AuthPage} />
         <ProtectedRoute path="/trip-info" component={TripInfoPage} />
         <ProtectedRoute path="/insurance-plans" component={InsurancePlansPage} />

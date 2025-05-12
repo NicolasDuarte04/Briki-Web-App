@@ -125,7 +125,7 @@ export default function AuthPage() {
       console.log("AuthPage: User already logged in, redirecting to home page");
       // Use consistent direct navigation approach
       setTimeout(() => {
-        window.location.href = '/';
+        window.location.href = '/home';
       }, 100);
     } else {
       console.log("AuthPage: No logged in user detected, staying on auth page");
