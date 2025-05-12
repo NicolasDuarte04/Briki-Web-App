@@ -2,10 +2,10 @@ import { useLocation } from "wouter";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Button } from "@/components/ui/button";
 import { useRecentlyViewed, type InsuranceCategory } from "@/contexts/recently-viewed-context";
-import { SlideIn } from "@/components/ui/transition-effect";
 import { Navigation, A11y, Virtual, FreeMode } from 'swiper/modules';
 import { ClockIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import { useCallback, useEffect, useRef } from "react";
+import { CardHover } from "@/components/ui/apple-transition";
 
 // Import Swiper styles
 import 'swiper/css';
@@ -37,56 +37,56 @@ export default function RecentlyViewedPlans({ category }: RecentlyViewedPlansPro
 
   return (
     <div className="w-full mb-10">
-      <SlideIn>
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-gray-900">Recently Viewed Plans</h2>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => clearRecentlyViewed(category)}
-            className="text-sm text-gray-500 hover:text-red-500"
-          >
-            <XCircleIcon className="h-4 w-4 mr-1" />
-            Clear History
-          </Button>
-        </div>
-        
-        <Swiper
-          modules={[Navigation, A11y, Virtual, FreeMode]}
-          spaceBetween={16}
-          slidesPerView="auto"
-          navigation
-          freeMode={{
-            enabled: true,
-            minimumVelocity: 0.02,
-            momentum: true,
-            momentumRatio: 0.5
-          }}
-          className="py-2"
-          virtual={{
-            enabled: true,
-            addSlidesAfter: 2,
-            addSlidesBefore: 2,
-          }}
-          breakpoints={{
-            640: {
-              slidesPerView: 2,
-            },
-            768: {
-              slidesPerView: 3,
-            },
-            1024: {
-              slidesPerView: 4,
-            },
-          }}
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-bold text-gray-900 bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-700">Recently Viewed Plans</h2>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={() => clearRecentlyViewed(category)}
+          className="text-sm text-gray-500 hover:text-red-500 rounded-full transition-all duration-300"
         >
-          {plans.map((plan, index) => (
-            <SwiperSlide key={plan.id} className="h-auto" virtualIndex={index}>
-              <div className="group relative h-full overflow-hidden rounded-lg bg-white shadow-sm border border-gray-200 transition-all hover:border-primary hover:shadow-md">
-                <div className="p-4 h-full flex flex-col">
+          <XCircleIcon className="h-4 w-4 mr-1" />
+          Clear History
+        </Button>
+      </div>
+      
+      <Swiper
+        modules={[Navigation, A11y, Virtual, FreeMode]}
+        spaceBetween={16}
+        slidesPerView="auto"
+        navigation
+        freeMode={{
+          enabled: true,
+          minimumVelocity: 0.02,
+          momentum: true,
+          momentumRatio: 0.5
+        }}
+        className="py-2"
+        virtual={{
+          enabled: true,
+          addSlidesAfter: 2,
+          addSlidesBefore: 2,
+        }}
+        breakpoints={{
+          640: {
+            slidesPerView: 2,
+          },
+          768: {
+            slidesPerView: 3,
+          },
+          1024: {
+            slidesPerView: 4,
+          },
+        }}
+      >
+        {plans.map((plan, index) => (
+          <SwiperSlide key={plan.id} className="h-auto" virtualIndex={index}>
+            <CardHover>
+              <div className="relative h-full overflow-hidden rounded-lg bg-white shadow-sm border border-gray-200">
+                <div className="p-4 h-full flex flex-col bg-gradient-to-b from-white to-gray-50">
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="text-base font-bold text-gray-900">{plan.name}</h3>
-                    <div className="flex items-center text-xs text-gray-500">
+                    <div className="flex items-center text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
                       <ClockIcon className="h-3 w-3 mr-1" />
                       {formatViewTime(plan.viewedAt)}
                     </div>
@@ -119,7 +119,7 @@ export default function RecentlyViewedPlans({ category }: RecentlyViewedPlansPro
                           }
                         });
                       }} 
-                      className="w-full text-xs py-1"
+                      className="w-full text-xs py-1 rounded-lg shadow-sm transition-all duration-300 hover:shadow-md"
                     >
                       View Again
                     </Button>
@@ -145,17 +145,17 @@ export default function RecentlyViewedPlans({ category }: RecentlyViewedPlansPro
                           }
                         });
                       }} 
-                      className="w-full text-xs py-1"
+                      className="w-full text-xs py-1 rounded-lg shadow-sm transition-all duration-300 hover:shadow-md"
                     >
                       Compare
                     </Button>
                   </div>
                 </div>
               </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
-      </SlideIn>
+            </CardHover>
+          </SwiperSlide>
+        ))}
+      </Swiper>
     </div>
   );
 }
