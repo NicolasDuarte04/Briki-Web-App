@@ -1,0 +1,65 @@
+We are moving forward with the creation of a **New Countdown Screen** for the Briki Web Application. I need you to complete the following tasks:
+
+---
+
+### 🌟 **1️⃣ New Countdown Screen**  
+**Objective:** Display the time left until the official launch of Briki.  
+
+**Tasks:**  
+1. Create a **completely new screen** (do not update the existing screen) with the following elements:  
+   - **Countdown Timer** in the format: **Days : Hours : Minutes : Seconds**  
+   - Smooth animations for counting down.  
+   - Modern and futuristic design to match Briki's aesthetic.  
+
+2. Style it to match Briki's futuristic design with:  
+   - Clean typography.  
+   - Animated transitions for each time unit change.  
+   - Dark mode and light mode compatibility.  
+
+3. When the timer reaches **00:00:00:00**, display a message:  
+   - "Briki is now live! Welcome to the Future of Insurance."  
+
+---
+
+### 🌟 **2️⃣ Pre-Test the App Button**  
+**Objective:** Allow users to explore the app before the official launch.  
+
+**Tasks:**  
+1. Add a button directly below the countdown timer labeled **"Pre-Test the App"**.  
+2. When clicked, it should navigate users to the **existing Login and Register screens**.  
+   - These should be the current login and register screens you have already built.  
+   - No new screens should be created—just link to the existing ones.  
+
+3. Display a **disclaimer banner** at the top of the login and register screens saying:  
+   - "You are exploring the Beta version of Briki. Some features may be under development. Payments are currently disabled during this phase."  
+
+4. Add an **info icon** next to the disclaimer that, when clicked, explains:  
+   - "This version of Briki is for testing purposes only. Payments are disabled, and some features may not function as intended. Full functionality will be available upon official launch."  
+
+5. **Disable all payment functionalities** during the Beta phase to avoid accidental charges.  
+
+---
+
+### 🌟 **3️⃣ UI Enhancements**  
+**Objective:** Improve visual engagement for early users.  
+
+**Tasks:**  
+1. Add a futuristic background to the new Countdown Screen.  
+2. Implement smooth hover animations on the "Pre-Test the App" button.  
+3. Ensure full mobile responsiveness for the new screen.  
+
+---
+
+### **Expected Deliverables:**  
+- A **new standalone Countdown Screen** with a fully functional timer.  
+- "Pre-Test the App" button that navigates to the **existing Login and Register screens**.  
+- Clear disclaimer banner and info icon to set user expectations.  
+- Payment features disabled during the Beta phase.  
+- Responsive design and smooth UI transitions.  
+
+Please provide a detailed report of:  
+- Screenshots of the new Countdown Screen.  
+- Confirmation that the "Pre-Test the App" button links to the current Login and Register screens.  
+- Any issues or blockers encountered during implementation.  
+
+If there are any challenges, provide a detailed explanation so we can resolve them quickly.

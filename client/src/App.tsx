@@ -27,6 +27,7 @@ import PetInsurancePage from "@/pages/pet-insurance-page";
 import HealthInsurancePage from "@/pages/health-insurance-page";
 import AutoQuotePage from "@/pages/auto-quote-page";
 import AIAssistantDemo from "@/pages/ai-assistant-demo";
+import CountdownPage from "@/pages/countdown-page";
 
 function Router() {
   const [location] = useLocation();
