@@ -33,6 +33,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return localStorage.getItem('auth_token');
   });
   
+  // This effect will run on page refresh or initial load
+  useEffect(() => {
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+      console.log("Found auth token on page load/refresh, will validate shortly");
+      setAuthToken(token);
+    }
+  }, []);
+  
   const {
     data: user,
     error,
@@ -85,7 +94,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     refetchOnWindowFocus: true,
     refetchOnMount: true,
     retry: 2,
-    enabled: !!authToken, // Only run query if we have a token
+    // Always enable the query, but we'll check token inside the queryFn
+    enabled: true
   });
 
   const loginMutation = useMutation({
