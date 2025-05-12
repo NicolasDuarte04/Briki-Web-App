@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import Navbar from "@/components/navbar";
@@ -21,9 +21,15 @@ import {
 import { popularPlans } from "@/data/popular-plans";
 
 export default function HomePage() {
-  const [, navigate] = useLocation();
+  const [location, navigate] = useLocation();
   const { user, isLoading } = useAuth();
   const { t } = useLanguage();
+  
+  // Debug log for mounting
+  useEffect(() => {
+    console.log("HomePage mounted, current location:", location);
+    console.log("User data in home page:", user);
+  }, [location, user]);
 
   // Featured destinations data
   const destinations = [

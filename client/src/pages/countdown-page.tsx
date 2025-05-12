@@ -19,7 +19,17 @@ export default function CountdownPage() {
 
   const handlePreTestClick = () => {
     // Navigate to existing auth page
+    console.log("Pre-test button clicked, navigating to auth page");
     navigate('/auth');
+    
+    // Double-check navigation with a small delay
+    setTimeout(() => {
+      console.log("Current location after pre-test click:", window.location.pathname);
+      if (window.location.pathname !== '/auth') {
+        console.log("Navigation seems to have failed, trying again...");
+        window.location.href = '/auth';
+      }
+    }, 300);
   };
 
   const handleCountdownComplete = () => {
