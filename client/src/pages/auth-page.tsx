@@ -196,7 +196,7 @@ export default function AuthPage() {
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <div className="h-12 w-12 mb-3">
-                  <FuturisticPetIcon className="h-full w-full" />
+                  <PetIcon className="h-full w-full" />
                 </div>
                 <span className="text-xs text-foreground/80">Pet</span>
               </motion.div>
@@ -207,7 +207,7 @@ export default function AuthPage() {
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <div className="h-12 w-12 mb-3">
-                  <FuturisticHealthIcon className="h-full w-full" />
+                  <HealthIcon className="h-full w-full" />
                 </div>
                 <span className="text-xs text-foreground/80">Health</span>
               </motion.div>
@@ -471,7 +471,7 @@ export default function AuthPage() {
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <div className="h-16 w-16 mb-3">
-                  <FuturisticTravelIcon className="h-full w-full" />
+                  <TravelIcon className="h-full w-full" />
                 </div>
                 <span className="text-foreground/90">Travel Insurance</span>
               </motion.div>
@@ -482,7 +482,7 @@ export default function AuthPage() {
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <div className="h-16 w-16 mb-3">
-                  <FuturisticAutoIcon className="h-full w-full" />
+                  <AutoIcon className="h-full w-full" />
                 </div>
                 <span className="text-foreground/90">Auto Insurance</span>
               </motion.div>
@@ -493,7 +493,7 @@ export default function AuthPage() {
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <div className="h-16 w-16 mb-3">
-                  <FuturisticPetIcon className="h-full w-full" />
+                  <PetIcon className="h-full w-full" />
                 </div>
                 <span className="text-foreground/90">Pet Insurance</span>
               </motion.div>
@@ -504,7 +504,7 @@ export default function AuthPage() {
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <div className="h-16 w-16 mb-3">
-                  <FuturisticHealthIcon className="h-full w-full" />
+                  <HealthIcon className="h-full w-full" />
                 </div>
                 <span className="text-foreground/90">Health Insurance</span>
               </motion.div>

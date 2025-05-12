@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { CountdownTimer } from '@/components/countdown/countdown-timer';
-import { CountdownBackground } from '@/components/countdown/countdown-background';
+import { FuturisticBackground } from '@/components/ui/futuristic-background';
 import { ChevronRight, Info } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -31,7 +31,9 @@ export default function CountdownPage() {
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center relative overflow-hidden bg-background">
       {/* Animated background */}
-      <CountdownBackground />
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        <FuturisticBackground particleCount={60} />
+      </div>
       
       {/* Content container */}
       <motion.div 
