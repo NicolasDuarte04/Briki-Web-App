@@ -124,7 +124,7 @@ export default function AuthPage() {
   useEffect(() => {
     if (user) {
       console.log("AuthPage: User already logged in, redirecting to home page");
-      navigate("/home");
+      navigate("/");
     } else {
       console.log("AuthPage: No logged in user detected, staying on auth page");
     }
@@ -134,7 +134,7 @@ export default function AuthPage() {
   useEffect(() => {
     if (loginMutation.isSuccess) {
       console.log("AuthPage: Login successful, redirecting to home page");
-      navigate("/home");
+      navigate("/");
     }
   }, [loginMutation.isSuccess, navigate]);
   
@@ -142,7 +142,7 @@ export default function AuthPage() {
   useEffect(() => {
     if (registerMutation.isSuccess) {
       console.log("AuthPage: Registration successful, redirecting to home page");
-      navigate("/home");
+      navigate("/");
     }
   }, [registerMutation.isSuccess, navigate]);
 
