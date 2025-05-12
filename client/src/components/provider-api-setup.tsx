@@ -138,8 +138,24 @@ export default function ProviderApiSetup({ onComplete }: ProviderApiSetupProps) 
   
   // Check API key status on mount and after changes
   useEffect(() => {
-    const status = checkRequiredApiKeys();
-    setApiStatus(status);
+    const checkApiStatus = () => {
+      const status = checkRequiredApiKeys();
+      setApiStatus(status);
+      
+      // Log current API configuration status
+      console.log(`API Configuration Status:`, {
+        ready: status.ready,
+        missingProviders: status.missingProviders.length,
+        configuredProviders: INSURANCE_PROVIDERS.length - status.missingProviders.length
+      });
+    };
+    
+    checkApiStatus();
+    
+    // Set up interval to periodically check status (keys can expire)
+    const intervalId = setInterval(checkApiStatus, 60000); // Check every minute
+    
+    return () => clearInterval(intervalId);
   }, [selectedProvider]);
   
   // Filter providers based on search term
