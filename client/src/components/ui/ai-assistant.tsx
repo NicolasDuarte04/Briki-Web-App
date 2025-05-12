@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ModernAIAssistantIcon as AIAssistantIcon } from "@/components/icons/modern-icons";
+import { AIAssistantIcon } from "@/components/icons/futuristic-icons";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Mic, MicOff, Send, Volume2, X } from "lucide-react";

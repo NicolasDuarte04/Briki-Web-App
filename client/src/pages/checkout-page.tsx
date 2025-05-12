@@ -10,8 +10,6 @@ import { useAuth } from "@/hooks/use-auth";
 import { InsurancePlan, Trip } from "@shared/schema";
 import { loadStripe } from "@stripe/stripe-js";
 import { motion } from "framer-motion";
-import { PaymentDisabled } from "@/components/countdown/payment-disabled";
-import { BetaDisclaimer } from "@/components/countdown/beta-disclaimer";
 import { 
   Elements, 
   PaymentElement, 
@@ -324,9 +322,6 @@ export default function CheckoutPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      {/* Beta Disclaimer */}
-      <BetaDisclaimer />
-      
       <Navbar />
       
       {/* Background elements */}
@@ -508,8 +503,22 @@ export default function CheckoutPage() {
                       <CardContent className="pt-6 pb-6">
                         <h2 className="text-xl font-semibold text-gray-900 mb-4">Payment Information</h2>
                         
-                        {/* Payment disabled during beta phase */}
-                        <PaymentDisabled />
+                        {clientSecret ? (
+                          <Elements stripe={stripePromise} options={{ clientSecret }}>
+                            <StripeCheckoutForm
+                              totalAmount={totalAmount}
+                              planId={parseInt(planId || "0")}
+                              onSuccess={handlePaymentSuccess}
+                              tripId={latestTrip?.id || 0}
+                              form={form}
+                            />
+                          </Elements>
+                        ) : (
+                          <div className="flex justify-center py-8">
+                            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                            <span className="ml-2">Initializing payment...</span>
+                          </div>
+                        )}
                       </CardContent>
                     </Card>
                   </form>
