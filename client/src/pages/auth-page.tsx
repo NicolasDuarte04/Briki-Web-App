@@ -123,11 +123,14 @@ export default function AuthPage() {
   useEffect(() => {
     if (user) {
       console.log("AuthPage: User already logged in, redirecting to home page");
-      navigate("/");
+      // Use consistent direct navigation approach
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 100);
     } else {
       console.log("AuthPage: No logged in user detected, staying on auth page");
     }
-  }, [user, navigate]);
+  }, [user]);
   
   // Handle login success
   useEffect(() => {

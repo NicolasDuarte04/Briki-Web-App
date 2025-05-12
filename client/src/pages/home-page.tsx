@@ -49,7 +49,10 @@ export default function HomePage() {
       testButton.style.borderRadius = '4px';
       testButton.onclick = () => {
         console.log("Pre-test button clicked, navigating to home page");
-        navigate("/");
+        // Use direct URL navigation for consistency
+        window.location.href = '/';
+        
+        // The remaining code won't run as page reloads, but keeping for reference
         setTimeout(() => {
           console.log("Current location after pre-test click:", location);
         }, 100);
