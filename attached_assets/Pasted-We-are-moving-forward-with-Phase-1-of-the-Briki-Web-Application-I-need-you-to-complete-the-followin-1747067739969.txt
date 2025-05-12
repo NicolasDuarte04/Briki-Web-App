@@ -1,0 +1,60 @@
+We are moving forward with Phase 1 of the Briki Web Application. I need you to complete the following tasks for **Step 1: UI Consistency and AI Assistant Integration**:
+
+---
+
+### 🌟 **1️⃣ Futuristic UI Transition**  
+**Objective:** Ensure a fully immersive futuristic UI experience across all screens.  
+
+**Tasks:**  
+1. Complete the UI transition for the following screens:  
+   - Trip Info Screen  
+   - Plan Comparison Screen  
+   - Checkout Screen  
+
+2. Apply consistent dark theme styling to:  
+   - Buttons  
+   - Forms  
+   - Dropdown selectors  
+   - Navigation elements  
+
+3. Ensure **mobile responsiveness** is fully optimized:  
+   - Test across standard breakpoints (mobile, tablet, desktop).  
+   - Adjust component sizing and layout for smaller screens.  
+
+4. Replace outdated form fields and dropdowns with modern, styled versions:  
+   - Add animations for opening and closing dropdowns.  
+   - Implement smooth transitions when selecting options.  
+
+---
+
+### 🌟 **2️⃣ AI Assistant Integration**  
+**Objective:** Fully integrate the AI Assistant into the user journey for seamless assistance.  
+
+**Tasks:**  
+1. Connect the AI Assistant to:  
+   - Trip Info Screen → Provide contextual suggestions based on user selections.  
+   - Plan Comparison Screen → Offer tips for choosing the best plan based on user preferences.  
+   - Checkout Screen → Assist with filling out payment forms and answering common questions.  
+
+2. Add **voice recognition** capabilities (if not already implemented) to allow users to interact verbally.  
+
+3. Implement a **help button** on all major screens to quickly access the AI Assistant.  
+
+4. Ensure **real-time updates**:  
+   - When a user changes a form input, the AI Assistant should adjust its recommendations accordingly.  
+
+---
+
+### 🌟 **Expected Deliverables:**  
+- Fully consistent futuristic UI across all specified screens.  
+- AI Assistant integrated with contextual responses and seamless navigation.  
+- Smooth transitions, micro-interactions, and enhanced mobile experience.  
+
+---
+
+Please provide a detailed report of the changes made, including:  
+- Screenshots of the updated UI.  
+- Confirmation that mobile responsiveness is verified.  
+- Documentation of how the AI Assistant interacts with the user journey.  
+
+If there are any blockers or challenges, provide detailed explanations so we can address them immediately.  
