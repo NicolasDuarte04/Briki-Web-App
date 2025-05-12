@@ -7,6 +7,7 @@ import { AuthProvider } from "@/hooks/use-auth";
 import { ProtectedRoute } from "@/lib/protected-route";
 import { LanguageProvider } from "@/components/language-selector";
 import { PageTransition } from "@/components/ui/transition-effect";
+import { RecentlyViewedProvider } from "@/contexts/recently-viewed-context";
 
 import NotFound from "@/pages/not-found";
 import HomePage from "@/pages/home-page";
@@ -28,7 +29,7 @@ function Router() {
   const [location] = useLocation();
   
   return (
-    <PageTransition location={location}>
+    <PageTransition>
       <Switch>
         <Route path="/" component={HomePage} />
         <Route path="/auth" component={AuthPage} />
@@ -55,10 +56,12 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <LanguageProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Router />
-          </TooltipProvider>
+          <RecentlyViewedProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Router />
+            </TooltipProvider>
+          </RecentlyViewedProvider>
         </LanguageProvider>
       </AuthProvider>
     </QueryClientProvider>
