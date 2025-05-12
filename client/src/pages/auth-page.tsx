@@ -150,7 +150,41 @@ export default function AuthPage() {
         <div className="w-full max-w-sm mx-auto lg:w-96">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-semibold text-gray-800">Briki</h1>
-            <p className="text-gray-600 mt-2">Travel Insurance Made Simple</p>
+            <p className="text-gray-600 mt-2">All Your Insurance Needs in One Place</p>
+            <div className="flex justify-center mt-4 space-x-5">
+              <div className="flex flex-col items-center">
+                <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <span className="text-xs mt-1">Travel</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center text-green-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <span className="text-xs mt-1">Auto</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <div className="h-8 w-8 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <span className="text-xs mt-1">Pet</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <div className="h-8 w-8 rounded-full bg-red-100 flex items-center justify-center text-red-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                </div>
+                <span className="text-xs mt-1">Health</span>
+              </div>
+            </div>
           </div>
           
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -373,13 +407,47 @@ export default function AuthPage() {
         <div 
           className="absolute inset-0 bg-cover bg-center"
           style={{ 
-            backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1488085061387-422e29b40080?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')"
+            backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')"
           }}
         >
           <div className="flex flex-col items-center justify-center h-full text-white px-8">
-            <h2 className="text-4xl font-bold mb-4 text-center">Travel with Peace of Mind</h2>
+            <h2 className="text-4xl font-bold mb-6 text-center">Protection for What Matters Most</h2>
+            <div className="grid grid-cols-2 gap-6 mb-8 max-w-xl">
+              <div className="flex items-center">
+                <div className="rounded-full bg-white bg-opacity-20 p-2 mr-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <span>Travel Insurance</span>
+              </div>
+              <div className="flex items-center">
+                <div className="rounded-full bg-white bg-opacity-20 p-2 mr-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <span>Auto Insurance</span>
+              </div>
+              <div className="flex items-center">
+                <div className="rounded-full bg-white bg-opacity-20 p-2 mr-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <span>Pet Insurance</span>
+              </div>
+              <div className="flex items-center">
+                <div className="rounded-full bg-white bg-opacity-20 p-2 mr-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                </div>
+                <span>Health Insurance</span>
+              </div>
+            </div>
             <p className="text-xl max-w-xl text-center">
-              Compare and purchase travel insurance plans from leading providers to protect your next adventure.
+              Compare and purchase insurance plans from leading providers across multiple categories in one place.
             </p>
           </div>
         </div>
