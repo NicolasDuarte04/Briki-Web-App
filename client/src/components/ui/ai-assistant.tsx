@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { AIAssistantIcon } from "@/components/icons/futuristic-icons";
+import { RefinedAIAssistantIcon } from "@/components/icons/refined-ai-assistant-icon";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Mic, MicOff, Send, Volume2, X } from "lucide-react";
@@ -341,7 +341,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
             }}
           >
             <div className="p-4 bg-gradient-to-r from-blue-700 to-indigo-700 flex items-center">
-              <AIAssistantIcon className="h-10 w-10" isActive={true} />
+              <RefinedAIAssistantIcon className="h-10 w-10" animated={true} />
               <div className="ml-3">
                 <h3 className="text-white font-medium text-base">Briki AI Assistant</h3>
                 <p className="text-blue-100 text-xs">Your intelligent insurance guide</p>
