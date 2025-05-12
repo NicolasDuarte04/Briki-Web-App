@@ -52,49 +52,144 @@ export default function HomePage() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       
-      {/* Hero Section */}
-      <div className="relative bg-white overflow-hidden">
-        <div className="max-w-7xl mx-auto">
-          <div className="relative z-10 bg-white pb-8 sm:pb-16 md:pb-20 lg:w-full lg:pb-28 xl:pb-32">
-            <div className="mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28">
-              <FadeIn duration={0.6}>
-                <div className="text-center lg:text-left">
-                  <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
-                    <span className="block">Insurance</span>
-                    <span className="block text-primary">simplified</span>
-                  </h1>
-                  <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
-                    Compare insurance plans across travel, auto, pet, and health categories from top providers. Find the perfect coverage for your needs with just a few clicks.
-                  </p>
-                  <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
-                    <div className="rounded-md shadow">
-                      <Button 
-                        className="w-full px-8 py-3 md:py-4 md:text-lg md:px-10"
-                        onClick={handleGetStarted}
-                      >
-                        Get Started
-                      </Button>
-                    </div>
-                    <div className="mt-3 sm:mt-0 sm:ml-3">
-                      <Button 
-                        variant="secondary"
-                        className="w-full px-8 py-3 md:py-4 md:text-lg md:px-10"
-                        onClick={() => navigate("/learn-more")}
-                      >
-                        Learn More
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </FadeIn>
+      {/* Hero Section - Futuristic AI-driven design */}
+      <div className="relative overflow-hidden bg-background">
+        <div className="absolute inset-0 z-0">
+          <FuturisticBackground particleCount={80} />
+        </div>
+        
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="relative pb-8 sm:pb-16 md:pb-20 lg:pb-28 xl:pb-32 pt-20">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, type: "spring", stiffness: 50 }}
+                className="text-center lg:text-left"
+              >
+                <h1 className="text-4xl tracking-tight font-extrabold sm:text-5xl md:text-6xl lg:text-7xl section-header">
+                  <span className="block mb-2">AI-Powered</span>
+                  <span className="block">Insurance Platform</span>
+                </h1>
+                
+                <motion.p 
+                  className="mt-3 text-base sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0 text-foreground/80"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.7, delay: 0.3 }}
+                >
+                  Compare and analyze insurance options across multiple categories using our advanced AI technology. Get personalized recommendations based on your unique needs and preferences.
+                </motion.p>
+                
+                <motion.div 
+                  className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.7, delay: 0.5, type: "spring" }}
+                >
+                  <motion.div 
+                    className="rounded-md"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Button 
+                      className="w-full px-8 py-3 md:py-4 md:text-lg md:px-10 briki-button"
+                      onClick={handleGetStarted}
+                    >
+                      Get Started
+                    </Button>
+                  </motion.div>
+                  
+                  <motion.div 
+                    className="mt-3 sm:mt-0 sm:ml-3"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Button 
+                      variant="secondary"
+                      className="w-full px-8 py-3 md:py-4 md:text-lg md:px-10 briki-button-secondary"
+                      onClick={() => navigate("/learn-more")}
+                    >
+                      Learn More
+                    </Button>
+                  </motion.div>
+                </motion.div>
+              </motion.div>
             </div>
           </div>
-          <div className="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2">
-            <img 
-              className="h-56 w-full object-cover sm:h-72 md:h-96 lg:w-full lg:h-full"
-              src="https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
-              alt="Insurance protection"
-            />
+          
+          <div className="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2 p-6 flex items-center justify-center">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.7, delay: 0.7, type: "spring" }}
+              className="relative w-full h-full flex items-center justify-center"
+            >
+              {/* Insurance comparison visualization */}
+              <div className="max-w-md w-full ai-data-visual p-6 backdrop-blur-md bg-opacity-30">
+                <h3 className="text-lg font-semibold text-foreground mb-4">Smart Insurance Comparison</h3>
+                
+                <div className="space-y-4">
+                  {/* Coverage bars with animated growth */}
+                  {['Coverage', 'Price', 'Benefits', 'Claims Process'].map((category, i) => (
+                    <motion.div 
+                      key={category}
+                      className="space-y-2"
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.5, delay: 0.8 + (i * 0.1) }}
+                    >
+                      <div className="flex justify-between">
+                        <span className="text-sm text-foreground/80">{category}</span>
+                        <span className="text-sm font-medium text-primary">
+                          {Math.floor(80 - (i * 10))}%
+                        </span>
+                      </div>
+                      
+                      <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+                        <motion.div 
+                          className="h-full bg-primary rounded-full"
+                          initial={{ width: 0 }}
+                          animate={{ width: `${80 - (i * 10)}%` }}
+                          transition={{ duration: 0.8, delay: 1.0 + (i * 0.1), type: "spring" }}
+                        />
+                      </div>
+                    </motion.div>
+                  ))}
+                  
+                  {/* Animated data dots */}
+                  <div className="absolute">
+                    <motion.div 
+                      className="ai-data-particle" 
+                      style={{ top: '20%', left: '10%' }}
+                      animate={{ 
+                        x: [0, 10, 5, 0],
+                        y: [0, -10, 5, 0],
+                      }}
+                      transition={{ 
+                        repeat: Infinity,
+                        duration: 4,
+                        ease: "easeInOut"
+                      }}
+                    />
+                    <motion.div 
+                      className="ai-data-particle" 
+                      style={{ top: '70%', right: '20%' }}
+                      animate={{ 
+                        x: [0, -15, -5, 0],
+                        y: [0, 5, 15, 0],
+                      }}
+                      transition={{ 
+                        repeat: Infinity,
+                        duration: 5,
+                        ease: "easeInOut",
+                        delay: 1
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </motion.div>
           </div>
         </div>
       </div>
