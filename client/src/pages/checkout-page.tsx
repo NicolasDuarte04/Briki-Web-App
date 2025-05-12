@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { InsurancePlan, Trip } from "@shared/schema";
 import { loadStripe } from "@stripe/stripe-js";
+import { motion } from "framer-motion";
 import { 
   Elements, 
   PaymentElement, 
@@ -37,7 +38,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, ShieldCheck, Calendar, Briefcase } from "lucide-react";
+import { Loader2, ShieldCheck, Calendar, Briefcase, HelpCircle } from "lucide-react";
+import { FuturisticBackground } from "@/components/ui/futuristic-background";
+import { AIAssistant, getCheckoutTips } from "@/components/ui/ai-assistant";
 
 const checkoutFormSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -323,15 +326,25 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       
-      <div className="flex-grow bg-gray-50">
+      {/* Background elements */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        <FuturisticBackground particleCount={40} interactive={false} />
+      </div>
+      
+      <div className="flex-grow relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">Checkout</h1>
-            <p className="mt-2 text-lg text-gray-600">Complete your purchase to secure your travel insurance</p>
-          </div>
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="mb-8"
+          >
+            <h1 className="text-3xl font-bold section-header">Checkout</h1>
+            <p className="mt-2 text-lg text-foreground/70">Complete your purchase to secure your travel insurance</p>
+          </motion.div>
           
           {(planLoading || tripsLoading) ? (
             <div className="flex justify-center py-12">

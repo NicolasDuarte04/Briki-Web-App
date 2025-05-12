@@ -35,8 +35,10 @@ import {
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, CheckCircle, AlertCircle } from "lucide-react";
+import { CalendarIcon, CheckCircle, AlertCircle, HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { FuturisticBackground } from "@/components/ui/futuristic-background";
+import { AIAssistant, getTripFormTips } from "@/components/ui/ai-assistant";
 
 // Import our new animated components
 import { AnimatedInput } from "@/components/ui/animated-input";
@@ -235,21 +237,38 @@ export default function TripInfoPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       
-      <div className="flex-grow">
+      {/* Background elements */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        <FuturisticBackground particleCount={50} />
+      </div>
+      
+      <div className="flex-grow relative z-10">
         <div className="briki-mobile-container">
-          <div className="mb-8">
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="mb-8"
+          >
             <div className="flex items-center mb-4">
-              <Link href="/" className="text-gray-500">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
-                </svg>
+              <Link href="/">
+                <motion.div 
+                  whileHover={{ x: -5 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="text-primary hover:text-primary/80 transition-colors"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+                  </svg>
+                </motion.div>
               </Link>
             </div>
-            <h2 className="text-2xl font-bold text-black">{t('tripDetails')}</h2>
-          </div>
+            <h2 className="text-3xl font-bold section-header mb-2">{t('tripDetails')}</h2>
+            <p className="text-foreground/70">Tell us about your trip to get personalized insurance options</p>
+          </motion.div>
           
           <div>
             <Form {...form}>
@@ -692,6 +711,29 @@ export default function TripInfoPage() {
             </Form>
           </div>
         </div>
+        
+        {/* Help button that triggers AI Assistant */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 1, duration: 0.5 }}
+        >
+          <AIAssistant 
+            tips={getTripFormTips}
+            position="bottom-right"
+            contextAware={true}
+            formData={form.getValues()}
+            helpMode={true}
+            autoShow={false}
+            onUserQuery={(query) => {
+              // Handle user query - for now just showing a toast with the query
+              toast({
+                title: "Question received",
+                description: `We'll help with: "${query}"`,
+              });
+            }}
+          />
+        </motion.div>
       </div>
       
       <Footer />
