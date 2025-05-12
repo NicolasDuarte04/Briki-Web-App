@@ -20,6 +20,7 @@ import LearnMorePage from "@/pages/learn-more-page";
 import TermsPage from "@/pages/terms-page";
 import ProfilePage from "@/pages/profile-page";
 import SettingsPage from "@/pages/settings-page";
+import ApiSettingsPage from "@/pages/api-settings-page";
 import AutoInsurancePage from "@/pages/auto-insurance-page";
 import PetInsurancePage from "@/pages/pet-insurance-page";
 import HealthInsurancePage from "@/pages/health-insurance-page";
@@ -48,6 +49,7 @@ function Router() {
         <Route path="/terms" component={TermsPage} />
         <ProtectedRoute path="/profile" component={ProfilePage} />
         <ProtectedRoute path="/settings" component={SettingsPage} />
+        <ProtectedRoute path="/api-settings" component={ApiSettingsPage} />
         <Route component={NotFound} />
       </Switch>
     </PageTransition>
