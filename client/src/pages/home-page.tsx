@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import Navbar from "@/components/navbar";
@@ -13,23 +13,17 @@ import { FuturisticBackground } from "@/components/ui/futuristic-background";
 import { AIAssistant, getTravelInsuranceTips, getAutoInsuranceTips, getHealthInsuranceTips, getPetInsuranceTips } from "@/components/ui/ai-assistant";
 import { ComparisonChart, RadarChart, CoverageComparison } from "@/components/ui/data-visualization";
 import { 
-  TravelIcon, 
-  AutoIcon, 
-  PetIcon, 
-  HealthIcon 
-} from "@/components/icons/modern-icons";
+  FuturisticTravelIcon, 
+  FuturisticAutoIcon, 
+  FuturisticPetIcon, 
+  FuturisticHealthIcon 
+} from "@/components/icons/futuristic-icons";
 import { popularPlans } from "@/data/popular-plans";
 
 export default function HomePage() {
-  const [location, navigate] = useLocation();
+  const [, navigate] = useLocation();
   const { user, isLoading } = useAuth();
   const { t } = useLanguage();
-  
-  // Debug log for mounting
-  useEffect(() => {
-    console.log("HomePage mounted, current location:", location);
-    console.log("User data in home page:", user);
-  }, [location, user]);
 
   // Featured destinations data
   const destinations = [
@@ -252,7 +246,7 @@ export default function HomePage() {
               >
                 <div className="h-full bg-card rounded-xl overflow-hidden border border-border p-6 transition-all duration-300 briki-card">
                   <div className="h-32 flex items-center justify-center mb-6">
-                    <TravelIcon className="w-28 h-28 transition-transform duration-500 group-hover:scale-110" />
+                    <FuturisticTravelIcon className="w-28 h-28 transition-transform duration-500 group-hover:scale-110" />
                   </div>
                   <div className="space-y-4">
                     <div className="flex flex-col items-center text-center">
@@ -293,7 +287,7 @@ export default function HomePage() {
               >
                 <div className="h-full bg-card rounded-xl overflow-hidden border border-border p-6 transition-all duration-300 briki-card">
                   <div className="h-32 flex items-center justify-center mb-6">
-                    <AutoIcon className="w-28 h-28 transition-transform duration-500 group-hover:scale-110" />
+                    <FuturisticAutoIcon className="w-28 h-28 transition-transform duration-500 group-hover:scale-110" />
                   </div>
                   <div className="space-y-4">
                     <div className="flex flex-col items-center text-center">
@@ -334,7 +328,7 @@ export default function HomePage() {
               >
                 <div className="h-full bg-card rounded-xl overflow-hidden border border-border p-6 transition-all duration-300 briki-card">
                   <div className="h-32 flex items-center justify-center mb-6">
-                    <PetIcon className="w-28 h-28 transition-transform duration-500 group-hover:scale-110" />
+                    <FuturisticPetIcon className="w-28 h-28 transition-transform duration-500 group-hover:scale-110" />
                   </div>
                   <div className="space-y-4">
                     <div className="flex flex-col items-center text-center">
@@ -375,7 +369,7 @@ export default function HomePage() {
               >
                 <div className="h-full bg-card rounded-xl overflow-hidden border border-border p-6 transition-all duration-300 briki-card">
                   <div className="h-32 flex items-center justify-center mb-6">
-                    <HealthIcon className="w-28 h-28 transition-transform duration-500 group-hover:scale-110" />
+                    <FuturisticHealthIcon className="w-28 h-28 transition-transform duration-500 group-hover:scale-110" />
                   </div>
                   <div className="space-y-4">
                     <div className="flex flex-col items-center text-center">
@@ -648,7 +642,7 @@ export default function HomePage() {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div className="flex flex-col items-center text-center">
                   <div className="w-20 h-20 mb-4">
-                    <TravelIcon className="w-full h-full" />
+                    <FuturisticTravelIcon className="w-full h-full" />
                   </div>
                   <div className="h-3 w-full bg-muted rounded-full overflow-hidden">
                     <motion.div 
@@ -664,7 +658,7 @@ export default function HomePage() {
                 
                 <div className="flex flex-col items-center text-center">
                   <div className="w-20 h-20 mb-4">
-                    <AutoIcon className="w-full h-full" />
+                    <FuturisticAutoIcon className="w-full h-full" />
                   </div>
                   <div className="h-3 w-full bg-muted rounded-full overflow-hidden">
                     <motion.div 
@@ -680,7 +674,7 @@ export default function HomePage() {
                 
                 <div className="flex flex-col items-center text-center">
                   <div className="w-20 h-20 mb-4">
-                    <PetIcon className="w-full h-full" />
+                    <FuturisticPetIcon className="w-full h-full" />
                   </div>
                   <div className="h-3 w-full bg-muted rounded-full overflow-hidden">
                     <motion.div 
@@ -696,7 +690,7 @@ export default function HomePage() {
                 
                 <div className="flex flex-col items-center text-center">
                   <div className="w-20 h-20 mb-4">
-                    <HealthIcon className="w-full h-full" />
+                    <FuturisticHealthIcon className="w-full h-full" />
                   </div>
                   <div className="h-3 w-full bg-muted rounded-full overflow-hidden">
                     <motion.div 

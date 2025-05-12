@@ -22,12 +22,11 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { FuturisticBackground } from "@/components/ui/futuristic-background";
 import { 
-  TravelIcon, 
-  AutoIcon, 
-  PetIcon, 
-  HealthIcon 
-} from "@/components/icons/modern-icons";
-import { BetaDisclaimer } from "@/components/countdown/beta-disclaimer";
+  FuturisticTravelIcon, 
+  FuturisticAutoIcon, 
+  FuturisticPetIcon, 
+  FuturisticHealthIcon 
+} from "@/components/icons/futuristic-icons";
 
 const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -53,12 +52,7 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 export default function AuthPage() {
   const [activeTab, setActiveTab] = useState<string>("login");
   const { user, loginMutation, registerMutation } = useAuth();
-  const [location, navigate] = useLocation();
-  
-  // Debug log for mounting and current location
-  useEffect(() => {
-    console.log("AuthPage mounted, current location:", location);
-  }, [location]);
+  const [, navigate] = useLocation();
   
   // Initialize forms
   const loginForm = useForm<LoginFormValues>({
@@ -129,7 +123,7 @@ export default function AuthPage() {
   useEffect(() => {
     if (user) {
       console.log("AuthPage: User already logged in, redirecting to home page");
-      navigate("/home");
+      navigate("/");
     } else {
       console.log("AuthPage: No logged in user detected, staying on auth page");
     }
@@ -137,45 +131,22 @@ export default function AuthPage() {
   
   // Handle login success
   useEffect(() => {
-    console.log("Login mutation state change:", { 
-      isSuccess: loginMutation.isSuccess,
-      isPending: loginMutation.isPending,
-      isError: loginMutation.isError,
-      error: loginMutation.error
-    });
-    
     if (loginMutation.isSuccess) {
       console.log("AuthPage: Login successful, redirecting to home page");
-      // Force a small delay to ensure state has propagated
-      setTimeout(() => {
-        navigate("/home");
-      }, 300);
+      navigate("/");
     }
-  }, [loginMutation.isSuccess, loginMutation.isPending, loginMutation.isError, navigate]);
+  }, [loginMutation.isSuccess, navigate]);
   
   // Handle registration success
   useEffect(() => {
-    console.log("Registration mutation state change:", { 
-      isSuccess: registerMutation.isSuccess,
-      isPending: registerMutation.isPending,
-      isError: registerMutation.isError,
-      error: registerMutation.error
-    });
-    
     if (registerMutation.isSuccess) {
       console.log("AuthPage: Registration successful, redirecting to home page");
-      // Force a small delay to ensure state has propagated
-      setTimeout(() => {
-        navigate("/home");
-      }, 300);
+      navigate("/");
     }
-  }, [registerMutation.isSuccess, registerMutation.isPending, registerMutation.isError, navigate]);
+  }, [registerMutation.isSuccess, navigate]);
 
   return (
     <div className="flex min-h-screen bg-background">
-      {/* Beta Disclaimer */}
-      <BetaDisclaimer />
-      
       {/* Background elements */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         <FuturisticBackground particleCount={60} />
@@ -199,7 +170,7 @@ export default function AuthPage() {
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <div className="h-12 w-12 mb-3">
-                  <TravelIcon className="h-full w-full" />
+                  <FuturisticTravelIcon className="h-full w-full" />
                 </div>
                 <span className="text-xs text-foreground/80">Travel</span>
               </motion.div>
@@ -210,7 +181,7 @@ export default function AuthPage() {
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <div className="h-12 w-12 mb-3">
-                  <AutoIcon className="h-full w-full" />
+                  <FuturisticAutoIcon className="h-full w-full" />
                 </div>
                 <span className="text-xs text-foreground/80">Auto</span>
               </motion.div>
@@ -221,7 +192,7 @@ export default function AuthPage() {
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <div className="h-12 w-12 mb-3">
-                  <PetIcon className="h-full w-full" />
+                  <FuturisticPetIcon className="h-full w-full" />
                 </div>
                 <span className="text-xs text-foreground/80">Pet</span>
               </motion.div>
@@ -232,7 +203,7 @@ export default function AuthPage() {
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <div className="h-12 w-12 mb-3">
-                  <HealthIcon className="h-full w-full" />
+                  <FuturisticHealthIcon className="h-full w-full" />
                 </div>
                 <span className="text-xs text-foreground/80">Health</span>
               </motion.div>
@@ -496,7 +467,7 @@ export default function AuthPage() {
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <div className="h-16 w-16 mb-3">
-                  <TravelIcon className="h-full w-full" />
+                  <FuturisticTravelIcon className="h-full w-full" />
                 </div>
                 <span className="text-foreground/90">Travel Insurance</span>
               </motion.div>
@@ -507,7 +478,7 @@ export default function AuthPage() {
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <div className="h-16 w-16 mb-3">
-                  <AutoIcon className="h-full w-full" />
+                  <FuturisticAutoIcon className="h-full w-full" />
                 </div>
                 <span className="text-foreground/90">Auto Insurance</span>
               </motion.div>
@@ -518,7 +489,7 @@ export default function AuthPage() {
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <div className="h-16 w-16 mb-3">
-                  <PetIcon className="h-full w-full" />
+                  <FuturisticPetIcon className="h-full w-full" />
                 </div>
                 <span className="text-foreground/90">Pet Insurance</span>
               </motion.div>
@@ -529,7 +500,7 @@ export default function AuthPage() {
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <div className="h-16 w-16 mb-3">
-                  <HealthIcon className="h-full w-full" />
+                  <FuturisticHealthIcon className="h-full w-full" />
                 </div>
                 <span className="text-foreground/90">Health Insurance</span>
               </motion.div>
