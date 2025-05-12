@@ -8,6 +8,7 @@ import { ProtectedRoute } from "@/lib/protected-route";
 import { LanguageProvider } from "@/components/language-selector";
 import { PageTransition } from "@/components/ui/transition-effect";
 import { RecentlyViewedProvider } from "@/contexts/recently-viewed-context";
+import { AIAssistantProvider } from "@/components/layout";
 
 import NotFound from "@/pages/not-found";
 import HomePage from "@/pages/home-page";
@@ -25,6 +26,7 @@ import AutoInsurancePage from "@/pages/auto-insurance-page";
 import PetInsurancePage from "@/pages/pet-insurance-page";
 import HealthInsurancePage from "@/pages/health-insurance-page";
 import AutoQuotePage from "@/pages/auto-quote-page";
+import AIAssistantDemo from "@/pages/ai-assistant-demo";
 
 function Router() {
   const [location] = useLocation();
@@ -47,6 +49,7 @@ function Router() {
         <Route path="/health-compare" component={HealthInsurancePage} /> {/* Placeholder until we create HealthComparePage */}
         <Route path="/learn-more" component={LearnMorePage} />
         <Route path="/terms" component={TermsPage} />
+        <Route path="/ai-assistant" component={AIAssistantDemo} />
         <ProtectedRoute path="/profile" component={ProfilePage} />
         <ProtectedRoute path="/settings" component={SettingsPage} />
         <ProtectedRoute path="/api-settings" component={ApiSettingsPage} />
