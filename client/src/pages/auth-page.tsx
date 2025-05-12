@@ -132,11 +132,21 @@ export default function AuthPage() {
   
   // Handle login success
   useEffect(() => {
+    console.log("Login mutation state change:", { 
+      isSuccess: loginMutation.isSuccess,
+      isPending: loginMutation.isPending,
+      isError: loginMutation.isError,
+      error: loginMutation.error
+    });
+    
     if (loginMutation.isSuccess) {
       console.log("AuthPage: Login successful, redirecting to home page");
-      navigate("/home");
+      // Force a small delay to ensure state has propagated
+      setTimeout(() => {
+        navigate("/home");
+      }, 300);
     }
-  }, [loginMutation.isSuccess, navigate]);
+  }, [loginMutation.isSuccess, loginMutation.isPending, loginMutation.isError, navigate]);
   
   // Handle registration success
   useEffect(() => {
