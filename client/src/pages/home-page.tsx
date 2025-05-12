@@ -5,6 +5,7 @@ import Footer from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/components/language-selector";
+import { FadeIn, SlideIn, StaggerChildren } from "@/components/ui/transition-effect";
 
 export default function HomePage() {
   const [, navigate] = useLocation();
@@ -106,75 +107,96 @@ export default function HomePage() {
           </div>
           
           <div className="mt-10">
-            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-              {/* Travel Insurance */}
-              <div onClick={() => navigate("/insurance-plans")} className="cursor-pointer group relative">
-                <div className="relative h-64 w-full overflow-hidden rounded-lg bg-white shadow-lg border border-gray-200 hover:border-primary transition-all">
-                  <img
-                    src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
-                    alt="Travel Insurance"
-                    className="h-40 w-full object-cover transition duration-200 group-hover:scale-105"
-                  />
-                  <div className="p-4">
-                    <div className="flex flex-col items-center text-center">
-                      <h3 className="text-lg font-bold text-gray-900">{t('travelInsurance')}</h3>
-                      <p className="mt-1 text-sm text-gray-500">Travel with peace of mind knowing you're covered for emergencies and cancellations</p>
+              {/* Using StaggerChildren for animation */}
+              <StaggerChildren staggerDelay={0.15} className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+                {/* Travel Insurance */}
+                <div 
+                  onClick={() => navigate("/insurance-plans")} 
+                  className="cursor-pointer group relative"
+                  role="button"
+                  aria-label="View travel insurance plans"
+                >
+                  <div className="relative h-64 w-full overflow-hidden rounded-lg bg-white shadow-lg border border-gray-200 hover:border-primary transition-all duration-300 hover:shadow-xl">
+                    <img
+                      src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+                      alt="Travel Insurance"
+                      className="h-40 w-full object-cover transition duration-300 group-hover:scale-105"
+                    />
+                    <div className="p-4">
+                      <div className="flex flex-col items-center text-center">
+                        <h3 className="text-lg font-bold text-gray-900">{t('travelInsurance')}</h3>
+                        <p className="mt-1 text-sm text-gray-500">Travel with peace of mind knowing you're covered for emergencies and cancellations</p>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              
-              {/* Auto Insurance */}
-              <div onClick={() => navigate("/auto-insurance")} className="cursor-pointer group relative">
-                <div className="relative h-64 w-full overflow-hidden rounded-lg bg-white shadow-lg border border-gray-200 hover:border-primary transition-all">
-                  <img
-                    src="https://images.unsplash.com/photo-1560641545-3a9e73c8e732?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
-                    alt="Auto Insurance"
-                    className="h-40 w-full object-cover transition duration-200 group-hover:scale-105"
-                  />
-                  <div className="p-4">
-                    <div className="flex flex-col items-center text-center">
-                      <h3 className="text-lg font-bold text-gray-900">{t('autoInsurance')}</h3>
-                      <p className="mt-1 text-sm text-gray-500">Protect your vehicle with reliable coverage options for every need</p>
+                
+                {/* Auto Insurance */}
+                <div 
+                  onClick={() => navigate("/auto-insurance")} 
+                  className="cursor-pointer group relative"
+                  role="button"
+                  aria-label="View auto insurance plans"
+                >
+                  <div className="relative h-64 w-full overflow-hidden rounded-lg bg-white shadow-lg border border-gray-200 hover:border-primary transition-all duration-300 hover:shadow-xl">
+                    <img
+                      src="https://images.unsplash.com/photo-1560641545-3a9e73c8e732?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+                      alt="Auto Insurance"
+                      className="h-40 w-full object-cover transition duration-300 group-hover:scale-105"
+                    />
+                    <div className="p-4">
+                      <div className="flex flex-col items-center text-center">
+                        <h3 className="text-lg font-bold text-gray-900">{t('autoInsurance')}</h3>
+                        <p className="mt-1 text-sm text-gray-500">Protect your vehicle with reliable coverage options for every need</p>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              
-              {/* Pet Insurance */}
-              <div onClick={() => navigate("/pet-insurance")} className="cursor-pointer group relative">
-                <div className="relative h-64 w-full overflow-hidden rounded-lg bg-white shadow-lg border border-gray-200 hover:border-primary transition-all">
-                  <img
-                    src="https://images.unsplash.com/photo-1450778869180-41d0601e046e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
-                    alt="Pet Insurance"
-                    className="h-40 w-full object-cover transition duration-200 group-hover:scale-105"
-                  />
-                  <div className="p-4">
-                    <div className="flex flex-col items-center text-center">
-                      <h3 className="text-lg font-bold text-gray-900">{t('petInsurance')}</h3>
-                      <p className="mt-1 text-sm text-gray-500">Give your pets the protection they deserve with medical and accident coverage</p>
+                
+                {/* Pet Insurance */}
+                <div 
+                  onClick={() => navigate("/pet-insurance")} 
+                  className="cursor-pointer group relative"
+                  role="button"
+                  aria-label="View pet insurance plans"
+                >
+                  <div className="relative h-64 w-full overflow-hidden rounded-lg bg-white shadow-lg border border-gray-200 hover:border-primary transition-all duration-300 hover:shadow-xl">
+                    <img
+                      src="https://images.unsplash.com/photo-1450778869180-41d0601e046e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+                      alt="Pet Insurance"
+                      className="h-40 w-full object-cover transition duration-300 group-hover:scale-105"
+                    />
+                    <div className="p-4">
+                      <div className="flex flex-col items-center text-center">
+                        <h3 className="text-lg font-bold text-gray-900">{t('petInsurance')}</h3>
+                        <p className="mt-1 text-sm text-gray-500">Give your pets the protection they deserve with medical and accident coverage</p>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              
-              {/* Health Insurance */}
-              <div onClick={() => navigate("/health-insurance")} className="cursor-pointer group relative">
-                <div className="relative h-64 w-full overflow-hidden rounded-lg bg-white shadow-lg border border-gray-200 hover:border-primary transition-all">
-                  <img
-                    src="https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
-                    alt="Health Insurance"
-                    className="h-40 w-full object-cover transition duration-200 group-hover:scale-105"
-                  />
-                  <div className="p-4">
-                    <div className="flex flex-col items-center text-center">
-                      <h3 className="text-lg font-bold text-gray-900">{t('healthInsurance')}</h3>
-                      <p className="mt-1 text-sm text-gray-500">Find the perfect health plan for your lifestyle and medical needs</p>
+                
+                {/* Health Insurance */}
+                <div 
+                  onClick={() => navigate("/health-insurance")} 
+                  className="cursor-pointer group relative"
+                  role="button"
+                  aria-label="View health insurance plans"
+                >
+                  <div className="relative h-64 w-full overflow-hidden rounded-lg bg-white shadow-lg border border-gray-200 hover:border-primary transition-all duration-300 hover:shadow-xl">
+                    <img
+                      src="https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+                      alt="Health Insurance"
+                      className="h-40 w-full object-cover transition duration-300 group-hover:scale-105"
+                    />
+                    <div className="p-4">
+                      <div className="flex flex-col items-center text-center">
+                        <h3 className="text-lg font-bold text-gray-900">{t('healthInsurance')}</h3>
+                        <p className="mt-1 text-sm text-gray-500">Find the perfect health plan for your lifestyle and medical needs</p>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
+              </StaggerChildren>
           </div>
         </div>
       </div>

@@ -44,22 +44,22 @@ export default function Footer() {
                 <ul className="mt-4 space-y-4">
                   <li>
                     <Link href="/insurance-plans" className="text-base text-gray-500 hover:text-gray-900">
-                      Plans
+                      Travel Insurance Plans
                     </Link>
                   </li>
                   <li>
-                    <Link href="/" className="text-base text-gray-500 hover:text-gray-900">
-                      Coverage
+                    <Link href="/auto-insurance" className="text-base text-gray-500 hover:text-gray-900">
+                      Auto Insurance Plans
                     </Link>
                   </li>
                   <li>
-                    <Link href="/" className="text-base text-gray-500 hover:text-gray-900">
-                      Providers
+                    <Link href="/pet-insurance" className="text-base text-gray-500 hover:text-gray-900">
+                      Pet Insurance Plans
                     </Link>
                   </li>
                   <li>
-                    <Link href="/" className="text-base text-gray-500 hover:text-gray-900">
-                      Claims
+                    <Link href="/health-insurance" className="text-base text-gray-500 hover:text-gray-900">
+                      Health Insurance Plans
                     </Link>
                   </li>
                 </ul>
