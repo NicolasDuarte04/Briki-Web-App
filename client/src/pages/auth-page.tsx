@@ -141,8 +141,8 @@ export default function AuthPage() {
   // Handle registration success
   useEffect(() => {
     if (registerMutation.isSuccess) {
-      console.log("AuthPage: Registration successful, redirecting to home page");
-      navigate("/home");
+      console.log("AuthPage: Registration successful, redirecting to trip info page");
+      navigate("/trip-info");
     }
   }, [registerMutation.isSuccess, navigate]);
 
