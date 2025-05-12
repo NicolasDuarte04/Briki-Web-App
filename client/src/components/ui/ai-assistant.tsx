@@ -89,7 +89,7 @@ interface AIAssistantProps {
 }
 
 export const AIAssistant: React.FC<AIAssistantProps> = ({
-  tips,
+  tips = [],
   delay = 2000,
   position = "bottom-right",
   autoShow = true,
@@ -98,6 +98,10 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
   onUserQuery,
   helpMode = false
 }) => {
+  // Ensure tips is an array - fallback for undefined data
+  const safeTips = Array.isArray(tips) && tips.length > 0 
+    ? tips 
+    : ["Our AI assistant is here to help with your insurance needs."];
   const [isExpanded, setIsExpanded] = useState(false);
   const [currentTip, setCurrentTip] = useState(0);
   const [isTyping, setIsTyping] = useState(false);
@@ -169,8 +173,8 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
   
   // Typing effect
   useEffect(() => {
-    if (isExpanded && tips.length > 0) {
-      const currentTipText = tips[currentTip];
+    if (isExpanded && safeTips.length > 0) {
+      const currentTipText = safeTips[currentTip % safeTips.length]; // Use modulo to prevent out of bounds
       let index = 0;
       setIsTyping(true);
       setTypedText("");
@@ -187,7 +191,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
       
       return () => clearInterval(typingInterval);
     }
-  }, [isExpanded, currentTip, tips]);
+  }, [isExpanded, currentTip, safeTips]);
   
   // Scroll to bottom of chat when new messages are added
   useEffect(() => {
