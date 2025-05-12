@@ -11,10 +11,10 @@ export default function CountdownPage() {
     seconds: 0
   });
 
-  // Calculate time difference from 20 days from now
+  // Calculate time difference from a fixed global launch date
   useEffect(() => {
-    const targetDate = new Date();
-    targetDate.setDate(targetDate.getDate() + 20);
+    // Set a fixed global launch date (June 1, 2025)
+    const targetDate = new Date('2025-06-01T00:00:00');
     
     const interval = setInterval(() => {
       const now = new Date();
@@ -61,6 +61,9 @@ export default function CountdownPage() {
             Briki
           </h1>
           <p className="mt-4 text-xl text-muted-foreground">
+            Global Launch Countdown - June 1, 2025
+          </p>
+          <p className="mt-2 text-base text-muted-foreground/80">
             The future of insurance comparison is coming soon
           </p>
         </div>
@@ -121,9 +124,19 @@ export default function CountdownPage() {
         
         {/* Beta Disclaimer */}
         <div className="animate-fade-in-up animation-delay-500">
-          <p className="text-sm text-muted-foreground bg-card/30 backdrop-blur-sm rounded-lg p-4 border border-accent/10">
-            You are accessing a beta version of Briki. Payments are currently disabled for testing purposes.
-          </p>
+          <div className="text-sm text-foreground bg-card/40 backdrop-blur-sm rounded-lg p-4 border border-accent/20 shadow-glow-sm">
+            <div className="flex items-center gap-2 mb-2">
+              <svg className="w-5 h-5 text-primary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+              <span className="font-semibold">Beta Notice</span>
+            </div>
+            <p>
+              You are accessing a beta version of Briki. Payments are currently disabled for testing purposes.
+            </p>
+          </div>
         </div>
       </div>
     </div>
