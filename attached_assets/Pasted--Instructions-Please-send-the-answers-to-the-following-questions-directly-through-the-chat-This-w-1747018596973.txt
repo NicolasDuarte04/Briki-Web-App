@@ -1,0 +1,73 @@
+# Instructions:
+Please send the answers to the following questions directly through the chat. This will help us refine the structure and move forward efficiently.
+
+---
+
+# Questions:
+## 1️⃣ Login & Sign Up Page Update:
+- When updating the login page, are you able to:
+  - Replace the subtitle from "Travel Insurance Made Simple" to "All Your Insurance Needs in One Place"?
+  - Add small icons for Travel, Auto, Pet, and Health under the new subtitle for visual clarity?
+  - Ensure Google and Facebook login buttons remain functional and styled correctly?
+
+---
+
+## 2️⃣ Popular Plans Section:
+- When replacing *Popular Destinations* with *Popular Plans*, can you:
+  - Display the plans based on top-rated options for Travel, Auto, Pet, and Health?  
+  - Integrate clickable buttons for *Get a Quote* and *View Details*?
+  - Ensure the section is **horizontally scrollable** on both desktop and mobile?
+
+---
+
+## 3️⃣ Smooth Transition Animations:
+- Are you implementing smooth slide or fade animations when switching categories?  
+- Will the animations be **consistent across all devices** (desktop, mobile, tablet)?
+
+---
+
+## 4️⃣ Comparison Logic Expansion:
+- For the *Compare Plans* screen, are you able to:
+  - Dynamically display coverage differences for Auto, Pet, and Health?
+  - Highlight the best value and key features during the comparison?
+  - Allow users to easily remove or add plans during the comparison process?
+
+---
+
+## 5️⃣ Footer & Navbar Update:
+- When updating the footer, are you adding:
+  - Links to each category (Travel, Auto, Pet, Health)?
+  - A global search bar for quick access to insurance types?  
+- In the navbar, can the categories be **highlighted based on the active page**?
+
+---
+
+## 6️⃣ Mobile Responsiveness:
+- Are the category cards swipeable and scrollable on mobile?  
+- Is the comparison view fully visible and navigable on mobile screens?  
+- Will the navbar collapse into a hamburger menu for mobile navigation?  
+
+---
+
+## 7️⃣ Search Bar Logic:
+- Should we add a **search bar** on each category page (e.g., "Search for Car Models" in Auto, "Search for Pet Breeds" in Pet)?  
+- Can the search bar have **auto-completion** based on popular models and breeds?  
+
+---
+
+## 8️⃣ Recently Viewed Plans (Optional):
+- Are you able to implement a *Recently Viewed Plans* section under each category for users to easily revisit past quotes?  
+- If yes, can we include:
+  - Timestamp of last view
+  - One-click access to *Compare Again* or *Get a Quote*  
+
+---
+
+## 9️⃣ Animated Loaders (Optional):
+- When switching between categories, can you implement a smooth loader to avoid white screens?  
+- Should the loader show a branded Briki animation during page load?  
+
+---
+
+# Instructions:
+Please reply with the answers directly through the chat. We will adjust the development plan based on your responses.
