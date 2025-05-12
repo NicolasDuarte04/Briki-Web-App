@@ -173,7 +173,7 @@ export default function AIAssistantDemo() {
           Try our AI assistant now by clicking the button below
         </p>
         <AIAssistantButton 
-          variant="text" 
+          displayVariant="text" 
           label="Launch AI Assistant" 
           className="mx-auto"
           size="lg"

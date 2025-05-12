@@ -8,7 +8,7 @@ import { ProtectedRoute } from "@/lib/protected-route";
 import { LanguageProvider } from "@/components/language-selector";
 import { PageTransition } from "@/components/ui/transition-effect";
 import { RecentlyViewedProvider } from "@/contexts/recently-viewed-context";
-import { AIAssistantProvider } from "@/components/layout";
+import { AIAssistantProvider, FloatingAssistantButton } from "@/components/layout";
 
 import NotFound from "@/pages/not-found";
 import HomePage from "@/pages/home-page";
@@ -67,7 +67,10 @@ function App() {
           <RecentlyViewedProvider>
             <TooltipProvider>
               <Toaster />
-              <Router />
+              <AIAssistantProvider>
+                <Router />
+                <FloatingAssistantButton />
+              </AIAssistantProvider>
             </TooltipProvider>
           </RecentlyViewedProvider>
         </LanguageProvider>
