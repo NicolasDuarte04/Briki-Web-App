@@ -5,6 +5,12 @@ import { storage } from "./storage";
 import Stripe from "stripe";
 import { users, trips, insurancePlans, orders } from "@shared/schema";
 import { z } from "zod";
+import { 
+  getChatCompletionFromOpenAI, 
+  generateInsuranceRecommendation, 
+  explainInsuranceTerm, 
+  comparePlans 
+} from "./services/openai";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   console.warn('Warning: Missing STRIPE_SECRET_KEY environment variable');

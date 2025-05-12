@@ -77,6 +77,23 @@ export function useFilteredInsurancePlans(
 }
 
 /**
+ * Hook to fetch travel insurance plans for a specific trip
+ */
+export function usePlansForTrip(tripDetails: any, enabled = true) {
+  return useQuery({
+    queryKey: ['api/insurance/travel', tripDetails],
+    queryFn: () => apiRequest(
+      'POST',
+      '/api/insurance/travel/search',
+      { criteria: tripDetails }
+    ),
+    refetchOnWindowFocus: false,
+    enabled,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+  });
+}
+
+/**
  * Hook to fetch detailed information about a specific plan
  */
 export function useInsurancePlanDetail(planId: string, enabled = true) {
@@ -236,4 +253,32 @@ export function useRefreshProviderData() {
       queryClient.invalidateQueries({ queryKey: CACHE_KEYS.providerStatus });
     }
   });
+}
+
+/**
+ * Hook to invalidate the plans cache
+ */
+export function useInvalidatePlansCache() {
+  const queryClient = useQueryClient();
+  
+  return {
+    invalidateAllPlans: () => {
+      queryClient.invalidateQueries({ queryKey: CACHE_KEYS.allPlans });
+    },
+    invalidatePlansByCategory: (category: string) => {
+      queryClient.invalidateQueries({ queryKey: ['/api/insurance/plans', category] });
+    },
+    invalidatePlansByProvider: (provider: string) => {
+      queryClient.invalidateQueries({ queryKey: CACHE_KEYS.plansByProvider(provider) });
+    },
+    invalidateFilteredPlans: (category: string, criteria: Record<string, any>) => {
+      queryClient.invalidateQueries({ queryKey: CACHE_KEYS.filteredPlans(category, criteria) });
+    },
+    invalidatePlanDetail: (planId: string) => {
+      queryClient.invalidateQueries({ queryKey: CACHE_KEYS.planDetail(planId) });
+    },
+    invalidateAllProviderData: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/insurance'] });
+    }
+  };
 }
