@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { InsurancePlan } from "@shared/schema";
+import { InsurancePlan, Trip } from "@shared/schema";
 import { useLocation, Link } from "wouter";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 
 import Navbar from "@/components/navbar";
@@ -14,7 +14,7 @@ import { FeatureBreakdown } from "@/components/feature-breakdown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Filter, Search, Sparkles, ChevronLeft, Medal, ThumbsUp, Zap, Star, HelpCircle } from "lucide-react";
+import { Filter, Search, Sparkles, ChevronLeft, Medal, ThumbsUp, Zap, Star, HelpCircle, RefreshCw } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
@@ -30,6 +30,9 @@ import {
 } from "@/components/ui/sheet";
 import { FuturisticBackground } from "@/components/ui/futuristic-background";
 import { AIAssistant, getComparisonTips } from "@/components/ui/ai-assistant";
+import { PlanGridSkeleton, TopProgressBar } from "@/components/ui/skeleton-loaders";
+import { ApiErrorsSummary, AllProvidersFailedError } from "@/components/ui/error-display";
+import { usePlansForTrip, useInvalidatePlansCache, usePlanErrors } from "@/services/caching/insurance-cache";
 
 export default function InsurancePlansPage() {
   const [, navigate] = useLocation();
@@ -42,17 +45,57 @@ export default function InsurancePlansPage() {
   const [activeTab, setActiveTab] = useState("all");
   const { toast } = useToast();
   
-  // Get insurance plans
-  const { data: plans = [], isLoading, error } = useQuery<InsurancePlan[]>({
-    queryKey: ["/api/plans"],
-  });
+  // Use our cached and fallback trip data
+  // In a real implementation, this would come from a previous step or context
+  const tripData = {
+    id: 1,
+    destination: "Mexico",
+    countryOfOrigin: "Colombia",
+    departureDate: "2023-12-10",
+    returnDate: "2023-12-20",
+    travelers: 2,
+    userId: null,
+    createdAt: null,
+    estimatedCost: 1500, // Estimated trip cost for coverage calculations
+  } as Trip;
+  
+  // Get provider API errors
+  const { data: apiErrors = {} } = usePlanErrors();
+  
+  // Get insurance plans using our real API integration and caching
+  const { 
+    data: plans = [], 
+    isLoading, 
+    error, 
+    isError, 
+    refetch 
+  } = usePlansForTrip(tripData);
+  
+  // Cache invalidation mutation
+  const invalidateCacheMutation = useInvalidatePlansCache();
+  const isInvalidating = invalidateCacheMutation.isPending;
+  
+  // Helper to handle refreshing data
+  const handleRefresh = () => {
+    invalidateCacheMutation.mutate({ tripId: tripData.id });
+    toast({
+      title: "Refreshing data",
+      description: "Getting the latest quotes from insurance providers...",
+    });
+  };
+  
+  // Show loading state during initial load and invalidation
+  const showLoading = isLoading || isInvalidating;
+  
+  // Get total error count
+  const errorCount = Object.keys(apiErrors).length;
   
   // Filter plans based on criteria
   const filteredPlans = plans.filter(plan => 
     plan.basePrice >= filterPriceRange[0] &&
     plan.basePrice <= filterPriceRange[1] &&
-    (!filterMedical || plan.medicalCoverage >= 150000) &&
-    (!filterTrip || plan.tripCancellation.includes("100%")) &&
+    (!filterMedical || (plan.medicalCoverage || 0) >= 150000) &&
+    (!filterTrip || (plan.tripCancellation || "").includes("100%")) &&
     (!filterAdventure || plan.adventureActivities) &&
     (activeTab === "all" || 
      (activeTab === "best" && plan.rating && parseFloat(plan.rating) >= 4.5) ||
@@ -276,67 +319,129 @@ export default function InsurancePlansPage() {
             </Tabs>
           </motion.div>
           
+          {/* Loading progress bar */}
+          <TopProgressBar isLoading={showLoading} />
+
+          {/* API Error summary section - only show if we have some plans */}
+          {errorCount > 0 && plans.length > 0 && (
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.1 }}
+              className="mb-6"
+            >
+              <ApiErrorsSummary 
+                errors={apiErrors} 
+                onRetryAll={handleRefresh} 
+              />
+            </motion.div>
+          )}
+
           {/* Plan display section */}
           <div className="mt-4">
-            {isLoading ? (
-              <div className="flex flex-col items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
-                <p className="text-gray-500">Cargando planes de seguro...</p>
-              </div>
-            ) : error ? (
-              <div className="bg-red-50 border border-red-200 text-red-800 rounded-xl p-4">
-                <h3 className="font-medium mb-1">Error al cargar los planes</h3>
-                <p className="text-sm">Por favor intenta de nuevo o contacta a soporte.</p>
-              </div>
-            ) : filteredPlans.length === 0 ? (
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 text-center">
-                <h3 className="text-lg font-medium text-blue-800 mb-2">No se encontraron planes</h3>
-                <p className="text-blue-600 mb-4">Intenta ajustar los filtros para ver más opciones.</p>
-                <Button variant="outline" onClick={resetFilters} className="mt-2">
-                  Restablecer filtros
-                </Button>
-              </div>
-            ) : (
-              <>
-                {/* If we have a selected plan for details, show the feature breakdown */}
-                {selectedPlanForDetails && (
-                  <div className="mb-6 bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-                    <div className="flex justify-between items-center mb-4">
-                      <h3 className="text-lg font-bold">{selectedPlanForDetails.name}</h3>
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        onClick={() => setSelectedPlanForDetails(null)}
-                      >
-                        Ver todos
-                      </Button>
-                    </div>
-                    <FeatureBreakdown 
-                      plans={[selectedPlanForDetails]} 
-                      maxFeatures={7}
-                    />
-                    <div className="mt-4 pt-4 border-t border-gray-100">
-                      <Button 
-                        className="briki-button w-full" 
-                        onClick={() => navigate(`/checkout/${selectedPlanForDetails.id}`)}
-                      >
-                        Seleccionar plan
-                      </Button>
-                    </div>
+            <AnimatePresence mode="wait">
+              {showLoading ? (
+                <motion.div 
+                  key="loading"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="py-4"
+                >
+                  <div className="flex flex-col items-center justify-center mb-8">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+                    <p className="text-foreground/70">Obteniendo cotizaciones de seguros en tiempo real...</p>
                   </div>
-                )}
-                
-                {/* Plan grid */}
-                <PlanGrid 
-                  plans={filteredPlans}
-                  onSelectPlan={(plan) => navigate(`/checkout/${plan.id}`)}
-                  onComparePlans={(plans) => {
-                    setSelectedPlans(plans);
-                    setCompareModalOpen(true);
-                  }}
-                />
-              </>
-            )}
+                  <PlanGridSkeleton count={6} />
+                </motion.div>
+              ) : (isError && plans.length === 0) ? (
+                <motion.div
+                  key="error"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  <AllProvidersFailedError onRetry={handleRefresh} />
+                </motion.div>
+              ) : filteredPlans.length === 0 ? (
+                <motion.div
+                  key="no-results"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="bg-background/80 backdrop-blur-sm border border-primary/20 rounded-xl p-6 text-center shadow-glow-sm"
+                >
+                  <h3 className="text-lg font-medium text-foreground mb-2">No se encontraron planes</h3>
+                  <p className="text-foreground/70 mb-4">Intenta ajustar los filtros para ver más opciones.</p>
+                  <Button variant="outline" onClick={resetFilters} className="mt-2">
+                    Restablecer filtros
+                  </Button>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="results"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  {/* Refresh button */}
+                  <div className="flex justify-end mb-4">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={handleRefresh}
+                      className="gap-1.5"
+                      disabled={showLoading}
+                    >
+                      <RefreshCw className="h-3.5 w-3.5" />
+                      Actualizar cotizaciones
+                    </Button>
+                  </div>
+                  
+                  {/* If we have a selected plan for details, show the feature breakdown */}
+                  {selectedPlanForDetails && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="mb-6 bg-background/80 backdrop-blur-sm rounded-xl p-5 shadow-glow-sm border border-primary/20"
+                    >
+                      <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-lg font-bold">{selectedPlanForDetails.name}</h3>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => setSelectedPlanForDetails(null)}
+                        >
+                          Ver todos
+                        </Button>
+                      </div>
+                      <FeatureBreakdown 
+                        plans={[selectedPlanForDetails]} 
+                        maxFeatures={7}
+                      />
+                      <div className="mt-4 pt-4 border-t border-primary/10">
+                        <Button 
+                          className="w-full" 
+                          onClick={() => navigate(`/checkout/${selectedPlanForDetails.id}`)}
+                        >
+                          Seleccionar plan
+                        </Button>
+                      </div>
+                    </motion.div>
+                  )}
+                  
+                  {/* Plan grid */}
+                  <PlanGrid 
+                    plans={filteredPlans}
+                    onSelectPlan={(plan) => navigate(`/checkout/${plan.id}`)}
+                    onComparePlans={(plans) => {
+                      setSelectedPlans(plans);
+                      setCompareModalOpen(true);
+                    }}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
         

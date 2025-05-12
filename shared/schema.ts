@@ -19,6 +19,7 @@ export const trips = pgTable("trips", {
   departureDate: text("departure_date").notNull(),
   returnDate: text("return_date").notNull(),
   travelers: integer("travelers").notNull(),
+  estimatedCost: integer("estimated_cost").default(0),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -65,6 +66,7 @@ export const insertTripSchema = createInsertSchema(trips).pick({
   departureDate: true,
   returnDate: true,
   travelers: true,
+  estimatedCost: true,
 });
 
 export const insertInsurancePlanSchema = createInsertSchema(insurancePlans).omit({
