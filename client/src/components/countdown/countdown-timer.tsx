@@ -105,7 +105,7 @@ export function CountdownTimer({ targetDate, onComplete, className }: CountdownT
           transition={{ delay: 0.8, duration: 0.6 }}
           className="text-center text-sm sm:text-base text-foreground/70 max-w-md"
         >
-          Countdown to the future of insurance
+          Countdown to June 1, 2025 — The Official Launch of Briki
         </motion.div>
       ) : (
         <motion.div 

@@ -11,12 +11,10 @@ export default function CountdownPage() {
   const [, navigate] = useLocation();
   const [isCompleted, setIsCompleted] = useState(false);
   
-  // Calculate target date: 20 days from current date
-  const calculateTargetDate = () => {
-    const today = new Date();
-    const targetDate = new Date(today);
-    targetDate.setDate(today.getDate() + 20); // 20 days countdown
-    return targetDate;
+  // Fixed target date: June 1, 2025
+  const getFixedTargetDate = () => {
+    // Using a fixed date (June 1, 2025) for the official launch
+    return new Date(2025, 5, 1, 0, 0, 0);
   };
 
   const handlePreTestClick = () => {
@@ -65,7 +63,7 @@ export default function CountdownPage() {
           transition={{ duration: 0.6, delay: 0.3 }}
         >
           <CountdownTimer 
-            targetDate={calculateTargetDate()} 
+            targetDate={getFixedTargetDate()} 
             onComplete={handleCountdownComplete}
           />
         </motion.div>
