@@ -76,6 +76,17 @@ export function ProtectedRoute({
   // After verification attempts, if still no user, redirect to auth
   if (!user) {
     console.log("Protected route: No authenticated user found, redirecting to auth");
+    // Force redirect if needed
+    useEffect(() => {
+      const timer = setTimeout(() => {
+        if (window.location.pathname !== '/auth') {
+          console.log("Protected route: Forcing redirect to auth page");
+          window.location.href = "/auth";
+        }
+      }, 300);
+      return () => clearTimeout(timer);
+    }, []);
+    
     return (
       <Route path={path}>
         <Redirect to="/auth" />

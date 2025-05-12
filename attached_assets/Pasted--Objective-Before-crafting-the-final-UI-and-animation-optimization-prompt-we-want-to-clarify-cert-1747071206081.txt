@@ -1,0 +1,44 @@
+# Objective:
+Before crafting the final UI and animation optimization prompt, we want to clarify certain implementation details and explore possibilities to enhance Briki's visual presence and user experience. Below are the key questions to ensure maximum efficiency and visual appeal.
+
+---
+
+# Questions:
+1️⃣ **Visual Consistency:**  
+- Are the current images and illustrations across the platform following a consistent design style?  
+- Are you using any design system (e.g., Material UI, Tailwind CSS) for alignment and spacing?  
+- Should we consider moving to a **neomorphic or glassmorphism design style** for a futuristic look?
+
+2️⃣ **Button & Card Interactivity:**  
+- Are the main action buttons (e.g., "Get Started," "Learn More," "Compare Plans") interactive with hover and press animations?  
+- Would it be possible to implement **gradient transitions** and **ripple effects** to enhance user interaction?  
+
+3️⃣ **AI Assistant Visuals:**  
+- Is the AI Assistant currently represented visually? If not, should we consider an **animated icon** that reacts when it provides tips?  
+- Are the tips displayed with smooth fade-in transitions, or is it just text appearing?  
+- Would it be possible to add micro-interactions, like **typing indicators** or a subtle wave animation when the AI is loading a suggestion?  
+
+4️⃣ **Mobile Responsiveness Enhancements:**  
+- Are the swipe gestures fully fluid across iOS and Android?  
+- Is there any lag or jank when navigating between the main categories (Travel, Auto, Pet, Health)?  
+- Should we consider adding **pull-to-refresh** for updating the insurance list in real-time?  
+
+5️⃣ **Search Logic and Category Switching:**  
+- Are search results currently animated when appearing (e.g., slide up or fade in)?  
+- Is category switching smooth and instantaneous, or is there a noticeable delay?  
+- Can we add **visual cues** during category switching (e.g., glowing lines or animated dividers)?  
+
+6️⃣ **Loading Screen and Animations:**  
+- Is the current loader the animated Briki logo?  
+- Should we upgrade the loader to include a more **futuristic spinning animation** with progress indicators?  
+- Would it be possible to animate **data loading**, like policy cards sliding in or glowing briefly when rendered?  
+
+---
+
+# Expected Output:
+- Detailed answers for each question to prepare a high-impact prompt for the final UI polish and animation optimization.  
+- Identification of any bottlenecks or limitations for more complex visual enhancements.  
+
+---
+
+Would you like me to proceed with the full UI and animation optimization once you provide the answers?  
