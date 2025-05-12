@@ -1,14 +1,16 @@
 import { useLocation } from "wouter";
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination, A11y, Autoplay } from 'swiper/modules';
+import { Navigation, Pagination, A11y, Autoplay, Virtual, EffectFade } from 'swiper/modules';
 import { Button } from "@/components/ui/button";
 import { useRecentlyViewed, type Plan } from "@/contexts/recently-viewed-context";
 import { SlideIn } from "@/components/ui/transition-effect";
+import { useCallback, useEffect, useRef } from "react";
 
 // Import Swiper styles
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
+import 'swiper/css/effect-fade';
 
 interface PopularPlansSliderProps {
   plans: Plan[];
@@ -17,46 +19,60 @@ interface PopularPlansSliderProps {
 export default function PopularPlansSlider({ plans }: PopularPlansSliderProps) {
   const [, navigate] = useLocation();
   const { addToRecentlyViewed } = useRecentlyViewed();
+  const animationFrameRef = useRef<number | null>(null);
 
-  const handleViewDetails = (plan: Plan) => {
+  // Cleanup animation frame on unmount
+  useEffect(() => {
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, []);
+
+  const handleViewDetails = useCallback((plan: Plan) => {
     addToRecentlyViewed(plan);
     
-    // Navigate based on category
-    switch (plan.category) {
-      case "travel":
-        navigate("/insurance-plans");
-        break;
-      case "auto":
-        navigate("/auto-insurance");
-        break;
-      case "pet":
-        navigate("/pet-insurance");
-        break;
-      case "health":
-        navigate("/health-insurance");
-        break;
-    }
-  };
+    // Navigate based on category using requestAnimationFrame for smoother transitions
+    animationFrameRef.current = requestAnimationFrame(() => {
+      switch (plan.category) {
+        case "travel":
+          navigate("/insurance-plans");
+          break;
+        case "auto":
+          navigate("/auto-insurance");
+          break;
+        case "pet":
+          navigate("/pet-insurance");
+          break;
+        case "health":
+          navigate("/health-insurance");
+          break;
+      }
+    });
+  }, [addToRecentlyViewed, navigate]);
 
-  const handleGetQuote = (plan: Plan) => {
+  const handleGetQuote = useCallback((plan: Plan) => {
     addToRecentlyViewed(plan);
     
-    // Navigate based on category
-    switch (plan.category) {
-      case "travel":
-        navigate("/trip-info");
-        break;
-      case "auto":
-        navigate("/auto-quote");
-        break;
-      case "pet":
-        navigate("/pet-insurance");
-        break;
-      case "health":
-        navigate("/health-insurance");
-        break;
-    }
-  };
+    // Navigate based on category using requestAnimationFrame for smoother transitions
+    animationFrameRef.current = requestAnimationFrame(() => {
+      switch (plan.category) {
+        case "travel":
+          navigate("/trip-info");
+          break;
+        case "auto":
+          navigate("/auto-quote");
+          break;
+        case "pet":
+          navigate("/pet-insurance");
+          break;
+        case "health":
+          navigate("/health-insurance");
+          break;
+      }
+    });
+  }, [addToRecentlyViewed, navigate]);
 
   // Map category to accent color
   const getCategoryColor = (category: string) => {
@@ -78,12 +94,20 @@ export default function PopularPlansSlider({ plans }: PopularPlansSliderProps) {
     <div className="w-full">
       <SlideIn>
         <Swiper
-          modules={[Navigation, Pagination, A11y, Autoplay]}
+          modules={[Navigation, Pagination, A11y, Autoplay, Virtual, EffectFade]}
           spaceBetween={16}
           slidesPerView="auto"
           navigation
-          pagination={{ clickable: true }}
+          pagination={{ clickable: true, dynamicBullets: true }}
           className="py-4"
+          virtual={{
+            enabled: true,
+            addSlidesAfter: 2,
+            addSlidesBefore: 2,
+          }}
+          speed={600}
+          watchSlidesProgress={true}
+          grabCursor={true}
           breakpoints={{
             640: {
               slidesPerView: 2,
@@ -98,10 +122,11 @@ export default function PopularPlansSlider({ plans }: PopularPlansSliderProps) {
           autoplay={{
             delay: 5000,
             disableOnInteraction: false,
+            pauseOnMouseEnter: true,
           }}
         >
-          {plans.map((plan) => (
-            <SwiperSlide key={plan.id} className="h-auto">
+          {plans.map((plan, index) => (
+            <SwiperSlide key={plan.id} className="h-auto" virtualIndex={index}>
               <div className="group relative h-full overflow-hidden rounded-lg bg-white shadow-lg border border-gray-200 transition-all hover:border-primary hover:shadow-xl">
                 <div className={`py-2 px-4 ${getCategoryColor(plan.category)} text-white text-sm font-semibold`}>
                   {plan.category.charAt(0).toUpperCase() + plan.category.slice(1)} Insurance

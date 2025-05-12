@@ -3,8 +3,9 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Button } from "@/components/ui/button";
 import { useRecentlyViewed, type InsuranceCategory } from "@/contexts/recently-viewed-context";
 import { SlideIn } from "@/components/ui/transition-effect";
-import { Navigation, A11y } from 'swiper/modules';
+import { Navigation, A11y, Virtual, FreeMode } from 'swiper/modules';
 import { ClockIcon, XCircleIcon } from "@heroicons/react/24/outline";
+import { useCallback, useEffect, useRef } from "react";
 
 // Import Swiper styles
 import 'swiper/css';
@@ -17,12 +18,22 @@ interface RecentlyViewedPlansProps {
 export default function RecentlyViewedPlans({ category }: RecentlyViewedPlansProps) {
   const [, navigate] = useLocation();
   const { recentlyViewed, formatViewTime, clearRecentlyViewed } = useRecentlyViewed();
+  const animationFrameRef = useRef<number | null>(null);
   
   const plans = recentlyViewed[category];
   
   if (plans.length === 0) {
     return null;
   }
+  
+  // Cleanup animation frame on unmount
+  useEffect(() => {
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div className="w-full mb-10">
@@ -41,11 +52,22 @@ export default function RecentlyViewedPlans({ category }: RecentlyViewedPlansPro
         </div>
         
         <Swiper
-          modules={[Navigation, A11y]}
+          modules={[Navigation, A11y, Virtual, FreeMode]}
           spaceBetween={16}
           slidesPerView="auto"
           navigation
+          freeMode={{
+            enabled: true,
+            minimumVelocity: 0.02,
+            momentum: true,
+            momentumRatio: 0.5
+          }}
           className="py-2"
+          virtual={{
+            enabled: true,
+            addSlidesAfter: 2,
+            addSlidesBefore: 2,
+          }}
           breakpoints={{
             640: {
               slidesPerView: 2,
@@ -58,8 +80,8 @@ export default function RecentlyViewedPlans({ category }: RecentlyViewedPlansPro
             },
           }}
         >
-          {plans.map((plan) => (
-            <SwiperSlide key={plan.id} className="h-auto">
+          {plans.map((plan, index) => (
+            <SwiperSlide key={plan.id} className="h-auto" virtualIndex={index}>
               <div className="group relative h-full overflow-hidden rounded-lg bg-white shadow-sm border border-gray-200 transition-all hover:border-primary hover:shadow-md">
                 <div className="p-4 h-full flex flex-col">
                   <div className="flex justify-between items-start mb-2">
@@ -75,42 +97,56 @@ export default function RecentlyViewedPlans({ category }: RecentlyViewedPlansPro
                   </p>
                   
                   <div className="flex space-x-2 mt-auto">
-                    <Button size="sm" variant="outline" onClick={() => {
-                      // Navigate based on category
-                      switch (plan.category) {
-                        case "travel":
-                          navigate("/insurance-plans");
-                          break;
-                        case "auto":
-                          navigate("/auto-insurance");
-                          break;
-                        case "pet":
-                          navigate("/pet-insurance");
-                          break;
-                        case "health":
-                          navigate("/health-insurance");
-                          break;
-                      }
-                    }} className="w-full text-xs py-1">
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      onClick={() => {
+                        // Navigate based on category using requestAnimationFrame for smoother transitions
+                        animationFrameRef.current = requestAnimationFrame(() => {
+                          switch (plan.category) {
+                            case "travel":
+                              navigate("/insurance-plans");
+                              break;
+                            case "auto":
+                              navigate("/auto-insurance");
+                              break;
+                            case "pet":
+                              navigate("/pet-insurance");
+                              break;
+                            case "health":
+                              navigate("/health-insurance");
+                              break;
+                          }
+                        });
+                      }} 
+                      className="w-full text-xs py-1"
+                    >
                       View Again
                     </Button>
-                    <Button size="sm" variant="default" onClick={() => {
-                      // Navigate based on category
-                      switch (plan.category) {
-                        case "travel":
-                          navigate("/compare-plans");
-                          break;
-                        case "auto":
-                          navigate("/auto-compare");
-                          break;
-                        case "pet":
-                          navigate("/pet-compare");
-                          break;
-                        case "health":
-                          navigate("/health-compare");
-                          break;
-                      }
-                    }} className="w-full text-xs py-1">
+                    <Button 
+                      size="sm" 
+                      variant="default" 
+                      onClick={() => {
+                        // Navigate based on category using requestAnimationFrame for smoother transitions
+                        animationFrameRef.current = requestAnimationFrame(() => {
+                          switch (plan.category) {
+                            case "travel":
+                              navigate("/compare-plans");
+                              break;
+                            case "auto":
+                              navigate("/auto-compare");
+                              break;
+                            case "pet":
+                              navigate("/pet-compare");
+                              break;
+                            case "health":
+                              navigate("/health-compare");
+                              break;
+                          }
+                        });
+                      }} 
+                      className="w-full text-xs py-1"
+                    >
                       Compare
                     </Button>
                   </div>
