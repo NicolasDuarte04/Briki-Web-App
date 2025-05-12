@@ -39,8 +39,11 @@ function Router() {
         <Route path="/weather-risk" component={WeatherRiskPage} />
         <Route path="/auto-insurance" component={AutoInsurancePage} />
         <ProtectedRoute path="/auto-quote" component={AutoQuotePage} />
+        <Route path="/auto-compare" component={AutoQuotePage} /> {/* Placeholder until we create AutoComparePage */}
         <Route path="/pet-insurance" component={PetInsurancePage} />
+        <Route path="/pet-compare" component={PetInsurancePage} /> {/* Placeholder until we create PetComparePage */}
         <Route path="/health-insurance" component={HealthInsurancePage} />
+        <Route path="/health-compare" component={HealthInsurancePage} /> {/* Placeholder until we create HealthComparePage */}
         <Route path="/learn-more" component={LearnMorePage} />
         <Route path="/terms" component={TermsPage} />
         <ProtectedRoute path="/profile" component={ProfilePage} />

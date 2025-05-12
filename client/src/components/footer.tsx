@@ -134,7 +134,24 @@ export default function Footer() {
             </div>
           </div>
         </div>
-        <div className="mt-12 border-t border-gray-200 pt-8">
+        <div className="mt-8 border-t border-gray-200 pt-8">
+          <div className="max-w-md mx-auto mb-8">
+            <h3 className="text-sm font-semibold text-gray-400 tracking-wider uppercase text-center mb-4">
+              Find Your Perfect Insurance
+            </h3>
+            <div className="flex">
+              <input
+                type="search"
+                placeholder="Search for insurance plans, categories, or providers..."
+                className="w-full px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+              />
+              <button className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-r-md transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </button>
+            </div>
+          </div>
           <p className="text-base text-gray-400 text-center">
             &copy; {new Date().getFullYear()} Briki, Inc. All rights reserved.
           </p>
