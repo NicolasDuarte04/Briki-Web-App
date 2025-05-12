@@ -120,12 +120,31 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
     }
   }, []);
   
-  // Positioning classes
+  // Screen size detection for responsive behavior
+  const [isMobile, setIsMobile] = useState(false);
+  
+  // Check for mobile screen on mount and window resize
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    // Initial check
+    checkMobile();
+    
+    // Add resize listener
+    window.addEventListener('resize', checkMobile);
+    
+    // Cleanup
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+  
+  // Positioning classes - adjust for mobile
   const positionClasses = {
-    "bottom-right": "bottom-6 right-6",
-    "bottom-left": "bottom-6 left-6",
-    "top-right": "top-6 right-6",
-    "top-left": "top-6 left-6",
+    "bottom-right": isMobile ? "bottom-2 right-2" : "bottom-6 right-6",
+    "bottom-left": isMobile ? "bottom-2 left-2" : "bottom-6 left-6",
+    "top-right": isMobile ? "top-2 right-2" : "top-6 right-6",
+    "top-left": isMobile ? "top-2 left-2" : "top-6 left-6",
   };
   
   // Auto-show assistant after delay
@@ -415,7 +434,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
                   
                   <div className="mt-4 flex justify-between items-center">
                     <div className="flex space-x-1">
-                      {tips.map((_, index) => (
+                      {safeTips.map((_, index) => (
                         <button
                           key={index}
                           onClick={() => setCurrentTip(index)}
@@ -428,14 +447,14 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
                     </div>
                     <div className="flex space-x-2">
                       <button
-                        onClick={() => setCurrentTip((prev) => (prev === 0 ? tips.length - 1 : prev - 1))}
+                        onClick={() => setCurrentTip((prev) => (prev === 0 ? safeTips.length - 1 : prev - 1))}
                         className="text-blue-300 hover:text-blue-200 transition-colors text-xs flex items-center"
                         disabled={isTyping}
                       >
                         Previous
                       </button>
                       <button
-                        onClick={() => setCurrentTip((prev) => (prev === tips.length - 1 ? 0 : prev + 1))}
+                        onClick={() => setCurrentTip((prev) => (prev === safeTips.length - 1 ? 0 : prev + 1))}
                         className="text-blue-300 hover:text-blue-200 transition-colors text-xs flex items-center"
                         disabled={isTyping}
                       >
