@@ -57,6 +57,12 @@ export async function getChatCompletionFromOpenAI(
   } = {}
 ): Promise<string> {
   try {
+    // Check if we have the API key before attempting
+    if (!process.env.OPENAI_API_KEY) {
+      console.warn('OPENAI_API_KEY is not set. Using fallback responses.');
+      return getFallbackResponse(messages);
+    }
+
     const response = await openai.chat.completions.create({
       model: options.model || DEFAULT_MODEL,
       messages: [
@@ -71,13 +77,64 @@ export async function getChatCompletionFromOpenAI(
   } catch (error: any) {
     console.error('OpenAI API error:', error);
     
-    // Return a friendly error message
-    if (error.status === 429) {
-      return "I'm currently handling too many requests. Please try again in a moment.";
+    // Return a friendly error message with appropriate fallback
+    if (error.status === 429 || error.code === 'insufficient_quota') {
+      console.warn('OpenAI API quota exceeded. Using fallback responses.');
+      return getFallbackResponse(messages);
     }
     
     return "I'm having trouble connecting to my knowledge base. Please try again later.";
   }
+}
+
+/**
+ * Provides fallback responses when the OpenAI API is unavailable
+ */
+function getFallbackResponse(messages: ChatMessage[]): string {
+  // Get the last user message
+  const lastUserMessage = messages.filter(m => m.role === 'user').pop();
+  
+  if (!lastUserMessage) {
+    return "I'm here to help with insurance questions. What would you like to know?";
+  }
+  
+  const userQuery = lastUserMessage.content.toLowerCase();
+  
+  // Provide some basic pre-written responses for common insurance questions
+  if (userQuery.includes('deductible')) {
+    return "A deductible is the amount you pay out of pocket before your insurance coverage begins. For example, if you have a $500 deductible and a $3,000 medical bill, you would pay the first $500, and your insurance would cover the rest according to your plan terms.";
+  }
+  
+  if (userQuery.includes('premium')) {
+    return "An insurance premium is the amount you pay to your insurance company for coverage. This payment can be made monthly, quarterly, or annually, depending on your policy terms. Premium costs are based on factors such as coverage type, your age, location, and other risk factors.";
+  }
+  
+  if (userQuery.includes('coverage')) {
+    return "Insurance coverage refers to the specific risks and events that your insurance policy protects against. Different plans offer different levels of coverage for various situations. It's important to understand exactly what is covered in your policy to avoid surprises when making a claim.";
+  }
+  
+  if (userQuery.includes('claim')) {
+    return "An insurance claim is a formal request to your insurance company for coverage or compensation for a covered loss or policy event. The claim process typically involves submitting documentation, an investigation by the insurance company, and then approval or denial of the requested compensation.";
+  }
+  
+  if (userQuery.includes('travel insurance')) {
+    return "Travel insurance provides coverage for unexpected events during your trip, such as medical emergencies, trip cancellations, lost luggage, or travel delays. Different policies offer different levels of protection, so it's important to choose one that matches your specific travel needs and destinations.";
+  }
+  
+  if (userQuery.includes('auto insurance') || userQuery.includes('car insurance')) {
+    return "Auto insurance protects you financially in case of an accident, theft, or damage to your vehicle. Most policies include liability coverage (for damage you cause to others), while comprehensive and collision coverage protect your own vehicle. Additional options can include roadside assistance and rental car coverage.";
+  }
+  
+  if (userQuery.includes('pet insurance')) {
+    return "Pet insurance helps cover veterinary expenses for your pets. Policies typically cover accidents, illnesses, and sometimes preventive care. Coverage levels, deductibles, and premiums vary based on your pet's age, breed, and the plan you choose.";
+  }
+  
+  if (userQuery.includes('health insurance')) {
+    return "Health insurance covers medical expenses for illnesses, injuries, and preventive care. Plans vary widely in terms of coverage, networks of doctors, and costs. Key components include premiums, deductibles, copayments, and coverage limits. Many plans also provide prescription drug coverage and wellness benefits.";
+  }
+  
+  // Default response if no pattern matches
+  return "I'm currently operating in fallback mode due to high demand. I can answer basic insurance questions, help you understand policy terms, or assist with general information about different insurance types. For complex questions, you might want to try again later.";
 }
 
 /**
