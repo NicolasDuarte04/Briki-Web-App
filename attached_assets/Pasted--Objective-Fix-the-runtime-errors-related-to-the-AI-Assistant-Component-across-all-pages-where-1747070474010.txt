@@ -1,0 +1,68 @@
+# Objective:
+Fix the runtime errors related to the **AI Assistant Component** across all pages where it is implemented. Ensure the `tip functions` are properly exposed and called with parentheses for smooth operation.
+
+---
+
+# Tasks:
+## 1️⃣ AI Assistant Component:
+- Ensure the **AI Assistant** component properly exposes all `tip functions`.
+- All pages calling these tips should be verified:
+  - HomePage → Functions should be called with parentheses (e.g., `tipFunction()`, not just `tipFunction`).
+  - Trip Info Page (`trip-info-page.tsx`) → Verify that tip functions are correctly called.
+  - Checkout Page (`checkout-page.tsx`) → Verify proper function calls and error-free execution.
+
+---
+
+## 2️⃣ Runtime Error Fixes:
+- Identify the source of the runtime errors:
+  - Use logging and debugging to find any issues related to `null` or `undefined` calls.
+  - Check if the `tip functions` are returning valid responses before rendering.
+  - Ensure there are proper fallbacks for undefined data (e.g., `|| "No data available"`).
+
+---
+
+## 3️⃣ AI Assistant Tip Integration:
+- Verify that the **AI tips** are displayed correctly:
+  - On form fills (e.g., "Tip: Choose a destination with better coverage for lower premiums").
+  - During plan comparison (e.g., "Tip: This plan covers emergency evacuation at the best rate").
+  - On checkout (e.g., "Tip: Adding family members can reduce the per-person rate").
+
+---
+
+## 4️⃣ Mobile & Desktop Compatibility:
+- Ensure the **AI Assistant**:
+  - Works seamlessly on both **mobile and desktop** views.
+  - Adjusts position dynamically if the user scrolls or navigates within the page.
+  - Shows **real-time tips** based on user interactions.
+
+---
+
+## 5️⃣ Test Cases:
+- Test each page after updates:
+  - HomePage → Verify AI Assistant tips are interactive and error-free.
+  - Trip Info Page → Ensure all functions are called properly.
+  - Checkout Page → Check if the assistant displays dynamic tips during the purchase process.
+- Test for:
+  - **Null or Undefined errors**
+  - **Component rendering issues**
+  - **Missing tip messages**
+
+---
+
+# Questions:
+1. Are the tip functions dynamically loading based on user input, or are they pre-configured?  
+2. Should the AI Assistant have a **dismissible option** if users don't want tips during their journey?  
+3. Are you planning to enable **context-based tips** (e.g., if a user spends too much time on a form field, it triggers a specific tip)?  
+4. Should we log user interactions with the AI Assistant to improve future recommendations?  
+5. Are all pages expected to have **real-time AI Assistant updates** as users input data?
+
+---
+
+# Expected Output:
+- AI Assistant works seamlessly across HomePage, Trip Info Page, and Checkout Page.
+- No runtime errors when calling tip functions.
+- Interactive and helpful tips displayed in real-time.
+- Smooth operation on both mobile and desktop platforms.
+- Briki branding and user experience fully optimized.
+
+---

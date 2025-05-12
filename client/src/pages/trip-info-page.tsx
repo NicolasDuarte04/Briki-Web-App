@@ -719,7 +719,7 @@ export default function TripInfoPage() {
           transition={{ delay: 1, duration: 0.5 }}
         >
           <AIAssistant 
-            tips={getTripFormTips}
+            tips={getTripFormTips()}
             position="bottom-right"
             contextAware={true}
             formData={form.getValues()}
