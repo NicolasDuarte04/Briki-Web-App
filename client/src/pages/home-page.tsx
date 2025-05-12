@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import Navbar from "@/components/navbar";
@@ -21,9 +21,47 @@ import {
 import { popularPlans } from "@/data/popular-plans";
 
 export default function HomePage() {
-  const [, navigate] = useLocation();
+  const [location, navigate] = useLocation();
   const { user, isLoading } = useAuth();
   const { t } = useLanguage();
+  
+  // Add debugging information
+  console.log("HomePage mounted, current location:", location);
+  console.log("User data in home page:", user);
+  
+  // Monitor component mounting and user data changes
+  useEffect(() => {
+    console.log("HomePage useEffect running");
+    console.log("Auth state in HomePage:", { user, isLoading });
+    
+    // Add a test button on the window object for debugging
+    if (typeof window !== 'undefined') {
+      const testButton = document.createElement('button');
+      testButton.innerText = 'Test Home Navigation';
+      testButton.style.position = 'fixed';
+      testButton.style.bottom = '20px';
+      testButton.style.left = '20px';
+      testButton.style.zIndex = '9999';
+      testButton.style.padding = '8px 16px';
+      testButton.style.backgroundColor = '#4f46e5';
+      testButton.style.color = 'white';
+      testButton.style.border = 'none';
+      testButton.style.borderRadius = '4px';
+      testButton.onclick = () => {
+        console.log("Pre-test button clicked, navigating to home page");
+        navigate("/");
+        setTimeout(() => {
+          console.log("Current location after pre-test click:", location);
+        }, 100);
+      };
+      document.body.appendChild(testButton);
+      
+      // Clean up
+      return () => {
+        document.body.removeChild(testButton);
+      };
+    }
+  }, [user, isLoading, navigate, location]);
 
   // Featured destinations data
   const destinations = [

@@ -133,17 +133,23 @@ export default function AuthPage() {
   useEffect(() => {
     if (loginMutation.isSuccess) {
       console.log("AuthPage: Login successful, redirecting to home page");
-      navigate("/");
+      // Directly go to the root path - no subdirectory
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 100);
     }
-  }, [loginMutation.isSuccess, navigate]);
+  }, [loginMutation.isSuccess]);
   
   // Handle registration success
   useEffect(() => {
     if (registerMutation.isSuccess) {
       console.log("AuthPage: Registration successful, redirecting to home page");
-      navigate("/");
+      // Directly go to the root path - no subdirectory
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 100);
     }
-  }, [registerMutation.isSuccess, navigate]);
+  }, [registerMutation.isSuccess]);
 
   return (
     <div className="flex min-h-screen bg-background">
