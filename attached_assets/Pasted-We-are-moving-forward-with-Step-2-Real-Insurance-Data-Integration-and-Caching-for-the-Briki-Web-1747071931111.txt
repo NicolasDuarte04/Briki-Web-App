@@ -1,0 +1,67 @@
+We are moving forward with **Step 2: Real Insurance Data Integration and Caching** for the Briki Web Application. I need you to complete the following tasks:
+
+---
+
+### 🌟 **1️⃣ API Connection for All Providers**  
+**Objective:** Connect all 12 insurance providers to the platform.  
+
+**Tasks:**  
+1. Establish real-time API connections for the 12 insurance providers.  
+2. Replace mock data with live API data.  
+3. Ensure proper authentication and secure connections for all API requests.  
+
+---
+
+### 🌟 **2️⃣ Data Validation & Normalization**  
+**Objective:** Ensure consistent and reliable data across all providers.  
+
+**Tasks:**  
+1. Validate incoming data to prevent display errors or broken elements.  
+2. Normalize data from different providers to match the internal schema.  
+3. Handle any discrepancies in data structure gracefully.  
+
+---
+
+### 🌟 **3️⃣ Error Handling**  
+**Objective:** Improve user experience during API failures or connection issues.  
+
+**Tasks:**  
+1. Implement user-friendly error messages when an API call fails.  
+2. Create fallbacks that display alternative content or retry logic.  
+3. Monitor for API rate limits and handle gracefully.  
+
+---
+
+### 🌟 **4️⃣ Caching Mechanism**  
+**Objective:** Speed up data retrieval and improve the user experience.  
+
+**Tasks:**  
+1. Integrate **React Query** or an equivalent caching mechanism for faster access.  
+2. Apply cache invalidation logic when the user interacts with filters or refreshes the page.  
+3. Optimize loading times for frequently accessed data.  
+
+---
+
+### 🌟 **5️⃣ Loading States & Skeleton Screens**  
+**Objective:** Enhance UX during data fetch.  
+
+**Tasks:**  
+1. Integrate smooth loading indicators for data fetching.  
+2. Use skeleton loaders to prevent blank screens while waiting for responses.  
+3. Ensure consistency in loading animations across all major screens.  
+
+---
+
+### **Expected Deliverables:**  
+- Full API integration with real data from all 12 providers.  
+- Consistent and validated data displayed in the UI.  
+- Graceful error handling with proper user feedback.  
+- Caching mechanism to optimize load times.  
+- Smooth loading screens to avoid blank screens.  
+
+Please provide a report of:  
+- Which APIs were connected and verified.  
+- How caching and data normalization were implemented.  
+- Screenshots of the final data displays and error handling.  
+
+If there are any blockers or issues, please provide a detailed explanation so we can resolve them quickly.
