@@ -1,0 +1,119 @@
+# Objective:
+We want to transform Briki from a single-focus Travel Insurance platform to a **multi-category insurance marketplace**. This includes:
+- Travel Insurance (already functional)
+- Auto Insurance (new)
+- Pet Insurance (new)
+- Health Insurance (new)
+
+The design and navigation should follow the concept of "Rappi-style categories," where users can easily switch between insurance types through smooth navigation and interactive category cards.
+
+---
+
+# Tasks:
+## 1️⃣ Navbar Update:
+- Update the main navigation to:
+  - Home | Travel Insurance | Auto Insurance | Pet Insurance | Health Insurance | Support | Sign In
+- Each link should navigate to its respective category page.
+
+---
+
+## 2️⃣ Homepage Redesign:
+- Add horizontal scrollable sections for each category:
+  - Travel Insurance (existing setup)
+  - Auto Insurance
+  - Pet Insurance
+  - Health Insurance
+- Each section should display top plans in a scrollable format with:
+  - Icons
+  - Coverage Highlights
+  - Price
+  - CTA buttons (*Get a Quote*, *Learn More*)
+  
+---
+
+## 3️⃣ Quote Forms for Each Category:
+### Travel Insurance (Existing):
+- Keep the current trip details flow.
+  
+### Auto Insurance (New):
+- Fields:
+  - License Plate
+  - Car Brand
+  - Model
+  - Year
+  - Coverage Type (Basic, Comprehensive, Third-Party)
+  
+### Pet Insurance (New):
+- Fields:
+  - Pet Type (Dog, Cat, Other)
+  - Breed
+  - Age
+  - Coverage Type (Accident Only, Accident & Illness, Routine Care)
+
+### Health Insurance (New):
+- Fields:
+  - Age
+  - Health Status (Excellent, Good, Fair, Poor)
+  - Coverage Type (Basic, Comprehensive, Global Coverage)
+  - Monthly Premium Range
+
+---
+
+## 4️⃣ Filter System Update:
+- Travel: Destination, Duration, Age
+- Auto: Car Age, Brand, Insurance Type, Value Range
+- Pet: Pet Type, Breed, Coverage Type, Age Group
+- Health: Age, Coverage Type, Monthly Premium, Global Access
+
+---
+
+## 5️⃣ Comparison Logic:
+- Extend the *Compare Plans* functionality to all new categories:
+  - Allow side-by-side views of different policies for Auto, Pet, and Health.
+  - Include clear distinctions like:
+    - *Price Difference*
+    - *Coverage Limits*
+    - *Exclusions*
+    - *Special Benefits*
+
+---
+
+## 6️⃣ New Insurance Plan Pages:
+- Create distinct pages for:
+  - Auto Insurance
+  - Pet Insurance
+  - Health Insurance
+- Each page should have:
+  - Category-Specific Icon
+  - Search Filters
+  - Interactive Cards
+  - "Compare Plans" button
+  
+---
+
+## 7️⃣ Visual Enhancements:
+- Consistent design across all categories.
+- Branded icons for each category.
+- Animations for smoother navigation.
+- Dynamic page transitions between categories.
+
+---
+
+## 8️⃣ Future Scalability:
+- Structure the navigation and category layout to allow for *Life Insurance* in the future without major redesigns.
+- Ensure components are reusable to easily add new categories.
+
+---
+
+# Questions:
+1. Should mock data be generated for Auto, Pet, and Health categories, or do you want me to integrate it with placeholder JSON files?
+2. Do you want the search bar to have category-specific search logic (e.g., auto-completion for pet breeds, car models, etc.)?
+3. Should we maintain the current color scheme and typography, or do you want it redesigned for multi-category scaling?
+
+---
+
+# Expected Output:
+- Multi-category navigation with seamless switching between Travel, Auto, Pet, and Health.
+- Category-specific pages with interactive elements and filtering.
+- Consistent UI experience with "Rappi-style" navigation.
+- Scalable structure for future categories.
