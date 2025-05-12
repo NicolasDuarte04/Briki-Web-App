@@ -18,16 +18,16 @@ export default function CountdownPage() {
   };
 
   const handlePreTestClick = () => {
-    // Navigate to existing auth page
-    console.log("Pre-test button clicked, navigating to auth page");
-    navigate('/auth');
+    // Navigate directly to home page instead of auth
+    console.log("Pre-test button clicked, navigating to home page");
+    navigate('/home');
     
     // Double-check navigation with a small delay
     setTimeout(() => {
       console.log("Current location after pre-test click:", window.location.pathname);
-      if (window.location.pathname !== '/auth') {
+      if (window.location.pathname !== '/home') {
         console.log("Navigation seems to have failed, trying again...");
-        window.location.href = '/auth';
+        window.location.href = '/home';
       }
     }, 300);
   };
