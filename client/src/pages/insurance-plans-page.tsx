@@ -453,7 +453,7 @@ export default function InsurancePlansPage() {
           className="fixed bottom-6 right-6 z-50"
         >
           <AIAssistant 
-            tips={getComparisonTips}
+            tips={getComparisonTips()}
             position="bottom-right"
             contextAware={true}
             helpMode={true}
