@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { InsurancePlan } from "@shared/schema";
 import { useLocation, Link } from "wouter";
+import { motion } from "framer-motion";
+import { useToast } from "@/hooks/use-toast";
 
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
@@ -12,7 +14,7 @@ import { FeatureBreakdown } from "@/components/feature-breakdown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Filter, Search, Sparkles, ChevronLeft, Medal, ThumbsUp, Zap, Star } from "lucide-react";
+import { Filter, Search, Sparkles, ChevronLeft, Medal, ThumbsUp, Zap, Star, HelpCircle } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
@@ -26,6 +28,8 @@ import {
   SheetFooter,
   SheetClose
 } from "@/components/ui/sheet";
+import { FuturisticBackground } from "@/components/ui/futuristic-background";
+import { AIAssistant, getComparisonTips } from "@/components/ui/ai-assistant";
 
 export default function InsurancePlansPage() {
   const [, navigate] = useLocation();
@@ -36,6 +40,7 @@ export default function InsurancePlansPage() {
   const [filterTrip, setFilterTrip] = useState(false);
   const [filterAdventure, setFilterAdventure] = useState(false);
   const [activeTab, setActiveTab] = useState("all");
+  const { toast } = useToast();
   
   // Get insurance plans
   const { data: plans = [], isLoading, error } = useQuery<InsurancePlan[]>({
@@ -78,21 +83,31 @@ export default function InsurancePlansPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#f8f8f6]">
+    <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       
-      <div className="flex-grow mb-12">
+      {/* Background elements */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        <FuturisticBackground particleCount={30} interactive={false} />
+      </div>
+      
+      <div className="flex-grow mb-12 relative z-10">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6">
           {/* Header with back button */}
-          <div className="mb-8">
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="mb-8"
+          >
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <Link href="/trip-info" className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-gray-600 hover:text-gray-900">
+                <Link href="/trip-info" className="w-10 h-10 rounded-full bg-background/80 backdrop-blur-sm border border-primary/20 shadow-glow-sm flex items-center justify-center text-foreground hover:text-primary transition-colors">
                   <ChevronLeft className="h-5 w-5" />
                 </Link>
                 <div className="ml-4">
-                  <h1 className="text-2xl font-bold">Seguros de viaje</h1>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <h1 className="text-2xl font-bold section-header">Seguros de viaje</h1>
+                  <p className="text-sm text-foreground/70 mt-1">
                     {filteredPlans.length} planes disponibles para tu viaje
                   </p>
                 </div>
@@ -101,11 +116,15 @@ export default function InsurancePlansPage() {
               {/* Filter trigger */}
               <Sheet>
                 <SheetTrigger asChild>
-                  <Button variant="outline" size="sm" className="gap-2 h-10">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="gap-2 h-10 bg-background/80 backdrop-blur-sm border border-primary/20 hover:bg-primary/10 transition-colors"
+                  >
                     <Filter className="h-4 w-4" />
                     <span>Filtros</span>
                     {getActiveFilterCount() > 0 && (
-                      <Badge className="ml-1 h-5 w-5 p-0 flex items-center justify-center rounded-full">
+                      <Badge className="ml-1 h-5 w-5 p-0 flex items-center justify-center rounded-full bg-primary text-primary-foreground">
                         {getActiveFilterCount()}
                       </Badge>
                     )}
@@ -208,43 +227,54 @@ export default function InsurancePlansPage() {
                 </SheetContent>
               </Sheet>
             </div>
-          </div>
+          </motion.div>
           
           {/* Trip Summary Card */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="bg-background/80 backdrop-blur-sm rounded-xl shadow-glow-sm border border-primary/20 p-4 mb-6"
+          >
             <TripSummary />
-          </div>
+          </motion.div>
           
           {/* Category Tabs */}
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
-            <TabsList className="w-full bg-gray-100 p-1 rounded-xl">
-              <TabsTrigger 
-                value="all" 
-                className="flex-1 data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-lg"
-              >
-                Todos
-              </TabsTrigger>
-              <TabsTrigger 
-                value="best" 
-                className="flex-1 data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-lg"
-              >
-                <Medal className="h-3.5 w-3.5 mr-1.5" />
-                Mejor valorados
-              </TabsTrigger>
-              <TabsTrigger 
-                value="economy" 
-                className="flex-1 data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-lg"
-              >
-                Económicos
-              </TabsTrigger>
-              <TabsTrigger 
-                value="premium" 
-                className="flex-1 data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-lg"
-              >
-                Premium
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
+              <TabsList className="w-full bg-background/60 backdrop-blur-sm border border-primary/10 p-1 rounded-xl">
+                <TabsTrigger 
+                  value="all" 
+                  className="flex-1 data-[state=active]:bg-primary/20 data-[state=active]:text-primary data-[state=active]:shadow-glow-xs rounded-lg transition-all"
+                >
+                  Todos
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="best" 
+                  className="flex-1 data-[state=active]:bg-primary/20 data-[state=active]:text-primary data-[state=active]:shadow-glow-xs rounded-lg transition-all"
+                >
+                  <Medal className="h-3.5 w-3.5 mr-1.5" />
+                  Mejor valorados
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="economy" 
+                  className="flex-1 data-[state=active]:bg-primary/20 data-[state=active]:text-primary data-[state=active]:shadow-glow-xs rounded-lg transition-all"
+                >
+                  Económicos
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="premium" 
+                  className="flex-1 data-[state=active]:bg-primary/20 data-[state=active]:text-primary data-[state=active]:shadow-glow-xs rounded-lg transition-all"
+                >
+                  Premium
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </motion.div>
           
           {/* Plan display section */}
           <div className="mt-4">
@@ -309,6 +339,29 @@ export default function InsurancePlansPage() {
             )}
           </div>
         </div>
+        
+        {/* AI Assistant */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 1, duration: 0.5 }}
+          className="fixed bottom-6 right-6 z-50"
+        >
+          <AIAssistant 
+            tips={getComparisonTips}
+            position="bottom-right"
+            contextAware={true}
+            helpMode={true}
+            autoShow={false}
+            onUserQuery={(query) => {
+              // Handle user query - for now just showing a toast with the query
+              toast({
+                title: "Question received",
+                description: `We'll help with: "${query}"`,
+              });
+            }}
+          />
+        </motion.div>
       </div>
       
       {/* Compare modal */}

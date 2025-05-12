@@ -597,6 +597,29 @@ export default function CheckoutPage() {
             </div>
           )}
         </div>
+        
+        {/* AI Assistant */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 1, duration: 0.5 }}
+          className="fixed bottom-6 right-6 z-50"
+        >
+          <AIAssistant 
+            tips={getCheckoutTips}
+            position="bottom-right"
+            contextAware={true}
+            helpMode={true}
+            autoShow={false}
+            onUserQuery={(query) => {
+              // Handle user query - for now just showing a toast with the query
+              toast({
+                title: "Question received",
+                description: `We'll help with: "${query}"`,
+              });
+            }}
+          />
+        </motion.div>
       </div>
       
       <Footer />
