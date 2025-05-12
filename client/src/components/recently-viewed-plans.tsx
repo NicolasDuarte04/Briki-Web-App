@@ -2,7 +2,7 @@ import { useLocation } from "wouter";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Button } from "@/components/ui/button";
 import { useRecentlyViewed, type InsuranceCategory } from "@/contexts/recently-viewed-context";
-import { Navigation, A11y, Virtual, FreeMode } from 'swiper/modules';
+import { Navigation, A11y, FreeMode } from 'swiper/modules';
 import { ClockIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import { useCallback, useEffect, useRef } from "react";
 import { CardHover } from "@/components/ui/apple-transition";
@@ -51,7 +51,7 @@ export default function RecentlyViewedPlans({ category }: RecentlyViewedPlansPro
       </div>
       
       <Swiper
-        modules={[Navigation, A11y, Virtual, FreeMode]}
+        modules={[Navigation, A11y, FreeMode]}
         spaceBetween={16}
         slidesPerView="auto"
         navigation
@@ -62,11 +62,6 @@ export default function RecentlyViewedPlans({ category }: RecentlyViewedPlansPro
           momentumRatio: 0.5
         }}
         className="py-2"
-        virtual={{
-          enabled: true,
-          addSlidesAfter: 2,
-          addSlidesBefore: 2,
-        }}
         breakpoints={{
           640: {
             slidesPerView: 2,
@@ -80,7 +75,7 @@ export default function RecentlyViewedPlans({ category }: RecentlyViewedPlansPro
         }}
       >
         {plans.map((plan, index) => (
-          <SwiperSlide key={plan.id} className="h-auto" virtualIndex={index}>
+          <SwiperSlide key={plan.id} className="h-auto">
             <CardHover>
               <div className="relative h-full overflow-hidden rounded-lg bg-white shadow-sm border border-gray-200">
                 <div className="p-4 h-full flex flex-col bg-gradient-to-b from-white to-gray-50">

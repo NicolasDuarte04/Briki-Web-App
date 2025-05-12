@@ -1,6 +1,6 @@
 import { useLocation } from "wouter";
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination, A11y, Autoplay, Virtual, EffectFade } from 'swiper/modules';
+import { Navigation, Pagination, A11y, Autoplay, EffectFade } from 'swiper/modules';
 import { Button } from "@/components/ui/button";
 import { useRecentlyViewed, type Plan } from "@/contexts/recently-viewed-context";
 import { SlideIn } from "@/components/ui/transition-effect";
@@ -95,17 +95,13 @@ export default function PopularPlansSlider({ plans }: PopularPlansSliderProps) {
     <div className="w-full">
       <SlideIn>
         <Swiper
-          modules={[Navigation, Pagination, A11y, Autoplay, Virtual, EffectFade]}
+          modules={[Navigation, Pagination, A11y, Autoplay, EffectFade]}
           spaceBetween={16}
           slidesPerView="auto"
           navigation
           pagination={{ clickable: true, dynamicBullets: true }}
           className="py-4"
-          virtual={{
-            enabled: true,
-            addSlidesAfter: 2,
-            addSlidesBefore: 2,
-          }}
+          // Remove virtual module due to compatibility issues
           speed={600}
           watchSlidesProgress={true}
           grabCursor={true}
@@ -127,7 +123,7 @@ export default function PopularPlansSlider({ plans }: PopularPlansSliderProps) {
           }}
         >
           {plans.map((plan, index) => (
-            <SwiperSlide key={plan.id} className="h-auto" virtualIndex={index}>
+            <SwiperSlide key={plan.id} className="h-auto">
               <FadeScale delay={index * 0.05}>
                 <CardHover>
                   <div className="relative h-full overflow-hidden rounded-lg bg-white shadow-lg border border-gray-200">
