@@ -35,7 +35,6 @@ function Router() {
   return (
     <PageTransition>
       <Switch>
-        <Route path="/" component={CountdownPage} />
         <Route path="/home" component={HomePage} />
         <Route path="/auth" component={AuthPage} />
         <ProtectedRoute path="/trip-info" component={TripInfoPage} />
@@ -43,6 +42,7 @@ function Router() {
         <ProtectedRoute path="/checkout/:planId" component={CheckoutPage} />
         <Route path="/weather-risk" component={WeatherRiskPage} />
         <Route path="/auto-insurance" component={AutoInsurancePage} />
+        <Route path="/" component={CountdownPage} />
         <ProtectedRoute path="/auto-quote" component={AutoQuotePage} />
         <Route path="/auto-compare" component={AutoQuotePage} /> {/* Placeholder until we create AutoComparePage */}
         <Route path="/pet-insurance" component={PetInsurancePage} />
