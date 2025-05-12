@@ -3,7 +3,8 @@ import React from "react";
 export const RefinedAIAssistantIcon: React.FC<{
   className?: string;
   animated?: boolean;
-}> = ({ className = "w-12 h-12", animated = true }) => {
+  isActive?: boolean;
+}> = ({ className = "w-12 h-12", animated = true, isActive = true }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -17,8 +18,8 @@ export const RefinedAIAssistantIcon: React.FC<{
           cx="12"
           cy="12"
           r="10"
-          fill="url(#refined-ai-gradient)"
-          className={animated ? "animate-pulse" : ""}
+          fill={isActive ? "url(#refined-ai-gradient)" : "#64748b"}
+          className={animated && isActive ? "animate-pulse" : ""}
           style={{ animationDuration: "3s" }}
         />
         

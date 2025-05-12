@@ -374,7 +374,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
                 >
                   {message.role === 'assistant' && (
                     <div className="bg-primary/10 p-2 rounded-full">
-                      <AIAssistantIcon className="h-6 w-6" isActive={true} />
+                      <RefinedAIAssistantIcon className="h-6 w-6" animated={true} />
                     </div>
                   )}
                   
@@ -522,7 +522,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
               background: "linear-gradient(135deg, #3B82F6, #2563EB)"
             }}
           >
-            <AIAssistantIcon className={`${isMobile ? 'h-6 w-6' : 'h-8 w-8'}`} isActive={helpMode} />
+            <RefinedAIAssistantIcon className={`${isMobile ? 'h-6 w-6' : 'h-8 w-8'}`} animated={helpMode} />
           </motion.button>
         )}
       </AnimatePresence>
