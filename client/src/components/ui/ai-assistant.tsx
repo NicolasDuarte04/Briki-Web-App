@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Mic, MicOff, Send, Volume2, X } from "lucide-react";
 
 // Define context-aware tips for different pages
-export const getTravelInsuranceTips = [
+export const travelInsuranceTips = [
   "Consider your destination's healthcare costs when selecting coverage limits.",
   "Adventure activities like skiing or scuba diving may require additional coverage.",
   "Pre-existing conditions might need special coverage - check policy details.",
@@ -14,7 +14,7 @@ export const getTravelInsuranceTips = [
   "Multi-trip policies might be more economical for frequent travelers."
 ];
 
-export const getAutoInsuranceTips = [
+export const autoInsuranceTips = [
   "Bundling auto with other policies can save you up to 15% on premiums.",
   "Higher deductibles lower your premium but increase out-of-pocket costs if you file a claim.",
   "Many insurers offer discounts for safe driving histories and anti-theft devices.",
@@ -22,7 +22,11 @@ export const getAutoInsuranceTips = [
   "Usage-based insurance might save you money if you're a low-mileage driver."
 ];
 
-export const getHealthInsuranceTips = [
+// Helper functions to get tips
+export const getTravelInsuranceTips = () => travelInsuranceTips;
+export const getAutoInsuranceTips = () => autoInsuranceTips;
+
+export const healthInsuranceTips = [
   "Balance monthly premiums against deductibles and out-of-pocket maximums.",
   "Check if your preferred doctors and hospitals are in-network.",
   "Consider prescription drug coverage if you take regular medications.",
@@ -30,7 +34,7 @@ export const getHealthInsuranceTips = [
   "Review coverage for specialized services you might need, like therapy or maternity care."
 ];
 
-export const getPetInsuranceTips = [
+export const petInsuranceTips = [
   "Insure your pet when they're young to avoid pre-existing condition limitations.",
   "Check if the policy covers breed-specific conditions that your pet might be prone to.",
   "Annual wellness coverage can help manage routine care costs.",
@@ -38,7 +42,11 @@ export const getPetInsuranceTips = [
   "Some policies offer multi-pet discounts for households with multiple animals."
 ];
 
-export const getTripFormTips = [
+// Helper functions to get tips
+export const getHealthInsuranceTips = () => healthInsuranceTips;
+export const getPetInsuranceTips = () => petInsuranceTips;
+
+export const tripFormTips = [
   "Enter your exact travel dates to get the most accurate coverage options.",
   "Adding your medical conditions helps us find plans with appropriate coverage.",
   "Select your coverage priorities to see plans tailored to your specific needs.",
@@ -46,7 +54,7 @@ export const getTripFormTips = [
   "International trips typically require higher medical coverage limits."
 ];
 
-export const getComparisonTips = [
+export const comparisonTips = [
   "Compare deductibles across plans - lower deductibles mean higher premiums.",
   "Look for emergency evacuation coverage when traveling to remote destinations.",
   "Pre-existing condition coverage varies widely between insurance providers.",
@@ -54,13 +62,20 @@ export const getComparisonTips = [
   "Some plans offer 'cancel for any reason' coverage for maximum flexibility."
 ];
 
-export const getCheckoutTips = [
+// Helper functions for tips
+export const getTripFormTips = () => tripFormTips;
+export const getComparisonTips = () => comparisonTips;
+
+export const checkoutTips = [
   "Double-check all your personal information to ensure accurate coverage.",
   "Policy documents will be sent to the email address you provide.",
   "Your coverage begins at 12:01 AM on your selected start date.",
   "Save your policy number in a secure, accessible location for claims.",
   "Add additional travelers now to avoid complications later."
 ];
+
+// Helper function for checkout tips
+export const getCheckoutTips = () => checkoutTips;
 
 interface AIAssistantProps {
   tips: string[];

@@ -17,6 +17,7 @@ export default function ApiSettingsPage() {
   const [, navigate] = useLocation();
   const [activeTab, setActiveTab] = useState('connections');
   const invalidateCacheMutation = useInvalidatePlansCache();
+  const isPending = invalidateCacheMutation.isPending;
   const { toast } = useToast();
   
   // Create a local function to safely call the mutation
