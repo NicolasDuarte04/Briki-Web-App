@@ -11,6 +11,9 @@ export interface ProviderConfig {
   mapping: Record<string, string>; // Maps provider fields to our schema
   rateLimitPerMinute?: number;
   timeout?: number; // ms
+  endpointPath?: string; // Custom endpoint path, defaults to "/plans"
+  responseFormat?: 'standard' | 'nested' | 'array'; // How the response is structured
+  supportedCountries?: string[]; // Countries this provider supports
 }
 
 // List of all insurance providers
@@ -27,7 +30,10 @@ export const INSURANCE_PROVIDERS: ProviderConfig[] = [
       tripCancellation: "cancellation_coverage"
     },
     rateLimitPerMinute: 100,
-    timeout: 10000
+    timeout: 10000,
+    responseFormat: 'nested',
+    endpointPath: '/quotes/travel',
+    supportedCountries: ['US', 'CA', 'MX', 'CO']
   },
   {
     name: "WorldNomads",
@@ -41,7 +47,10 @@ export const INSURANCE_PROVIDERS: ProviderConfig[] = [
       tripCancellation: "trip_cancellation_coverage"
     },
     rateLimitPerMinute: 80,
-    timeout: 12000
+    timeout: 12000,
+    responseFormat: 'standard',
+    endpointPath: '/insurance/quotes',
+    supportedCountries: ['US', 'CA', 'GB', 'AU', 'NZ', 'DE', 'FR', 'ES', 'MX', 'CO']
   },
   {
     name: "Allianz",
@@ -55,7 +64,10 @@ export const INSURANCE_PROVIDERS: ProviderConfig[] = [
       tripCancellation: "cancellationCoverage"
     },
     rateLimitPerMinute: 120,
-    timeout: 8000
+    timeout: 8000,
+    responseFormat: 'nested',
+    endpointPath: '/quotes',
+    supportedCountries: ['US', 'CA', 'MX', 'BR', 'CO', 'DE', 'ES', 'FR', 'IT', 'GB']
   },
   {
     name: "AXA",
@@ -69,7 +81,10 @@ export const INSURANCE_PROVIDERS: ProviderConfig[] = [
       tripCancellation: "cancellation_reimbursement"
     },
     rateLimitPerMinute: 90,
-    timeout: 15000
+    timeout: 15000,
+    responseFormat: 'standard',
+    endpointPath: '/travel/quotes',
+    supportedCountries: ['US', 'CA', 'FR', 'ES', 'IT', 'DE', 'GB', 'MX', 'CO', 'BR']
   },
   {
     name: "Trawick",
@@ -83,7 +98,10 @@ export const INSURANCE_PROVIDERS: ProviderConfig[] = [
       tripCancellation: "trip_cancellation_limit"
     },
     rateLimitPerMinute: 60,
-    timeout: 10000
+    timeout: 10000,
+    responseFormat: 'array',
+    endpointPath: '/quote/travel',
+    supportedCountries: ['US', 'CA', 'MX', 'CO', 'BR']
   },
   {
     name: "IMG",
@@ -97,7 +115,10 @@ export const INSURANCE_PROVIDERS: ProviderConfig[] = [
       tripCancellation: "trip_interruption"
     },
     rateLimitPerMinute: 70,
-    timeout: 12000
+    timeout: 12000,
+    responseFormat: 'nested',
+    endpointPath: '/quotes/travel',
+    supportedCountries: ['US', 'CA', 'MX', 'BR', 'CO', 'AR', 'CL']
   },
   {
     name: "TravelGuard",
@@ -111,7 +132,10 @@ export const INSURANCE_PROVIDERS: ProviderConfig[] = [
       tripCancellation: "trip_cancellation_coverage"
     },
     rateLimitPerMinute: 80,
-    timeout: 10000
+    timeout: 10000,
+    responseFormat: 'standard',
+    endpointPath: '/quotes/policies',
+    supportedCountries: ['US', 'CA', 'MX', 'GB']
   },
   {
     name: "SafetyWing",
@@ -125,7 +149,10 @@ export const INSURANCE_PROVIDERS: ProviderConfig[] = [
       tripCancellation: "trip_interruption"
     },
     rateLimitPerMinute: 100,
-    timeout: 8000
+    timeout: 8000,
+    responseFormat: 'standard',
+    endpointPath: '/trip/quotes',
+    supportedCountries: ['US', 'CA', 'NO', 'SE', 'DK', 'FI', 'GB', 'DE', 'FR', 'ES', 'IT', 'MX', 'CO', 'BR']
   },
   {
     name: "HTH",
@@ -139,7 +166,10 @@ export const INSURANCE_PROVIDERS: ProviderConfig[] = [
       tripCancellation: "trip_cancellation"
     },
     rateLimitPerMinute: 60,
-    timeout: 15000
+    timeout: 15000,
+    responseFormat: 'nested',
+    endpointPath: '/quotes',
+    supportedCountries: ['US', 'CA', 'MX', 'CO']
   },
   {
     name: "Seven Corners",
@@ -153,7 +183,10 @@ export const INSURANCE_PROVIDERS: ProviderConfig[] = [
       tripCancellation: "trip_cancellation_amount"
     },
     rateLimitPerMinute: 80,
-    timeout: 12000
+    timeout: 12000,
+    responseFormat: 'nested',
+    endpointPath: '/travel/quotes',
+    supportedCountries: ['US', 'CA', 'MX', 'CO', 'BR']
   },
   {
     name: "Berkshire Hathaway",
@@ -167,7 +200,10 @@ export const INSURANCE_PROVIDERS: ProviderConfig[] = [
       tripCancellation: "cancellation_amount"
     },
     rateLimitPerMinute: 90,
-    timeout: 10000
+    timeout: 10000,
+    responseFormat: 'standard',
+    endpointPath: '/quotes',
+    supportedCountries: ['US', 'CA']
   },
   {
     name: "InsureMyTrip",
@@ -181,7 +217,10 @@ export const INSURANCE_PROVIDERS: ProviderConfig[] = [
       tripCancellation: "trip_cost_protection"
     },
     rateLimitPerMinute: 100,
-    timeout: 12000
+    timeout: 12000,
+    responseFormat: 'array',
+    endpointPath: '/quotes/compare',
+    supportedCountries: ['US', 'CA', 'MX', 'CO', 'BR', 'AR', 'CL', 'EC', 'PE', 'UY', 'PY', 'BO', 'VE']
   }
 ];
 
@@ -192,6 +231,7 @@ export interface ApiError {
   providerName: string;
   retryable: boolean;
   timestamp: Date;
+  details?: Record<string, any>; // Additional error details
 }
 
 // Provider rate limiting tracker
@@ -199,6 +239,172 @@ const rateLimitTracker: Record<string, {
   requestCount: number;
   resetTime: number;
 }> = {};
+
+// Get the appropriate endpoint for a provider
+const getProviderEndpoint = (provider: ProviderConfig, tripData: any): string => {
+  // Use custom endpoint path if specified, otherwise use default "/plans"
+  const endpointPath = provider.endpointPath || '/plans';
+  
+  // Special case handling for certain providers
+  switch (provider.name) {
+    case 'Allianz': 
+      // Allianz uses a country-specific endpoint
+      const countryCode = tripData.destination?.substring(0, 2)?.toLowerCase() || 'us';
+      return `${provider.baseUrl}/${countryCode}${endpointPath}`;
+      
+    case 'WorldNomads':
+      // WorldNomads includes trip duration in URL
+      const duration = calculateTripDuration(tripData.departureDate, tripData.returnDate);
+      return `${provider.baseUrl}${endpointPath}?duration=${duration}`;
+      
+    case 'HTH':
+      // HTH has a specific endpoint for international travel
+      return tripData.origin !== tripData.destination 
+        ? `${provider.baseUrl}/international${endpointPath}`
+        : `${provider.baseUrl}/domestic${endpointPath}`;
+        
+    default:
+      return `${provider.baseUrl}${endpointPath}`;
+  }
+};
+
+// Format trip data according to provider requirements
+const formatTripDataForProvider = (provider: ProviderConfig, tripData: any): Record<string, any> => {
+  // Base data structure all providers use
+  const baseFormattedData = {
+    destination: tripData.destination,
+    origin: tripData.origin,
+    departure_date: tripData.departureDate,
+    return_date: tripData.returnDate,
+    travelers: tripData.travelers,
+    trip_cost: tripData.tripCost
+  };
+  
+  // Provider-specific formatting
+  switch (provider.name) {
+    case 'GeoBlue':
+      return {
+        ...baseFormattedData,
+        trip_details: {
+          destination_country: tripData.destination,
+          origin_country: tripData.origin,
+          start_date: tripData.departureDate,
+          end_date: tripData.returnDate,
+          traveler_count: tripData.travelers,
+          estimated_cost: tripData.tripCost
+        }
+      };
+      
+    case 'Allianz':
+      return {
+        tripInfo: {
+          destination: tripData.destination,
+          departFrom: tripData.origin,
+          departureDate: tripData.departureDate,
+          returnDate: tripData.returnDate,
+          travelers: Number(tripData.travelers),
+          tripCost: Number(tripData.tripCost || 0)
+        }
+      };
+      
+    case 'TravelGuard':
+      // TravelGuard requires traveler age information
+      return {
+        ...baseFormattedData,
+        traveler_ages: new Array(Number(tripData.travelers))
+          .fill(35) // Default age if not provided
+      };
+      
+    default:
+      return baseFormattedData;
+  }
+};
+
+// Calculate trip duration in days
+const calculateTripDuration = (departureDate: string, returnDate: string): number => {
+  try {
+    const start = new Date(departureDate);
+    const end = new Date(returnDate);
+    const durationMs = end.getTime() - start.getTime();
+    return Math.max(1, Math.ceil(durationMs / (1000 * 60 * 60 * 24)));
+  } catch (error) {
+    console.error('Error calculating trip duration:', error);
+    return 7; // Default to 7 days if calculation fails
+  }
+};
+
+// Handle provider-specific error responses
+const handleProviderSpecificErrors = (provider: ProviderConfig, response: Response): ApiError | null => {
+  // Handle special error cases for specific providers
+  switch (provider.name) {
+    case 'Allianz':
+      // Allianz sometimes returns 200 with error in the body
+      if (response.status === 200 && response.headers.get('X-Error-Code')) {
+        return {
+          statusCode: 400,
+          message: `Allianz error: ${response.headers.get('X-Error-Message') || 'Unknown error'}`,
+          providerName: provider.name,
+          retryable: false,
+          timestamp: new Date(),
+          details: { 
+            errorCode: response.headers.get('X-Error-Code'),
+            errorType: response.headers.get('X-Error-Type')
+          }
+        };
+      }
+      break;
+      
+    case 'TravelGuard':
+      // TravelGuard sometimes uses custom error headers
+      if (!response.ok && response.headers.get('X-TG-Error')) {
+        return {
+          statusCode: response.status,
+          message: response.headers.get('X-TG-Error-Message') || `TravelGuard error`,
+          providerName: provider.name,
+          retryable: response.status >= 500,
+          timestamp: new Date()
+        };
+      }
+      break;
+  }
+  
+  return null;
+};
+
+// Extract plans from provider response based on their format
+const extractProviderPlans = (provider: ProviderConfig, response: any): Array<Record<string, any>> => {
+  // If the response is null or undefined, return an empty array
+  if (!response) return [];
+  
+  // Extract plans based on provider's response format
+  switch (provider.responseFormat) {
+    case 'nested':
+      // Handle nested response format (e.g., response.data.products)
+      if (response.data?.products) return response.data.products;
+      if (response.data?.plans) return response.data.plans;
+      if (response.results?.plans) return response.results.plans;
+      break;
+      
+    case 'array':
+      // Response is directly an array of plans
+      if (Array.isArray(response)) return response;
+      break;
+      
+    default:
+      // Standard format, look in common locations
+      if (Array.isArray(response.plans)) return response.plans;
+      if (Array.isArray(response.products)) return response.products;
+      if (Array.isArray(response.quotes)) return response.quotes;
+      if (Array.isArray(response.options)) return response.options;
+      
+      // If we can't find a plans array, but the response looks like a single plan,
+      // wrap it in an array
+      if (response.id || response.name || response.price) return [response];
+  }
+  
+  console.warn(`Could not extract plans from ${provider.name} response:`, response);
+  return [];
+};
 
 // Helper to check if a provider is rate limited
 const isRateLimited = (provider: ProviderConfig): boolean => {
@@ -338,12 +544,25 @@ export const fetchProviderPlans = async (
         message: `Rate limit exceeded for ${provider.name}`,
         providerName: provider.name,
         retryable: true,
-        timestamp: new Date()
+        timestamp: new Date(),
+        details: { rateLimitReset: rateLimitTracker[provider.name]?.resetTime }
       } as ApiError;
     }
     
     // Increment rate limit counter
     incrementRateLimit(provider);
+    
+    // Check if provider API key is present
+    if ((provider.authType !== 'none') && !provider.apiKey) {
+      throw {
+        statusCode: 401,
+        message: `API key missing for ${provider.name}`,
+        providerName: provider.name,
+        retryable: false,
+        timestamp: new Date(),
+        details: { requiresConfiguration: true }
+      } as ApiError;
+    }
     
     // Build authentication headers
     const headers = await getAuthHeaders(provider);
@@ -352,30 +571,48 @@ export const fetchProviderPlans = async (
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), provider.timeout || 10000);
     
+    // Determine endpoint based on provider - some providers use different endpoints
+    const endpoint = getProviderEndpoint(provider, tripData);
+    
     // Make the API request with retry logic
     const response = await retryRequest(async () => {
       try {
-        const res = await fetch(`${provider.baseUrl}/plans`, {
+        // Prepare request body with provider-specific formatting
+        const formattedTripData = formatTripDataForProvider(provider, tripData);
+        
+        const res = await fetch(endpoint, {
           method: 'POST',
           headers,
-          body: JSON.stringify(tripData),
+          body: JSON.stringify(formattedTripData),
           signal: controller.signal
         });
         
         clearTimeout(timeoutId);
         
+        // Check for provider-specific error handling
+        const customError = handleProviderSpecificErrors(provider, res);
+        if (customError) throw customError;
+        
         if (!res.ok) {
+          // Attempt to parse error response
           const errorData = await res.json().catch(() => ({}));
+          
           throw {
             statusCode: res.status,
             message: errorData.message || `Error from ${provider.name}: ${res.statusText}`,
             providerName: provider.name,
             retryable: res.status >= 500 || res.status === 429,
-            timestamp: new Date()
+            timestamp: new Date(),
+            details: errorData
           } as ApiError;
         }
         
-        return await res.json();
+        const responseData = await res.json();
+        // Log successful response for debugging
+        console.debug(`${provider.name} API response:`, 
+          JSON.stringify(responseData).substring(0, 200) + '...');
+        
+        return responseData;
       } catch (error: any) {
         if (error.name === 'AbortError') {
           throw {
@@ -388,16 +625,39 @@ export const fetchProviderPlans = async (
         }
         throw error;
       }
-    });
+    }, provider.authType === 'oauth' ? 2 : 3); // Fewer retries for OAuth to avoid token issues
     
-    // Normalize the data
-    const plans = Array.isArray(response.plans) ? response.plans : [response];
-    return plans.map((plan: Record<string, any>) => ({
-      ...normalizeProviderData(plan, provider.mapping),
-      provider: provider.name
-    })) as InsurancePlan[];
+    // Extract and normalize the data with provider-specific extraction
+    const plans = extractProviderPlans(provider, response);
+    
+    // Apply normalization and validation
+    const normalizedPlans = plans
+      .map((plan: Record<string, any>) => {
+        const normalizedPlan = {
+          ...normalizeProviderData(plan, provider.mapping),
+          provider: provider.name
+        } as InsurancePlan;
+        
+        // Apply basic validation during normalization
+        return normalizedPlan;
+      })
+      .filter(validatePlan); // Remove invalid plans
+      
+    console.log(`Successfully fetched ${normalizedPlans.length} plans from ${provider.name}`);
+    return normalizedPlans;
   } catch (error: any) {
+    // Enhanced error logging with details
     console.error(`Error fetching from ${provider.name}:`, error);
+    // Ensure the error has the ApiError format
+    if (!error.providerName) {
+      error = {
+        statusCode: error.statusCode || 500,
+        message: error.message || `Unknown error from ${provider.name}`,
+        providerName: provider.name,
+        retryable: error.retryable !== undefined ? error.retryable : true,
+        timestamp: new Date()
+      };
+    }
     throw error;
   }
 };
