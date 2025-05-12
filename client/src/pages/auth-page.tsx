@@ -123,8 +123,8 @@ export default function AuthPage() {
   // Redirect if user is logged in
   useEffect(() => {
     if (user) {
-      console.log("AuthPage: User already logged in, redirecting to landing page");
-      navigate("/trip-info");
+      console.log("AuthPage: User already logged in, redirecting to home page");
+      navigate("/home");
     } else {
       console.log("AuthPage: No logged in user detected, staying on auth page");
     }
@@ -133,16 +133,16 @@ export default function AuthPage() {
   // Handle login success
   useEffect(() => {
     if (loginMutation.isSuccess) {
-      console.log("AuthPage: Login successful, redirecting to trip info page");
-      navigate("/trip-info");
+      console.log("AuthPage: Login successful, redirecting to home page");
+      navigate("/home");
     }
   }, [loginMutation.isSuccess, navigate]);
   
   // Handle registration success
   useEffect(() => {
     if (registerMutation.isSuccess) {
-      console.log("AuthPage: Registration successful, redirecting to trip info page");
-      navigate("/trip-info");
+      console.log("AuthPage: Registration successful, redirecting to home page");
+      navigate("/home");
     }
   }, [registerMutation.isSuccess, navigate]);
 
