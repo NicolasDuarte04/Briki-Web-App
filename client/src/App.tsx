@@ -18,6 +18,9 @@ import LearnMorePage from "@/pages/learn-more-page";
 import TermsPage from "@/pages/terms-page";
 import ProfilePage from "@/pages/profile-page";
 import SettingsPage from "@/pages/settings-page";
+import AutoInsurancePage from "@/pages/auto-insurance-page";
+import PetInsurancePage from "@/pages/pet-insurance-page";
+import HealthInsurancePage from "@/pages/health-insurance-page";
 
 function Router() {
   return (

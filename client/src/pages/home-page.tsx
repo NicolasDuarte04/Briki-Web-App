@@ -4,10 +4,12 @@ import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
+import { useLanguage } from "@/components/language-selector";
 
 export default function HomePage() {
   const [, navigate] = useLocation();
   const { user, isLoading } = useAuth();
+  const { t } = useLanguage();
 
   // Featured destinations data
   const destinations = [
@@ -53,11 +55,11 @@ export default function HomePage() {
             <div className="mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28">
               <div className="text-center lg:text-left">
                 <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
-                  <span className="block">Travel with</span>
-                  <span className="block text-primary">peace of mind</span>
+                  <span className="block">Insurance</span>
+                  <span className="block text-primary">simplified</span>
                 </h1>
                 <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
-                  Compare travel insurance plans from top providers to find the perfect coverage for your next adventure. Protect your trip with just a few clicks.
+                  Compare insurance plans across travel, auto, pet, and health categories from top providers. Find the perfect coverage for your needs with just a few clicks.
                 </p>
                 <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
                   <div className="rounded-md shadow">
@@ -91,15 +93,101 @@ export default function HomePage() {
         </div>
       </div>
       
-      {/* Popular Destinations */}
+      {/* Insurance Categories */}
       <div className="bg-white py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+              Insurance Categories
+            </h2>
+            <p className="mt-3 max-w-2xl mx-auto text-xl text-gray-500 sm:mt-4">
+              Explore different types of insurance to protect what matters most
+            </p>
+          </div>
+          
+          <div className="mt-10">
+            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+              {/* Travel Insurance */}
+              <div onClick={() => navigate("/insurance-plans")} className="cursor-pointer group relative">
+                <div className="relative h-64 w-full overflow-hidden rounded-lg bg-white shadow-lg border border-gray-200 hover:border-primary transition-all">
+                  <img
+                    src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+                    alt="Travel Insurance"
+                    className="h-40 w-full object-cover transition duration-200 group-hover:scale-105"
+                  />
+                  <div className="p-4">
+                    <div className="flex flex-col items-center text-center">
+                      <h3 className="text-lg font-bold text-gray-900">{t('travelInsurance')}</h3>
+                      <p className="mt-1 text-sm text-gray-500">Protect your trips from cancellations, medical emergencies, and lost baggage</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Auto Insurance */}
+              <div onClick={() => navigate("/auto-insurance")} className="cursor-pointer group relative">
+                <div className="relative h-64 w-full overflow-hidden rounded-lg bg-white shadow-lg border border-gray-200 hover:border-primary transition-all">
+                  <img
+                    src="https://images.unsplash.com/photo-1560641545-3a9e73c8e732?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+                    alt="Auto Insurance"
+                    className="h-40 w-full object-cover transition duration-200 group-hover:scale-105"
+                  />
+                  <div className="p-4">
+                    <div className="flex flex-col items-center text-center">
+                      <h3 className="text-lg font-bold text-gray-900">{t('autoInsurance')}</h3>
+                      <p className="mt-1 text-sm text-gray-500">Coverage for accidents, theft, and liability to keep you driving with confidence</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Pet Insurance */}
+              <div onClick={() => navigate("/pet-insurance")} className="cursor-pointer group relative">
+                <div className="relative h-64 w-full overflow-hidden rounded-lg bg-white shadow-lg border border-gray-200 hover:border-primary transition-all">
+                  <img
+                    src="https://images.unsplash.com/photo-1450778869180-41d0601e046e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+                    alt="Pet Insurance"
+                    className="h-40 w-full object-cover transition duration-200 group-hover:scale-105"
+                  />
+                  <div className="p-4">
+                    <div className="flex flex-col items-center text-center">
+                      <h3 className="text-lg font-bold text-gray-900">{t('petInsurance')}</h3>
+                      <p className="mt-1 text-sm text-gray-500">Help cover unexpected veterinary costs and keep your furry friends healthy</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Health Insurance */}
+              <div onClick={() => navigate("/health-insurance")} className="cursor-pointer group relative">
+                <div className="relative h-64 w-full overflow-hidden rounded-lg bg-white shadow-lg border border-gray-200 hover:border-primary transition-all">
+                  <img
+                    src="https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+                    alt="Health Insurance"
+                    className="h-40 w-full object-cover transition duration-200 group-hover:scale-105"
+                  />
+                  <div className="p-4">
+                    <div className="flex flex-col items-center text-center">
+                      <h3 className="text-lg font-bold text-gray-900">{t('healthInsurance')}</h3>
+                      <p className="mt-1 text-sm text-gray-500">Comprehensive coverage for medical needs, prescriptions, and preventive care</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Popular Destinations */}
+      <div className="bg-gray-50 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
               Popular Destinations
             </h2>
             <p className="mt-3 max-w-2xl mx-auto text-xl text-gray-500 sm:mt-4">
-              Find the perfect insurance coverage for your dream destination
+              Find the perfect travel insurance coverage for your dream destination
             </p>
           </div>
           
@@ -136,19 +224,19 @@ export default function HomePage() {
       </div>
       
       {/* Features */}
-      <div className="bg-gray-50 py-12">
+      <div className="bg-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
-              Why choose Briki for travel insurance?
+              Why choose Briki for all your insurance needs?
             </h2>
             <p className="mt-4 text-lg text-gray-500">
-              We've got you covered with the best travel insurance options
+              We've got you covered with the best insurance options across multiple categories
             </p>
           </div>
           
           <div className="mt-12">
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
               <div className="bg-white shadow rounded-lg px-6 py-8">
                 <div className="flex items-center justify-center h-12 w-12 rounded-md bg-primary text-white mb-5">
                   <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -169,7 +257,19 @@ export default function HomePage() {
                 </div>
                 <h3 className="text-xl font-medium text-gray-900">Comprehensive Coverage</h3>
                 <p className="mt-2 text-base text-gray-500">
-                  Get coverage for medical emergencies, trip cancellations, lost baggage, and more.
+                  Get coverage for all your needs with plans tailored to your specific requirements across all categories.
+                </p>
+              </div>
+              
+              <div className="bg-white shadow rounded-lg px-6 py-8">
+                <div className="flex items-center justify-center h-12 w-12 rounded-md bg-purple-500 text-white mb-5">
+                  <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-medium text-gray-900">Fast & Simple</h3>
+                <p className="mt-2 text-base text-gray-500">
+                  Get insurance quotes in minutes, not hours. Our simple process makes finding the right coverage quick and easy.
                 </p>
               </div>
               
@@ -181,7 +281,7 @@ export default function HomePage() {
                 </div>
                 <h3 className="text-xl font-medium text-gray-900">24/7 Support</h3>
                 <p className="mt-2 text-base text-gray-500">
-                  Our support team is available around the clock to assist you with any questions or claims.
+                  Our support team is available around the clock to assist you with any questions or claims across all insurance types.
                 </p>
               </div>
             </div>
