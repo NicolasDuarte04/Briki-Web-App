@@ -64,13 +64,19 @@ export default function Navbar() {
             <Link href="/" className={`hover:text-primary px-3 py-2 text-sm font-medium ${isActivePath("/")}`}>
               {t('home')}
             </Link>
-            <Link href="/trip-info" className={`hover:text-primary px-3 py-2 text-sm font-medium ${isActivePath("/trip-info")}`}>
-              {t('myTrips')}
-            </Link>
             <Link href="/insurance-plans" className={`hover:text-primary px-3 py-2 text-sm font-medium ${isActivePath("/insurance-plans")}`}>
-              {t('insurancePlans')}
+              {t('travelInsurance')}
             </Link>
-            <Link href="/" className={`hover:text-primary px-3 py-2 text-sm font-medium ${isActivePath("/support")}`}>
+            <Link href="/auto-insurance" className={`hover:text-primary px-3 py-2 text-sm font-medium ${isActivePath("/auto-insurance")}`}>
+              {t('autoInsurance')}
+            </Link>
+            <Link href="/pet-insurance" className={`hover:text-primary px-3 py-2 text-sm font-medium ${isActivePath("/pet-insurance")}`}>
+              {t('petInsurance')}
+            </Link>
+            <Link href="/health-insurance" className={`hover:text-primary px-3 py-2 text-sm font-medium ${isActivePath("/health-insurance")}`}>
+              {t('healthInsurance')}
+            </Link>
+            <Link href="/support" className={`hover:text-primary px-3 py-2 text-sm font-medium ${isActivePath("/support")}`}>
               {t('support')}
             </Link>
           </div>
@@ -183,21 +189,35 @@ export default function Navbar() {
                       {t('home')}
                     </Link>
                     <Link 
-                      href="/trip-info" 
-                      className={`block px-3 py-2 rounded-md text-base font-medium ${isActivePath("/trip-info") ? "bg-gray-100 text-primary" : "text-gray-500 hover:bg-gray-50 hover:text-primary"}`}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      {t('myTrips')}
-                    </Link>
-                    <Link 
                       href="/insurance-plans" 
                       className={`block px-3 py-2 rounded-md text-base font-medium ${isActivePath("/insurance-plans") ? "bg-gray-100 text-primary" : "text-gray-500 hover:bg-gray-50 hover:text-primary"}`}
                       onClick={() => setIsOpen(false)}
                     >
-                      {t('insurancePlans')}
+                      {t('travelInsurance')}
                     </Link>
                     <Link 
-                      href="/" 
+                      href="/auto-insurance" 
+                      className={`block px-3 py-2 rounded-md text-base font-medium ${isActivePath("/auto-insurance") ? "bg-gray-100 text-primary" : "text-gray-500 hover:bg-gray-50 hover:text-primary"}`}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      {t('autoInsurance')}
+                    </Link>
+                    <Link 
+                      href="/pet-insurance" 
+                      className={`block px-3 py-2 rounded-md text-base font-medium ${isActivePath("/pet-insurance") ? "bg-gray-100 text-primary" : "text-gray-500 hover:bg-gray-50 hover:text-primary"}`}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      {t('petInsurance')}
+                    </Link>
+                    <Link 
+                      href="/health-insurance" 
+                      className={`block px-3 py-2 rounded-md text-base font-medium ${isActivePath("/health-insurance") ? "bg-gray-100 text-primary" : "text-gray-500 hover:bg-gray-50 hover:text-primary"}`}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      {t('healthInsurance')}
+                    </Link>
+                    <Link 
+                      href="/support" 
                       className={`block px-3 py-2 rounded-md text-base font-medium ${isActivePath("/support") ? "bg-gray-100 text-primary" : "text-gray-500 hover:bg-gray-50 hover:text-primary"}`}
                       onClick={() => setIsOpen(false)}
                     >
