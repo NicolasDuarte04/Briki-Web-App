@@ -118,6 +118,76 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     });
   }
+  
+  // AI Assistant endpoints
+  
+  // Chat message endpoint
+  app.post("/api/ai/chat", async (req, res) => {
+    try {
+      const { messages } = req.body;
+      
+      if (!messages || !Array.isArray(messages)) {
+        return res.status(400).json({ error: "Invalid request format. 'messages' array is required." });
+      }
+      
+      const response = await getChatCompletionFromOpenAI(messages);
+      res.json({ response });
+    } catch (error: any) {
+      console.error("Error in chatbot API:", error);
+      res.status(500).json({ error: "Failed to process chat request", message: error.message });
+    }
+  });
+
+  // Insurance term explanation endpoint
+  app.post("/api/ai/explain-term", async (req, res) => {
+    try {
+      const { term } = req.body;
+      
+      if (!term || typeof term !== 'string') {
+        return res.status(400).json({ error: "Invalid request. 'term' is required." });
+      }
+      
+      const explanation = await explainInsuranceTerm(term);
+      res.json({ explanation });
+    } catch (error: any) {
+      console.error("Error explaining term:", error);
+      res.status(500).json({ error: "Failed to explain insurance term", message: error.message });
+    }
+  });
+
+  // Insurance recommendation endpoint
+  app.post("/api/ai/recommend", async (req, res) => {
+    try {
+      const { category, criteria } = req.body;
+      
+      if (!category || !criteria) {
+        return res.status(400).json({ error: "Invalid request. 'category' and 'criteria' are required." });
+      }
+      
+      const recommendation = await generateInsuranceRecommendation(category, criteria);
+      res.json({ recommendation });
+    } catch (error: any) {
+      console.error("Error generating recommendation:", error);
+      res.status(500).json({ error: "Failed to generate recommendation", message: error.message });
+    }
+  });
+
+  // Plan comparison endpoint
+  app.post("/api/ai/compare-plans", async (req, res) => {
+    try {
+      const { plans } = req.body;
+      
+      if (!plans || !Array.isArray(plans) || plans.length < 2) {
+        return res.status(400).json({ error: "Invalid request. At least 2 plans are required for comparison." });
+      }
+      
+      const comparison = await comparePlans(plans);
+      res.json({ comparison });
+    } catch (error: any) {
+      console.error("Error comparing plans:", error);
+      res.status(500).json({ error: "Failed to compare plans", message: error.message });
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;
