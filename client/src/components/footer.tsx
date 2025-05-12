@@ -11,8 +11,8 @@ export default function Footer() {
               <span className="checkmark">✓</span>
             </h1>
             <p className="text-gray-500 text-base">
-              Making travel insurance simple and accessible for everyone.
-              Compare plans, find the perfect coverage, and travel with peace of mind.
+              Briki — Your Gateway to Better Insurance: Travel, Auto, Pet, and Health.
+              Compare plans, find the perfect coverage, and protect what matters most.
             </p>
             <div className="flex space-x-6">
               <a href="#" className="text-gray-400 hover:text-gray-500">

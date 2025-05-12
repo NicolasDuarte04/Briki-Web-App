@@ -1,0 +1,102 @@
+# Objective:
+We are enhancing the Briki web application to reflect its new vision as a **multi-category insurance platform**, not just focused on travel but covering:
+- Travel Insurance
+- Auto Insurance
+- Pet Insurance
+- Health Insurance
+
+This prompt includes updates to navigation, layout, and UI elements to ensure consistency, clarity, and a seamless user experience across all categories.
+
+---
+
+# Tasks:
+## 1️⃣ Navbar Update:
+- Update the navbar to reflect the multi-category structure:
+  - Home | Travel Insurance | Auto Insurance | Pet Insurance | Health Insurance | Support | Sign In
+- Remove redundant or legacy "Travel" mentions.
+
+---
+
+## 2️⃣ Login & Sign Up Page Update:
+- Remove the line that says *"Travel Insurance Made Simple"* and replace it with:
+  - "All Your Insurance Needs in One Place"
+- Update the UI elements to reflect the multi-category structure:
+  - If possible, add small icons representing Travel, Auto, Pet, and Health below the text to give a sense of coverage.  
+
+---
+
+## 3️⃣ Remove "Popular Destinations":
+- Replace the "Popular Destinations" section with:
+  - **Popular Plans:** Highlight top plans across categories.
+  - Travel → Top-Rated International Plans
+  - Auto → Best Third-Party and Comprehensive Plans
+  - Pet → Most Popular Pet Coverage
+  - Health → Top-Rated Health Plans
+- This new section should be scrollable and allow direct *Get a Quote* or *View Details* interactions.
+
+---
+
+## 4️⃣ Improve Category Cards:
+- Currently, the category cards for *Auto*, *Pet*, and *Health* are placeholders.
+- Add actual descriptions:
+  - Auto Insurance → "Protect your vehicle with reliable coverage options for every need."
+  - Pet Insurance → "Give your pets the protection they deserve with medical and accident coverage."
+  - Health Insurance → "Find the perfect health plan for your lifestyle and medical needs."
+
+---
+
+## 5️⃣ Smooth Transitions and Animations:
+- When switching between categories, the transition should be smooth and visually appealing.
+- Implement a slide-in animation or a fade effect to make navigation feel fluid.
+
+---
+
+## 6️⃣ Compare Plans Expansion:
+- Ensure the *Compare Plans* logic now handles:
+  - Auto Insurance (Liability, Comprehensive, Third-Party)
+  - Pet Insurance (Accident, Medical, Routine Care)
+  - Health Insurance (Basic, Premium, Global)
+- When comparing, display:
+  - Price, Coverage Limits, Exclusions, Special Benefits
+
+---
+
+## 7️⃣ CTA Consistency:
+- All call-to-action buttons should be consistent:
+  - *Get a Quote* → For direct plan exploration
+  - *View Details* → For deeper inspection of policy details
+  - *Compare Now* → For side-by-side plan analysis
+
+---
+
+## 8️⃣ Footer Update:
+- Update the footer to reflect multi-category support:
+  - Remove "Travel-focused" text and replace with:
+    - "Briki — Your Gateway to Better Insurance: Travel, Auto, Pet, and Health."
+  - Add links for each category:
+    - Travel Insurance Plans | Auto Insurance Plans | Pet Insurance Plans | Health Insurance Plans
+
+---
+
+## 9️⃣ Mobile Responsiveness:
+- Ensure that all new layouts are mobile-friendly:
+  - Navbar should collapse into a hamburger menu.
+  - Category cards should be swipeable.
+  - Comparison view should be scrollable horizontally.
+
+---
+
+# Questions:
+1. Should we implement a "Recently Viewed Plans" section for returning users?  
+2. Do you want to add a search bar at the top of each category to allow users to filter plans faster?  
+3. Should we include animated loaders while switching between categories for a smoother experience?  
+
+---
+
+# Expected Output:
+- A fully updated multi-category interface.
+- Consistent branding across all categories.
+- Smooth navigation and intuitive comparison logic.
+- Clear call-to-action and seamless transitions.
+
+---
