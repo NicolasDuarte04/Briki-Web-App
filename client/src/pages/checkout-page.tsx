@@ -10,6 +10,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { InsurancePlan, Trip } from "@shared/schema";
 import { loadStripe } from "@stripe/stripe-js";
 import { motion } from "framer-motion";
+import { PaymentDisabled } from "@/components/countdown/payment-disabled";
+import { BetaDisclaimer } from "@/components/countdown/beta-disclaimer";
 import { 
   Elements, 
   PaymentElement, 

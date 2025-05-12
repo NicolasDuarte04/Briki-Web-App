@@ -27,6 +27,7 @@ import {
   FuturisticPetIcon, 
   FuturisticHealthIcon 
 } from "@/components/icons/futuristic-icons";
+import { BetaDisclaimer } from "@/components/countdown/beta-disclaimer";
 
 const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -147,6 +148,9 @@ export default function AuthPage() {
 
   return (
     <div className="flex min-h-screen bg-background">
+      {/* Beta Disclaimer */}
+      <BetaDisclaimer />
+      
       {/* Background elements */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         <FuturisticBackground particleCount={60} />
