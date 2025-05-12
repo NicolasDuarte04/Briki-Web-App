@@ -20,13 +20,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
-import { FuturisticBackground } from "@/components/ui/futuristic-background";
+import { RefinedBackground } from "@/components/ui/refined-background";
 import { 
-  FuturisticTravelIcon, 
-  FuturisticAutoIcon, 
-  FuturisticPetIcon, 
-  FuturisticHealthIcon 
-} from "@/components/icons/futuristic-icons";
+  RefinedTravelIcon, 
+  RefinedAutoIcon, 
+  RefinedPetIcon, 
+  RefinedHealthIcon 
+} from "@/components/icons/refined-icons";
 
 const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -158,7 +158,7 @@ export default function AuthPage() {
     <div className="flex min-h-screen bg-background">
       {/* Background elements */}
       <div className="absolute inset-0 z-0 overflow-hidden">
-        <FuturisticBackground particleCount={60} />
+        <RefinedBackground particleCount={40} />
       </div>
       
       {/* Left column: Auth form */}
@@ -179,7 +179,7 @@ export default function AuthPage() {
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <div className="h-12 w-12 mb-3">
-                  <FuturisticTravelIcon className="h-full w-full" />
+                  <RefinedTravelIcon className="h-full w-full" />
                 </div>
                 <span className="text-xs text-foreground/80">Travel</span>
               </motion.div>
@@ -190,7 +190,7 @@ export default function AuthPage() {
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <div className="h-12 w-12 mb-3">
-                  <FuturisticAutoIcon className="h-full w-full" />
+                  <RefinedAutoIcon className="h-full w-full" />
                 </div>
                 <span className="text-xs text-foreground/80">Auto</span>
               </motion.div>
@@ -201,7 +201,7 @@ export default function AuthPage() {
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <div className="h-12 w-12 mb-3">
-                  <FuturisticPetIcon className="h-full w-full" />
+                  <RefinedPetIcon className="h-full w-full" />
                 </div>
                 <span className="text-xs text-foreground/80">Pet</span>
               </motion.div>
@@ -212,7 +212,7 @@ export default function AuthPage() {
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <div className="h-12 w-12 mb-3">
-                  <FuturisticHealthIcon className="h-full w-full" />
+                  <RefinedHealthIcon className="h-full w-full" />
                 </div>
                 <span className="text-xs text-foreground/80">Health</span>
               </motion.div>
@@ -460,7 +460,7 @@ export default function AuthPage() {
       <div className="relative hidden w-0 flex-1 lg:block">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-900/30 to-indigo-900/30">
           <div className="absolute inset-0">
-            <FuturisticBackground particleCount={40} interactive={false} />
+            <RefinedBackground particleCount={30} />
           </div>
           
           <div className="flex flex-col items-center justify-center h-full text-foreground px-8 relative z-10">
@@ -476,7 +476,7 @@ export default function AuthPage() {
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <div className="h-16 w-16 mb-3">
-                  <FuturisticTravelIcon className="h-full w-full" />
+                  <RefinedTravelIcon className="h-full w-full" />
                 </div>
                 <span className="text-foreground/90">Travel Insurance</span>
               </motion.div>
@@ -487,7 +487,7 @@ export default function AuthPage() {
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <div className="h-16 w-16 mb-3">
-                  <FuturisticAutoIcon className="h-full w-full" />
+                  <RefinedAutoIcon className="h-full w-full" />
                 </div>
                 <span className="text-foreground/90">Auto Insurance</span>
               </motion.div>
@@ -498,7 +498,7 @@ export default function AuthPage() {
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <div className="h-16 w-16 mb-3">
-                  <FuturisticPetIcon className="h-full w-full" />
+                  <RefinedPetIcon className="h-full w-full" />
                 </div>
                 <span className="text-foreground/90">Pet Insurance</span>
               </motion.div>
@@ -509,7 +509,7 @@ export default function AuthPage() {
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <div className="h-16 w-16 mb-3">
-                  <FuturisticHealthIcon className="h-full w-full" />
+                  <RefinedHealthIcon className="h-full w-full" />
                 </div>
                 <span className="text-foreground/90">Health Insurance</span>
               </motion.div>
