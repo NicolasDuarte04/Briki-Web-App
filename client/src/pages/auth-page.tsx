@@ -136,9 +136,9 @@ export default function AuthPage() {
   useEffect(() => {
     if (loginMutation.isSuccess) {
       console.log("AuthPage: Login successful, redirecting to home page");
-      // Directly go to the root path - no subdirectory
+      // Navigate to the home page instead of root
       setTimeout(() => {
-        window.location.href = '/';
+        window.location.href = '/home';
       }, 100);
     }
   }, [loginMutation.isSuccess]);
@@ -147,9 +147,9 @@ export default function AuthPage() {
   useEffect(() => {
     if (registerMutation.isSuccess) {
       console.log("AuthPage: Registration successful, redirecting to home page");
-      // Directly go to the root path - no subdirectory
+      // Navigate to the home page instead of root
       setTimeout(() => {
-        window.location.href = '/';
+        window.location.href = '/home';
       }, 100);
     }
   }, [registerMutation.isSuccess]);
