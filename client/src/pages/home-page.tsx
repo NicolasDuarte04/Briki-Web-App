@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
+import { motion } from "framer-motion";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,15 @@ import { useLanguage } from "@/components/language-selector";
 import { FadeIn, SlideIn, StaggerChildren } from "@/components/ui/transition-effect";
 import PopularPlansSlider from "@/components/popular-plans-slider";
 import RecentlyViewedPlans from "@/components/recently-viewed-plans";
+import { FuturisticBackground } from "@/components/ui/futuristic-background";
+import { AIAssistant, getTravelInsuranceTips, getAutoInsuranceTips, getHealthInsuranceTips, getPetInsuranceTips } from "@/components/ui/ai-assistant";
+import { ComparisonChart, RadarChart, CoverageComparison } from "@/components/ui/data-visualization";
+import { 
+  FuturisticTravelIcon, 
+  FuturisticAutoIcon, 
+  FuturisticPetIcon, 
+  FuturisticHealthIcon 
+} from "@/components/icons/futuristic-icons";
 import { popularPlans } from "@/data/popular-plans";
 
 export default function HomePage() {
@@ -194,135 +204,306 @@ export default function HomePage() {
         </div>
       </div>
       
-      {/* Insurance Categories */}
-      <div className="bg-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <SlideIn direction="up">
-              <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-                Insurance Categories
-              </h2>
-              <p className="mt-3 max-w-2xl mx-auto text-xl text-gray-500 sm:mt-4">
-                Explore different types of insurance to protect what matters most
-              </p>
-            </SlideIn>
+      {/* Insurance Categories - Futuristic Design */}
+      <div className="bg-background py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          <div className="absolute inset-0 z-0 opacity-30">
+            <DataVisualizationBackground />
           </div>
           
-          <div className="mt-10">
-            <StaggerChildren staggerDelay={0.15} className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-              {/* Travel Insurance */}
-              <div 
+          <div className="text-center relative z-10">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, type: "spring" }}
+              viewport={{ once: true }}
+            >
+              <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl section-header">
+                AI-Powered Insurance Categories
+              </h2>
+              <p className="mt-3 max-w-2xl mx-auto text-xl text-foreground/70 sm:mt-4">
+                Explore different insurance types optimized using advanced analytics and risk assessment
+              </p>
+            </motion.div>
+          </div>
+          
+          <div className="mt-16 relative z-10">
+            <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
+              {/* Travel Insurance - Futuristic Card */}
+              <motion.div 
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                viewport={{ once: true }}
+                whileHover={{ 
+                  y: -10,
+                  boxShadow: "0 20px 30px rgba(59, 130, 246, 0.2)",
+                }}
                 onClick={() => navigate("/insurance-plans")} 
-                className="cursor-pointer group relative"
+                className="cursor-pointer group"
                 role="button"
                 aria-label="View travel insurance plans"
               >
-                <div className="relative h-64 w-full overflow-hidden rounded-lg bg-white shadow-lg border border-gray-200 hover:border-primary transition-all duration-300 hover:shadow-xl">
-                  <img
-                    src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
-                    alt="Travel Insurance"
-                    className="h-40 w-full object-cover transition duration-300 group-hover:scale-105"
-                  />
-                  <div className="p-4">
+                <div className="h-full bg-card rounded-xl overflow-hidden border border-border p-6 transition-all duration-300 briki-card">
+                  <div className="h-32 flex items-center justify-center mb-6">
+                    <FuturisticTravelIcon className="w-28 h-28 transition-transform duration-500 group-hover:scale-110" />
+                  </div>
+                  <div className="space-y-4">
                     <div className="flex flex-col items-center text-center">
-                      <h3 className="text-lg font-bold text-gray-900">{t('travelInsurance')}</h3>
-                      <p className="mt-1 text-sm text-gray-500">Travel with peace of mind knowing you're covered for emergencies and cancellations</p>
+                      <h3 className="text-xl font-bold section-header">{t('travelInsurance')}</h3>
+                      <p className="mt-2 text-foreground/70">AI-powered protection for your journeys, with real-time risk assessment and emergency assistance.</p>
+                    </div>
+                    
+                    <div className="pt-4 flex justify-center">
+                      <motion.div
+                        className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-medium transition-colors hover:bg-primary/20"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        Explore Plans
+                        <svg className="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                      </motion.div>
                     </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
               
-              {/* Auto Insurance */}
-              <div 
+              {/* Auto Insurance - Futuristic Card */}
+              <motion.div 
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                viewport={{ once: true }}
+                whileHover={{ 
+                  y: -10,
+                  boxShadow: "0 20px 30px rgba(16, 185, 129, 0.2)",
+                }}
                 onClick={() => navigate("/auto-insurance")} 
-                className="cursor-pointer group relative"
+                className="cursor-pointer group"
                 role="button"
                 aria-label="View auto insurance plans"
               >
-                <div className="relative h-64 w-full overflow-hidden rounded-lg bg-white shadow-lg border border-gray-200 hover:border-primary transition-all duration-300 hover:shadow-xl">
-                  <img
-                    src="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
-                    alt="Auto Insurance"
-                    className="h-40 w-full object-cover transition duration-300 group-hover:scale-105"
-                  />
-                  <div className="p-4">
+                <div className="h-full bg-card rounded-xl overflow-hidden border border-border p-6 transition-all duration-300 briki-card">
+                  <div className="h-32 flex items-center justify-center mb-6">
+                    <FuturisticAutoIcon className="w-28 h-28 transition-transform duration-500 group-hover:scale-110" />
+                  </div>
+                  <div className="space-y-4">
                     <div className="flex flex-col items-center text-center">
-                      <h3 className="text-lg font-bold text-gray-900">{t('autoInsurance')}</h3>
-                      <p className="mt-1 text-sm text-gray-500">Protect your vehicle with reliable coverage options for every need</p>
+                      <h3 className="text-xl font-bold section-header">{t('autoInsurance')}</h3>
+                      <p className="mt-2 text-foreground/70">Smart coverage solutions that adapt to your driving patterns with predictive risk analysis.</p>
+                    </div>
+                    
+                    <div className="pt-4 flex justify-center">
+                      <motion.div
+                        className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-green-500/10 text-green-500 text-sm font-medium transition-colors hover:bg-green-500/20"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        Explore Plans
+                        <svg className="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                      </motion.div>
                     </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
               
-              {/* Pet Insurance */}
-              <div 
+              {/* Pet Insurance - Futuristic Card */}
+              <motion.div 
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                viewport={{ once: true }}
+                whileHover={{ 
+                  y: -10,
+                  boxShadow: "0 20px 30px rgba(245, 158, 11, 0.2)",
+                }}
                 onClick={() => navigate("/pet-insurance")} 
-                className="cursor-pointer group relative"
+                className="cursor-pointer group"
                 role="button"
                 aria-label="View pet insurance plans"
               >
-                <div className="relative h-64 w-full overflow-hidden rounded-lg bg-white shadow-lg border border-gray-200 hover:border-primary transition-all duration-300 hover:shadow-xl">
-                  <img
-                    src="https://images.unsplash.com/photo-1450778869180-41d0601e046e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
-                    alt="Pet Insurance"
-                    className="h-40 w-full object-cover transition duration-300 group-hover:scale-105"
-                  />
-                  <div className="p-4">
+                <div className="h-full bg-card rounded-xl overflow-hidden border border-border p-6 transition-all duration-300 briki-card">
+                  <div className="h-32 flex items-center justify-center mb-6">
+                    <FuturisticPetIcon className="w-28 h-28 transition-transform duration-500 group-hover:scale-110" />
+                  </div>
+                  <div className="space-y-4">
                     <div className="flex flex-col items-center text-center">
-                      <h3 className="text-lg font-bold text-gray-900">{t('petInsurance')}</h3>
-                      <p className="mt-1 text-sm text-gray-500">Give your pets the protection they deserve with medical and accident coverage</p>
+                      <h3 className="text-xl font-bold section-header">{t('petInsurance')}</h3>
+                      <p className="mt-2 text-foreground/70">Advanced pet health coverage with breed-specific analysis and preventative care recommendations.</p>
+                    </div>
+                    
+                    <div className="pt-4 flex justify-center">
+                      <motion.div
+                        className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-amber-500/10 text-amber-500 text-sm font-medium transition-colors hover:bg-amber-500/20"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        Explore Plans
+                        <svg className="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                      </motion.div>
                     </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
               
-              {/* Health Insurance */}
-              <div 
+              {/* Health Insurance - Futuristic Card */}
+              <motion.div 
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+                viewport={{ once: true }}
+                whileHover={{ 
+                  y: -10,
+                  boxShadow: "0 20px 30px rgba(239, 68, 68, 0.2)",
+                }}
                 onClick={() => navigate("/health-insurance")} 
-                className="cursor-pointer group relative"
+                className="cursor-pointer group"
                 role="button"
                 aria-label="View health insurance plans"
               >
-                <div className="relative h-64 w-full overflow-hidden rounded-lg bg-white shadow-lg border border-gray-200 hover:border-primary transition-all duration-300 hover:shadow-xl">
-                  <img
-                    src="https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
-                    alt="Health Insurance"
-                    className="h-40 w-full object-cover transition duration-300 group-hover:scale-105"
-                  />
-                  <div className="p-4">
+                <div className="h-full bg-card rounded-xl overflow-hidden border border-border p-6 transition-all duration-300 briki-card">
+                  <div className="h-32 flex items-center justify-center mb-6">
+                    <FuturisticHealthIcon className="w-28 h-28 transition-transform duration-500 group-hover:scale-110" />
+                  </div>
+                  <div className="space-y-4">
                     <div className="flex flex-col items-center text-center">
-                      <h3 className="text-lg font-bold text-gray-900">{t('healthInsurance')}</h3>
-                      <p className="mt-1 text-sm text-gray-500">Find the perfect health plan for your lifestyle and medical needs</p>
+                      <h3 className="text-xl font-bold section-header">{t('healthInsurance')}</h3>
+                      <p className="mt-2 text-foreground/70">Personalized health protection using AI to match your medical needs with optimal coverage solutions.</p>
+                    </div>
+                    
+                    <div className="pt-4 flex justify-center">
+                      <motion.div
+                        className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-red-500/10 text-red-500 text-sm font-medium transition-colors hover:bg-red-500/20"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        Explore Plans
+                        <svg className="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                      </motion.div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </StaggerChildren>
+              </motion.div>
+            </div>
           </div>
         </div>
       </div>
       
-      {/* Popular Plans */}
-      <div className="bg-gray-50 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <SlideIn direction="up">
-              <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-                Popular Plans
+      {/* Popular Plans - Futuristic Design */}
+      <div className="bg-background py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          <div className="text-center mb-12">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, type: "spring" }}
+              viewport={{ once: true }}
+            >
+              <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl section-header">
+                AI-Recommended Insurance Plans
               </h2>
-              <p className="mt-3 max-w-2xl mx-auto text-xl text-gray-500 sm:mt-4">
-                Discover our top-rated insurance plans across all categories
+              <p className="mt-3 max-w-2xl mx-auto text-xl text-foreground/70 sm:mt-4">
+                Personalized recommendations based on comprehensive risk analysis and user data
               </p>
-            </SlideIn>
+            </motion.div>
           </div>
           
-          <div className="mt-10">
+          {/* Data visualization comparing plans */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.3 }}
+            viewport={{ once: true }}
+            className="mb-16"
+          >
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <ComparisonChart 
+                title="Coverage Comparison"
+                datasets={[
+                  {
+                    name: "Premium Plan",
+                    color: "#3B82F6",
+                    points: [
+                      { label: "Medical", value: 95 },
+                      { label: "Evacuation", value: 90 },
+                      { label: "Trip Cancel", value: 85 },
+                      { label: "Baggage", value: 80 },
+                    ]
+                  },
+                  {
+                    name: "Standard Plan",
+                    color: "#10B981",
+                    points: [
+                      { label: "Medical", value: 70 },
+                      { label: "Evacuation", value: 65 },
+                      { label: "Trip Cancel", value: 75 },
+                      { label: "Baggage", value: 60 },
+                    ]
+                  },
+                  {
+                    name: "Basic Plan",
+                    color: "#F59E0B",
+                    points: [
+                      { label: "Medical", value: 50 },
+                      { label: "Evacuation", value: 40 },
+                      { label: "Trip Cancel", value: 55 },
+                      { label: "Baggage", value: 45 },
+                    ]
+                  }
+                ]}
+                height={300}
+                animated={true}
+              />
+              
+              <RadarChart
+                title="Risk Protection Analysis"
+                categories={["Medical", "Evacuation", "Delays", "Cancellation", "Lost Items", "Liability"]}
+                datasets={[
+                  {
+                    name: "Premium Protection",
+                    color: "#3B82F6",
+                    values: [90, 95, 85, 90, 80, 85]
+                  },
+                  {
+                    name: "Standard Protection",
+                    color: "#10B981",
+                    values: [70, 75, 65, 80, 60, 65]
+                  }
+                ]}
+                size={300}
+                animated={true}
+              />
+            </div>
+          </motion.div>
+          
+          <div className="rounded-xl overflow-hidden border border-border backdrop-blur-sm bg-card/50 p-6">
+            <div className="mb-8">
+              <h3 className="text-xl font-bold section-header mb-2">Trending Insurance Plans</h3>
+              <p className="text-foreground/70">Our most popular plans based on real user selections</p>
+            </div>
+            
             <PopularPlansSlider plans={popularPlans} />
           </div>
 
-          <div className="mt-12">
+          <div className="mt-12 rounded-xl overflow-hidden border border-border backdrop-blur-sm bg-card/50 p-6">
+            <div className="mb-8">
+              <h3 className="text-xl font-bold section-header mb-2">Recently Viewed Plans</h3>
+              <p className="text-foreground/70">Continue exploring plans you've viewed</p>
+            </div>
+            
             <RecentlyViewedPlans category="travel" />
           </div>
+          
+          {/* AI Assistant */}
+          <AIAssistant tips={getTravelInsuranceTips()} position="bottom-right" />
         </div>
       </div>
       
