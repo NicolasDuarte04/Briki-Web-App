@@ -20,6 +20,10 @@ export function CountdownBackground() {
     setCanvasDimensions();
     window.addEventListener('resize', setCanvasDimensions);
     
+    // Store canvas dimensions to avoid null checks
+    const getCanvasWidth = () => canvas.width;
+    const getCanvasHeight = () => canvas.height;
+    
     // Create particles
     const particlesArray: Particle[] = [];
     const numberOfParticles = 100;
@@ -34,8 +38,8 @@ export function CountdownBackground() {
       alpha: number;
       
       constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
+        this.x = Math.random() * getCanvasWidth();
+        this.y = Math.random() * getCanvasHeight();
         this.size = Math.random() * 5 + 1;
         this.speedX = Math.random() * 1 - 0.5;
         this.speedY = Math.random() * 1 - 0.5;
@@ -52,11 +56,14 @@ export function CountdownBackground() {
         
         if (this.size > 0.2) this.size -= 0.01;
         
+        const width = getCanvasWidth();
+        const height = getCanvasHeight();
+        
         // Wrap around edges
-        if (this.x < 0) this.x = canvas.width;
-        if (this.x > canvas.width) this.x = 0;
-        if (this.y < 0) this.y = canvas.height;
-        if (this.y > canvas.height) this.y = 0;
+        if (this.x < 0) this.x = width;
+        if (this.x > width) this.x = 0;
+        if (this.y < 0) this.y = height;
+        if (this.y > height) this.y = 0;
       }
       
       draw() {
