@@ -494,25 +494,27 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
                 <Button
                   onClick={handleQuerySubmit}
                   variant="default"
-                  size="icon"
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                  size={isMobile ? "sm" : "icon"}
+                  className={`bg-blue-600 hover:bg-blue-700 text-white ${isMobile ? 'p-1' : ''}`}
                   aria-label="Send message"
                 >
-                  <Send className="h-5 w-5" />
+                  <Send className={`${isMobile ? 'h-4 w-4' : 'h-5 w-5'}`} />
                 </Button>
               </div>
-              <div className="mt-2 text-center">
-                <p className="text-xs text-gray-400">
-                  Briki AI is designed to assist with insurance questions, but may not have all answers.
-                </p>
-              </div>
+              {!isMobile && (
+                <div className="mt-2 text-center">
+                  <p className="text-xs text-gray-400">
+                    Briki AI is designed to assist with insurance questions, but may not have all answers.
+                  </p>
+                </div>
+              )}
             </div>
           </motion.div>
         ) : (
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="bg-primary text-white p-3 rounded-full shadow-lg hover:shadow-blue-500/20"
+            className={`bg-primary text-white rounded-full shadow-lg hover:shadow-blue-500/20 ${isMobile ? 'p-2' : 'p-3'}`}
             onClick={() => setIsExpanded(true)}
             aria-label="Open AI Assistant"
             style={{
@@ -520,7 +522,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
               background: "linear-gradient(135deg, #3B82F6, #2563EB)"
             }}
           >
-            <AIAssistantIcon className="h-8 w-8" isActive={helpMode} />
+            <AIAssistantIcon className={`${isMobile ? 'h-6 w-6' : 'h-8 w-8'}`} isActive={helpMode} />
           </motion.button>
         )}
       </AnimatePresence>
