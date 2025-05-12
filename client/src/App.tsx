@@ -21,6 +21,7 @@ import SettingsPage from "@/pages/settings-page";
 import AutoInsurancePage from "@/pages/auto-insurance-page";
 import PetInsurancePage from "@/pages/pet-insurance-page";
 import HealthInsurancePage from "@/pages/health-insurance-page";
+import AutoQuotePage from "@/pages/auto-quote-page";
 
 function Router() {
   return (
@@ -31,6 +32,10 @@ function Router() {
       <ProtectedRoute path="/insurance-plans" component={InsurancePlansPage} />
       <ProtectedRoute path="/checkout/:planId" component={CheckoutPage} />
       <Route path="/weather-risk" component={WeatherRiskPage} />
+      <Route path="/auto-insurance" component={AutoInsurancePage} />
+      <ProtectedRoute path="/auto-quote" component={AutoQuotePage} />
+      <Route path="/pet-insurance" component={PetInsurancePage} />
+      <Route path="/health-insurance" component={HealthInsurancePage} />
       <Route path="/learn-more" component={LearnMorePage} />
       <Route path="/terms" component={TermsPage} />
       <ProtectedRoute path="/profile" component={ProfilePage} />
