@@ -22,11 +22,11 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { FuturisticBackground } from "@/components/ui/futuristic-background";
 import { 
-  MinimalTravelIcon, 
-  MinimalAutoIcon, 
-  MinimalPetIcon, 
-  MinimalHealthIcon 
-} from "@/components/icons/minimal-icons";
+  TravelIcon, 
+  AutoIcon, 
+  PetIcon, 
+  HealthIcon 
+} from "@/components/icons/contemporary-icons";
 
 const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -179,7 +179,7 @@ export default function AuthPage() {
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <div className="h-12 w-12 mb-3">
-                  <MinimalTravelIcon className="h-full w-full" />
+                  <TravelIcon className="h-full w-full" />
                 </div>
                 <span className="text-xs text-foreground/80">Travel</span>
               </motion.div>
@@ -190,7 +190,7 @@ export default function AuthPage() {
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <div className="h-12 w-12 mb-3">
-                  <MinimalAutoIcon className="h-full w-full" />
+                  <AutoIcon className="h-full w-full" />
                 </div>
                 <span className="text-xs text-foreground/80">Auto</span>
               </motion.div>
@@ -201,7 +201,7 @@ export default function AuthPage() {
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <div className="h-12 w-12 mb-3">
-                  <MinimalPetIcon className="h-full w-full" />
+                  <PetIcon className="h-full w-full" />
                 </div>
                 <span className="text-xs text-foreground/80">Pet</span>
               </motion.div>
@@ -212,7 +212,7 @@ export default function AuthPage() {
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <div className="h-12 w-12 mb-3">
-                  <MinimalHealthIcon className="h-full w-full" />
+                  <HealthIcon className="h-full w-full" />
                 </div>
                 <span className="text-xs text-foreground/80">Health</span>
               </motion.div>
@@ -476,7 +476,7 @@ export default function AuthPage() {
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <div className="h-16 w-16 mb-3">
-                  <MinimalTravelIcon className="h-full w-full" />
+                  <TravelIcon className="h-full w-full" />
                 </div>
                 <span className="text-foreground/90">Travel Insurance</span>
               </motion.div>
@@ -487,7 +487,7 @@ export default function AuthPage() {
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <div className="h-16 w-16 mb-3">
-                  <MinimalAutoIcon className="h-full w-full" />
+                  <AutoIcon className="h-full w-full" />
                 </div>
                 <span className="text-foreground/90">Auto Insurance</span>
               </motion.div>
@@ -498,7 +498,7 @@ export default function AuthPage() {
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <div className="h-16 w-16 mb-3">
-                  <MinimalPetIcon className="h-full w-full" />
+                  <PetIcon className="h-full w-full" />
                 </div>
                 <span className="text-foreground/90">Pet Insurance</span>
               </motion.div>
@@ -509,7 +509,7 @@ export default function AuthPage() {
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <div className="h-16 w-16 mb-3">
-                  <MinimalHealthIcon className="h-full w-full" />
+                  <HealthIcon className="h-full w-full" />
                 </div>
                 <span className="text-foreground/90">Health Insurance</span>
               </motion.div>

@@ -1,19 +1,6 @@
 import React from "react";
-import { 
-  MinimalTravelIcon, 
-  MinimalAutoIcon, 
-  MinimalPetIcon, 
-  MinimalHealthIcon 
-} from "./minimal-icons";
 
-// Re-export minimal icons as modern contemporary designs
-export const TravelIcon = MinimalTravelIcon;
-export const AutoIcon = MinimalAutoIcon;
-export const PetIcon = MinimalPetIcon;
-export const HealthIcon = MinimalHealthIcon;
-
-// Legacy implementation kept for reference
-const OldTravelIcon: React.FC<{ className?: string }> = ({ className = "w-20 h-20" }) => (
+export const TravelIcon: React.FC<{ className?: string }> = ({ className = "w-20 h-20" }) => (
   <svg
     className={className}
     viewBox="0 0 24 24"
@@ -26,8 +13,8 @@ const OldTravelIcon: React.FC<{ className?: string }> = ({ className = "w-20 h-2
   >
     <defs>
       <linearGradient id="travel-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#A465F5" />
-        <stop offset="100%" stopColor="#8B5CF6" />
+        <stop offset="0%" stopColor="#60A5FA" />
+        <stop offset="100%" stopColor="#2563EB" />
       </linearGradient>
       <filter id="travel-glow" x="-10%" y="-10%" width="120%" height="120%">
         <feGaussianBlur stdDeviation="1" result="blur" />
@@ -52,7 +39,7 @@ const OldTravelIcon: React.FC<{ className?: string }> = ({ className = "w-20 h-2
   </svg>
 );
 
-const OldAutoIcon: React.FC<{ className?: string }> = ({ className = "w-20 h-20" }) => (
+export const AutoIcon: React.FC<{ className?: string }> = ({ className = "w-20 h-20" }) => (
   <svg
     className={className}
     viewBox="0 0 24 24"
@@ -65,8 +52,8 @@ const OldAutoIcon: React.FC<{ className?: string }> = ({ className = "w-20 h-20"
   >
     <defs>
       <linearGradient id="auto-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#5EEAD4" />
-        <stop offset="100%" stopColor="#2DD4BF" />
+        <stop offset="0%" stopColor="#34D399" />
+        <stop offset="100%" stopColor="#10B981" />
       </linearGradient>
       <filter id="auto-glow" x="-10%" y="-10%" width="120%" height="120%">
         <feGaussianBlur stdDeviation="1" result="blur" />
@@ -91,7 +78,7 @@ const OldAutoIcon: React.FC<{ className?: string }> = ({ className = "w-20 h-20"
   </svg>
 );
 
-const OldPetIcon: React.FC<{ className?: string }> = ({ className = "w-20 h-20" }) => (
+export const PetIcon: React.FC<{ className?: string }> = ({ className = "w-20 h-20" }) => (
   <svg
     className={className}
     viewBox="0 0 24 24"
@@ -104,8 +91,8 @@ const OldPetIcon: React.FC<{ className?: string }> = ({ className = "w-20 h-20" 
   >
     <defs>
       <linearGradient id="pet-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#FDBA74" />
-        <stop offset="100%" stopColor="#FB923C" />
+        <stop offset="0%" stopColor="#FBBF24" />
+        <stop offset="100%" stopColor="#F59E0B" />
       </linearGradient>
       <filter id="pet-glow" x="-10%" y="-10%" width="120%" height="120%">
         <feGaussianBlur stdDeviation="1" result="blur" />
@@ -131,7 +118,7 @@ const OldPetIcon: React.FC<{ className?: string }> = ({ className = "w-20 h-20" 
   </svg>
 );
 
-const OldHealthIcon: React.FC<{ className?: string }> = ({ className = "w-20 h-20" }) => (
+export const HealthIcon: React.FC<{ className?: string }> = ({ className = "w-20 h-20" }) => (
   <svg
     className={className}
     viewBox="0 0 24 24"
@@ -144,8 +131,8 @@ const OldHealthIcon: React.FC<{ className?: string }> = ({ className = "w-20 h-2
   >
     <defs>
       <linearGradient id="health-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#F472B6" />
-        <stop offset="100%" stopColor="#EC4899" />
+        <stop offset="0%" stopColor="#EF4444" />
+        <stop offset="100%" stopColor="#DC2626" />
       </linearGradient>
       <filter id="health-glow" x="-10%" y="-10%" width="120%" height="120%">
         <feGaussianBlur stdDeviation="1" result="blur" />
