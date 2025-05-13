@@ -1,0 +1,89 @@
+We’re in the final phase before the public demo of Briki, and we want to apply a full **UI refinement and value positioning polish** to ensure the app feels aligned with our vision.
+
+This task includes **design tone adjustments**, **icon improvements**, and **clear messaging** for both users and potential partners.
+
+---
+
+✅ BEFORE YOU START:  
+Please summarize your understanding of this prompt in one paragraph and wait for our confirmation before beginning implementation.
+
+---
+
+### 1. Background & Color Tone Refinement
+
+**Goal:** Dial back the current dark, overly futuristic style and adopt a **warmer, emotionally intelligent AI aesthetic**.
+
+**Design Inspiration:**
+- Reference the attached gradients: soft teal, indigo, violet blends
+- We want to feel **calm, advanced, and trustworthy**—similar to modern AI interfaces like Apple Vision Pro or Humane AI
+
+**Implementation Notes:**
+- Use **light-to-mid gradient backgrounds** with soft transitions—avoid black or solid darkness
+- Apply background consistency across:
+  - Home page
+  - Auth screen
+  - Countdown page
+  - Category pages (Travel, Auto, Pet, Health)
+
+**Visual Balance:**
+- Fonts should feel clean and slightly spaced (use letter spacing if needed)
+- Shadows should be **light** or replaced with subtle blur depth
+- Ensure hover states, buttons, and cards are easy to scan and aligned with the new tone
+
+---
+
+### 2. Icon System Redesign (Travel, Auto, Pet, Health)
+
+**Goal:** Replace the current cartoonish or generic icons with **professional Apple-style icons** that match our new aesthetic.
+
+**Requirements:**
+- One icon per category: Travel, Auto, Pet, Health
+- Use minimalist, neutral white or light-filled designs with soft colored outlines
+  - Travel: Blue tone
+  - Auto: Teal or mint
+  - Pet: Soft orange
+  - Health: Subtle red
+- Optional subtle hover animation (e.g., soft scale or glow pulse)
+- Make sure they feel **cohesive with the background gradient**
+
+---
+
+### 3. Value Proposition Display
+
+**Goal:** Clearly communicate Briki’s dual purpose to users and insurance industry professionals.
+
+**Where to Place:**
+
+**a. Countdown Screen** (under timer)
+- Large heading:  
+  **“The easiest way to compare and understand insurance plans—backed by AI.”**
+- Smaller text below:  
+  _“For providers: A data-driven distribution channel + insight platform into real consumer behavior and intent.”_
+
+**b. Home Page Hero Section**  
+Replace current description with:  
+_“Briki simplifies your insurance decision—compare, learn, and choose with confidence.  
+Smarter for users. Smarter for providers.”_
+
+**c. Optional 'About' or 'Learn More' Page**  
+If this section exists, split into toggles:  
+- “For Users”  
+- “For Insurance Companies”
+
+**d. OpenGraph Metadata (if integrated):**  
+Use the value prop in the OG description for social previews
+
+---
+
+### 4. Final Polish Checklist
+
+Please ensure the following throughout:
+- Consistent color palette across all screens
+- Mobile responsiveness preserved
+- Text always readable over new backgrounds
+- AI Assistant retains new subdued behavior (does not auto-pop up)
+- All icons and gradient tones feel balanced from a UI perspective
+
+---
+
+Let me know once you've reviewed and send back your summary before we give you the go-ahead.
