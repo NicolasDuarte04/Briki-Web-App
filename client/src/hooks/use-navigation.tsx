@@ -46,8 +46,8 @@ export function useNavigation() {
         sessionStorage.setItem('navigationHistory', JSON.stringify(history));
         navigate(previousPage);
       } else {
-        // If authenticated, go to home page, otherwise to countdown
-        navigate(user ? '/home' : '/');
+        // Always go to home page to avoid going back to countdown
+        navigate('/home');
       }
     } catch (error) {
       console.error('Error navigating back:', error);
