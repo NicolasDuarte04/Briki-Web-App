@@ -569,7 +569,7 @@
     100% { background-position: 0% 50%; }
   }
   
-  /* Liquid blob animations in the background */
+  /* Liquid blob animations in the background - blue tones */
   .auth-layout::before,
   .auth-layout::after {
     content: "";
@@ -577,11 +577,11 @@
     width: 60vw;
     height: 60vw;
     border-radius: 50%;
-    background: linear-gradient(135deg, rgba(147, 51, 234, 0.4) 0%, rgba(139, 92, 246, 0.3) 100%);
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.4) 0%, rgba(56, 189, 248, 0.3) 100%);
     filter: blur(80px);
     z-index: 0;
     opacity: 0.6;
-    mix-blend-mode: hard-light;
+    mix-blend-mode: soft-light;
     animation: liquidMove 18s infinite alternate cubic-bezier(0.37, 0, 0.63, 1);
   }
   
@@ -594,7 +594,7 @@
   .auth-layout::after {
     bottom: -20%;
     left: -10%;
-    background: linear-gradient(135deg, rgba(124, 58, 237, 0.45) 0%, rgba(166, 80, 255, 0.35) 100%);
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.4) 0%, rgba(99, 102, 241, 0.35) 100%);
     animation-delay: -9s;
     animation-direction: alternate-reverse;
     width: 50vw;
@@ -609,13 +609,13 @@
     filter: blur(60px);
     z-index: 0;
     opacity: 0.4;
-    mix-blend-mode: hard-light;
+    mix-blend-mode: soft-light;
   }
   
   .auth-layout .blob-1 {
     width: 30vw;
     height: 30vw;
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.4) 0%, rgba(124, 58, 237, 0.3) 100%);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.4) 0%, rgba(37, 99, 235, 0.3) 100%);
     top: 20%;
     left: -10%;
     animation: liquidMove 15s infinite alternate-reverse cubic-bezier(0.37, 0, 0.63, 1);
@@ -624,7 +624,7 @@
   .auth-layout .blob-2 {
     width: 25vw;
     height: 25vw;
-    background: linear-gradient(135deg, rgba(192, 132, 252, 0.35) 0%, rgba(139, 92, 246, 0.25) 100%);
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.35) 0%, rgba(14, 165, 233, 0.25) 100%);
     bottom: 20%;
     right: -5%;
     animation: liquidMove 17s infinite alternate cubic-bezier(0.37, 0, 0.63, 1);
@@ -768,10 +768,10 @@
     background-position: right center;
   }
   
-  /* Loudly animated background for auth page - liquid motion effect */
+  /* Loudly animated background for auth page - liquid motion effect with more blue */
   .auth-background {
     @apply fixed inset-0 overflow-hidden;
-    background: linear-gradient(125deg, #e0e6ff 0%, #d1d5ff 100%);
+    background: linear-gradient(125deg, #d0f0ff 0%, #d4e2ff 100%);
     background-size: 400% 400%;
     animation: gradientPosition 15s ease infinite;
   }
@@ -780,10 +780,10 @@
     content: "";
     @apply absolute inset-0;
     background: 
-      radial-gradient(circle at 20% 35%, rgba(139, 92, 246, 0.5) 0%, transparent 50%),
-      radial-gradient(circle at 85% 20%, rgba(147, 51, 234, 0.45) 0%, transparent 50%),
-      radial-gradient(circle at 10% 85%, rgba(124, 58, 237, 0.45) 0%, transparent 55%),
-      radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.4) 0%, transparent 50%);
+      radial-gradient(circle at 20% 35%, rgba(56, 189, 248, 0.5) 0%, transparent 50%),
+      radial-gradient(circle at 85% 20%, rgba(79, 70, 229, 0.45) 0%, transparent 50%),
+      radial-gradient(circle at 10% 85%, rgba(14, 165, 233, 0.45) 0%, transparent 55%),
+      radial-gradient(circle at 90% 80%, rgba(59, 130, 246, 0.5) 0%, transparent 50%);
     animation: pulse 15s infinite alternate;
     opacity: 0.8;
     mix-blend-mode: soft-light;
@@ -792,7 +792,7 @@
   .auth-background::after {
     content: "";
     @apply absolute inset-0 z-0;
-    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23a855f7' fill-opacity='0.07' fill-rule='evenodd'/%3E%3C/svg%3E");
+    /* No background pattern to remove the dots */
     opacity: 0.7;
   }
   
