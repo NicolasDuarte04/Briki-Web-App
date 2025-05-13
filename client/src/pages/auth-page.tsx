@@ -27,6 +27,12 @@ import {
   PetIcon, 
   HealthIcon 
 } from "@/components/icons/contemporary-icons";
+import {
+  AppleTravelIcon,
+  AppleAutoIcon,
+  ApplePetIcon,
+  AppleHealthIcon
+} from "@/components/icons/apple-style-icons";
 
 const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),

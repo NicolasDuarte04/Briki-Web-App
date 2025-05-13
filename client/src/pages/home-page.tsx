@@ -293,7 +293,10 @@ export default function HomePage() {
               >
                 <div className="h-full bg-card rounded-xl overflow-hidden border border-border p-6 transition-all duration-300 briki-card">
                   <div className="h-32 flex items-center justify-center mb-6">
-                    <FuturisticTravelIcon className="w-28 h-28 transition-transform duration-500 group-hover:scale-110" />
+                    {/* Use Apple-style icon with fallback to futuristic icon */}
+                    <div className="relative w-28 h-28">
+                      <AppleTravelIcon className="w-28 h-28 absolute inset-0 transition-all duration-500 group-hover:scale-110" />
+                    </div>
                   </div>
                   <div className="space-y-4">
                     <div className="flex flex-col items-center text-center">
@@ -334,7 +337,10 @@ export default function HomePage() {
               >
                 <div className="h-full bg-card rounded-xl overflow-hidden border border-border p-6 transition-all duration-300 briki-card">
                   <div className="h-32 flex items-center justify-center mb-6">
-                    <FuturisticAutoIcon className="w-28 h-28 transition-transform duration-500 group-hover:scale-110" />
+                    {/* Use Apple-style icon with fallback to futuristic icon */}
+                    <div className="relative w-28 h-28">
+                      <AppleAutoIcon className="w-28 h-28 absolute inset-0 transition-all duration-500 group-hover:scale-110" />
+                    </div>
                   </div>
                   <div className="space-y-4">
                     <div className="flex flex-col items-center text-center">
@@ -375,7 +381,10 @@ export default function HomePage() {
               >
                 <div className="h-full bg-card rounded-xl overflow-hidden border border-border p-6 transition-all duration-300 briki-card">
                   <div className="h-32 flex items-center justify-center mb-6">
-                    <FuturisticPetIcon className="w-28 h-28 transition-transform duration-500 group-hover:scale-110" />
+                    {/* Use Apple-style icon with fallback to futuristic icon */}
+                    <div className="relative w-28 h-28">
+                      <ApplePetIcon className="w-28 h-28 absolute inset-0 transition-all duration-500 group-hover:scale-110" />
+                    </div>
                   </div>
                   <div className="space-y-4">
                     <div className="flex flex-col items-center text-center">
@@ -416,7 +425,10 @@ export default function HomePage() {
               >
                 <div className="h-full bg-card rounded-xl overflow-hidden border border-border p-6 transition-all duration-300 briki-card">
                   <div className="h-32 flex items-center justify-center mb-6">
-                    <FuturisticHealthIcon className="w-28 h-28 transition-transform duration-500 group-hover:scale-110" />
+                    {/* Use Apple-style icon with fallback to futuristic icon */}
+                    <div className="relative w-28 h-28">
+                      <AppleHealthIcon className="w-28 h-28 absolute inset-0 transition-all duration-500 group-hover:scale-110" />
+                    </div>
                   </div>
                   <div className="space-y-4">
                     <div className="flex flex-col items-center text-center">
