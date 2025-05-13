@@ -94,18 +94,20 @@ export default function Navbar() {
             </div>
           ) : user ? (
             <div className="flex items-center">
-              <div className="flex-shrink-0 ml-4">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="relative p-2 rounded-full text-gray-400 hover:text-gray-500"
-                  onClick={toggleAssistant}
-                >
-                  <span className="sr-only">Open AI Assistant</span>
-                  <Bot className="h-5 w-5" />
-                  <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-primary ring-2 ring-white"></span>
-                </Button>
-              </div>
+              {showAIAssistant && (
+                <div className="flex-shrink-0 ml-4">
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="relative p-2 rounded-full text-gray-400 hover:text-gray-500"
+                    onClick={toggleAssistant}
+                  >
+                    <span className="sr-only">Open AI Assistant</span>
+                    <Bot className="h-5 w-5" />
+                    <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-primary ring-2 ring-white"></span>
+                  </Button>
+                </div>
+              )}
               
               <div className="flex-shrink-0 ml-2">
                 <Button variant="ghost" size="icon" className="relative p-2 rounded-full text-gray-400 hover:text-gray-500">
@@ -270,20 +272,22 @@ export default function Navbar() {
                             <div className="text-sm font-medium text-gray-500">{user.email}</div>
                           </div>
                         </div>
-                        <div className="flex items-center px-4 pb-2">
-                          <Button 
-                            variant="outline"
-                            size="sm"
-                            className="flex-1 gap-2"
-                            onClick={() => {
-                              toggleAssistant();
-                              setIsOpen(false);
-                            }}
-                          >
-                            <SparklesIcon className="h-4 w-4" />
-                            Chat with AI Assistant
-                          </Button>
-                        </div>
+                        {showAIAssistant && (
+                          <div className="flex items-center px-4 pb-2">
+                            <Button 
+                              variant="outline"
+                              size="sm"
+                              className="flex-1 gap-2"
+                              onClick={() => {
+                                toggleAssistant();
+                                setIsOpen(false);
+                              }}
+                            >
+                              <SparklesIcon className="h-4 w-4" />
+                              Chat with AI Assistant
+                            </Button>
+                          </div>
+                        )}
                         <div className="mt-3 space-y-1">
                           <Button 
                             variant="ghost" 
@@ -308,17 +312,19 @@ export default function Navbar() {
                             Settings
                           </Button>
                           
-                          <Button 
-                            variant="ghost" 
-                            className="w-full justify-start text-gray-500"
-                            onClick={() => {
-                              navigate("/ai-assistant");
-                              setIsOpen(false);
-                            }}
-                          >
-                            <Bot className="mr-2 h-4 w-4" />
-                            AI Assistant
-                          </Button>
+                          {showAIAssistant && (
+                            <Button 
+                              variant="ghost" 
+                              className="w-full justify-start text-gray-500"
+                              onClick={() => {
+                                navigate("/ai-assistant");
+                                setIsOpen(false);
+                              }}
+                            >
+                              <Bot className="mr-2 h-4 w-4" />
+                              AI Assistant
+                            </Button>
+                          )}
                           <Button 
                             variant="ghost" 
                             className="w-full justify-start text-gray-500"

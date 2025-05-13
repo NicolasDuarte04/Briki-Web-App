@@ -24,18 +24,27 @@ export function FloatingAssistantButton() {
     '/learn-more', // Learn more page
   ];
   
+  // Check if current path is in the excluded list
+  const isExcludedPath = excludedPaths.some(path => 
+    location === path || location.startsWith(`${path}/`)
+  );
+  
   // Don't show the button if:
   // 1. User is not authenticated OR
   // 2. Current path is in the excluded list
-  if (!user || excludedPaths.some(path => location.startsWith(path))) {
+  if (!user || isExcludedPath) {
     console.log("Hiding AI Assistant Button:", { 
       path: location, 
       isAuthenticated: !!user,
-      isExcludedPath: excludedPaths.some(path => location.startsWith(path))
+      isExcludedPath
     });
     return null;
   }
   
-  console.log("Showing AI Assistant Button:", { path: location, isAuthenticated: !!user });
+  console.log("Showing AI Assistant Button:", { 
+    path: location, 
+    isAuthenticated: !!user,
+    isExcludedPath: false
+  });
   return <AIAssistantButton displayVariant="fab" />;
 }
