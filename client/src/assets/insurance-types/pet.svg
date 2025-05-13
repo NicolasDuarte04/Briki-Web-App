@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grassGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#40c057" />
+      <stop offset="100%" stop-color="#2b8a3e" />
+    </linearGradient>
+    <linearGradient id="skyGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#74c0fc" />
+      <stop offset="100%" stop-color="#4dabf7" />
+    </linearGradient>
+    <linearGradient id="dogGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffa94d" />
+      <stop offset="100%" stop-color="#e8590c" />
+    </linearGradient>
+    <linearGradient id="catGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#adb5bd" />
+      <stop offset="100%" stop-color="#868e96" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Sky Background -->
+  <rect x="0" y="0" width="200" height="100" rx="2" fill="url(#skyGradient)"/>
+  
+  <!-- Grass Background -->
+  <rect x="0" y="100" width="200" height="100" rx="2" fill="url(#grassGradient)"/>
+  
+  <!-- Sun -->
+  <circle cx="170" cy="40" r="15" fill="#fcc419" opacity="0.9"/>
+  
+  <!-- Clouds -->
+  <circle cx="50" cy="40" r="12" fill="white" opacity="0.8"/>
+  <circle cx="65" cy="40" r="15" fill="white" opacity="0.8"/>
+  <circle cx="40" cy="40" r="10" fill="white" opacity="0.8"/>
+  
+  <!-- Dog -->
+  <g transform="translate(60, 130)">
+    <!-- Body -->
+    <ellipse cx="0" cy="0" rx="25" ry="15" fill="url(#dogGradient)"/>
+    
+    <!-- Head -->
+    <circle cx="-22" cy="-5" r="15" fill="url(#dogGradient)"/>
+    
+    <!-- Ears -->
+    <ellipse cx="-32" cy="-15" rx="8" ry="12" fill="url(#dogGradient)"/>
+    <ellipse cx="-15" cy="-18" rx="7" ry="10" fill="url(#dogGradient)"/>
+    
+    <!-- Legs -->
+    <rect x="-15" y="10" width="5" height="20" rx="2" fill="url(#dogGradient)"/>
+    <rect x="10" y="10" width="5" height="20" rx="2" fill="url(#dogGradient)"/>
+    
+    <!-- Tail -->
+    <path d="M25,0 C35,-5 40,-15 30,-20" stroke="url(#dogGradient)" stroke-width="5" fill="none" stroke-linecap="round"/>
+    
+    <!-- Face -->
+    <circle cx="-28" cy="-5" r="2" fill="#212529"/>
+    <ellipse cx="-35" cy="0" rx="5" ry="3" fill="#212529"/>
+  </g>
+  
+  <!-- Cat -->
+  <g transform="translate(140, 135)">
+    <!-- Body -->
+    <ellipse cx="0" cy="0" rx="20" ry="12" fill="url(#catGradient)"/>
+    
+    <!-- Head -->
+    <circle cx="-18" cy="-8" r="12" fill="url(#catGradient)"/>
+    
+    <!-- Ears -->
+    <path d="M-26,-18 L-30,-25 L-22,-22 Z" fill="url(#catGradient)"/>
+    <path d="M-10,-18 L-6,-25 L-14,-22 Z" fill="url(#catGradient)"/>
+    
+    <!-- Legs -->
+    <rect x="-13" y="8" width="4" height="16" rx="2" fill="url(#catGradient)"/>
+    <rect x="8" y="8" width="4" height="16" rx="2" fill="url(#catGradient)"/>
+    
+    <!-- Tail -->
+    <path d="M20,0 C35,-15 25,-25 20,-25" stroke="url(#catGradient)" stroke-width="4" fill="none" stroke-linecap="round"/>
+    
+    <!-- Face -->
+    <circle cx="-22" cy="-8" r="1.5" fill="#212529"/>
+    <circle cx="-14" cy="-8" r="1.5" fill="#212529"/>
+    <path d="M-18,-5 L-18,-1" stroke="#212529" stroke-width="1" stroke-linecap="round"/>
+    <path d="M-22,-3 L-14,-3" stroke="#212529" stroke-width="1" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Ball -->
+  <circle cx="100" cy="150" r="8" fill="#fa5252" opacity="0.9"/>
+  <path d="M100,150 M95,145 C100,142 105,142 110,145" stroke="white" stroke-width="1" fill="none"/>
+  <path d="M100,150 M95,155 C100,158 105,158 110,155" stroke="white" stroke-width="1" fill="none"/>
+</svg>

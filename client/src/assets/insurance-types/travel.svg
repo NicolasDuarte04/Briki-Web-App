@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="skyGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#a5d8ff" />
+      <stop offset="100%" stop-color="#339af0" />
+    </linearGradient>
+    <linearGradient id="landGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#40c057" />
+      <stop offset="100%" stop-color="#2b8a3e" />
+    </linearGradient>
+    <linearGradient id="planeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e9ecef" />
+      <stop offset="100%" stop-color="#adb5bd" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background Sky -->
+  <rect x="0" y="0" width="200" height="140" rx="2" fill="url(#skyGradient)"/>
+  
+  <!-- Land/Beach -->
+  <rect x="0" y="140" width="200" height="60" rx="2" fill="url(#landGradient)"/>
+  
+  <!-- Clouds -->
+  <circle cx="40" cy="40" r="15" fill="white" opacity="0.8"/>
+  <circle cx="55" cy="40" r="20" fill="white" opacity="0.8"/>
+  <circle cx="30" cy="40" r="12" fill="white" opacity="0.8"/>
+  
+  <circle cx="140" cy="30" r="12" fill="white" opacity="0.8"/>
+  <circle cx="155" cy="30" r="16" fill="white" opacity="0.8"/>
+  <circle cx="170" cy="30" r="10" fill="white" opacity="0.8"/>
+  
+  <!-- Sun -->
+  <circle cx="160" cy="40" r="18" fill="#fcc419" opacity="0.9"/>
+  
+  <!-- Airplane -->
+  <g transform="translate(100, 70) rotate(-15) scale(1.2)">
+    <path d="M0,0 L-30,15 L-25,20 L5,10 L40,-10 L35,-15 Z" fill="url(#planeGradient)"/>
+    <path d="M0,0 L-5,30 L0,25 L5,30 L3,-5 Z" fill="url(#planeGradient)"/>
+    <path d="M15,-5 L25,-20 L20,-22 L10,-7 Z" fill="url(#planeGradient)"/>
+  </g>
+  
+  <!-- Palm Tree -->
+  <rect x="35" y="140" width="6" height="30" fill="#825700"/>
+  <path d="M38,140 C50,135 60,120 45,110 C38,142 38,140 38,140 Z" fill="#2b8a3e"/>
+  <path d="M38,140 C26,135 16,120 31,110 C38,142 38,140 38,140 Z" fill="#2b8a3e"/>
+  <path d="M38,140 C46,130 60,125 60,110 C38,135 38,140 38,140 Z" fill="#2b8a3e"/>
+  <path d="M38,140 C30,130 16,125 16,110 C38,135 38,140 38,140 Z" fill="#2b8a3e"/>
+</svg>
