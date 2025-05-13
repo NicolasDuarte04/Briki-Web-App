@@ -1,14 +1,36 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+
+// Email notification form schema
+const emailSchema = z.object({
+  email: z.string().email({ message: "Please enter a valid email address" }),
+});
+
+type EmailFormValues = z.infer<typeof emailSchema>;
 
 export default function CountdownPage() {
   const [, navigate] = useLocation();
+  const { toast } = useToast();
+  const [emailSubmitted, setEmailSubmitted] = useState(false);
   const [timeLeft, setTimeLeft] = useState({
     days: 20,
     hours: 0,
     minutes: 0,
     seconds: 0
+  });
+  
+  // Form validation
+  const form = useForm<EmailFormValues>({
+    resolver: zodResolver(emailSchema),
+    defaultValues: {
+      email: "",
+    },
   });
 
   // Calculate time difference from a fixed global launch date
@@ -42,6 +64,52 @@ export default function CountdownPage() {
   const handlePreTestClick = () => {
     // Using direct window location for consistent navigation
     window.location.href = '/auth';
+  };
+  
+  // Handle email submission
+  const onSubmitEmail = (data: EmailFormValues) => {
+    console.log("Email subscription:", data.email);
+    
+    // In a production environment, this would send the email to a database or service
+    // For demo purposes, we'll just show a success toast
+    toast({
+      title: "Thank you for subscribing!",
+      description: "We'll notify you when Briki officially launches.",
+      variant: "default",
+    });
+    
+    // Reset form and show success state
+    form.reset();
+    setEmailSubmitted(true);
+    
+    // Reset success state after a few seconds
+    setTimeout(() => {
+      setEmailSubmitted(false);
+    }, 5000);
+  };
+  
+  // Handle social sharing
+  const shareOnSocial = (platform: 'instagram' | 'linkedin') => {
+    const shareText = "I'm excited for the launch of Briki - the future of insurance comparison coming June 1, 2025. Join me!";
+    const shareUrl = window.location.origin;
+    
+    let shareLink = "";
+    
+    if (platform === 'instagram') {
+      // Instagram doesn't have a direct share URL, so we'll copy to clipboard
+      navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
+      toast({
+        title: "Ready to share on Instagram!",
+        description: "The message has been copied to your clipboard. Open Instagram to paste and share.",
+        variant: "default",
+      });
+      return;
+    }
+    
+    if (platform === 'linkedin') {
+      shareLink = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(shareText)}`;
+      window.open(shareLink, '_blank');
+    }
   };
   
   return (
