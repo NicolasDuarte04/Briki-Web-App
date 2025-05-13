@@ -229,10 +229,10 @@ export default function ChatInterface({
         >
           <Button
             onClick={toggleExpanded}
-            className="h-14 w-14 rounded-full bg-gradient-to-br from-primary to-primary/90 shadow-lg"
+            className="h-14 w-14 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 shadow-md transition-all duration-300 hover:shadow-lg border border-white/20"
             aria-label="Open AI Assistant"
           >
-            <Bot size={24} />
+            <Bot size={22} className="text-white" />
           </Button>
         </motion.div>
       )}
@@ -309,7 +309,7 @@ export default function ChatInterface({
                 )}
               </CardContent>
               
-              <CardFooter className="p-3 pt-2 border-t">
+              <CardFooter className="p-3 pt-2 border-t border-blue-100 dark:border-blue-500/20">
                 <form onSubmit={handleSubmit} className="flex w-full gap-2">
                   <Input
                     ref={inputRef}
@@ -318,18 +318,18 @@ export default function ChatInterface({
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     disabled={isLoading}
-                    className="flex-grow"
+                    className="flex-grow border-blue-100 dark:border-blue-500/20 focus-visible:ring-blue-500/30 shadow-sm"
                   />
                   <Button 
                     type="submit" 
                     size="icon" 
                     disabled={!input.trim() || isLoading}
-                    className={isLoading ? 'animate-pulse' : ''}
+                    className={`${isLoading ? 'animate-pulse' : ''} bg-gradient-to-br from-blue-500 to-indigo-500 text-white shadow-sm transition-all duration-300 hover:shadow`}
                   >
                     {isLoading ? (
-                      <RefreshCw size={18} className="animate-spin" />
+                      <RefreshCw size={16} className="animate-spin" />
                     ) : (
-                      <SendHorizonal size={18} />
+                      <SendHorizonal size={16} />
                     )}
                   </Button>
                 </form>
