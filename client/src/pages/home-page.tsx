@@ -19,6 +19,13 @@ import {
   HealthIcon,
   InsuranceIcon
 } from "@/components/icons/contemporary-icons";
+
+import {
+  FuturisticTravelIcon,
+  FuturisticAutoIcon,
+  FuturisticPetIcon,
+  FuturisticHealthIcon
+} from "@/components/icons/futuristic-icons";
 import { popularPlans } from "@/data/popular-plans";
 
 export default function HomePage() {
@@ -527,8 +534,8 @@ export default function HomePage() {
           
           <div className="rounded-xl overflow-hidden border border-border backdrop-blur-sm bg-card/50 p-6">
             <div className="mb-8">
-              <h3 className="text-xl font-bold section-header mb-2">Trending Insurance Plans</h3>
-              <p className="text-foreground/70">Our most popular plans based on real user selections</p>
+              <h3 className="text-xl font-bold section-header mb-2">Planes de Seguro Populares</h3>
+              <p className="text-foreground/70">Nuestros planes más populares basados en selecciones reales de usuarios</p>
             </div>
             
             <PopularPlansSlider plans={popularPlans} />
@@ -536,8 +543,8 @@ export default function HomePage() {
 
           <div className="mt-12 rounded-xl overflow-hidden border border-border backdrop-blur-sm bg-card/50 p-6">
             <div className="mb-8">
-              <h3 className="text-xl font-bold section-header mb-2">Recently Viewed Plans</h3>
-              <p className="text-foreground/70">Continue exploring plans you've viewed</p>
+              <h3 className="text-xl font-bold section-header mb-2">Planes Vistos Recientemente</h3>
+              <p className="text-foreground/70">Continúa explorando los planes que has visto</p>
             </div>
             
             <RecentlyViewedPlans category="travel" />
@@ -683,7 +690,7 @@ export default function HomePage() {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div className="flex flex-col items-center text-center">
                   <div className="w-20 h-20 mb-4">
-                    <FuturisticTravelIcon className="w-full h-full" />
+                    <TravelIcon className="w-full h-full" />
                   </div>
                   <div className="h-3 w-full bg-muted rounded-full overflow-hidden">
                     <motion.div 
@@ -699,7 +706,7 @@ export default function HomePage() {
                 
                 <div className="flex flex-col items-center text-center">
                   <div className="w-20 h-20 mb-4">
-                    <FuturisticAutoIcon className="w-full h-full" />
+                    <AutoIcon className="w-full h-full" />
                   </div>
                   <div className="h-3 w-full bg-muted rounded-full overflow-hidden">
                     <motion.div 
@@ -715,7 +722,7 @@ export default function HomePage() {
                 
                 <div className="flex flex-col items-center text-center">
                   <div className="w-20 h-20 mb-4">
-                    <FuturisticPetIcon className="w-full h-full" />
+                    <PetIcon className="w-full h-full" />
                   </div>
                   <div className="h-3 w-full bg-muted rounded-full overflow-hidden">
                     <motion.div 
@@ -731,7 +738,7 @@ export default function HomePage() {
                 
                 <div className="flex flex-col items-center text-center">
                   <div className="w-20 h-20 mb-4">
-                    <FuturisticHealthIcon className="w-full h-full" />
+                    <HealthIcon className="w-full h-full" />
                   </div>
                   <div className="h-3 w-full bg-muted rounded-full overflow-hidden">
                     <motion.div 
