@@ -289,7 +289,7 @@ export default function AuthPage() {
                           className="w-full briki-button" 
                           disabled={loginMutation.isPending}
                         >
-                          {loginMutation.isPending ? "Signing in..." : "Sign in"}
+                          {loginMutation.isPending ? "Iniciando sesión..." : "Iniciar sesión"}
                         </Button>
                       </motion.div>
                     </form>
@@ -413,7 +413,7 @@ export default function AuthPage() {
                           className="w-full briki-button"
                           disabled={registerMutation.isPending}
                         >
-                          {registerMutation.isPending ? "Creating account..." : "Create account"}
+                          {registerMutation.isPending ? "Creando cuenta..." : "Crear cuenta"}
                         </Button>
                       </motion.div>
                     </form>
