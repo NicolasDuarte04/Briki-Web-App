@@ -251,7 +251,7 @@ export default function ChatInterface({
               className
             )}
           >
-            <Card className="shadow-glow-md border-primary/20 backdrop-blur-sm bg-background/90 flex flex-col h-full overflow-hidden">
+            <Card className="shadow-lg border border-white/20 dark:border-white/10 backdrop-blur-md bg-white/80 dark:bg-black/40 flex flex-col h-full overflow-hidden">
               <CardHeader className="px-4 py-3 border-b flex flex-row items-center justify-between space-y-0">
                 <div className="flex items-center space-x-2">
                   <div className="bg-primary text-primary-foreground w-8 h-8 rounded-full flex items-center justify-center">

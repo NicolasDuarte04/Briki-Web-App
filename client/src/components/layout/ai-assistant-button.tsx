@@ -44,13 +44,13 @@ export function AIAssistantButton({
             <Button
               onClick={toggleAssistant}
               className={cn(
-                "h-14 w-14 rounded-full bg-gradient-to-br from-primary to-primary/90",
+                "h-14 w-14 rounded-full bg-gradient-to-br from-violet-500 to-indigo-500 shadow-lg border border-white/20 backdrop-blur-sm",
                 className
               )}
               aria-label={label}
               disabled={disabled}
             >
-              <Bot size={24} />
+              <Bot size={24} className="text-white" />
             </Button>
           </TooltipTrigger>
           <TooltipContent side="left">{tooltip}</TooltipContent>
