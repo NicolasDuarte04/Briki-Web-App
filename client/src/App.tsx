@@ -9,7 +9,6 @@ import { LanguageProvider } from "@/components/language-selector";
 import { PageTransition } from "@/components/ui/transition-effect";
 import { RecentlyViewedProvider } from "@/contexts/recently-viewed-context";
 import { AIAssistantProvider, AuthenticatedLayout, FloatingAssistantButton } from "@/components/layout";
-import { FloatingFeedbackButton } from "@/components/feedback/feedback-form";
 
 import NotFound from "@/pages/not-found";
 import HomePage from "@/pages/home-page";
@@ -93,21 +92,13 @@ function AppContent() {
           <Router />
           {/* Single instance of the FloatingAssistantButton */}
           <FloatingAssistantButton />
-          {/* Feedback button for pre-launch demo */}
-          <FloatingFeedbackButton />
         </AuthenticatedLayout>
       </AIAssistantProvider>
     );
   }
   
-  // Otherwise just render the Router without AI Assistant but with feedback button
-  return (
-    <>
-      <Router />
-      {/* Always show feedback button even when not authenticated */}
-      <FloatingFeedbackButton />
-    </>
-  );
+  // Otherwise just render the Router without AI Assistant
+  return <Router />;
 }
 
 function App() {
