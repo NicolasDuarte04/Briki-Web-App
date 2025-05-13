@@ -9,15 +9,15 @@ import { useLanguage } from "@/components/language-selector";
 import { FadeIn, SlideIn, StaggerChildren } from "@/components/ui/transition-effect";
 import PopularPlansSlider from "@/components/popular-plans-slider";
 import RecentlyViewedPlans from "@/components/recently-viewed-plans";
-import { RefinedBackground } from "@/components/ui/refined-background";
+import { FuturisticBackground } from "@/components/ui/futuristic-background";
 import { AIAssistant, getTravelInsuranceTips, getAutoInsuranceTips, getHealthInsuranceTips, getPetInsuranceTips } from "@/components/ui/ai-assistant";
 import { ComparisonChart, RadarChart, CoverageComparison } from "@/components/ui/data-visualization";
 import { 
-  RefinedTravelIcon, 
-  RefinedAutoIcon, 
-  RefinedPetIcon, 
-  RefinedHealthIcon 
-} from "@/components/icons/refined-icons";
+  FuturisticTravelIcon, 
+  FuturisticAutoIcon, 
+  FuturisticPetIcon, 
+  FuturisticHealthIcon 
+} from "@/components/icons/futuristic-icons";
 import { popularPlans } from "@/data/popular-plans";
 
 export default function HomePage() {
@@ -103,10 +103,10 @@ export default function HomePage() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       
-      {/* Hero Section - Refined AI-driven design */}
+      {/* Hero Section - Futuristic AI-driven design */}
       <div className="relative overflow-hidden bg-background">
         <div className="absolute inset-0 z-0">
-          <RefinedBackground particleCount={60} />
+          <FuturisticBackground particleCount={80} />
         </div>
         
         <div className="max-w-7xl mx-auto relative z-10">
@@ -245,11 +245,11 @@ export default function HomePage() {
         </div>
       </div>
       
-      {/* Insurance Categories - Refined Design */}
+      {/* Insurance Categories - Futuristic Design */}
       <div className="bg-background py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="absolute inset-0 z-0 opacity-30 pointer-events-none">
-            <RefinedBackground particleCount={25} />
+            <FuturisticBackground particleCount={30} interactive={false} />
           </div>
           
           <div className="text-center relative z-10">
@@ -270,7 +270,7 @@ export default function HomePage() {
           
           <div className="mt-16 relative z-10">
             <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
-              {/* Travel Insurance - Refined Card */}
+              {/* Travel Insurance - Futuristic Card */}
               <motion.div 
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -287,7 +287,7 @@ export default function HomePage() {
               >
                 <div className="h-full bg-card rounded-xl overflow-hidden border border-border p-6 transition-all duration-300 briki-card">
                   <div className="h-32 flex items-center justify-center mb-6">
-                    <RefinedTravelIcon className="w-28 h-28 transition-transform duration-500 group-hover:scale-110" />
+                    <FuturisticTravelIcon className="w-28 h-28 transition-transform duration-500 group-hover:scale-110" />
                   </div>
                   <div className="space-y-4">
                     <div className="flex flex-col items-center text-center">
@@ -311,7 +311,7 @@ export default function HomePage() {
                 </div>
               </motion.div>
               
-              {/* Auto Insurance - Refined Card */}
+              {/* Auto Insurance - Futuristic Card */}
               <motion.div 
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -328,7 +328,7 @@ export default function HomePage() {
               >
                 <div className="h-full bg-card rounded-xl overflow-hidden border border-border p-6 transition-all duration-300 briki-card">
                   <div className="h-32 flex items-center justify-center mb-6">
-                    <RefinedAutoIcon className="w-28 h-28 transition-transform duration-500 group-hover:scale-110" />
+                    <FuturisticAutoIcon className="w-28 h-28 transition-transform duration-500 group-hover:scale-110" />
                   </div>
                   <div className="space-y-4">
                     <div className="flex flex-col items-center text-center">
@@ -352,7 +352,7 @@ export default function HomePage() {
                 </div>
               </motion.div>
               
-              {/* Pet Insurance - Refined Card */}
+              {/* Pet Insurance - Futuristic Card */}
               <motion.div 
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -369,7 +369,7 @@ export default function HomePage() {
               >
                 <div className="h-full bg-card rounded-xl overflow-hidden border border-border p-6 transition-all duration-300 briki-card">
                   <div className="h-32 flex items-center justify-center mb-6">
-                    <RefinedPetIcon className="w-28 h-28 transition-transform duration-500 group-hover:scale-110" />
+                    <FuturisticPetIcon className="w-28 h-28 transition-transform duration-500 group-hover:scale-110" />
                   </div>
                   <div className="space-y-4">
                     <div className="flex flex-col items-center text-center">
@@ -393,7 +393,7 @@ export default function HomePage() {
                 </div>
               </motion.div>
               
-              {/* Health Insurance - Refined Card */}
+              {/* Health Insurance - Futuristic Card */}
               <motion.div 
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -410,7 +410,7 @@ export default function HomePage() {
               >
                 <div className="h-full bg-card rounded-xl overflow-hidden border border-border p-6 transition-all duration-300 briki-card">
                   <div className="h-32 flex items-center justify-center mb-6">
-                    <RefinedHealthIcon className="w-28 h-28 transition-transform duration-500 group-hover:scale-110" />
+                    <FuturisticHealthIcon className="w-28 h-28 transition-transform duration-500 group-hover:scale-110" />
                   </div>
                   <div className="space-y-4">
                     <div className="flex flex-col items-center text-center">
@@ -438,7 +438,7 @@ export default function HomePage() {
         </div>
       </div>
       
-      {/* Popular Plans - Refined Design */}
+      {/* Popular Plans - Futuristic Design */}
       <div className="bg-background py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center mb-12">
@@ -548,11 +548,11 @@ export default function HomePage() {
         </div>
       </div>
       
-      {/* Features - Refined Design */}
+      {/* Features - Futuristic Design */}
       <div className="bg-background py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="absolute inset-0 z-0 opacity-30">
-            <RefinedBackground particleCount={40} />
+            <FuturisticBackground particleCount={60} interactive={false} />
           </div>
           
           <div className="text-center relative z-10">
@@ -683,7 +683,7 @@ export default function HomePage() {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div className="flex flex-col items-center text-center">
                   <div className="w-20 h-20 mb-4">
-                    <RefinedTravelIcon className="w-full h-full" />
+                    <FuturisticTravelIcon className="w-full h-full" />
                   </div>
                   <div className="h-3 w-full bg-muted rounded-full overflow-hidden">
                     <motion.div 
@@ -699,7 +699,7 @@ export default function HomePage() {
                 
                 <div className="flex flex-col items-center text-center">
                   <div className="w-20 h-20 mb-4">
-                    <RefinedAutoIcon className="w-full h-full" />
+                    <FuturisticAutoIcon className="w-full h-full" />
                   </div>
                   <div className="h-3 w-full bg-muted rounded-full overflow-hidden">
                     <motion.div 
@@ -715,7 +715,7 @@ export default function HomePage() {
                 
                 <div className="flex flex-col items-center text-center">
                   <div className="w-20 h-20 mb-4">
-                    <RefinedPetIcon className="w-full h-full" />
+                    <FuturisticPetIcon className="w-full h-full" />
                   </div>
                   <div className="h-3 w-full bg-muted rounded-full overflow-hidden">
                     <motion.div 
@@ -731,7 +731,7 @@ export default function HomePage() {
                 
                 <div className="flex flex-col items-center text-center">
                   <div className="w-20 h-20 mb-4">
-                    <RefinedHealthIcon className="w-full h-full" />
+                    <FuturisticHealthIcon className="w-full h-full" />
                   </div>
                   <div className="h-3 w-full bg-muted rounded-full overflow-hidden">
                     <motion.div 
@@ -750,11 +750,11 @@ export default function HomePage() {
         </div>
       </div>
       
-      {/* CTA Section - Refined Style */}
+      {/* CTA Section - Futuristic Style */}
       <div className="bg-gradient-to-r from-primary/80 to-blue-700/80 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="absolute inset-0 z-0 opacity-20">
-            <RefinedBackground particleCount={30} />
+            <FuturisticBackground particleCount={40} interactive={false} />
           </div>
           
           <div className="lg:flex lg:items-center lg:justify-between relative z-10">

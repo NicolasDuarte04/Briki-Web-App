@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { RefinedAIAssistantIcon } from "@/components/icons/refined-ai-assistant-icon";
+import { AIAssistantIcon } from "@/components/icons/futuristic-icons";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Mic, MicOff, Send, Volume2, X } from "lucide-react";
@@ -341,7 +341,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
             }}
           >
             <div className="p-4 bg-gradient-to-r from-blue-700 to-indigo-700 flex items-center">
-              <RefinedAIAssistantIcon className="h-10 w-10" animated={true} />
+              <AIAssistantIcon className="h-10 w-10" isActive={true} />
               <div className="ml-3">
                 <h3 className="text-white font-medium text-base">Briki AI Assistant</h3>
                 <p className="text-blue-100 text-xs">Your intelligent insurance guide</p>
@@ -374,7 +374,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
                 >
                   {message.role === 'assistant' && (
                     <div className="bg-primary/10 p-2 rounded-full">
-                      <RefinedAIAssistantIcon className="h-6 w-6" animated={true} />
+                      <AIAssistantIcon className="h-6 w-6" isActive={true} />
                     </div>
                   )}
                   
@@ -522,7 +522,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
               background: "linear-gradient(135deg, #3B82F6, #2563EB)"
             }}
           >
-            <RefinedAIAssistantIcon className={`${isMobile ? 'h-6 w-6' : 'h-8 w-8'}`} animated={helpMode} />
+            <AIAssistantIcon className={`${isMobile ? 'h-6 w-6' : 'h-8 w-8'}`} isActive={helpMode} />
           </motion.button>
         )}
       </AnimatePresence>
