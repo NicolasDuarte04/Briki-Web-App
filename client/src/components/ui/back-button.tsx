@@ -20,7 +20,7 @@ export function BackButton({
     <Button 
       variant={variant} 
       size={size} 
-      className={className}
+      className={`rounded-full bg-background/80 backdrop-blur-sm border border-primary/20 shadow-glow-sm hover:text-primary transition-colors ${className}`}
       onClick={goBack}
       aria-label="Go back"
     >

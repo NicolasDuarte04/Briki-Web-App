@@ -438,11 +438,31 @@ export const CoverageComparison: React.FC<CoverageComparisonProps> = ({
     return null;
   };
   
+  // If no data is loaded yet, show a loading/empty state
+  if (!isDataLoaded || !plans || plans.length === 0 || !plans[0].coverage || plans[0].coverage.length === 0) {
+    return (
+      <div ref={comparisonRef} className="w-full ai-data-visual p-4 border rounded-lg">
+        <h3 className="text-lg font-semibold mb-4 section-header">{title}</h3>
+        <div className="py-8 text-center">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h4 className="text-base font-medium mb-2">No hay datos de cobertura disponibles</h4>
+          <p className="text-sm text-muted-foreground max-w-md mx-auto">
+            Los datos de cobertura de este plan están siendo actualizados o no están disponibles en este momento. Por favor, vuelva a intentarlo más tarde.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div ref={comparisonRef} className="w-full ai-data-visual p-4">
       <h3 className="text-lg font-semibold mb-4 section-header">{title}</h3>
       
-      <div className="flex mb-6 space-x-2">
+      <div className="flex flex-wrap mb-6 gap-2">
         {plans.map((plan, index) => (
           <button
             key={index}

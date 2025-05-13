@@ -13,9 +13,10 @@ import TripSummary from "@/components/trip-summary";
 import { PlanGrid } from "@/components/plan-grid";
 import { FeatureBreakdown } from "@/components/feature-breakdown";
 import { Button } from "@/components/ui/button";
+import { BackButton } from "@/components/ui/back-button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Filter, Search, Sparkles, ChevronLeft, Medal, ThumbsUp, Zap, Star, HelpCircle, RefreshCw } from "lucide-react";
+import { Filter, Search, Sparkles, Medal, ThumbsUp, Zap, Star, HelpCircle, RefreshCw } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
@@ -147,12 +148,11 @@ export default function InsurancePlansPage() {
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <button 
-                  onClick={goBack}
-                  className="w-10 h-10 rounded-full bg-background/80 backdrop-blur-sm border border-primary/20 shadow-glow-sm flex items-center justify-center text-foreground hover:text-primary transition-colors"
-                >
-                  <ChevronLeft className="h-5 w-5" />
-                </button>
+                <BackButton 
+                  variant="ghost"
+                  size="icon"
+                  className="w-10 h-10"
+                />
                 <div className="ml-4">
                   <h1 className="text-2xl font-bold section-header">Seguros de viaje</h1>
                   <p className="text-sm text-foreground/70 mt-1">
