@@ -177,7 +177,16 @@ export default function Navbar() {
               </div>
             </div>
           ) : (
-            <div className="flex flex-col items-end gap-2">
+            <div className="flex items-center gap-3">
+              <Button 
+                variant="outline" 
+                onClick={() => navigate("/company")}
+                className="hidden sm:flex items-center justify-center px-4 py-2 text-sm font-medium text-indigo-700 border border-indigo-300 bg-white hover:bg-indigo-50/80 hover:text-indigo-800 transition-all shadow-sm rounded-md"
+              >
+                <span>For Insurance Companies</span>
+                <span className="ml-2 text-xs opacity-70">→</span>
+              </Button>
+              
               <div className="flex items-center">
                 <Button 
                   variant="ghost" 
@@ -193,15 +202,6 @@ export default function Navbar() {
                   {t('signUp')}
                 </Button>
               </div>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => navigate("/company")}
-                className="text-sm font-medium text-indigo-700 border border-indigo-200 bg-indigo-50/80 hover:bg-indigo-100 hover:text-indigo-800 transition-all shadow-sm"
-              >
-                <span>For Insurance Companies</span>
-                <span className="ml-1 text-xs opacity-70">→</span>
-              </Button>
             </div>
           )}
           
@@ -379,17 +379,17 @@ export default function Navbar() {
                           {t('signUp')}
                         </Button>
                         
-                        <div className="pt-2 border-t border-gray-100">
+                        <div className="pt-3 mt-2 border-t border-gray-100">
                           <Button
                             variant="outline"
-                            className="w-full mt-2 bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100"
+                            className="w-full mt-2 bg-white text-indigo-700 border-indigo-300 hover:bg-indigo-50 transition-all shadow-sm flex items-center justify-center"
                             onClick={() => {
                               navigate("/company");
                               setIsOpen(false);
                             }}
                           >
                             <span>For Insurance Companies</span>
-                            <span className="ml-1 text-xs opacity-70">→</span>
+                            <span className="ml-2 text-xs opacity-70">→</span>
                           </Button>
                         </div>
                       </div>
