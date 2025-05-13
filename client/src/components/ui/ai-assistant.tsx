@@ -92,7 +92,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
   tips = [],
   delay = 2000,
   position = "bottom-right",
-  autoShow = true,
+  autoShow = false, // Changed default to false so user must click to open
   contextAware = false,
   formData,
   onUserQuery,
