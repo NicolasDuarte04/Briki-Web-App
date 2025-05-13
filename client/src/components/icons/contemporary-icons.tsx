@@ -91,7 +91,7 @@ const OldAutoIcon: React.FC<{ className?: string }> = ({ className = "w-20 h-20"
   </svg>
 );
 
-export const PetIcon: React.FC<{ className?: string }> = ({ className = "w-20 h-20" }) => (
+const OldPetIcon: React.FC<{ className?: string }> = ({ className = "w-20 h-20" }) => (
   <svg
     className={className}
     viewBox="0 0 24 24"
@@ -131,7 +131,7 @@ export const PetIcon: React.FC<{ className?: string }> = ({ className = "w-20 h-
   </svg>
 );
 
-export const HealthIcon: React.FC<{ className?: string }> = ({ className = "w-20 h-20" }) => (
+const OldHealthIcon: React.FC<{ className?: string }> = ({ className = "w-20 h-20" }) => (
   <svg
     className={className}
     viewBox="0 0 24 24"
