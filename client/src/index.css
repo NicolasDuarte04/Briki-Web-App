@@ -6,57 +6,57 @@
 @tailwind utilities;
 
 :root {
-  /* Futuristic brand colors for AI-driven theme */
-  --background: 220 70% 3%; /* Dark blue-gray background */
-  --foreground: 210 40% 98%; /* Almost white text */
-  --muted: 217 33% 17%;
-  --muted-foreground: 215 20% 65%;
-  --popover: 222 47% 11%;
-  --popover-foreground: 210 40% 98%;
-  --card: 222 47% 11%;
-  --card-foreground: 210 40% 98%;
-  --border: 217 33% 17%;
-  --input: 217 33% 17%;
-  --primary: 221 83% 53%; /* Vibrant blue for primary actions */
-  --primary-foreground: 210 40% 98%;
-  --secondary: 217 33% 17%;
-  --secondary-foreground: 210 40% 98%;
-  --accent: 224 76% 48%;
-  --accent-foreground: 210 40% 98%;
+  /* Light, AI-inspired theme with soft purples and pinks */
+  --background: 0 0% 100%; /* White background */
+  --foreground: 222 47% 11%; /* Dark text for contrast */
+  --muted: 240 10% 95%;
+  --muted-foreground: 240 4% 46%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 47% 11%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+  --border: 240 5% 84%;
+  --input: 240 5% 96%;
+  --primary: 266 100% 64%; /* Soft purple for primary actions */
+  --primary-foreground: 0 0% 100%;
+  --secondary: 324 100% 76%; /* Soft pink as secondary color */
+  --secondary-foreground: 0 0% 100%;
+  --accent: 288 95% 90%;
+  --accent-foreground: 222 47% 11%;
   --destructive: 0 84% 60%;
-  --destructive-foreground: 210 40% 98%;
-  --ring: 221 83% 53%;
-  --radius: 0.75rem; /* Slightly less rounded corners for a more tech look */
+  --destructive-foreground: 0 0% 100%;
+  --ring: 266 100% 64%;
+  --radius: 0.75rem; /* Maintain the same radius for consistency */
   
-  /* Custom futuristic properties */
-  --glow-primary: 0 0 15px rgba(59, 130, 246, 0.5);
-  --glow-accent: 0 0 20px rgba(99, 102, 241, 0.4);
-  --gradient-primary: linear-gradient(135deg, #3B82F6, #2563EB);
-  --gradient-secondary: linear-gradient(135deg, #4F46E5, #4338CA);
-  --gradient-accent: linear-gradient(135deg, #8B5CF6, #7C3AED);
+  /* Custom AI-inspired properties */
+  --glow-primary: 0 0 15px rgba(164, 101, 245, 0.3);
+  --glow-accent: 0 0 20px rgba(248, 168, 242, 0.3);
+  --gradient-primary: linear-gradient(135deg, #A465F5, #8B5CF6);
+  --gradient-secondary: linear-gradient(135deg, #F472B6, #EC4899);
+  --gradient-accent: linear-gradient(135deg, #F9A8F2, #E879F9);
 }
 
 .dark {
-  /* Already using dark futuristic theme as default, so dark mode is just slightly darker */
-  --background: 222 47% 2%; 
+  /* Darker version of our light AI-inspired theme */
+  --background: 260 10% 12%; 
   --foreground: 210 40% 98%;
-  --muted: 223 47% 12%;
-  --muted-foreground: 215 20% 65%;
-  --popover: 224 71% 7%;
+  --muted: 266 20% 20%;
+  --muted-foreground: 240 10% 70%;
+  --popover: 260 10% 12%;
   --popover-foreground: 210 40% 98%;
-  --card: 224 71% 7%;
+  --card: 260 10% 14%;
   --card-foreground: 210 40% 98%;
-  --border: 215 27% 19%;
-  --input: 215 27% 19%;
-  --primary: 221 83% 53%;
+  --border: 266 20% 24%;
+  --input: 266 20% 18%;
+  --primary: 266 80% 60%;
   --primary-foreground: 210 40% 98%;
-  --secondary: 215 27% 19%;
+  --secondary: 324 80% 70%;
   --secondary-foreground: 210 40% 98%;
-  --accent: 224 76% 48%;
+  --accent: 288 75% 60%;
   --accent-foreground: 210 40% 98%;
   --destructive: 0 84% 60%;
   --destructive-foreground: 210 40% 98%;
-  --ring: 221 83% 53%;
+  --ring: 266 80% 60%;
   --radius: 0.75rem;
 }
 
