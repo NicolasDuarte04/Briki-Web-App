@@ -334,43 +334,43 @@
     background: white;
   }
   
-  /* Futuristic badge - Glowing edge effect */
+  /* Modern badge - Subtle glow effect */
   .briki-badge {
     @apply inline-flex items-center justify-center px-2.5 py-0.5 text-xs font-medium;
     border-radius: 9999px;
-    background: linear-gradient(145deg, hsl(var(--muted) / 0.7), hsl(var(--muted)));
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(145deg, hsl(var(--muted) / 0.5), hsl(var(--muted) / 0.3));
+    box-shadow: 0 2px 5px rgba(164, 101, 245, 0.05);
     border: 1px solid hsl(var(--border) / 0.5);
     backdrop-filter: blur(5px);
   }
   
   .briki-badge-primary {
-    background: linear-gradient(145deg, hsl(var(--primary) / 0.2), hsl(var(--primary) / 0.1));
+    background: linear-gradient(145deg, hsl(var(--primary) / 0.15), hsl(var(--primary) / 0.05));
     color: hsl(var(--primary));
-    border-color: hsl(var(--primary) / 0.3);
-    box-shadow: 0 0 8px rgba(59, 130, 246, 0.2);
+    border-color: hsl(var(--primary) / 0.2);
+    box-shadow: 0 0 8px rgba(164, 101, 245, 0.1);
   }
   
   .briki-badge-success {
-    background: linear-gradient(145deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.1));
+    background: linear-gradient(145deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.05));
     color: #10B981;
-    border-color: rgba(16, 185, 129, 0.3);
-    box-shadow: 0 0 8px rgba(16, 185, 129, 0.2);
+    border-color: rgba(16, 185, 129, 0.2);
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.1);
   }
 
   /* New AI-powered visualization elements */
   .ai-data-visual {
     @apply relative overflow-hidden;
     border-radius: var(--radius);
-    background: linear-gradient(145deg, hsl(var(--card)), hsl(var(--card) / 0.8));
+    background: linear-gradient(145deg, hsl(var(--card)), hsl(var(--card) / 0.95));
     border: 1px solid hsl(var(--border));
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 20px rgba(164, 101, 245, 0.08);
   }
 
   .ai-data-particle {
     @apply absolute w-1 h-1 rounded-full;
     background: hsl(var(--primary));
-    opacity: 0.6;
+    opacity: 0.4;
     filter: blur(1px);
     animation: float 8s infinite ease-in-out;
   }
@@ -382,12 +382,12 @@
     75% { transform: translate(-5px, 10px); }
   }
 
-  /* Futuristic section headers with gradient text */
+  /* Modern section headers with gradient text */
   .section-header {
     @apply font-bold tracking-tight;
-    background: linear-gradient(to right, #3B82F6, #60A5FA);
+    background: linear-gradient(to right, #A465F5, #8B5CF6);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+    text-shadow: 0 0 15px rgba(164, 101, 245, 0.2);
   }
 }
