@@ -21,9 +21,6 @@ type Translations = {
 // Initial translations
 const translations: Translations = {
   en: {
-    // General
-    slogan: 'The New Era of Smart Insurance',
-    
     // Navigation
     home: 'Home',
     myTrips: 'My Trips',
@@ -164,9 +161,6 @@ const translations: Translations = {
     dataSource: 'Source: International meteorological data'
   },
   es: {
-    // General
-    slogan: 'La Nueva Era de Seguros Inteligentes',
-    
     // Navigation
     home: 'Inicio',
     myTrips: 'Mis Viajes',
@@ -459,7 +453,7 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 // Provider component
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguage] = useState<Language>('es');
+  const [language, setLanguage] = useState<Language>('en');
 
   // Translation function
   const t = (key: string): string => {

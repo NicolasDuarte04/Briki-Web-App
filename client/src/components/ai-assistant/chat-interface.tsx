@@ -88,11 +88,11 @@ const ChatMessage = ({ message }: { message: Message }) => {
  */
 const EmptyState = ({ onStartConversation }: { onStartConversation: (message: string) => void }) => {
   const suggestions = [
-    "¿Puedes explicar qué cubre el seguro de viaje?",
-    "¿Cuál es la diferencia entre seguro de auto completo y de responsabilidad?",
-    "¿Cómo funciona el seguro de mascotas?",
-    "¿Qué debo buscar en un plan de seguro de salud?",
-    "¿Qué es un deducible en seguros?"
+    "Can you explain what travel insurance covers?",
+    "What's the difference between comprehensive and liability auto insurance?",
+    "How does pet insurance work?",
+    "What should I look for in a health insurance plan?",
+    "What is a deductible in insurance?"
   ];
 
   return (
@@ -102,15 +102,15 @@ const EmptyState = ({ onStartConversation }: { onStartConversation: (message: st
       </div>
       
       <div className="space-y-2">
-        <h3 className="text-lg font-semibold">Asistente IA de Briki</h3>
+        <h3 className="text-lg font-semibold">Briki AI Assistant</h3>
         <p className="text-sm text-muted-foreground max-w-md">
-          Soy tu asistente de seguros. Pregúntame lo que quieras sobre planes de seguros,
-          opciones de cobertura o términos de seguros.
+          I'm your insurance assistant. Ask me anything about insurance plans, 
+          coverage options, or insurance terms.
         </p>
       </div>
       
       <div className="space-y-3 w-full max-w-md">
-        <p className="text-sm font-medium text-foreground/80">Intenta preguntar:</p>
+        <p className="text-sm font-medium text-foreground/80">Try asking:</p>
         <div className="grid gap-2">
           {suggestions.map((suggestion, index) => (
             <Button
@@ -314,7 +314,7 @@ export default function ChatInterface({
                   <Input
                     ref={inputRef}
                     type="text"
-                    placeholder="Escribe tu mensaje..."
+                    placeholder="Type your message..."
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     disabled={isLoading}

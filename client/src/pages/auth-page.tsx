@@ -29,21 +29,21 @@ import {
 } from "@/components/icons/contemporary-icons";
 
 const loginSchema = z.object({
-  username: z.string().min(1, "Nombre de usuario es requerido"),
-  password: z.string().min(1, "Contraseña es requerida"),
+  username: z.string().min(1, "Username is required"),
+  password: z.string().min(1, "Password is required"),
   rememberMe: z.boolean().optional(),
 });
 
 const registerSchema = insertUserSchema.extend({
-  password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
   confirmPassword: z.string(),
-  email: z.string().email("Dirección de correo electrónico inválida"),
+  email: z.string().email("Invalid email address"),
   terms: z.literal(true, {
-    errorMap: () => ({ message: "Debes aceptar los términos y condiciones" }),
+    errorMap: () => ({ message: "You must accept the terms and conditions" }),
   }),
 }).refine((data) => data.password === data.confirmPassword, {
   path: ["confirmPassword"],
-  message: "Las contraseñas no coinciden",
+  message: "Passwords do not match",
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -171,7 +171,7 @@ export default function AuthPage() {
             className="text-center mb-8"
           >
             <h1 className="text-4xl font-extrabold text-foreground section-header mb-4">Briki</h1>
-            <p className="text-foreground/70 mt-2">The New Era of Smart Insurance</p>
+            <p className="text-foreground/70 mt-2">AI-Powered Insurance Platform</p>
             <div className="flex justify-center mt-8 space-x-8">
               <motion.div 
                 className="flex flex-col items-center"
@@ -227,8 +227,8 @@ export default function AuthPage() {
             <div className="bg-card border border-border rounded-xl p-6 shadow-lg backdrop-blur-sm">
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="grid w-full grid-cols-2 mb-6">
-                  <TabsTrigger value="login">Iniciar Sesión</TabsTrigger>
-                  <TabsTrigger value="register">Registrarse</TabsTrigger>
+                  <TabsTrigger value="login">Sign In</TabsTrigger>
+                  <TabsTrigger value="register">Sign Up</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="login">
@@ -239,9 +239,9 @@ export default function AuthPage() {
                         name="username"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-foreground">Nombre de usuario</FormLabel>
+                            <FormLabel className="text-foreground">Username</FormLabel>
                             <FormControl>
-                              <Input placeholder="nombre de usuario" className="bg-background/50 border-border" {...field} />
+                              <Input placeholder="username" className="bg-background/50 border-border" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -253,7 +253,7 @@ export default function AuthPage() {
                         name="password"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-foreground">Contraseña</FormLabel>
+                            <FormLabel className="text-foreground">Password</FormLabel>
                             <FormControl>
                               <Input type="password" placeholder="••••••••" className="bg-background/50 border-border" {...field} />
                             </FormControl>
@@ -274,12 +274,12 @@ export default function AuthPage() {
                                   onCheckedChange={field.onChange}
                                 />
                               </FormControl>
-                              <FormLabel className="text-sm font-normal text-foreground/80">Recordarme</FormLabel>
+                              <FormLabel className="text-sm font-normal text-foreground/80">Remember me</FormLabel>
                             </FormItem>
                           )}
                         />
                         <Button variant="link" className="p-0 h-auto text-sm text-primary">
-                          ¿Olvidaste tu contraseña?
+                          Forgot password?
                         </Button>
                       </div>
                       
@@ -289,7 +289,7 @@ export default function AuthPage() {
                           className="w-full briki-button" 
                           disabled={loginMutation.isPending}
                         >
-                          {loginMutation.isPending ? "Iniciando sesión..." : "Iniciar sesión"}
+                          {loginMutation.isPending ? "Signing in..." : "Sign in"}
                         </Button>
                       </motion.div>
                     </form>
@@ -301,7 +301,7 @@ export default function AuthPage() {
                         <Separator className="bg-border" />
                       </div>
                       <div className="relative flex justify-center text-sm">
-                        <span className="px-2 bg-card text-foreground/70">O continúa con</span>
+                        <span className="px-2 bg-card text-foreground/70">Or continue with</span>
                       </div>
                     </div>
                     
@@ -335,9 +335,9 @@ export default function AuthPage() {
                         name="username"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-foreground">Nombre de usuario</FormLabel>
+                            <FormLabel className="text-foreground">Username</FormLabel>
                             <FormControl>
-                              <Input placeholder="nombre de usuario" className="bg-background/50 border-border" {...field} />
+                              <Input placeholder="username" className="bg-background/50 border-border" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -349,9 +349,9 @@ export default function AuthPage() {
                         name="email"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-foreground">Correo electrónico</FormLabel>
+                            <FormLabel className="text-foreground">Email</FormLabel>
                             <FormControl>
-                              <Input type="email" placeholder="tu@correo.com" className="bg-background/50 border-border" {...field} />
+                              <Input type="email" placeholder="your@email.com" className="bg-background/50 border-border" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -363,7 +363,7 @@ export default function AuthPage() {
                         name="password"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-foreground">Contraseña</FormLabel>
+                            <FormLabel className="text-foreground">Password</FormLabel>
                             <FormControl>
                               <Input type="password" placeholder="••••••••" className="bg-background/50 border-border" {...field} />
                             </FormControl>
@@ -377,7 +377,7 @@ export default function AuthPage() {
                         name="confirmPassword"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-foreground">Confirmar Contraseña</FormLabel>
+                            <FormLabel className="text-foreground">Confirm Password</FormLabel>
                             <FormControl>
                               <Input type="password" placeholder="••••••••" className="bg-background/50 border-border" {...field} />
                             </FormControl>
@@ -413,7 +413,7 @@ export default function AuthPage() {
                           className="w-full briki-button"
                           disabled={registerMutation.isPending}
                         >
-                          {registerMutation.isPending ? "Creando cuenta..." : "Crear cuenta"}
+                          {registerMutation.isPending ? "Creating account..." : "Create account"}
                         </Button>
                       </motion.div>
                     </form>
@@ -425,7 +425,7 @@ export default function AuthPage() {
                         <Separator className="bg-border" />
                       </div>
                       <div className="relative flex justify-center text-sm">
-                        <span className="px-2 bg-card text-foreground/70">O continúa con</span>
+                        <span className="px-2 bg-card text-foreground/70">Or continue with</span>
                       </div>
                     </div>
                     
@@ -521,7 +521,7 @@ export default function AuthPage() {
               transition={{ duration: 0.7, delay: 0.6 }}
               className="text-xl max-w-xl text-center text-foreground/90 section-header"
             >
-              La nueva era de seguros inteligentes comparando planes en múltiples categorías con análisis en tiempo real.
+              AI-powered insurance platform comparing plans across multiple categories with real-time analysis.
             </motion.p>
           </div>
         </div>
