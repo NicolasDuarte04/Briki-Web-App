@@ -7,8 +7,8 @@
 @tailwind utilities;
 
 :root {
-  /* Stripe-inspired vibrant UI with dominant blues */
-  --background: 210 50% 98%; /* Clean white background with slight blue tint */
+  /* Bolder UI inspired by the reference image */
+  --background: 228 56% 95%; /* Soft lavender-blue background */
   --foreground: 229 84% 5%; /* Nearly black text for strong contrast */
   --muted: 214 32% 91%;
   --muted-foreground: 215 25% 27%;
@@ -18,29 +18,29 @@
   --card-foreground: 229 84% 5%;
   --border: 220 13% 91%;
   --input: 220 13% 91%;
-  --primary: 239 84% 56%; /* Vibrant indigo/blue for primary */
+  --primary: 255 70% 50%; /* Vibrant purple for primary buttons/logo */
   --primary-foreground: 0 0% 100%;
-  --secondary: 199 89% 48%; /* Sky blue */
+  --secondary: 199 89% 48%; /* Bold blue */
   --secondary-foreground: 0 0% 100%;
-  --accent: 224 76% 48%; /* Electric blue accent for highlights */
+  --accent: 264 76% 56%; /* Accent purple */
   --accent-foreground: 0 0% 100%;
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
-  --ring: 239 84% 56%;
+  --ring: 255 70% 50%;
   --radius: 0.75rem;
   
-  /* Updated gradients for more vibrant, Stripe-inspired aesthetic */
-  --glow-primary: 0 0 20px rgba(79, 70, 229, 0.4); /* Stronger glow */
-  --glow-accent: 0 0 20px rgba(96, 165, 250, 0.4); /* Sky blue glow */
-  --gradient-primary: linear-gradient(135deg, #4F46E5, #6366F1); /* Vibrant indigo gradient */
+  /* Updated gradients for more vibrant aesthetic */
+  --glow-primary: 0 0 20px rgba(94, 53, 224, 0.5); /* Stronger purple glow */
+  --glow-accent: 0 0 20px rgba(94, 53, 224, 0.4); /* Purple glow */
+  --gradient-primary: linear-gradient(135deg, #5E35E0, #7C3AED); /* Bold purple gradient */
   --gradient-secondary: linear-gradient(135deg, #0EA5E9, #38BDF8); /* Vibrant sky blue */
-  --gradient-accent: linear-gradient(135deg, #60A5FA, #93C5FD); /* Electric blue */
-  --gradient-auto: linear-gradient(135deg, #0EA5E9, #0284C7); /* Auto category */
+  --gradient-accent: linear-gradient(135deg, #8B5CF6, #C084FC); /* Rich purple fade */
+  --gradient-auto: linear-gradient(135deg, #0284C7, #38BDF8); /* Auto category */
   --gradient-pet: linear-gradient(135deg, #8B5CF6, #A78BFA); /* Pet category */
   --gradient-health: linear-gradient(135deg, #F43F5E, #FB7185); /* Health category */
-  --gradient-travel: linear-gradient(135deg, #6366F1, #818CF8); /* Travel category */
-  --gradient-background: linear-gradient(145deg, #F8FAFC, #F1F5F9); /* Light gradient background */
-  --gradient-card-hover: linear-gradient(145deg, rgba(79, 70, 229, 0.05), rgba(96, 165, 250, 0.05)); /* Subtle hover gradient */
+  --gradient-travel: linear-gradient(135deg, #5E35E0, #7C3AED); /* Travel category */
+  --gradient-background: linear-gradient(145deg, #E9EEFA, #D1D6F0); /* Light purple-blue background */
+  --gradient-card-hover: linear-gradient(145deg, rgba(94, 53, 224, 0.05), rgba(124, 58, 237, 0.05)); /* Subtle hover gradient */
 }
 
 .dark {
@@ -555,34 +555,51 @@
     border-radius: 4px;
   }
   
-  /* Auth page specific styles */
-  .auth-card {
-    @apply rounded-2xl bg-white shadow-xl p-8 border border-transparent relative overflow-hidden;
-    transition: all 0.25s cubic-bezier(0.21, 0.61, 0.35, 1);
+  /* Auth page specific styles - more polished and vibrant */
+  .auth-layout {
+    @apply min-h-screen flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8;
+    background: var(--gradient-background);
+    background-size: 400% 400%;
+    animation: gradientFlow 15s ease infinite;
   }
   
-  .auth-card::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, rgba(79, 70, 229, 0.03) 0%, rgba(14, 165, 233, 0.03) 100%);
-    z-index: 0;
+  @keyframes gradientFlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  
+  .auth-logo {
+    @apply text-5xl font-extrabold tracking-tight relative;
+    font-family: 'DM Sans', 'Satoshi', sans-serif;
+    letter-spacing: -0.02em;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 8px rgba(94, 53, 224, 0.4));
+  }
+  
+  .auth-logo-tagline {
+    @apply text-sm mt-1 font-medium text-foreground/70;
+  }
+  
+  .auth-card {
+    @apply rounded-xl bg-white shadow-xl p-6 sm:p-7 border border-transparent relative overflow-hidden w-full max-w-md mt-8;
+    box-shadow: 0 10px 40px -10px rgba(94, 53, 224, 0.25);
+    transition: all 0.25s cubic-bezier(0.21, 0.61, 0.35, 1);
   }
   
   .auth-card::after {
     content: "";
     position: absolute;
     inset: 0;
-    border-radius: 1rem;
+    border-radius: 0.75rem;
     padding: 1px;
     background: var(--gradient-primary);
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
-    opacity: 0.5;
+    opacity: 0.3;
   }
   
   .auth-card > * {
@@ -590,10 +607,85 @@
     z-index: 1;
   }
   
+  .auth-tabs-list {
+    @apply grid w-full grid-cols-2 mb-6 rounded-md overflow-hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+  
+  .auth-tab {
+    @apply inline-flex items-center justify-center whitespace-nowrap py-3 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border-b-2 border-transparent relative;
+  }
+  
+  .auth-tab[data-state="active"] {
+    @apply bg-white text-primary border-primary shadow-sm;
+    box-shadow: 0 0 20px 0px rgba(94, 53, 224, 0.1);
+  }
+  
+  .auth-input {
+    @apply w-full px-4 py-3 text-base rounded-lg border border-input bg-white focus:outline-none;
+    transition: all 0.15s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+  
+  .auth-input:focus {
+    @apply ring-1 ring-primary border-primary;
+    box-shadow: 0 0 0 4px rgba(94, 53, 224, 0.1);
+  }
+  
+  .auth-submit-button {
+    @apply w-full py-3 flex items-center justify-center text-white font-medium relative overflow-hidden rounded-lg;
+    background: var(--gradient-primary);
+    box-shadow: 0 2px 5px rgba(94, 53, 224, 0.2), 
+                0 0 0 0 rgba(94, 53, 224, 0);
+    transition: all 0.3s cubic-bezier(0.21, 0.61, 0.35, 1);
+  }
+  
+  .auth-submit-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 15px rgba(94, 53, 224, 0.3),
+                0 0 0 1px rgba(94, 53, 224, 0.1);
+  }
+  
+  .auth-submit-button:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 5px rgba(94, 53, 224, 0.2);
+  }
+  
   .auth-background {
-    @apply fixed inset-0 opacity-20;
+    @apply fixed inset-0;
+    background-color: #D1D6F0;
     background-image: 
-      radial-gradient(circle at 25% 25%, rgba(79, 70, 229, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 75% 75%, rgba(14, 165, 233, 0.1) 0%, transparent 50%);
+      radial-gradient(circle at 15% 35%, rgba(94, 53, 224, 0.08) 0%, transparent 40%),
+      radial-gradient(circle at 85% 75%, rgba(94, 53, 224, 0.08) 0%, transparent 40%);
+  }
+  
+  /* Social login buttons */
+  .auth-social-button {
+    @apply inline-flex items-center justify-center px-4 py-2 border border-muted bg-white rounded-lg text-sm font-medium w-full transition-all;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+  
+  .auth-social-button:hover {
+    @apply border-muted/80 bg-muted/5;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  }
+  
+  .auth-social-button:active {
+    transform: translateY(0);
+  }
+  
+  /* Divider for "Or continue with" */
+  .auth-divider {
+    @apply relative w-full my-4;
+  }
+  
+  .auth-divider::before {
+    content: "";
+    @apply absolute top-1/2 left-0 w-full h-px bg-border;
+  }
+  
+  .auth-divider-text {
+    @apply relative inline-block px-2 text-xs text-muted-foreground bg-white;
   }
 }

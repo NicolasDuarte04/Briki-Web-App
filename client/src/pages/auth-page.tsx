@@ -7,7 +7,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { insertUserSchema } from "@shared/schema";
 
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -19,15 +18,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Separator } from "@/components/ui/separator";
-import { FuturisticBackground } from "@/components/ui/futuristic-background";
-import { 
-  TravelIcon, 
-  AutoIcon, 
-  PetIcon, 
-  HealthIcon 
-} from "@/components/icons/contemporary-icons";
 
+// Form schemas
 const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
   password: z.string().min(1, "Password is required"),
@@ -93,11 +85,11 @@ export default function AuthPage() {
     });
   };
   
-  // Force refresh auth status when auth page is loaded
+  // Auth checks and redirects
   useEffect(() => {
+    // Check auth on load
     const checkAuth = async () => {
       try {
-        // Make a direct fetch request to check authentication status
         const response = await fetch('/api/user', {
           credentials: 'include',
           headers: {
@@ -123,414 +115,294 @@ export default function AuthPage() {
   useEffect(() => {
     if (user) {
       console.log("AuthPage: User already logged in, redirecting to home page");
-      // Use consistent direct navigation approach
       setTimeout(() => {
         window.location.href = '/home';
       }, 100);
-    } else {
-      console.log("AuthPage: No logged in user detected, staying on auth page");
     }
   }, [user]);
   
-  // Handle login success
+  // Handle auth flow redirects
   useEffect(() => {
-    if (loginMutation.isSuccess) {
-      console.log("AuthPage: Login successful, redirecting to home page");
-      // Navigate to the home page instead of root
+    if (loginMutation.isSuccess || registerMutation.isSuccess) {
+      console.log("AuthPage: Auth successful, redirecting to home page");
       setTimeout(() => {
         window.location.href = '/home';
       }, 100);
     }
-  }, [loginMutation.isSuccess]);
-  
-  // Handle registration success
-  useEffect(() => {
-    if (registerMutation.isSuccess) {
-      console.log("AuthPage: Registration successful, redirecting to home page");
-      // Navigate to the home page instead of root
-      setTimeout(() => {
-        window.location.href = '/home';
-      }, 100);
-    }
-  }, [registerMutation.isSuccess]);
+  }, [loginMutation.isSuccess, registerMutation.isSuccess]);
 
   return (
-    <div className="flex min-h-screen bg-background">
-      {/* Updated gradient background */}
+    <div className="auth-layout">
+      {/* Subtle gradient background */}
       <div className="auth-background"></div>
       
-      {/* Left column: Auth form */}
-      <div className="flex flex-col justify-center w-full max-w-md px-4 py-12 mx-auto sm:px-6 lg:flex-none lg:px-20 xl:px-24 relative z-10">
-        <div className="w-full max-w-sm mx-auto lg:w-96">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: [0.21, 0.61, 0.35, 1] }}
-            className="text-center mb-10"
-          >
-            <h1 className="text-4xl font-extrabold headline-text mb-3">
-              <span className="section-header">Briki</span>
-            </h1>
-            <p className="text-foreground/70 mt-2 body-text">AI-Powered Insurance Platform</p>
-            
-            {/* Animated insurance category icons */}
-            <div className="flex justify-center mt-10 space-x-8 animate-slide-in-stagger">
-              <motion.div 
-                className="flex flex-col items-center"
-                whileHover={{ scale: 1.05, y: -5 }}
-                transition={{ type: "spring", stiffness: 400, damping: 10 }}
-              >
-                <div className="h-12 w-12 mb-3 rounded-md flex items-center justify-center" 
-                  style={{background: "var(--gradient-travel)", boxShadow: "0 4px 12px rgba(99, 102, 241, 0.15)"}}>
-                  <TravelIcon className="h-6 w-6 text-white" />
-                </div>
-                <span className="text-xs font-medium text-foreground/80">Travel</span>
-              </motion.div>
-              
-              <motion.div 
-                className="flex flex-col items-center"
-                whileHover={{ scale: 1.05, y: -5 }}
-                transition={{ type: "spring", stiffness: 400, damping: 10 }}
-              >
-                <div className="h-12 w-12 mb-3 rounded-md flex items-center justify-center"
-                  style={{background: "var(--gradient-auto)", boxShadow: "0 4px 12px rgba(14, 165, 233, 0.15)"}}>
-                  <AutoIcon className="h-6 w-6 text-white" />
-                </div>
-                <span className="text-xs font-medium text-foreground/80">Auto</span>
-              </motion.div>
-              
-              <motion.div 
-                className="flex flex-col items-center"
-                whileHover={{ scale: 1.05, y: -5 }}
-                transition={{ type: "spring", stiffness: 400, damping: 10 }}
-              >
-                <div className="h-12 w-12 mb-3 rounded-md flex items-center justify-center"
-                  style={{background: "var(--gradient-pet)", boxShadow: "0 4px 12px rgba(139, 92, 246, 0.15)"}}>
-                  <PetIcon className="h-6 w-6 text-white" />
-                </div>
-                <span className="text-xs font-medium text-foreground/80">Pet</span>
-              </motion.div>
-              
-              <motion.div 
-                className="flex flex-col items-center"
-                whileHover={{ scale: 1.05, y: -5 }}
-                transition={{ type: "spring", stiffness: 400, damping: 10 }}
-              >
-                <div className="h-12 w-12 mb-3 rounded-md flex items-center justify-center"
-                  style={{background: "var(--gradient-health)", boxShadow: "0 4px 12px rgba(244, 63, 94, 0.15)"}}>
-                  <HealthIcon className="h-6 w-6 text-white" />
-                </div>
-                <span className="text-xs font-medium text-foreground/80">Health</span>
-              </motion.div>
-            </div>
-          </motion.div>
+      {/* Centered auth container */}
+      <div className="relative z-10 w-full max-w-md">
+        {/* Logo and branding */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: [0.21, 0.61, 0.35, 1] }}
+          className="text-center"
+        >
+          <h1 className="auth-logo">Briki</h1>
+          <p className="auth-logo-tagline">AI-Powered Insurance Platform</p>
+        </motion.div>
           
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3, ease: [0.21, 0.61, 0.35, 1] }}
-          >
-            <div className="auth-card">
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="grid w-full grid-cols-2 mb-6">
-                  <TabsTrigger value="login">Sign In</TabsTrigger>
-                  <TabsTrigger value="register">Sign Up</TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="login">
-                  <Form {...loginForm}>
-                    <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
-                      <FormField
-                        control={loginForm.control}
-                        name="username"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-foreground">Username</FormLabel>
-                            <FormControl>
-                              <Input placeholder="username" className="bg-background/50 border-border" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      
-                      <FormField
-                        control={loginForm.control}
-                        name="password"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-foreground">Password</FormLabel>
-                            <FormControl>
-                              <Input type="password" placeholder="••••••••" className="bg-background/50 border-border" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      
-                      <div className="flex items-center justify-between">
-                        <FormField
-                          control={loginForm.control}
-                          name="rememberMe"
-                          render={({ field }) => (
-                            <FormItem className="flex flex-row items-center space-x-2 space-y-0">
-                              <FormControl>
-                                <Checkbox
-                                  checked={field.value}
-                                  onCheckedChange={field.onChange}
-                                />
-                              </FormControl>
-                              <FormLabel className="text-sm font-normal text-foreground/80">Remember me</FormLabel>
-                            </FormItem>
-                          )}
-                        />
-                        <Button variant="link" className="p-0 h-auto text-sm text-primary">
-                          Forgot password?
-                        </Button>
-                      </div>
-                      
-                      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                        <Button 
-                          type="submit" 
-                          className="w-full briki-button" 
-                          disabled={loginMutation.isPending}
-                        >
-                          {loginMutation.isPending ? "Signing in..." : "Sign in"}
-                        </Button>
-                      </motion.div>
-                    </form>
-                  </Form>
-                  
-                  <div className="mt-6">
-                    <div className="relative">
-                      <div className="absolute inset-0 flex items-center">
-                        <Separator className="bg-border" />
-                      </div>
-                      <div className="relative flex justify-center text-sm">
-                        <span className="px-2 bg-card text-foreground/70">Or continue with</span>
-                      </div>
-                    </div>
+        {/* Auth card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2, ease: [0.21, 0.61, 0.35, 1] }}
+        >
+          <div className="auth-card">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="auth-tabs-list">
+                <TabsTrigger 
+                  value="login" 
+                  className={`auth-tab ${activeTab === 'login' ? 'font-medium' : 'text-muted-foreground'}`}
+                >
+                  Sign In
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="register" 
+                  className={`auth-tab ${activeTab === 'register' ? 'font-medium' : 'text-muted-foreground'}`}
+                >
+                  Sign Up
+                </TabsTrigger>
+              </TabsList>
+              
+              {/* Login form */}
+              <TabsContent value="login">
+                <Form {...loginForm}>
+                  <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-5">
+                    <FormField
+                      control={loginForm.control}
+                      name="username"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-foreground text-sm font-medium block mb-1.5">Username</FormLabel>
+                          <FormControl>
+                            <Input placeholder="username" className="auth-input" {...field} />
+                          </FormControl>
+                          <FormMessage className="text-xs mt-1 text-destructive" />
+                        </FormItem>
+                      )}
+                    />
                     
-                    <div className="grid grid-cols-2 gap-3 mt-6">
-                      <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                        <Button variant="outline" type="button" className="w-full bg-card/50 border-border hover:bg-card/80 backdrop-blur-sm">
-                          <svg className="w-4 h-4 mr-2 text-primary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">
-                            <path fill="currentColor" d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z" />
-                          </svg>
-                          <span className="text-foreground">Google</span>
-                        </Button>
-                      </motion.div>
-                      
-                      <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                        <Button variant="outline" type="button" className="w-full bg-card/50 border-border hover:bg-card/80 backdrop-blur-sm">
-                          <svg className="w-4 h-4 mr-2 text-primary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
-                            <path fill="currentColor" d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z" />
-                          </svg>
-                          <span className="text-foreground">Facebook</span>
-                        </Button>
-                      </motion.div>
-                    </div>
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="register">
-                  <Form {...registerForm}>
-                    <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-4">
+                    <FormField
+                      control={loginForm.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-foreground text-sm font-medium block mb-1.5">Password</FormLabel>
+                          <FormControl>
+                            <Input type="password" placeholder="••••••••" className="auth-input" {...field} />
+                          </FormControl>
+                          <FormMessage className="text-xs mt-1 text-destructive" />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <div className="flex items-center justify-between">
                       <FormField
-                        control={registerForm.control}
-                        name="username"
+                        control={loginForm.control}
+                        name="rememberMe"
                         render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-foreground">Username</FormLabel>
-                            <FormControl>
-                              <Input placeholder="username" className="bg-background/50 border-border" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      
-                      <FormField
-                        control={registerForm.control}
-                        name="email"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-foreground">Email</FormLabel>
-                            <FormControl>
-                              <Input type="email" placeholder="your@email.com" className="bg-background/50 border-border" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      
-                      <FormField
-                        control={registerForm.control}
-                        name="password"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-foreground">Password</FormLabel>
-                            <FormControl>
-                              <Input type="password" placeholder="••••••••" className="bg-background/50 border-border" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      
-                      <FormField
-                        control={registerForm.control}
-                        name="confirmPassword"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-foreground">Confirm Password</FormLabel>
-                            <FormControl>
-                              <Input type="password" placeholder="••••••••" className="bg-background/50 border-border" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      
-                      <FormField
-                        control={registerForm.control}
-                        name="terms"
-                        render={({ field }) => (
-                          <FormItem className="flex flex-row items-start space-x-2 space-y-0">
+                          <FormItem className="flex flex-row items-center space-x-2 space-y-0">
                             <FormControl>
                               <Checkbox
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
+                                className="rounded border-muted data-[state=checked]:bg-primary"
                               />
                             </FormControl>
-                            <div className="space-y-1 leading-none">
-                              <FormLabel className="text-sm font-normal text-foreground/80">
-                                I agree to the <Button variant="link" className="p-0 h-auto text-sm text-primary">Terms of Service</Button> and <Button variant="link" className="p-0 h-auto text-sm text-primary">Privacy Policy</Button>
-                              </FormLabel>
-                              <FormMessage />
-                            </div>
+                            <FormLabel className="text-sm font-normal text-foreground/70 cursor-pointer">Remember me</FormLabel>
                           </FormItem>
                         )}
                       />
-                      
-                      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                        <Button
-                          type="submit"
-                          className="w-full briki-button"
-                          disabled={registerMutation.isPending}
-                        >
-                          {registerMutation.isPending ? "Creating account..." : "Create account"}
-                        </Button>
-                      </motion.div>
-                    </form>
-                  </Form>
-                  
-                  <div className="mt-6">
-                    <div className="relative">
-                      <div className="absolute inset-0 flex items-center">
-                        <Separator className="bg-border" />
-                      </div>
-                      <div className="relative flex justify-center text-sm">
-                        <span className="px-2 bg-card text-foreground/70">Or continue with</span>
-                      </div>
+                      <button type="button" className="text-sm text-primary/90 hover:text-primary transition-colors">
+                        Forgot password?
+                      </button>
                     </div>
                     
-                    <div className="grid grid-cols-2 gap-3 mt-6">
-                      <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                        <Button variant="outline" type="button" className="w-full bg-card/50 border-border hover:bg-card/80 backdrop-blur-sm">
-                          <svg className="w-4 h-4 mr-2 text-primary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">
-                            <path fill="currentColor" d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z" />
-                          </svg>
-                          <span className="text-foreground">Google</span>
-                        </Button>
-                      </motion.div>
-                      
-                      <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                        <Button variant="outline" type="button" className="w-full bg-card/50 border-border hover:bg-card/80 backdrop-blur-sm">
-                          <svg className="w-4 h-4 mr-2 text-primary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
-                            <path fill="currentColor" d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z" />
-                          </svg>
-                          <span className="text-foreground">Facebook</span>
-                        </Button>
-                      </motion.div>
-                    </div>
-                  </div>
-                </TabsContent>
-              </Tabs>
-            </div>
-          </motion.div>
-        </div>
-      </div>
-      
-      {/* Right column: Hero image */}
-      <div className="relative hidden w-0 flex-1 lg:block">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/30 to-indigo-900/30">
-          <div className="absolute inset-0">
-            <FuturisticBackground particleCount={40} interactive={false} />
+                    <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}>
+                      <button 
+                        type="submit" 
+                        className="auth-submit-button" 
+                        disabled={loginMutation.isPending}
+                      >
+                        {loginMutation.isPending ? "Signing in..." : "Sign in"}
+                      </button>
+                    </motion.div>
+                  </form>
+                </Form>
+                
+                <div className="auth-divider mt-6 text-center">
+                  <span className="auth-divider-text">Or continue with</span>
+                </div>
+                  
+                <div className="grid grid-cols-2 gap-3 mt-5">
+                  <motion.button 
+                    whileHover={{ scale: 1.02 }} 
+                    whileTap={{ scale: 0.98 }}
+                    className="auth-social-button"
+                    type="button"
+                  >
+                    <svg className="w-4 h-4 mr-2 text-[#4285F4]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">
+                      <path fill="currentColor" d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z" />
+                    </svg>
+                    <span className="text-foreground">Google</span>
+                  </motion.button>
+                  
+                  <motion.button 
+                    whileHover={{ scale: 1.02 }} 
+                    whileTap={{ scale: 0.98 }}
+                    className="auth-social-button"
+                    type="button"
+                  >
+                    <svg className="w-4 h-4 mr-2 text-[#1877F2]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
+                      <path fill="currentColor" d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z" />
+                    </svg>
+                    <span className="text-foreground">Facebook</span>
+                  </motion.button>
+                </div>
+              </TabsContent>
+              
+              {/* Register form */}
+              <TabsContent value="register">
+                <Form {...registerForm}>
+                  <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-5">
+                    <FormField
+                      control={registerForm.control}
+                      name="username"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-foreground text-sm font-medium block mb-1.5">Username</FormLabel>
+                          <FormControl>
+                            <Input placeholder="username" className="auth-input" {...field} />
+                          </FormControl>
+                          <FormMessage className="text-xs mt-1 text-destructive" />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={registerForm.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-foreground text-sm font-medium block mb-1.5">Email</FormLabel>
+                          <FormControl>
+                            <Input type="email" placeholder="your@email.com" className="auth-input" {...field} />
+                          </FormControl>
+                          <FormMessage className="text-xs mt-1 text-destructive" />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={registerForm.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-foreground text-sm font-medium block mb-1.5">Password</FormLabel>
+                          <FormControl>
+                            <Input type="password" placeholder="••••••••" className="auth-input" {...field} />
+                          </FormControl>
+                          <FormMessage className="text-xs mt-1 text-destructive" />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={registerForm.control}
+                      name="confirmPassword"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-foreground text-sm font-medium block mb-1.5">Confirm Password</FormLabel>
+                          <FormControl>
+                            <Input type="password" placeholder="••••••••" className="auth-input" {...field} />
+                          </FormControl>
+                          <FormMessage className="text-xs mt-1 text-destructive" />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={registerForm.control}
+                      name="terms"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 my-2">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              className="rounded border-muted data-[state=checked]:bg-primary"
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel className="text-sm font-normal text-foreground/80 cursor-pointer">
+                              I agree to the{" "}
+                              <a href="#" className="text-primary/90 hover:text-primary transition-colors">
+                                Terms of Service
+                              </a>{" "}
+                              and{" "}
+                              <a href="#" className="text-primary/90 hover:text-primary transition-colors">
+                                Privacy Policy
+                              </a>
+                            </FormLabel>
+                            <FormMessage className="text-xs text-destructive" />
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}>
+                      <button
+                        type="submit"
+                        className="auth-submit-button"
+                        disabled={registerMutation.isPending}
+                      >
+                        {registerMutation.isPending ? "Creating account..." : "Create account"}
+                      </button>
+                    </motion.div>
+                  </form>
+                </Form>
+                
+                <div className="auth-divider mt-6 text-center">
+                  <span className="auth-divider-text">Or continue with</span>
+                </div>
+                  
+                <div className="grid grid-cols-2 gap-3 mt-5">
+                  <motion.button 
+                    whileHover={{ scale: 1.02 }} 
+                    whileTap={{ scale: 0.98 }}
+                    className="auth-social-button"
+                    type="button"
+                  >
+                    <svg className="w-4 h-4 mr-2 text-[#4285F4]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">
+                      <path fill="currentColor" d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z" />
+                    </svg>
+                    <span className="text-foreground">Google</span>
+                  </motion.button>
+                  
+                  <motion.button 
+                    whileHover={{ scale: 1.02 }} 
+                    whileTap={{ scale: 0.98 }}
+                    className="auth-social-button"
+                    type="button"
+                  >
+                    <svg className="w-4 h-4 mr-2 text-[#1877F2]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
+                      <path fill="currentColor" d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z" />
+                    </svg>
+                    <span className="text-foreground">Facebook</span>
+                  </motion.button>
+                </div>
+              </TabsContent>
+            </Tabs>
           </div>
-          
-          <div className="flex flex-col items-center justify-center h-full text-foreground px-8 relative z-10">
-            <motion.div 
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.3 }}
-              className="mb-8 flex flex-wrap justify-center gap-8"
-            >
-              <motion.div 
-                className="flex flex-col items-center"
-                whileHover={{ scale: 1.1, y: -5 }}
-                transition={{ type: "spring", stiffness: 300 }}
-              >
-                <div className="h-16 w-16 mb-3">
-                  <TravelIcon className="h-full w-full" />
-                </div>
-                <span className="text-foreground/90">Travel Insurance</span>
-              </motion.div>
-              
-              <motion.div 
-                className="flex flex-col items-center"
-                whileHover={{ scale: 1.1, y: -5 }}
-                transition={{ type: "spring", stiffness: 300 }}
-              >
-                <div className="h-16 w-16 mb-3">
-                  <AutoIcon className="h-full w-full" />
-                </div>
-                <span className="text-foreground/90">Auto Insurance</span>
-              </motion.div>
-              
-              <motion.div 
-                className="flex flex-col items-center"
-                whileHover={{ scale: 1.1, y: -5 }}
-                transition={{ type: "spring", stiffness: 300 }}
-              >
-                <div className="h-16 w-16 mb-3">
-                  <PetIcon className="h-full w-full" />
-                </div>
-                <span className="text-foreground/90">Pet Insurance</span>
-              </motion.div>
-              
-              <motion.div 
-                className="flex flex-col items-center"
-                whileHover={{ scale: 1.1, y: -5 }}
-                transition={{ type: "spring", stiffness: 300 }}
-              >
-                <div className="h-16 w-16 mb-3">
-                  <HealthIcon className="h-full w-full" />
-                </div>
-                <span className="text-foreground/90">Health Insurance</span>
-              </motion.div>
-            </motion.div>
-            
-            <motion.p 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.7, delay: 0.6 }}
-              className="text-xl max-w-xl text-center text-foreground/90 section-header"
-            >
-              AI-powered insurance platform comparing plans across multiple categories with real-time analysis.
-            </motion.p>
-          </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
