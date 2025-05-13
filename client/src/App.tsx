@@ -71,7 +71,6 @@ function App() {
               <Toaster />
               <AIAssistantProvider>
                 <Router />
-                <FloatingAssistantButton />
               </AIAssistantProvider>
             </TooltipProvider>
           </RecentlyViewedProvider>
