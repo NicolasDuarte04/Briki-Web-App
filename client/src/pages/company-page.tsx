@@ -30,35 +30,85 @@ export default function CompanyPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-sky-50 to-white">
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white overflow-hidden">
       <Navbar />
       
-      <main className="flex-grow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      {/* Futuristic background elements */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_30%_40%,rgba(59,130,246,0.1),transparent_40%)]"></div>
+        <div className="absolute top-1/3 right-0 w-96 h-96 bg-blue-500/10 blur-3xl rounded-full"></div>
+        <div className="absolute bottom-0 left-1/4 w-64 h-64 bg-indigo-500/10 blur-3xl rounded-full"></div>
+        <motion.div 
+          className="absolute inset-0"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.7 }}
+          transition={{ duration: 2, delay: 0.5 }}
+        >
+          <div className="absolute top-10 left-10 w-1 h-20 bg-indigo-500/20"></div>
+          <div className="absolute top-40 left-20 w-1 h-40 bg-indigo-500/20"></div>
+          <div className="absolute top-10 left-30 w-1 h-30 bg-indigo-500/20"></div>
+          <div className="absolute top-20 right-40 w-1 h-20 bg-indigo-500/20"></div>
+          <div className="absolute top-50 right-20 w-1 h-40 bg-indigo-500/20"></div>
+          <div className="absolute top-30 right-10 w-1 h-30 bg-indigo-500/20"></div>
+        </motion.div>
+      </div>
+      
+      <main className="flex-grow relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           
           {/* Hero section */}
           <motion.div 
-            className="text-center mb-16"
+            className="text-center mb-16 relative"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <div className="flex justify-center mb-6">
-              <span className="p-3 bg-blue-100 rounded-full">
-                <BriefcaseIcon className="h-8 w-8 text-blue-600" />
-              </span>
-            </div>
-            <h1 className="text-4xl sm:text-5xl font-bold mb-4 text-gray-900">
+            <motion.div 
+              className="flex justify-center mb-8 relative"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+            >
+              <div className="p-4 bg-indigo-900/50 rounded-full border border-indigo-700/50 shadow-lg shadow-indigo-500/20 backdrop-blur-sm relative overflow-hidden">
+                <BriefcaseIcon className="h-10 w-10 text-indigo-400" />
+                <motion.div 
+                  className="absolute inset-0 bg-indigo-600/20 rounded-full"
+                  animate={{ 
+                    scale: [1, 1.2, 1],
+                    opacity: [0.5, 0.2, 0.5],
+                  }} 
+                  transition={{ 
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                />
+              </div>
+            </motion.div>
+            
+            <h1 className="text-4xl sm:text-6xl font-bold mb-6 bg-gradient-to-r from-white via-blue-100 to-indigo-200 text-transparent bg-clip-text">
               Briki for Insurance Companies
             </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-              Join our platform to showcase your plans to thousands of potential customers 
+            
+            <motion.p 
+              className="text-xl text-indigo-100/90 max-w-3xl mx-auto mb-10"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.6 }}
+            >
+              Join our AI-powered platform to showcase your plans to thousands of potential customers 
               and get powerful insights into customer preferences.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            </motion.p>
+            
+            <motion.div 
+              className="flex flex-col sm:flex-row gap-4 justify-center"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.8 }}
+            >
               <Button 
                 size="lg" 
-                className="bg-blue-600 hover:bg-blue-700 text-white px-8"
+                className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 shadow-lg shadow-indigo-900/30 border border-indigo-500/30"
                 onClick={() => navigate("/company-login")}
               >
                 Partner Login
@@ -66,12 +116,12 @@ export default function CompanyPage() {
               <Button 
                 size="lg" 
                 variant="outline" 
-                className="border-blue-600 text-blue-600 hover:bg-blue-50 px-8"
+                className="border-indigo-500/50 text-indigo-200 hover:bg-indigo-900/50 px-8 backdrop-blur-sm"
                 onClick={() => navigate("/company-register")}
               >
                 Register as Partner
               </Button>
-            </div>
+            </motion.div>
           </motion.div>
           
           {/* Features section */}
