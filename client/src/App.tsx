@@ -3,7 +3,7 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { AuthProvider } from "@/hooks/use-auth";
+import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import { ProtectedRoute } from "@/lib/protected-route";
 import { LanguageProvider } from "@/components/language-selector";
 import { PageTransition } from "@/components/ui/transition-effect";
@@ -28,6 +28,8 @@ import HealthInsurancePage from "@/pages/health-insurance-page";
 import AutoQuotePage from "@/pages/auto-quote-page";
 import AIAssistantDemo from "@/pages/ai-assistant-demo";
 import CountdownPage from "@/pages/countdown-page";
+
+// Removed unused ConditionalAIProvider
 
 function Router() {
   const [location] = useLocation();
@@ -61,6 +63,42 @@ function Router() {
   );
 }
 
+/**
+ * Component that wraps the Router with AI Assistant only when appropriate
+ */
+function AppContent() {
+  const [location] = useLocation();
+  const { user } = useAuth();
+  
+  // List of paths where AI Assistant should NOT be provided
+  const excludedPaths = ['/', '/auth', '/countdown', '/login', '/register', '/terms', '/learn-more'];
+  const isExcludedPath = excludedPaths.some(path => 
+    location === path || location.startsWith(`${path}/`)
+  );
+  
+  // Debug logging for AI assistant visibility
+  console.log("App render - AI Assistant visibility:", { 
+    path: location, 
+    isAuthenticated: !!user, 
+    isExcludedPath,
+    shouldShowAI: !!user && !isExcludedPath
+  });
+  
+  // Only show AI Assistant if user is logged in AND not on excluded paths
+  if (user && !isExcludedPath) {
+    return (
+      <AIAssistantProvider>
+        <AuthenticatedLayout>
+          <Router />
+        </AuthenticatedLayout>
+      </AIAssistantProvider>
+    );
+  }
+  
+  // Otherwise just render the Router without AI Assistant
+  return <Router />;
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -69,11 +107,7 @@ function App() {
           <RecentlyViewedProvider>
             <TooltipProvider>
               <Toaster />
-              <AIAssistantProvider>
-                <AuthenticatedLayout>
-                  <Router />
-                </AuthenticatedLayout>
-              </AIAssistantProvider>
+              <AppContent />
             </TooltipProvider>
           </RecentlyViewedProvider>
         </LanguageProvider>
