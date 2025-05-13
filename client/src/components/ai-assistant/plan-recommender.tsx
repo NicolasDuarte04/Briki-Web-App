@@ -8,12 +8,6 @@ import { useAIAssistant } from '@/hooks/use-ai-assistant';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { InsuranceCategory } from '@/services/api/insurance-providers';
-import { 
-  AppleTravelIcon, 
-  AppleAutoIcon, 
-  ApplePetIcon, 
-  AppleHealthIcon 
-} from '@/components/icons/apple-style-icons';
 
 interface PlanRecommenderProps {
   category?: InsuranceCategory;
@@ -124,28 +118,14 @@ export default function PlanRecommender({
         <Tabs defaultValue={activeCategory} onValueChange={(val) => handleCategoryChange(val as InsuranceCategory)}>
           <TabsList className="grid grid-cols-4 w-full">
             {Object.entries(categoryLabels).map(([value, label]) => (
-              <TabsTrigger key={value} value={value} className="flex items-center gap-1">
-                {value === 'travel' && <AppleTravelIcon className="w-4 h-4" />}
-                {value === 'auto' && <AppleAutoIcon className="w-4 h-4" />}
-                {value === 'pet' && <ApplePetIcon className="w-4 h-4" />}
-                {value === 'health' && <AppleHealthIcon className="w-4 h-4" />}
-                {label}
-              </TabsTrigger>
+              <TabsTrigger key={value} value={value}>{label}</TabsTrigger>
             ))}
           </TabsList>
           
           {Object.keys(categoryLabels).map((category) => (
             <TabsContent key={category} value={category} className="space-y-4 pt-2">
               <div className="space-y-2">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="h-8 w-8">
-                    {category === 'travel' && <AppleTravelIcon className="h-full w-full" />}
-                    {category === 'auto' && <AppleAutoIcon className="h-full w-full" />}
-                    {category === 'pet' && <ApplePetIcon className="h-full w-full" />}
-                    {category === 'health' && <AppleHealthIcon className="h-full w-full" />}
-                  </div>
-                  <div className="text-sm font-medium">Insurance criteria</div>
-                </div>
+                <div className="text-sm font-medium">Insurance criteria</div>
                 <div className="grid grid-cols-2 gap-2">
                   {formatCriteria(criteriaSets[category as InsuranceCategory]).map((item, index) => (
                     <div key={index} className="text-xs border rounded-md p-2 bg-muted/40">
