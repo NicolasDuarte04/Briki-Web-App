@@ -33,37 +33,6 @@ export default function HomePage() {
   useEffect(() => {
     console.log("HomePage useEffect running");
     console.log("Auth state in HomePage:", { user, isLoading });
-    
-    // Add a test button on the window object for debugging
-    if (typeof window !== 'undefined') {
-      const testButton = document.createElement('button');
-      testButton.innerText = 'Test Home Navigation';
-      testButton.style.position = 'fixed';
-      testButton.style.bottom = '20px';
-      testButton.style.left = '20px';
-      testButton.style.zIndex = '9999';
-      testButton.style.padding = '8px 16px';
-      testButton.style.backgroundColor = '#4f46e5';
-      testButton.style.color = 'white';
-      testButton.style.border = 'none';
-      testButton.style.borderRadius = '4px';
-      testButton.onclick = () => {
-        console.log("Pre-test button clicked, navigating to home page");
-        // Use direct URL navigation for consistency
-        window.location.href = '/';
-        
-        // The remaining code won't run as page reloads, but keeping for reference
-        setTimeout(() => {
-          console.log("Current location after pre-test click:", location);
-        }, 100);
-      };
-      document.body.appendChild(testButton);
-      
-      // Clean up
-      return () => {
-        document.body.removeChild(testButton);
-      };
-    }
   }, [user, isLoading, navigate, location]);
 
   // Featured destinations data
