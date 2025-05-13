@@ -17,19 +17,33 @@ export const TravelIcon: React.FC<{ className?: string }> = ({ className = "w-20
         <stop offset="100%" stopColor="#2563EB" />
       </linearGradient>
       <filter id="travel-glow" x="-10%" y="-10%" width="120%" height="120%">
-        <feGaussianBlur stdDeviation="1" result="blur" />
+        <feGaussianBlur stdDeviation="1.5" result="blur" />
         <feComposite in="SourceGraphic" in2="blur" operator="over" />
       </filter>
     </defs>
     
-    {/* Plane icon with subtle animation */}
-    <g filter="url(#travel-glow)" fill="url(#travel-gradient)" stroke="url(#travel-gradient)">
-      <path d="M22 16.32A3.73 3.73 0 0 1 18.32 20h-.45a.86.86 0 0 1-.82-.67L16 14l-7 3v3c0 .34-.1.66-.28.94l-2.5 4.44A.56.56 0 0 1 5.5 25h-.06a.62.62 0 0 1-.56-.53l-1.5-6.2a3 3 0 0 1 2.17-3.54L12 13 8.73 9.74a1.36 1.36 0 0 1-.35-1.22l.33-1.59A.8.8 0 0 1 9.5 6.3l2.12.42L16.32 3a.8.8 0 0 1 .68-.18l2.19.54a1.58 1.58 0 0 1 1.19 1.4c.03.4-.12.8-.43 1.11L16.24 10l5.1 1.26a.86.86 0 0 1 .66.82v4.24z" />
+    {/* Modern travel icon with plane and globe */}
+    <g filter="url(#travel-glow)" fill="none" stroke="url(#travel-gradient)">
+      {/* Globe */}
+      <circle cx="12" cy="12" r="8" strokeWidth="1.5" />
+      
+      {/* Latitude lines */}
+      <path d="M4 12h16" strokeWidth="0.75" strokeDasharray="1,1" opacity="0.8" />
+      <path d="M12 4v16" strokeWidth="0.75" strokeDasharray="1,1" opacity="0.8" />
+      <ellipse cx="12" cy="12" rx="5" ry="8" strokeWidth="0.75" strokeDasharray="1,1" opacity="0.8" />
+      
+      {/* Plane */}
+      <path 
+        d="M16 8L8 12l-2 5M8 12l2 7M16 8l2-2" 
+        strokeWidth="2" 
+        stroke="url(#travel-gradient)" 
+        fill="url(#travel-gradient)" 
+      />
     </g>
     
-    {/* Animated flight path */}
+    {/* Flight trail animation */}
     <path 
-      d="M8 12 L18 8" 
+      d="M16 8C14 9 12 10 8 12" 
       className="animate-pulse" 
       stroke="white" 
       strokeWidth="0.5" 
@@ -56,24 +70,61 @@ export const AutoIcon: React.FC<{ className?: string }> = ({ className = "w-20 h
         <stop offset="100%" stopColor="#10B981" />
       </linearGradient>
       <filter id="auto-glow" x="-10%" y="-10%" width="120%" height="120%">
-        <feGaussianBlur stdDeviation="1" result="blur" />
+        <feGaussianBlur stdDeviation="1.5" result="blur" />
         <feComposite in="SourceGraphic" in2="blur" operator="over" />
       </filter>
     </defs>
     
-    {/* Car icon with subtle glow */}
-    <g filter="url(#auto-glow)" fill="url(#auto-gradient)" stroke="url(#auto-gradient)">
-      <path d="M19 17h2v2h-2m0-6h2v2h-2m-7-2h2v2h-2m0-6h2v2h-2M5 17h2v2H5m0-6h2v2H5m0 6h14v-3h3v-9a3 3 0 0 0-3-3H5a3 3 0 0 0-3 3v9h3v3m14-10h-3V5h-8v2H5v2h14v-2Z" />
+    {/* Modern car icon with dashboard and protection concept */}
+    <g filter="url(#auto-glow)" stroke="url(#auto-gradient)">
+      {/* Car silhouette */}
+      <path 
+        d="M3 12l2-5h14l2 5" 
+        strokeWidth="1.5" 
+        fill="none" 
+      />
+      <path 
+        d="M3 12v4h3l1 2h10l1-2h3v-4H3z" 
+        strokeWidth="1.5" 
+        fill="none" 
+      />
+      
+      {/* Wheels */}
+      <circle cx="7" cy="16" r="1.5" fill="url(#auto-gradient)" />
+      <circle cx="17" cy="16" r="1.5" fill="url(#auto-gradient)" />
+      
+      {/* Shield over car (protection concept) */}
+      <path 
+        d="M12 4l5 2v4a8 8 0 01-5 7.5A8 8 0 017 10V6l5-2z" 
+        strokeWidth="1" 
+        opacity="0.6" 
+        fill="none" 
+      />
+      
+      {/* Dashboard/windshield */}
+      <path 
+        d="M6 10h12" 
+        strokeWidth="1"
+        strokeDasharray="1,0.5"
+      />
     </g>
     
-    {/* Subtle animation */}
+    {/* Animated protection pulse */}
     <path 
-      d="M5 14h14" 
+      d="M12 4v9.5" 
       className="animate-pulse" 
-      stroke="white" 
+      stroke="url(#auto-gradient)" 
       strokeWidth="0.5" 
-      strokeDasharray="1,1"
-      opacity="0.5"
+      strokeDasharray="0.5,0.5"
+      opacity="0.7"
+    />
+    <path 
+      d="M9 6 L15 6" 
+      className="animate-pulse" 
+      stroke="url(#auto-gradient)" 
+      strokeWidth="0.5" 
+      strokeDasharray="0.5,0.5"
+      opacity="0.7"
     />
   </svg>
 );
@@ -95,25 +146,72 @@ export const PetIcon: React.FC<{ className?: string }> = ({ className = "w-20 h-
         <stop offset="100%" stopColor="#F59E0B" />
       </linearGradient>
       <filter id="pet-glow" x="-10%" y="-10%" width="120%" height="120%">
-        <feGaussianBlur stdDeviation="1" result="blur" />
+        <feGaussianBlur stdDeviation="1.5" result="blur" />
         <feComposite in="SourceGraphic" in2="blur" operator="over" />
       </filter>
     </defs>
     
-    {/* Dog icon with subtle glow */}
-    <g filter="url(#pet-glow)" fill="url(#pet-gradient)" stroke="url(#pet-gradient)">
-      <path d="M17 4.5C17 5.9 18.1 7 19.5 7a.5.5 0 0 1 .5.5V9c0 1.1-.9 2-2 2h-2.5c-.28 0-.5.22-.5.5v1c0 .28.22.5.5.5H17c.83 0 1.5.67 1.5 1.5V16c0 1.1-.9 2-2 2h-1.5c-.28 0-.5.22-.5.5v1c0 .28.22.5.5.5h2c.28 0 .5.22.5.5v1c0 .28-.22.5-.5.5h-13c-.28 0-.5-.22-.5-.5v-1c0-.28.22-.5.5-.5h2a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5H4c-1.1 0-2-.9-2-2v-1.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 1-.5-.5v-2c0-.28.22-.5.5-.5h3a.5.5 0 0 0 .5-.5V10c0-1.66 1.34-3 3-3h5c.28 0 .5-.22.5-.5V4c0-.28-.22-.5-.5-.5h-2a.5.5 0 0 1-.5-.5V2c0-.28.22-.5.5-.5h6c.28 0 .5.22.5.5v1c0 .28-.22.5-.5.5h-2a.5.5 0 0 0-.5.5v1Z" />
-      <circle cx="8.5" cy="14.5" r="1.5" />
+    {/* Modern pet protection icon */}
+    <g filter="url(#pet-glow)" stroke="url(#pet-gradient)">
+      {/* Heart-shaped protection frame */}
+      <path 
+        d="M12 21c-1.5-1.5-9-5.5-9-11.5C3 6 5 4 8 4c1.5 0 3 1 4 2 1-1 2.5-2 4-2 3 0 5 2 5 5.5 0 6-7.5 10-9 11.5z" 
+        strokeWidth="1.5" 
+        fill="none" 
+        opacity="0.3"
+      />
+      
+      {/* Paw prints */}
+      <g fill="url(#pet-gradient)">
+        {/* Main paw */}
+        <circle cx="12" cy="13" r="1.2" />
+        <circle cx="14.5" cy="11" r="1" />
+        <circle cx="9.5" cy="11" r="1" />
+        <circle cx="10.5" cy="15" r="1" />
+        <circle cx="13.5" cy="15" r="1" />
+        
+        {/* Small paws */}
+        <g opacity="0.6">
+          <circle cx="7" cy="9" r="0.8" />
+          <circle cx="8" cy="7.5" r="0.6" />
+          <circle cx="6" cy="7.5" r="0.6" />
+          <circle cx="6.5" cy="10.5" r="0.6" />
+          <circle cx="7.5" cy="10.5" r="0.6" />
+          
+          <circle cx="17" cy="9" r="0.8" />
+          <circle cx="18" cy="7.5" r="0.6" />
+          <circle cx="16" cy="7.5" r="0.6" />
+          <circle cx="16.5" cy="10.5" r="0.6" />
+          <circle cx="17.5" cy="10.5" r="0.6" />
+        </g>
+      </g>
+      
+      {/* Cat/dog ear silhouette */}
+      <path 
+        d="M8 6l-2-2v3M16 6l2-2v3" 
+        strokeWidth="1.5" 
+        strokeLinecap="round" 
+      />
+      
+      {/* Collar */}
+      <path 
+        d="M9 18h6" 
+        strokeWidth="1.5" 
+        strokeLinecap="round" 
+      />
+      <circle cx="12" cy="18.5" r="0.5" fill="url(#pet-gradient)" />
     </g>
     
-    {/* Subtle animation */}
-    <path 
-      d="M12 17a5 5 0 0 1-3.5-1.4" 
-      className="animate-pulse" 
-      stroke="white" 
-      strokeWidth="0.5" 
-      strokeDasharray="1,1"
-      opacity="0.5"
+    {/* Animated paw pulse */}
+    <circle 
+      cx="12" 
+      cy="13" 
+      r="4" 
+      className="animate-ping" 
+      stroke="url(#pet-gradient)" 
+      strokeWidth="0.5"
+      opacity="0.2"
+      fill="none"
     />
   </svg>
 );
@@ -135,18 +233,56 @@ export const HealthIcon: React.FC<{ className?: string }> = ({ className = "w-20
         <stop offset="100%" stopColor="#DC2626" />
       </linearGradient>
       <filter id="health-glow" x="-10%" y="-10%" width="120%" height="120%">
-        <feGaussianBlur stdDeviation="1" result="blur" />
+        <feGaussianBlur stdDeviation="1.5" result="blur" />
         <feComposite in="SourceGraphic" in2="blur" operator="over" />
       </filter>
     </defs>
     
-    {/* Heart icon with subtle glow */}
-    <g filter="url(#health-glow)" fill="url(#health-gradient)" stroke="url(#health-gradient)">
-      <path d="M3 12h4l1.5-3L12 19l2-4h7" fill="none" />
-      <path d="M17.3 3.3a4 4 0 0 0-5.6 0l-.7.7-.7-.7a4 4 0 0 0-5.6 5.6l6.3 6.3 6.3-6.3a4 4 0 0 0 0-5.6Z" />
+    {/* Modern health icon with medical symbol & heartbeat */}
+    <g filter="url(#health-glow)" stroke="url(#health-gradient)">
+      {/* Heartbeat with shield concept */}
+      <path 
+        d="M4 12h3l2-2 2 4 2-8 2 12 2-8 1 2h2" 
+        strokeWidth="1.5" 
+        fill="none" 
+      />
+      
+      {/* Medical cross */}
+      <path 
+        d="M12 7v10M7 12h10" 
+        strokeWidth="2" 
+        opacity="0.6" 
+        strokeLinecap="round" 
+      />
+      
+      {/* Circular protection */}
+      <circle 
+        cx="12" 
+        cy="12" 
+        r="9" 
+        strokeWidth="1" 
+        fill="none" 
+      />
+      
+      {/* Heart */}
+      <path 
+        d="M12 18c3.5-2 7-4.5 7-8 0-2-1.5-3-3-3-1 0-2 0.5-3 1.5L12 10l-1-1.5C10 7.5 9 7 8 7c-1.5 0-3 1-3 3 0 3.5 3.5 6 7 8z" 
+        strokeWidth="0.75" 
+        fill="url(#health-gradient)" 
+        opacity="0.5" 
+      />
     </g>
     
-    {/* Animated pulse */}
+    {/* Animated heartbeat */}
+    <path 
+      d="M9 12h6" 
+      className="animate-pulse" 
+      stroke="url(#health-gradient)" 
+      strokeWidth="1"
+      opacity="0.7"
+    />
+    
+    {/* Animated protection ring */}
     <circle 
       cx="12" 
       cy="12" 
@@ -154,7 +290,7 @@ export const HealthIcon: React.FC<{ className?: string }> = ({ className = "w-20
       className="animate-ping" 
       stroke="url(#health-gradient)" 
       strokeWidth="0.5"
-      opacity="0.3"
+      opacity="0.2"
       fill="none"
     />
   </svg>
