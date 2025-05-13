@@ -6,66 +6,58 @@
 @tailwind utilities;
 
 :root {
-  /* Luminous AI-gradient brand colors */
-  --background: 240 50% 95%; /* Light violet-blue background */
-  --foreground: 240 30% 25%; /* Dark blue-gray text */
-  --muted: 240 20% 85%;
-  --muted-foreground: 240 25% 45%;
-  --popover: 240 40% 97%;
-  --popover-foreground: 240 30% 25%;
-  --card: 240 40% 97%;
-  --card-foreground: 240 30% 25%;
-  --border: 240 30% 90%;
-  --input: 240 30% 90%;
-  --primary: 250 95% 65%; /* Vibrant purple-blue for primary actions */
-  --primary-foreground: 0 0% 100%;
-  --secondary: 226 70% 55%;
-  --secondary-foreground: 0 0% 100%;
-  --accent: 190 90% 60%; /* Teal accent color */
-  --accent-foreground: 0 0% 100%;
-  --destructive: 0 84% 60%;
-  --destructive-foreground: 0 0% 100%;
-  --ring: 250 95% 65%;
-  --radius: 1rem; /* Slightly more rounded corners for a softer look */
-  
-  /* Custom gradient properties */
-  --glow-primary: 0 0 20px rgba(147, 51, 234, 0.3);
-  --glow-accent: 0 0 25px rgba(45, 212, 191, 0.25);
-  --gradient-primary: linear-gradient(135deg, #8B5CF6, #6366F1);
-  --gradient-secondary: linear-gradient(135deg, #06B6D4, #0EA5E9);
-  --gradient-accent: linear-gradient(135deg, #10B981, #2DD4BF);
-  --gradient-soft-violet: linear-gradient(135deg, #C4B5FD, #A78BFA);
-  --gradient-cool-teal: linear-gradient(135deg, #5EEAD4, #2DD4BF);
-  --gradient-background-main: linear-gradient(145deg, #EEF2FF, #F5F3FF);
-  --gradient-background-card: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(243, 244, 255, 0.85));
-}
-
-.dark {
-  /* Elegant dark mode with gradient compatibility */
-  --background: 240 25% 12%; 
-  --foreground: 210 40% 98%;
-  --muted: 240 20% 20%;
-  --muted-foreground: 215 20% 75%;
-  --popover: 240 30% 15%;
+  /* Futuristic brand colors for AI-driven theme */
+  --background: 220 70% 3%; /* Dark blue-gray background */
+  --foreground: 210 40% 98%; /* Almost white text */
+  --muted: 217 33% 17%;
+  --muted-foreground: 215 20% 65%;
+  --popover: 222 47% 11%;
   --popover-foreground: 210 40% 98%;
-  --card: 240 30% 15%;
+  --card: 222 47% 11%;
   --card-foreground: 210 40% 98%;
-  --border: 240 25% 25%;
-  --input: 240 25% 25%;
-  --primary: 250 95% 65%;
+  --border: 217 33% 17%;
+  --input: 217 33% 17%;
+  --primary: 221 83% 53%; /* Vibrant blue for primary actions */
   --primary-foreground: 210 40% 98%;
-  --secondary: 226 70% 55%;
+  --secondary: 217 33% 17%;
   --secondary-foreground: 210 40% 98%;
-  --accent: 190 90% 60%;
+  --accent: 224 76% 48%;
   --accent-foreground: 210 40% 98%;
   --destructive: 0 84% 60%;
   --destructive-foreground: 210 40% 98%;
-  --ring: 250 95% 65%;
-  --radius: 1rem;
+  --ring: 221 83% 53%;
+  --radius: 0.75rem; /* Slightly less rounded corners for a more tech look */
   
-  /* Dark mode gradient overrides */
-  --gradient-background-main: linear-gradient(145deg, hsl(240 25% 12%), hsl(250 25% 15%));
-  --gradient-background-card: linear-gradient(145deg, rgba(30, 30, 46, 0.9), rgba(35, 33, 54, 0.85));
+  /* Custom futuristic properties */
+  --glow-primary: 0 0 15px rgba(59, 130, 246, 0.5);
+  --glow-accent: 0 0 20px rgba(99, 102, 241, 0.4);
+  --gradient-primary: linear-gradient(135deg, #3B82F6, #2563EB);
+  --gradient-secondary: linear-gradient(135deg, #4F46E5, #4338CA);
+  --gradient-accent: linear-gradient(135deg, #8B5CF6, #7C3AED);
+}
+
+.dark {
+  /* Already using dark futuristic theme as default, so dark mode is just slightly darker */
+  --background: 222 47% 2%; 
+  --foreground: 210 40% 98%;
+  --muted: 223 47% 12%;
+  --muted-foreground: 215 20% 65%;
+  --popover: 224 71% 7%;
+  --popover-foreground: 210 40% 98%;
+  --card: 224 71% 7%;
+  --card-foreground: 210 40% 98%;
+  --border: 215 27% 19%;
+  --input: 215 27% 19%;
+  --primary: 221 83% 53%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 215 27% 19%;
+  --secondary-foreground: 210 40% 98%;
+  --accent: 224 76% 48%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 210 40% 98%;
+  --ring: 221 83% 53%;
+  --radius: 0.75rem;
 }
 
 @layer base {
