@@ -18,6 +18,12 @@ import {
   FuturisticPetIcon, 
   FuturisticHealthIcon 
 } from "@/components/icons/futuristic-icons";
+import {
+  AppleTravelIcon,
+  AppleAutoIcon,
+  ApplePetIcon,
+  AppleHealthIcon
+} from "@/components/icons/apple-style-icons";
 import { popularPlans } from "@/data/popular-plans";
 
 export default function HomePage() {
