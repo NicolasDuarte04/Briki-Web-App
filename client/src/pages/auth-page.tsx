@@ -239,9 +239,9 @@ export default function AuthPage() {
                         name="username"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-foreground">Username</FormLabel>
+                            <FormLabel className="text-foreground">Nombre de usuario</FormLabel>
                             <FormControl>
-                              <Input placeholder="username" className="bg-background/50 border-border" {...field} />
+                              <Input placeholder="nombre de usuario" className="bg-background/50 border-border" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -253,7 +253,7 @@ export default function AuthPage() {
                         name="password"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-foreground">Password</FormLabel>
+                            <FormLabel className="text-foreground">Contraseña</FormLabel>
                             <FormControl>
                               <Input type="password" placeholder="••••••••" className="bg-background/50 border-border" {...field} />
                             </FormControl>
@@ -274,12 +274,12 @@ export default function AuthPage() {
                                   onCheckedChange={field.onChange}
                                 />
                               </FormControl>
-                              <FormLabel className="text-sm font-normal text-foreground/80">Remember me</FormLabel>
+                              <FormLabel className="text-sm font-normal text-foreground/80">Recordarme</FormLabel>
                             </FormItem>
                           )}
                         />
                         <Button variant="link" className="p-0 h-auto text-sm text-primary">
-                          Forgot password?
+                          ¿Olvidaste tu contraseña?
                         </Button>
                       </div>
                       
@@ -301,7 +301,7 @@ export default function AuthPage() {
                         <Separator className="bg-border" />
                       </div>
                       <div className="relative flex justify-center text-sm">
-                        <span className="px-2 bg-card text-foreground/70">Or continue with</span>
+                        <span className="px-2 bg-card text-foreground/70">O continúa con</span>
                       </div>
                     </div>
                     
@@ -335,7 +335,7 @@ export default function AuthPage() {
                         name="username"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-foreground">Username</FormLabel>
+                            <FormLabel className="text-foreground">Nombre de usuario</FormLabel>
                             <FormControl>
                               <Input placeholder="username" className="bg-background/50 border-border" {...field} />
                             </FormControl>
