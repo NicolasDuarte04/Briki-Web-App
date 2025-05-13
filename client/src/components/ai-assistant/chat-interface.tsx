@@ -314,7 +314,7 @@ export default function ChatInterface({
                   <Input
                     ref={inputRef}
                     type="text"
-                    placeholder="Type your message..."
+                    placeholder="Escribe tu mensaje..."
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     disabled={isLoading}

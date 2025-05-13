@@ -152,14 +152,14 @@ export default function Navbar() {
                       onClick={() => navigate("/settings")}
                     >
                       <Settings className="mr-2 h-4 w-4" />
-                      <span>Settings</span>
+                      <span>Configuración</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem 
                       className="cursor-pointer" 
                       onClick={() => navigate("/ai-assistant")}
                     >
                       <Bot className="mr-2 h-4 w-4" />
-                      <span>AI Assistant</span>
+                      <span>Asistente IA</span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem 
@@ -172,7 +172,7 @@ export default function Navbar() {
                       ) : (
                         <LogOut className="mr-2 h-4 w-4" />
                       )}
-                      <span>Sign out</span>
+                      <span>Cerrar sesión</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -288,7 +288,7 @@ export default function Navbar() {
                               }}
                             >
                               <SparklesIcon className="h-4 w-4" />
-                              Chat with AI Assistant
+                              Chatear con Asistente IA
                             </Button>
                           </div>
                         )}
@@ -302,7 +302,7 @@ export default function Navbar() {
                             }}
                           >
                             <User className="mr-2 h-4 w-4" />
-                            Your Profile
+                            Tu Perfil
                           </Button>
                           <Button 
                             variant="ghost" 
@@ -313,7 +313,7 @@ export default function Navbar() {
                             }}
                           >
                             <Settings className="mr-2 h-4 w-4" />
-                            Settings
+                            Configuración
                           </Button>
                           
                           {showAIAssistant && (
@@ -326,7 +326,7 @@ export default function Navbar() {
                               }}
                             >
                               <Bot className="mr-2 h-4 w-4" />
-                              AI Assistant
+                              Asistente IA
                             </Button>
                           )}
                           <Button 
@@ -340,7 +340,7 @@ export default function Navbar() {
                             ) : (
                               <LogOut className="mr-2 h-4 w-4" />
                             )}
-                            Sign out
+                            Cerrar sesión
                           </Button>
                         </div>
                       </div>
