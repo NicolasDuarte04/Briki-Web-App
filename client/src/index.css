@@ -6,58 +6,83 @@
 @tailwind utilities;
 
 :root {
-  /* Light, AI-inspired theme with soft purples and pinks */
-  --background: 0 0% 100%; /* White background */
-  --foreground: 222 47% 11%; /* Dark text for contrast */
-  --muted: 240 10% 95%;
-  --muted-foreground: 240 4% 46%;
+  /* Premium gradient theme (teal, indigo, deep blue, violet) */
+  --background: 220 20% 97%; /* Light background with slight blue tint */
+  --foreground: 220 47% 11%; /* Dark text for contrast */
+  --muted: 220 15% 95%;
+  --muted-foreground: 220 10% 46%;
   --popover: 0 0% 100%;
-  --popover-foreground: 222 47% 11%;
+  --popover-foreground: 220 47% 11%;
   --card: 0 0% 100%;
-  --card-foreground: 222 47% 11%;
-  --border: 240 5% 84%;
-  --input: 240 5% 96%;
-  --primary: 266 100% 64%; /* Soft purple for primary actions */
+  --card-foreground: 220 47% 11%;
+  --border: 220 10% 84%;
+  --input: 220 10% 96%;
+  --primary: 200 100% 45%; /* Teal for primary actions */
   --primary-foreground: 0 0% 100%;
-  --secondary: 324 100% 76%; /* Soft pink as secondary color */
+  --secondary: 260 100% 55%; /* Indigo as secondary color */
   --secondary-foreground: 0 0% 100%;
-  --accent: 288 95% 90%;
-  --accent-foreground: 222 47% 11%;
+  --accent: 280 80% 50%; /* Violet as accent */
+  --accent-foreground: 0 0% 100%;
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
-  --ring: 266 100% 64%;
+  --ring: 200 100% 45%;
   --radius: 0.75rem; /* Maintain the same radius for consistency */
   
-  /* Custom AI-inspired properties */
-  --glow-primary: 0 0 15px rgba(164, 101, 245, 0.3);
-  --glow-accent: 0 0 20px rgba(248, 168, 242, 0.3);
-  --gradient-primary: linear-gradient(135deg, #A465F5, #8B5CF6);
-  --gradient-secondary: linear-gradient(135deg, #F472B6, #EC4899);
-  --gradient-accent: linear-gradient(135deg, #F9A8F2, #E879F9);
+  /* Custom premium gradient properties */
+  --glow-primary: 0 0 20px rgba(0, 160, 190, 0.4);
+  --glow-secondary: 0 0 20px rgba(80, 70, 230, 0.4);
+  --glow-accent: 0 0 20px rgba(120, 40, 200, 0.4);
+  
+  /* Rich gradients for premium look */
+  --gradient-primary: linear-gradient(135deg, #00A0BE, #0088A3);
+  --gradient-secondary: linear-gradient(135deg, #5046E6, #4338CA);
+  --gradient-accent: linear-gradient(135deg, #7828C8, #6D28D9);
+  --gradient-background: linear-gradient(135deg, #F5FDFF, #F3F4FF);
+  
+  /* Immersive radial gradients */
+  --radial-primary: radial-gradient(circle at center, rgba(0, 160, 190, 0.7) 0%, rgba(0, 136, 163, 0.3) 50%, transparent 80%);
+  --radial-secondary: radial-gradient(circle at center, rgba(80, 70, 230, 0.7) 0%, rgba(67, 56, 202, 0.3) 50%, transparent 80%);
+  --radial-accent: radial-gradient(circle at center, rgba(120, 40, 200, 0.7) 0%, rgba(109, 40, 217, 0.3) 50%, transparent 80%);
 }
 
 .dark {
-  /* Darker version of our light AI-inspired theme */
-  --background: 260 10% 12%; 
-  --foreground: 210 40% 98%;
-  --muted: 266 20% 20%;
-  --muted-foreground: 240 10% 70%;
-  --popover: 260 10% 12%;
+  /* Deep premium theme with rich colors (dark teal, deep indigo, deep blue, dark violet) */
+  --background: 220 30% 10%; /* Deep blue-black background */
+  --foreground: 210 40% 98%; /* Bright text for contrast */
+  --muted: 220 20% 16%;
+  --muted-foreground: 210 15% 70%;
+  --popover: 220 30% 10%;
   --popover-foreground: 210 40% 98%;
-  --card: 260 10% 14%;
+  --card: 220 25% 13%;
   --card-foreground: 210 40% 98%;
-  --border: 266 20% 24%;
-  --input: 266 20% 18%;
-  --primary: 266 80% 60%;
+  --border: 220 20% 18%;
+  --input: 220 20% 16%;
+  --primary: 190 90% 40%; /* Deep teal */
   --primary-foreground: 210 40% 98%;
-  --secondary: 324 80% 70%;
+  --secondary: 255 90% 45%; /* Deep indigo */
   --secondary-foreground: 210 40% 98%;
-  --accent: 288 75% 60%;
+  --accent: 280 75% 40%; /* Deep violet */
   --accent-foreground: 210 40% 98%;
   --destructive: 0 84% 60%;
   --destructive-foreground: 210 40% 98%;
-  --ring: 266 80% 60%;
+  --ring: 190 90% 40%;
   --radius: 0.75rem;
+  
+  /* Dark mode gradient properties */
+  --glow-primary: 0 0 25px rgba(0, 160, 190, 0.5);
+  --glow-secondary: 0 0 25px rgba(80, 70, 230, 0.5);
+  --glow-accent: 0 0 25px rgba(120, 40, 200, 0.5);
+  
+  /* Rich dark mode gradients */
+  --gradient-primary: linear-gradient(135deg, #00809E, #006A80);
+  --gradient-secondary: linear-gradient(135deg, #4035C0, #332AA0);
+  --gradient-accent: linear-gradient(135deg, #6020A0, #551B8D);
+  --gradient-background: linear-gradient(135deg, #152030, #0D1525);
+  
+  /* Dark mode radial gradients */
+  --radial-primary: radial-gradient(circle at center, rgba(0, 128, 158, 0.6) 0%, rgba(0, 106, 128, 0.2) 50%, transparent 80%);
+  --radial-secondary: radial-gradient(circle at center, rgba(64, 53, 192, 0.6) 0%, rgba(51, 42, 160, 0.2) 50%, transparent 80%);
+  --radial-accent: radial-gradient(circle at center, rgba(96, 32, 160, 0.6) 0%, rgba(85, 27, 141, 0.2) 50%, transparent 80%);
 }
 
 @layer base {
@@ -77,6 +102,110 @@
   
   p, span, button, a {
     font-family: 'Inter', sans-serif;
+  }
+}
+
+@layer components {
+  /* Gradient backgrounds */
+  .bg-gradient-primary {
+    background: var(--gradient-primary);
+  }
+  
+  .bg-gradient-secondary {
+    background: var(--gradient-secondary);
+  }
+  
+  .bg-gradient-accent {
+    background: var(--gradient-accent);
+  }
+  
+  .bg-gradient-page {
+    background: var(--gradient-background);
+  }
+  
+  /* Radial gradient backgrounds */
+  .bg-radial-primary {
+    background: var(--radial-primary);
+  }
+  
+  .bg-radial-secondary {
+    background: var(--radial-secondary);
+  }
+  
+  .bg-radial-accent {
+    background: var(--radial-accent);
+  }
+  
+  /* Glowing elements */
+  .glow-primary {
+    box-shadow: var(--glow-primary);
+  }
+  
+  .glow-secondary {
+    box-shadow: var(--glow-secondary);
+  }
+  
+  .glow-accent {
+    box-shadow: var(--glow-accent);
+  }
+  
+  /* Animation classes */
+  .hover-scale {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .hover-scale:hover {
+    transform: scale(1.03);
+  }
+  
+  /* Premium card style */
+  .premium-card {
+    @apply rounded-xl bg-white dark:bg-card border border-border p-6 shadow-sm hover-scale;
+    transition: all 0.3s ease;
+  }
+  
+  .premium-card:hover {
+    @apply glow-primary border-primary/30;
+  }
+  
+  /* Animated gradient border (premium effect) */
+  .animated-border {
+    position: relative;
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  
+  .animated-border::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    z-index: -1;
+    border-radius: calc(var(--radius) + 2px);
+    background: linear-gradient(
+      45deg,
+      var(--primary) 0%,
+      var(--secondary) 25%,
+      var(--accent) 50%,
+      var(--secondary) 75%,
+      var(--primary) 100%
+    );
+    background-size: 400% 400%;
+    animation: gradient-border 8s ease infinite;
+  }
+  
+  @keyframes gradient-border {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
   }
 }
 
