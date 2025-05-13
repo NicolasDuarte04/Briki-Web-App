@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="roadGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#495057" />
+      <stop offset="100%" stop-color="#343a40" />
+    </linearGradient>
+    <linearGradient id="skyGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#74c0fc" />
+      <stop offset="100%" stop-color="#228be6" />
+    </linearGradient>
+    <linearGradient id="carBodyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#20c997" />
+      <stop offset="100%" stop-color="#0ca678" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Sky Background -->
+  <rect x="0" y="0" width="200" height="130" rx="2" fill="url(#skyGradient)"/>
+  
+  <!-- Road -->
+  <rect x="0" y="130" width="200" height="70" rx="2" fill="url(#roadGradient)"/>
+  
+  <!-- Road Markings -->
+  <rect x="20" y="165" width="30" height="4" rx="2" fill="white"/>
+  <rect x="70" y="165" width="30" height="4" rx="2" fill="white"/>
+  <rect x="120" y="165" width="30" height="4" rx="2" fill="white"/>
+  <rect x="170" y="165" width="30" height="4" rx="2" fill="white"/>
+  
+  <!-- Car Body -->
+  <path d="M50,150 C50,140 60,140 70,140 H130 C140,140 150,140 150,150 L150,160 C150,160 145,160 145,160 L140,160 C140,155 135,155 130,155 C125,155 120,155 120,160 L80,160 C80,155 75,155 70,155 C65,155 60,155 60,160 L55,160 C55,160 50,160 50,160 Z" fill="url(#carBodyGradient)"/>
+  
+  <!-- Car Windows -->
+  <path d="M75,140 L65,130 H135 L125,140 Z" fill="#e9ecef"/>
+  
+  <!-- Car Wheels -->
+  <circle cx="70" cy="160" r="10" fill="#212529"/>
+  <circle cx="70" cy="160" r="6" fill="#495057"/>
+  <circle cx="70" cy="160" r="3" fill="#868e96"/>
+  
+  <circle cx="130" cy="160" r="10" fill="#212529"/>
+  <circle cx="130" cy="160" r="6" fill="#495057"/>
+  <circle cx="130" cy="160" r="3" fill="#868e96"/>
+  
+  <!-- Headlights -->
+  <circle cx="60" cy="145" r="4" fill="#ffe066"/>
+  <circle cx="140" cy="145" r="4" fill="#ffe066"/>
+  
+  <!-- Clouds -->
+  <circle cx="50" cy="40" r="15" fill="white" opacity="0.7"/>
+  <circle cx="65" cy="40" r="20" fill="white" opacity="0.7"/>
+  <circle cx="40" cy="40" r="12" fill="white" opacity="0.7"/>
+  
+  <circle cx="160" cy="50" r="10" fill="white" opacity="0.7"/>
+  <circle cx="175" cy="50" r="15" fill="white" opacity="0.7"/>
+  <circle cx="150" cy="50" r="8" fill="white" opacity="0.7"/>
+</svg>
