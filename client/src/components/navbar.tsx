@@ -88,14 +88,6 @@ export default function Navbar() {
             <Link href="/support" className={`hover:text-primary px-3 py-2 text-sm font-medium ${isActivePath("/support")}`}>
               {t('support')}
             </Link>
-            <Link 
-              href="/company" 
-              className={`hover:text-primary px-3 py-2 text-sm font-medium border border-blue-200 rounded-full bg-blue-50 text-blue-600 ${
-                isActivePath("/company") || location.startsWith("/company-") ? "bg-blue-100" : ""
-              }`}
-            >
-              For Companies
-            </Link>
           </div>
           
           {isLoading ? (
@@ -185,19 +177,30 @@ export default function Navbar() {
               </div>
             </div>
           ) : (
-            <div className="flex items-center">
+            <div className="flex flex-col items-end gap-2">
+              <div className="flex items-center">
+                <Button 
+                  variant="ghost" 
+                  onClick={() => navigate("/auth")}
+                  className="text-gray-500 hover:text-primary"
+                >
+                  {t('signIn')}
+                </Button>
+                <Button 
+                  onClick={() => navigate("/auth")}
+                  className="ml-2"
+                >
+                  {t('signUp')}
+                </Button>
+              </div>
               <Button 
-                variant="ghost" 
-                onClick={() => navigate("/auth")}
-                className="text-gray-500 hover:text-primary"
+                variant="outline" 
+                size="sm"
+                onClick={() => navigate("/company")}
+                className="text-sm font-medium text-indigo-700 border border-indigo-200 bg-indigo-50/80 hover:bg-indigo-100 hover:text-indigo-800 transition-all shadow-sm"
               >
-                {t('signIn')}
-              </Button>
-              <Button 
-                onClick={() => navigate("/auth")}
-                className="ml-2"
-              >
-                {t('signUp')}
+                <span>For Insurance Companies</span>
+                <span className="ml-1 text-xs opacity-70">→</span>
               </Button>
             </div>
           )}
@@ -261,18 +264,6 @@ export default function Navbar() {
                       onClick={() => setIsOpen(false)}
                     >
                       {t('support')}
-                    </Link>
-                    
-                    <Link 
-                      href="/company" 
-                      className={`mt-2 block px-3 py-2 rounded-md text-base font-medium ${
-                        isActivePath("/company") || location.startsWith("/company-") 
-                          ? "bg-blue-100 text-blue-600" 
-                          : "bg-blue-50 text-blue-600 hover:bg-blue-100"
-                      }`}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      For Companies
                     </Link>
                   </div>
                   
@@ -367,7 +358,7 @@ export default function Navbar() {
                   
                   {!user && !isLoading && (
                     <div className="pt-4 pb-3 border-t border-gray-200 mt-4">
-                      <div className="space-y-1">
+                      <div className="space-y-3">
                         <Button
                           variant="outline"
                           onClick={() => {
@@ -387,6 +378,20 @@ export default function Navbar() {
                         >
                           {t('signUp')}
                         </Button>
+                        
+                        <div className="pt-2 border-t border-gray-100">
+                          <Button
+                            variant="outline"
+                            className="w-full mt-2 bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100"
+                            onClick={() => {
+                              navigate("/company");
+                              setIsOpen(false);
+                            }}
+                          >
+                            <span>For Insurance Companies</span>
+                            <span className="ml-1 text-xs opacity-70">→</span>
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   )}
