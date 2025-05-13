@@ -1,0 +1,67 @@
+### Phase 2 – Unified Visual Polish & Component Refinement (Steps 4 & 5)
+
+We’re ready to move into the next phase of Briki’s design evolution. Thank you for the refinements so far — the login experience is much cleaner now. Here’s what to implement next:
+
+---
+
+### 1. UI Balance Between Screens (Step 4)
+- Create a **more unified design language** across consumer screens (homepage, login, plan pages) while preserving their **distinct identities**.
+- Maintain a **welcoming, animated, and fluid feel** for consumer pages (Home, Explore, Compare).
+- In contrast, the **company/enterprise interface** should continue using a **sleek, glassy, data-focused theme** (white/silver tones, futuristic UI).
+
+> Maintain soft transitions when navigating between consumer and company sides to feel like different wings of the same platform, not two different sites.
+
+---
+
+### 2. Component Redesign & Styling Priorities (Step 5)
+Please apply upgraded visuals to the following key areas:
+
+#### a. Navigation Bar
+- Increase contrast between active/inactive links
+- Add soft hover transitions
+- Add a **quick feedback icon or toggle** near the profile area for future onboarding
+
+#### b. Buttons
+- **Replace the current purple CTA button (`#A64EFF`)** with a more harmonious tone:
+  - Use a **gradient**: `#4C6EF5 → #5F99F7` for the “Sign In”, “Pre-Test the App”, and other key CTAs
+  - On hover: subtle lift animation + inner glow
+
+#### c. Logo / Brand Wordmark
+- The **“Briki” heading currently uses the same purple tone**. It looks slightly out of place with the new gradient background.
+  - Suggested replacement: solid `#5D5FEF` or similar indigo-blue that blends better with the overall color scheme.
+
+#### d. Plan Cards
+- Use glass-like cards with light shadow, smoother borders, and micro-animations on hover
+- Highlight coverage stats or pricing in a badge-style element
+
+#### e. Forms (Login, Register, Feedback)
+- Upgrade all form components to feel like native macOS/iOS inputs (glass, subtle shadows, smooth focus state)
+
+#### f. Footer
+- Unify design with soft border-top, social links (Instagram, LinkedIn), and a beta-mode notice
+
+---
+
+### 3. Briki Co-Pilot & Home Screen Update
+- Improve the **Home Screen** navigation — it still feels too generic
+  - Add gentle interactive sections, “Explore Now” hover motion, scroll-based transitions
+- The **Briki Co-Pilot AI button** should be more inviting:
+  - Add subtle breathing animation when idle
+  - Add a new floating behavior on desktop view
+  - Optional: voice input animation (waveform style) when user activates the bot
+
+---
+
+### 4. Color Theory Clarification
+Please move away from the flat, synthetic purple (#A64EFF) — it doesn’t pair well with the refined background gradient. We want a balance of energy and trust.
+
+Suggested new color set:
+- **Primary Buttons**: `#4C6EF5 → #5F99F7`
+- **Secondary Accent**: `#00C2FF`
+- **Headings / Brand Text**: `#5D5FEF` or similar modern indigo
+
+Let us know if you need updated branding specs or want us to upload a finalized design token sheet.
+
+---
+
+Let us know if you’d like a separate prompt for animating the Co-Pilot, or further layout refinements for mobile. Thanks again!

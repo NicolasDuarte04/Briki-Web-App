@@ -7,8 +7,8 @@
 @tailwind utilities;
 
 :root {
-  /* Louder UI with vibrant purples and rich gradients */
-  --background: 228 60% 95%; /* Soft lavender-blue background */
+  /* Updated UI with harmonious blue gradients - Phase 2 refinement */
+  --background: 220 60% 98%; /* Light blue-gray background */
   --foreground: 229 84% 5%; /* Nearly black text for strong contrast */
   --muted: 214 32% 91%;
   --muted-foreground: 215 25% 27%;
@@ -18,29 +18,29 @@
   --card-foreground: 229 84% 5%;
   --border: 220 13% 91%;
   --input: 220 13% 91%;
-  --primary: 262 83% 58%; /* More saturated, vibrant purple for buttons/logo */
+  --primary: 225 82% 63%; /* Modern indigo for buttons/logo #4C6EF5 */
   --primary-foreground: 0 0% 100%;
-  --secondary: 199 95% 48%; /* Brighter blue */
+  --secondary: 199 100% 50%; /* Bright blue #00C2FF */
   --secondary-foreground: 0 0% 100%;
-  --accent: 275 80% 50%; /* Richer accent purple */
+  --accent: 227 91% 63%; /* Indigo accent #3B5BFA */
   --accent-foreground: 0 0% 100%;
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
-  --ring: 262 83% 58%;
+  --ring: 225 82% 63%;
   --radius: 0.75rem;
   
-  /* Updated gradients for punchier, more liquid aesthetics */
-  --glow-primary: 0 0 25px rgba(139, 92, 246, 0.6); /* Brighter purple glow */
-  --glow-accent: 0 0 25px rgba(124, 58, 237, 0.5); /* Stronger glow */
-  --gradient-primary: linear-gradient(135deg, #7C3AED, #8B5CF6); /* Bolder vibrant purple gradient */
-  --gradient-secondary: linear-gradient(135deg, #0EA5E9, #38BDF8); /* Vibrant sky blue */
-  --gradient-accent: linear-gradient(135deg, #9333EA, #C084FC); /* Rich purple fade */
+  /* Updated gradients for more unified, refined aesthetics */
+  --glow-primary: 0 0 25px rgba(76, 110, 245, 0.5); /* Modern blue glow */
+  --glow-accent: 0 0 20px rgba(0, 194, 255, 0.4); /* Sky blue glow */
+  --gradient-primary: linear-gradient(135deg, #4C6EF5, #5F99F7); /* Modern indigo to blue gradient */
+  --gradient-secondary: linear-gradient(135deg, #00C2FF, #38BDF8); /* Vibrant sky blue */
+  --gradient-accent: linear-gradient(135deg, #5D5FEF, #748FFC); /* Indigo blue fade */
   --gradient-auto: linear-gradient(135deg, #0284C7, #38BDF8); /* Auto category */
-  --gradient-pet: linear-gradient(135deg, #9333EA, #A78BFA); /* Pet category */
+  --gradient-pet: linear-gradient(135deg, #5D5FEF, #748FFC); /* Pet category */
   --gradient-health: linear-gradient(135deg, #F43F5E, #FB7185); /* Health category */
-  --gradient-travel: linear-gradient(135deg, #7C3AED, #A78BFA); /* Travel category */
-  --gradient-background: linear-gradient(145deg, #E0E8FF, #D1D5FF); /* Enhanced purple-blue background */
-  --gradient-card-hover: linear-gradient(145deg, rgba(139, 92, 246, 0.08), rgba(124, 58, 237, 0.08)); /* Punchier hover gradient */
+  --gradient-travel: linear-gradient(135deg, #4C6EF5, #5F99F7); /* Travel category */
+  --gradient-background: linear-gradient(145deg, #E0E8FF, #D8E6FF); /* Enhanced blue background */
+  --gradient-card-hover: linear-gradient(145deg, rgba(76, 110, 245, 0.08), rgba(95, 153, 247, 0.08)); /* Refined hover gradient */
 }
 
 .dark {
@@ -656,11 +656,18 @@
     @apply text-5xl font-extrabold tracking-tight relative;
     font-family: 'DM Sans', 'Satoshi', sans-serif;
     letter-spacing: -0.02em;
+    color: #5D5FEF; /* Solid indigo color for better readability */
+    text-shadow: 0 2px 10px rgba(93, 95, 239, 0.3);
+    position: relative;
+    z-index: 1;
+  }
+  
+  /* Add subtle gradient background only on hover for a refined effect */
+  .auth-logo:hover {
     background: var(--gradient-primary);
     background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 12px rgba(139, 92, 246, 0.5));
     animation: textShine 5s infinite linear;
   }
   
@@ -673,16 +680,26 @@
     @apply text-sm mt-1 font-medium text-foreground/70;
   }
   
+  /* Glass card design with macOS-inspired aesthetics */
   .auth-card {
-    @apply rounded-xl bg-white shadow-xl p-7 border border-transparent relative overflow-hidden w-full max-w-md mt-8 backdrop-blur-sm;
+    @apply rounded-xl bg-white/90 shadow-xl p-7 relative overflow-hidden w-full max-w-md mt-8;
     background: rgba(255, 255, 255, 0.85);
     box-shadow: 
-      0 20px 60px -15px rgba(124, 58, 237, 0.3),
-      0 0 20px -5px rgba(139, 92, 246, 0.2),
-      inset 0 0 0 1px rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(10px);
+      0 20px 70px -15px rgba(76, 110, 245, 0.25),
+      0 10px 30px -5px rgba(0, 0, 0, 0.06),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
     transition: all 0.25s cubic-bezier(0.21, 0.61, 0.35, 1);
     animation: cardReveal 0.8s cubic-bezier(0.17, 0.67, 0.21, 0.97);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+  
+  .auth-card:hover {
+    box-shadow: 
+      0 25px 80px -15px rgba(76, 110, 245, 0.28),
+      0 10px 40px -5px rgba(0, 0, 0, 0.08),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.9);
+    transform: translateY(-2px);
   }
   
   @keyframes cardReveal {
@@ -690,15 +707,17 @@
       opacity: 0;
       transform: translateY(30px) scale(0.98);
       box-shadow: 
-        0 10px 30px -15px rgba(124, 58, 237, 0.2),
-        0 0 10px -5px rgba(139, 92, 246, 0.1);
+        0 10px 30px -15px rgba(76, 110, 245, 0.2),
+        0 0 10px -5px rgba(95, 153, 247, 0.1);
+      backdrop-filter: blur(5px);
     }
     to { 
       opacity: 1;
       transform: translateY(0) scale(1);
       box-shadow: 
-        0 20px 60px -15px rgba(124, 58, 237, 0.3),
-        0 0 20px -5px rgba(139, 92, 246, 0.2);
+        0 20px 70px -15px rgba(76, 110, 245, 0.25),
+        0 10px 30px -5px rgba(0, 0, 0, 0.06);
+      backdrop-filter: blur(20px);
     }
   }
   
@@ -708,11 +727,11 @@
     inset: 0;
     border-radius: 0.75rem;
     padding: 1px;
-    background: linear-gradient(135deg, rgba(147, 51, 234, 0.7), rgba(139, 92, 246, 0.7));
+    background: linear-gradient(135deg, rgba(76, 110, 245, 0.5), rgba(95, 153, 247, 0.5));
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
-    opacity: 0.4;
+    opacity: 0.3;
   }
   
   .auth-card > * {
@@ -720,55 +739,81 @@
     z-index: 1;
   }
   
+  /* Navigation Tabs - Enhanced contrast and transitions */
   .auth-tabs-list {
     @apply grid w-full grid-cols-2 mb-6 rounded-md overflow-hidden;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(8px);
   }
   
   .auth-tab {
-    @apply inline-flex items-center justify-center whitespace-nowrap py-3 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border-b-2 border-transparent relative;
+    @apply inline-flex items-center justify-center whitespace-nowrap py-3 text-sm font-medium ring-offset-background 
+    transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 
+    disabled:pointer-events-none disabled:opacity-50 border-b-2 border-transparent relative text-muted-foreground;
+    transition: all 0.3s cubic-bezier(0.21, 0.61, 0.35, 1);
+  }
+  
+  .auth-tab:hover:not([data-state="active"]) {
+    @apply text-foreground bg-white/50;
   }
   
   .auth-tab[data-state="active"] {
-    @apply bg-white text-primary border-primary shadow-sm;
-    border-image: linear-gradient(to right, #9333EA, #A855F7) 1;
-    box-shadow: 0 0 20px 0px rgba(147, 51, 234, 0.15);
+    @apply bg-white text-primary font-semibold shadow-sm;
+    border-bottom: 2px solid;
+    border-image: linear-gradient(to right, #4C6EF5, #5F99F7) 1;
+    box-shadow: 0 4px 15px -3px rgba(76, 110, 245, 0.15);
   }
   
+  /* Form inputs - macOS-inspired glass effect */
   .auth-input {
-    @apply w-full px-4 py-3 text-base rounded-lg border border-input bg-white focus:outline-none;
-    transition: all 0.15s ease;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    @apply w-full px-4 py-3 text-base rounded-lg border border-input bg-white/90 focus:outline-none;
+    transition: all 0.2s cubic-bezier(0.21, 0.61, 0.35, 1);
+    box-shadow: 
+      0 1px 3px rgba(0, 0, 0, 0.05),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(4px);
+  }
+  
+  .auth-input:hover {
+    @apply bg-white/95 border-input/80;
+    box-shadow: 
+      0 2px 5px rgba(0, 0, 0, 0.03),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
   }
   
   .auth-input:focus {
-    @apply ring-2 ring-primary/30 border-primary;
-    box-shadow: 0 0 0 4px rgba(147, 51, 234, 0.15);
+    @apply ring-2 ring-primary/20 border-primary/80;
+    box-shadow: 
+      0 0 0 3px rgba(76, 110, 245, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.98);
   }
   
   .auth-submit-button {
     @apply w-full py-3 flex items-center justify-center text-white font-medium relative overflow-hidden rounded-lg;
-    background-image: linear-gradient(135deg, #9333EA, #A855F7);
+    background-image: linear-gradient(135deg, #4C6EF5, #5F99F7);
     background-size: 200% auto;
-    box-shadow: 0 3px 10px rgba(147, 51, 234, 0.3), 
-                0 0 0 0 rgba(147, 51, 234, 0);
+    box-shadow: 0 3px 10px rgba(76, 110, 245, 0.25), 
+                0 0 0 0 rgba(76, 110, 245, 0);
     transition: all 0.3s cubic-bezier(0.21, 0.61, 0.35, 1);
     animation: gradientPosition 5s ease infinite;
   }
   
   .auth-submit-button:hover {
     transform: translateY(-1px);
-    box-shadow: 0 8px 20px rgba(147, 51, 234, 0.4),
-                0 0 0 1px rgba(147, 51, 234, 0.2);
+    box-shadow: 0 8px 20px rgba(76, 110, 245, 0.3),
+                0 0 0 1px rgba(95, 153, 247, 0.2),
+                inset 0 0 15px rgba(255, 255, 255, 0.2); /* Inner glow effect */
   }
   
   .auth-submit-button:active {
     transform: translateY(1px);
-    box-shadow: 0 2px 5px rgba(147, 51, 234, 0.3);
+    box-shadow: 0 2px 5px rgba(76, 110, 245, 0.25);
     background-position: right center;
   }
   
-  /* Branded Animated Gradient Background - Stripe-inspired */
+  /* Refined Animated Gradient Background - Stripe-inspired */
   .auth-background {
     @apply fixed inset-0 overflow-hidden;
     background: radial-gradient(
@@ -780,19 +825,19 @@
       #F0F4FF
     );
     background-size: 300% 300%;
-    animation: gradientShift 15s ease infinite;
+    animation: gradientShift 25s ease infinite;
   }
   
   .auth-background::before {
     content: "";
     @apply absolute inset-0;
     background: 
-      radial-gradient(circle at 20% 35%, rgba(56, 189, 248, 0.35) 0%, transparent 60%),
-      radial-gradient(circle at 85% 20%, rgba(79, 70, 229, 0.25) 0%, transparent 60%),
-      radial-gradient(circle at 10% 90%, rgba(14, 165, 233, 0.3) 0%, transparent 65%),
-      radial-gradient(circle at 90% 80%, rgba(90, 103, 216, 0.3) 0%, transparent 60%);
-    animation: pulse 18s infinite alternate;
-    opacity: 0.7;
+      radial-gradient(circle at 20% 35%, rgba(0, 194, 255, 0.25) 0%, transparent 65%),
+      radial-gradient(circle at 85% 20%, rgba(76, 110, 245, 0.2) 0%, transparent 65%),
+      radial-gradient(circle at 10% 90%, rgba(14, 165, 233, 0.25) 0%, transparent 70%),
+      radial-gradient(circle at 90% 80%, rgba(93, 95, 239, 0.2) 0%, transparent 65%);
+    animation: pulse 20s infinite alternate;
+    opacity: 0.65;
     mix-blend-mode: soft-light;
   }
   
@@ -800,8 +845,14 @@
     content: "";
     @apply absolute inset-0 z-0;
     background: 
-      linear-gradient(125deg, rgba(208, 241, 255, 0.1) 0%, rgba(176, 219, 255, 0.1) 50%, rgba(240, 244, 255, 0.1) 100%);
+      linear-gradient(125deg, rgba(208, 241, 255, 0.05) 0%, rgba(176, 219, 255, 0.05) 50%, rgba(240, 244, 255, 0.05) 100%);
     opacity: 0.4;
+    animation: subtleShift 30s infinite alternate ease-in-out;
+  }
+  
+  @keyframes subtleShift {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.05); }
   }
   
   @keyframes gradientShift {
@@ -886,16 +937,30 @@
     }
   }
   
-  /* Social login buttons */
+  /* Social login buttons - glass effect */
   .auth-social-button {
-    @apply inline-flex items-center justify-center px-4 py-2 border border-muted bg-white rounded-lg text-sm font-medium w-full transition-all;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    @apply inline-flex items-center justify-center px-4 py-3 border border-white/30 bg-white/80 backdrop-blur-sm 
+    rounded-lg text-sm font-medium w-full transition-all text-foreground/80 hover:text-foreground;
+    box-shadow: 
+      0 2px 5px rgba(0, 0, 0, 0.03),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    transition: all 0.2s cubic-bezier(0.21, 0.61, 0.35, 1);
   }
   
   .auth-social-button:hover {
-    @apply border-muted/80 bg-muted/5;
+    @apply bg-white/95 border-white/40;
     transform: translateY(-1px);
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    box-shadow: 
+      0 5px 10px rgba(0, 0, 0, 0.04),
+      0 2px 4px rgba(0, 0, 0, 0.02),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  }
+  
+  .auth-social-button:active {
+    transform: translateY(0);
+    box-shadow: 
+      0 2px 3px rgba(0, 0, 0, 0.03),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
   }
   
   .auth-social-button:active {
