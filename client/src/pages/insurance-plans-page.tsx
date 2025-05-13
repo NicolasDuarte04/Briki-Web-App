@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { InsurancePlan, Trip } from "@shared/schema";
 import { useLocation, Link } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigation } from "@/hooks/use-navigation";
 import { useToast } from "@/hooks/use-toast";
 
 import Navbar from "@/components/navbar";
@@ -36,6 +37,7 @@ import { usePlansForTrip, useInvalidatePlansCache, usePlanErrors } from "@/servi
 
 export default function InsurancePlansPage() {
   const [, navigate] = useLocation();
+  const { goBack } = useNavigation();
   const [compareModalOpen, setCompareModalOpen] = useState(false);
   const [selectedPlans, setSelectedPlans] = useState<InsurancePlan[]>([]);
   const [filterPriceRange, setFilterPriceRange] = useState([0, 200]);
@@ -145,9 +147,12 @@ export default function InsurancePlansPage() {
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <Link href="/trip-info" className="w-10 h-10 rounded-full bg-background/80 backdrop-blur-sm border border-primary/20 shadow-glow-sm flex items-center justify-center text-foreground hover:text-primary transition-colors">
+                <button 
+                  onClick={goBack}
+                  className="w-10 h-10 rounded-full bg-background/80 backdrop-blur-sm border border-primary/20 shadow-glow-sm flex items-center justify-center text-foreground hover:text-primary transition-colors"
+                >
                   <ChevronLeft className="h-5 w-5" />
-                </Link>
+                </button>
                 <div className="ml-4">
                   <h1 className="text-2xl font-bold section-header">Seguros de viaje</h1>
                   <p className="text-sm text-foreground/70 mt-1">
