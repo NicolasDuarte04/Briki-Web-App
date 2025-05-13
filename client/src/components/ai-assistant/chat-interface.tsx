@@ -38,7 +38,7 @@ const ChatMessage = ({ message }: { message: Message }) => {
     >
       <div
         className={cn(
-          "flex flex-col max-w-[80%] space-y-2",
+          "flex flex-col max-w-[75%] space-y-2",
           isUser ? "items-end" : "items-start"
         )}
       >
@@ -247,7 +247,7 @@ export default function ChatInterface({
             transition={{ duration: 0.2 }}
             className={cn(
               positionClasses[placement],
-              placement === 'inline' ? 'h-[600px]' : 'w-[400px] h-[500px]',
+              placement === 'inline' ? 'h-[500px]' : 'w-[350px] h-[450px]',
               className
             )}
           >
