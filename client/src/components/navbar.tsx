@@ -25,10 +25,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const [, navigate] = useLocation();
+  const [location, navigate] = useLocation();
   const { user, isLoading, logoutMutation } = useAuth();
   const { t } = useLanguage();
   const { toggleAssistant } = useAIAssistantUI();
+  
+  // Check if current page should show AI Assistant
+  const excludedPaths = ['/', '/auth', '/countdown', '/login', '/register', '/terms', '/learn-more'];
+  const showAIAssistant = user && !excludedPaths.some(path => location === path || location.startsWith(`${path}/`));
   
   const handleLogout = () => {
     logoutMutation.mutate();
