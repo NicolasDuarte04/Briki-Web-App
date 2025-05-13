@@ -62,8 +62,8 @@ const ChatMessage = ({ message }: { message: Message }) => {
           className={cn(
             "px-4 py-3 rounded-lg",
             isUser
-              ? "bg-primary text-primary-foreground rounded-tr-none"
-              : "bg-muted rounded-tl-none"
+              ? "bg-gradient-to-br from-blue-500 to-indigo-500 text-white rounded-tr-none shadow-sm"
+              : "bg-white dark:bg-white/10 border border-blue-100 dark:border-blue-500/20 rounded-tl-none shadow-sm"
           )}
         >
           <div className="text-sm leading-relaxed">
@@ -97,13 +97,13 @@ const EmptyState = ({ onStartConversation }: { onStartConversation: (message: st
 
   return (
     <div className="flex flex-col items-center justify-center h-full p-6 text-center space-y-6">
-      <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center">
-        <Bot size={40} className="text-primary" />
+      <div className="h-20 w-20 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-500/20 dark:to-indigo-500/20 flex items-center justify-center shadow-sm">
+        <Bot size={36} className="text-blue-500 dark:text-blue-400" />
       </div>
       
       <div className="space-y-2">
-        <h3 className="text-lg font-semibold">Briki AI Assistant</h3>
-        <p className="text-sm text-muted-foreground max-w-md">
+        <h3 className="text-lg font-semibold text-foreground">Briki AI Assistant</h3>
+        <p className="text-sm text-foreground/60 max-w-md">
           I'm your insurance assistant. Ask me anything about insurance plans, 
           coverage options, or insurance terms.
         </p>
@@ -116,10 +116,10 @@ const EmptyState = ({ onStartConversation }: { onStartConversation: (message: st
             <Button
               key={index}
               variant="outline"
-              className="justify-start h-auto py-2 px-3 text-left text-sm"
+              className="justify-start h-auto py-2 px-3 text-left text-sm border-blue-100 dark:border-blue-500/20 hover:bg-blue-50 dark:hover:bg-blue-900/10 shadow-sm"
               onClick={() => onStartConversation(suggestion)}
             >
-              <Lightbulb size={14} className="mr-2 text-primary" />
+              <Lightbulb size={14} className="mr-2 text-blue-500 dark:text-blue-400" />
               {suggestion}
             </Button>
           ))}
@@ -251,11 +251,11 @@ export default function ChatInterface({
               className
             )}
           >
-            <Card className="shadow-glow-md border-primary/20 backdrop-blur-sm bg-background/90 flex flex-col h-full overflow-hidden">
-              <CardHeader className="px-4 py-3 border-b flex flex-row items-center justify-between space-y-0">
+            <Card className="shadow-sm border-blue-100 dark:border-blue-500/20 backdrop-blur-sm bg-white/95 dark:bg-white/10 flex flex-col h-full overflow-hidden rounded-xl">
+              <CardHeader className="px-4 py-3 border-b border-blue-100 dark:border-blue-500/20 flex flex-row items-center justify-between space-y-0">
                 <div className="flex items-center space-x-2">
-                  <div className="bg-primary text-primary-foreground w-8 h-8 rounded-full flex items-center justify-center">
-                    <Bot size={18} />
+                  <div className="bg-gradient-to-br from-blue-500 to-indigo-500 text-white w-8 h-8 rounded-full flex items-center justify-center shadow-sm">
+                    <Bot size={16} />
                   </div>
                   <div>
                     <h3 className="font-semibold text-base">Briki AI Assistant</h3>
