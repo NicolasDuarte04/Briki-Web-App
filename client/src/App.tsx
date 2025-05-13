@@ -33,11 +33,12 @@ import CountdownPage from "@/pages/countdown-page";
 
 function Router() {
   const [location] = useLocation();
+  const { user } = useAuth();
   
   return (
     <PageTransition>
       <Switch>
-        <Route path="/" component={CountdownPage} />
+        <Route path="/" component={user ? HomePage : CountdownPage} />
         <Route path="/home" component={HomePage} />
         <Route path="/auth" component={AuthPage} />
         <ProtectedRoute path="/trip-info" component={TripInfoPage} />
