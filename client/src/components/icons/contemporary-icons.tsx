@@ -84,37 +84,65 @@ export const PetIcon: React.FC<{ className?: string }> = ({ className = "w-20 h-
     viewBox="0 0 24 24"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
-    stroke="currentColor"
-    strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
   >
     <defs>
       <linearGradient id="pet-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#FBBF24" />
-        <stop offset="100%" stopColor="#F59E0B" />
+        <stop offset="0%" stopColor="#FB923C" />
+        <stop offset="100%" stopColor="#F97316" />
       </linearGradient>
-      <filter id="pet-glow" x="-10%" y="-10%" width="120%" height="120%">
-        <feGaussianBlur stdDeviation="1" result="blur" />
+      <filter id="pet-soft-glow" x="-10%" y="-10%" width="120%" height="120%">
+        <feGaussianBlur stdDeviation="0.5" result="blur" />
         <feComposite in="SourceGraphic" in2="blur" operator="over" />
       </filter>
     </defs>
     
-    {/* Dog icon with subtle glow */}
-    <g filter="url(#pet-glow)" fill="url(#pet-gradient)" stroke="url(#pet-gradient)">
-      <path d="M17 4.5C17 5.9 18.1 7 19.5 7a.5.5 0 0 1 .5.5V9c0 1.1-.9 2-2 2h-2.5c-.28 0-.5.22-.5.5v1c0 .28.22.5.5.5H17c.83 0 1.5.67 1.5 1.5V16c0 1.1-.9 2-2 2h-1.5c-.28 0-.5.22-.5.5v1c0 .28.22.5.5.5h2c.28 0 .5.22.5.5v1c0 .28-.22.5-.5.5h-13c-.28 0-.5-.22-.5-.5v-1c0-.28.22-.5.5-.5h2a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5H4c-1.1 0-2-.9-2-2v-1.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 1-.5-.5v-2c0-.28.22-.5.5-.5h3a.5.5 0 0 0 .5-.5V10c0-1.66 1.34-3 3-3h5c.28 0 .5-.22.5-.5V4c0-.28-.22-.5-.5-.5h-2a.5.5 0 0 1-.5-.5V2c0-.28.22-.5.5-.5h6c.28 0 .5.22.5.5v1c0 .28-.22.5-.5.5h-2a.5.5 0 0 0-.5.5v1Z" />
-      <circle cx="8.5" cy="14.5" r="1.5" />
-    </g>
+    {/* Apple-style minimalist pet icon */}
+    <circle cx="12" cy="12" r="10" fill="white" className="transition-all duration-300" />
     
-    {/* Subtle animation */}
-    <path 
-      d="M12 17a5 5 0 0 1-3.5-1.4" 
-      className="animate-pulse" 
-      stroke="white" 
-      strokeWidth="0.5" 
-      strokeDasharray="1,1"
-      opacity="0.5"
-    />
+    <g filter="url(#pet-soft-glow)" className="transition-transform duration-300 hover:scale-105">
+      {/* Paw outline */}
+      <path 
+        d="M9 12.5C9 11.12 9.5 9 11 9C12.5 9 13 11.12 13 12.5"
+        stroke="url(#pet-gradient)" 
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        fill="none" 
+      />
+      
+      <path 
+        d="M11 12.5C11 11.12 11.5 9 13 9C14.5 9 15 11.12 15 12.5"
+        stroke="url(#pet-gradient)" 
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        fill="none" 
+      />
+      
+      <path 
+        d="M7 13.5C7 12.12 7.5 10 9 10C10.5 10 11 12.12 11 13.5"
+        stroke="url(#pet-gradient)" 
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        fill="none" 
+      />
+      
+      <path 
+        d="M13 13.5C13 12.12 13.5 10 15 10C16.5 10 17 12.12 17 13.5"
+        stroke="url(#pet-gradient)" 
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        fill="none" 
+      />
+      
+      {/* Central pad */}
+      <path 
+        d="M9 15C9 13.62 10.5 13 12 13C13.5 13 15 13.62 15 15C15 16.38 13.5 17 12 17C10.5 17 9 16.38 9 15Z"
+        stroke="url(#pet-gradient)" 
+        strokeWidth="1.5"
+        fill="none" 
+      />
+    </g>
   </svg>
 );
 
@@ -124,39 +152,54 @@ export const HealthIcon: React.FC<{ className?: string }> = ({ className = "w-20
     viewBox="0 0 24 24"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
-    stroke="currentColor"
-    strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
   >
     <defs>
       <linearGradient id="health-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#EF4444" />
-        <stop offset="100%" stopColor="#DC2626" />
+        <stop offset="0%" stopColor="#F87171" />
+        <stop offset="100%" stopColor="#EF4444" />
       </linearGradient>
-      <filter id="health-glow" x="-10%" y="-10%" width="120%" height="120%">
-        <feGaussianBlur stdDeviation="1" result="blur" />
+      <filter id="health-soft-glow" x="-10%" y="-10%" width="120%" height="120%">
+        <feGaussianBlur stdDeviation="0.5" result="blur" />
         <feComposite in="SourceGraphic" in2="blur" operator="over" />
       </filter>
     </defs>
     
-    {/* Heart icon with subtle glow */}
-    <g filter="url(#health-glow)" fill="url(#health-gradient)" stroke="url(#health-gradient)">
-      <path d="M3 12h4l1.5-3L12 19l2-4h7" fill="none" />
-      <path d="M17.3 3.3a4 4 0 0 0-5.6 0l-.7.7-.7-.7a4 4 0 0 0-5.6 5.6l6.3 6.3 6.3-6.3a4 4 0 0 0 0-5.6Z" />
-    </g>
+    {/* Apple-style minimalist health icon */}
+    <circle cx="12" cy="12" r="10" fill="white" className="transition-all duration-300" />
     
-    {/* Animated pulse */}
-    <circle 
-      cx="12" 
-      cy="12" 
-      r="9" 
-      className="animate-ping" 
-      stroke="url(#health-gradient)" 
-      strokeWidth="0.5"
-      opacity="0.3"
-      fill="none"
-    />
+    <g filter="url(#health-soft-glow)" className="transition-transform duration-300 hover:scale-105">
+      {/* Medical cross */}
+      <path 
+        d="M12 7V17M7 12H17" 
+        stroke="url(#health-gradient)" 
+        strokeWidth="1.5" 
+        strokeLinecap="round"
+        fill="none" 
+      />
+      
+      {/* Heart monitor line */}
+      <path 
+        d="M7 15L9 15L10 13L12 17L14 11L15 15L17 15" 
+        stroke="url(#health-gradient)" 
+        strokeWidth="1.5" 
+        strokeLinecap="round" 
+        strokeLinejoin="round"
+        fill="none" 
+      />
+      
+      {/* Subtle circle */}
+      <circle 
+        cx="12" 
+        cy="12" 
+        r="7" 
+        stroke="url(#health-gradient)" 
+        strokeWidth="1"
+        opacity="0.3"
+        fill="none" 
+      />
+    </g>
   </svg>
 );
 
