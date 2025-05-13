@@ -487,7 +487,7 @@ export default function AuthPage() {
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <div className="h-16 w-16 mb-3">
-                  <AutoIcon className="h-full w-full" />
+                  <MinimalAutoIcon className="h-full w-full" />
                 </div>
                 <span className="text-foreground/90">Auto Insurance</span>
               </motion.div>
@@ -498,7 +498,7 @@ export default function AuthPage() {
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <div className="h-16 w-16 mb-3">
-                  <PetIcon className="h-full w-full" />
+                  <MinimalPetIcon className="h-full w-full" />
                 </div>
                 <span className="text-foreground/90">Pet Insurance</span>
               </motion.div>
@@ -509,7 +509,7 @@ export default function AuthPage() {
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <div className="h-16 w-16 mb-3">
-                  <HealthIcon className="h-full w-full" />
+                  <MinimalHealthIcon className="h-full w-full" />
                 </div>
                 <span className="text-foreground/90">Health Insurance</span>
               </motion.div>
