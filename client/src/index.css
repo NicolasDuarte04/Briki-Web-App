@@ -41,27 +41,31 @@
 }
 
 .dark {
-  /* Already using dark futuristic theme as default, so dark mode is just slightly darker */
-  --background: 222 47% 2%; 
+  /* Elegant dark mode with gradient compatibility */
+  --background: 240 25% 12%; 
   --foreground: 210 40% 98%;
-  --muted: 223 47% 12%;
-  --muted-foreground: 215 20% 65%;
-  --popover: 224 71% 7%;
+  --muted: 240 20% 20%;
+  --muted-foreground: 215 20% 75%;
+  --popover: 240 30% 15%;
   --popover-foreground: 210 40% 98%;
-  --card: 224 71% 7%;
+  --card: 240 30% 15%;
   --card-foreground: 210 40% 98%;
-  --border: 215 27% 19%;
-  --input: 215 27% 19%;
-  --primary: 221 83% 53%;
+  --border: 240 25% 25%;
+  --input: 240 25% 25%;
+  --primary: 250 95% 65%;
   --primary-foreground: 210 40% 98%;
-  --secondary: 215 27% 19%;
+  --secondary: 226 70% 55%;
   --secondary-foreground: 210 40% 98%;
-  --accent: 224 76% 48%;
+  --accent: 190 90% 60%;
   --accent-foreground: 210 40% 98%;
   --destructive: 0 84% 60%;
   --destructive-foreground: 210 40% 98%;
-  --ring: 221 83% 53%;
-  --radius: 0.75rem;
+  --ring: 250 95% 65%;
+  --radius: 1rem;
+  
+  /* Dark mode gradient overrides */
+  --gradient-background-main: linear-gradient(145deg, hsl(240 25% 12%), hsl(250 25% 15%));
+  --gradient-background-card: linear-gradient(145deg, rgba(30, 30, 46, 0.9), rgba(35, 33, 54, 0.85));
 }
 
 @layer base {
