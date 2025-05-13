@@ -168,7 +168,7 @@ export default function AuthPage() {
             className="text-center mb-8"
           >
             <h1 className="text-4xl font-extrabold text-foreground section-header mb-4">Briki</h1>
-            <p className="text-foreground/70 mt-2">The New Era of Smart Insurance</p>
+            <p className="text-foreground/70 mt-2">AI-Powered Insurance Platform</p>
             <div className="flex justify-center mt-8 space-x-8">
               <motion.div 
                 className="flex flex-col items-center"
@@ -518,7 +518,7 @@ export default function AuthPage() {
               transition={{ duration: 0.7, delay: 0.6 }}
               className="text-xl max-w-xl text-center text-foreground/90 section-header"
             >
-              La nueva era de seguros inteligentes comparando planes en múltiples categorías con análisis en tiempo real.
+              AI-powered insurance platform comparing plans across multiple categories with real-time analysis.
             </motion.p>
           </div>
         </div>

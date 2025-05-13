@@ -88,10 +88,6 @@ export default function Navbar() {
             </Link>
           </div>
           
-          <div className="flex items-center">
-            <LanguageSelector />
-          </div>
-          
           {isLoading ? (
             <div className="flex items-center">
               <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
@@ -136,7 +132,7 @@ export default function Navbar() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <div className="px-4 py-3">
-                      <p className="text-sm">Conectado como</p>
+                      <p className="text-sm">Signed in as</p>
                       <p className="text-sm font-medium truncate">{user.email}</p>
                     </div>
                     <DropdownMenuSeparator />
@@ -145,21 +141,21 @@ export default function Navbar() {
                       onClick={() => navigate("/profile")}
                     >
                       <User className="mr-2 h-4 w-4" />
-                      <span>Perfil</span>
+                      <span>Profile</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem 
                       className="cursor-pointer" 
                       onClick={() => navigate("/settings")}
                     >
                       <Settings className="mr-2 h-4 w-4" />
-                      <span>Configuración</span>
+                      <span>Settings</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem 
                       className="cursor-pointer" 
                       onClick={() => navigate("/ai-assistant")}
                     >
                       <Bot className="mr-2 h-4 w-4" />
-                      <span>Asistente IA</span>
+                      <span>AI Assistant</span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem 
@@ -172,7 +168,7 @@ export default function Navbar() {
                       ) : (
                         <LogOut className="mr-2 h-4 w-4" />
                       )}
-                      <span>Cerrar sesión</span>
+                      <span>Sign out</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -288,7 +284,7 @@ export default function Navbar() {
                               }}
                             >
                               <SparklesIcon className="h-4 w-4" />
-                              Chatear con Asistente IA
+                              Chat with AI Assistant
                             </Button>
                           </div>
                         )}
@@ -302,7 +298,7 @@ export default function Navbar() {
                             }}
                           >
                             <User className="mr-2 h-4 w-4" />
-                            Tu Perfil
+                            Your Profile
                           </Button>
                           <Button 
                             variant="ghost" 
@@ -313,7 +309,7 @@ export default function Navbar() {
                             }}
                           >
                             <Settings className="mr-2 h-4 w-4" />
-                            Configuración
+                            Settings
                           </Button>
                           
                           {showAIAssistant && (
@@ -326,7 +322,7 @@ export default function Navbar() {
                               }}
                             >
                               <Bot className="mr-2 h-4 w-4" />
-                              Asistente IA
+                              AI Assistant
                             </Button>
                           )}
                           <Button 
@@ -340,7 +336,7 @@ export default function Navbar() {
                             ) : (
                               <LogOut className="mr-2 h-4 w-4" />
                             )}
-                            Cerrar sesión
+                            Sign out
                           </Button>
                         </div>
                       </div>

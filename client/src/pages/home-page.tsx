@@ -13,18 +13,10 @@ import { FuturisticBackground } from "@/components/ui/futuristic-background";
 import { AIAssistant, getTravelInsuranceTips, getAutoInsuranceTips, getHealthInsuranceTips, getPetInsuranceTips } from "@/components/ui/ai-assistant";
 import { ComparisonChart, RadarChart, CoverageComparison } from "@/components/ui/data-visualization";
 import { 
-  TravelIcon, 
-  AutoIcon, 
-  PetIcon, 
-  HealthIcon,
-  InsuranceIcon
-} from "@/components/icons/contemporary-icons";
-
-import {
-  FuturisticTravelIcon,
-  FuturisticAutoIcon,
-  FuturisticPetIcon,
-  FuturisticHealthIcon
+  FuturisticTravelIcon, 
+  FuturisticAutoIcon, 
+  FuturisticPetIcon, 
+  FuturisticHealthIcon 
 } from "@/components/icons/futuristic-icons";
 import { popularPlans } from "@/data/popular-plans";
 
@@ -127,7 +119,8 @@ export default function HomePage() {
                 className="text-center lg:text-left"
               >
                 <h1 className="text-4xl tracking-tight font-extrabold sm:text-5xl md:text-6xl lg:text-7xl section-header">
-                  <span className="block">{t('slogan')}</span>
+                  <span className="block mb-2">AI-Powered</span>
+                  <span className="block">Insurance Platform</span>
                 </h1>
                 
                 <motion.p 
@@ -136,7 +129,7 @@ export default function HomePage() {
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.7, delay: 0.3 }}
                 >
-                  Compara y analiza opciones de seguros en múltiples categorías usando nuestra tecnología de IA avanzada. Obtén recomendaciones personalizadas basadas en tus necesidades y preferencias únicas.
+                  Compare and analyze insurance options across multiple categories using our advanced AI technology. Get personalized recommendations based on your unique needs and preferences.
                 </motion.p>
                 
                 <motion.div 
@@ -154,7 +147,7 @@ export default function HomePage() {
                       className="w-full px-8 py-3 md:py-4 md:text-lg md:px-10 briki-button"
                       onClick={handleGetStarted}
                     >
-                      Comenzar
+                      Get Started
                     </Button>
                   </motion.div>
                   
@@ -168,7 +161,7 @@ export default function HomePage() {
                       className="w-full px-8 py-3 md:py-4 md:text-lg md:px-10 briki-button-secondary"
                       onClick={() => navigate("/learn-more")}
                     >
-                      Saber Más
+                      Learn More
                     </Button>
                   </motion.div>
                 </motion.div>
@@ -185,11 +178,11 @@ export default function HomePage() {
             >
               {/* Insurance comparison visualization */}
               <div className="max-w-md w-full ai-data-visual p-6 backdrop-blur-md bg-opacity-30">
-                <h3 className="text-lg font-semibold text-foreground mb-4">Comparación Inteligente de Seguros</h3>
+                <h3 className="text-lg font-semibold text-foreground mb-4">Smart Insurance Comparison</h3>
                 
                 <div className="space-y-4">
                   {/* Coverage bars with animated growth */}
-                  {['Cobertura', 'Precio', 'Beneficios', 'Proceso de Reclamos'].map((category, i) => (
+                  {['Coverage', 'Price', 'Benefits', 'Claims Process'].map((category, i) => (
                     <motion.div 
                       key={category}
                       className="space-y-2"
@@ -294,12 +287,12 @@ export default function HomePage() {
               >
                 <div className="h-full bg-card rounded-xl overflow-hidden border border-border p-6 transition-all duration-300 briki-card">
                   <div className="h-32 flex items-center justify-center mb-6">
-                    <TravelIcon className="w-28 h-28 transition-transform duration-500 group-hover:scale-110" />
+                    <FuturisticTravelIcon className="w-28 h-28 transition-transform duration-500 group-hover:scale-110" />
                   </div>
                   <div className="space-y-4">
                     <div className="flex flex-col items-center text-center">
                       <h3 className="text-xl font-bold section-header">{t('travelInsurance')}</h3>
-                      <p className="mt-2 text-foreground/70">Protección con IA para tus viajes, con evaluación de riesgos en tiempo real y asistencia de emergencia.</p>
+                      <p className="mt-2 text-foreground/70">AI-powered protection for your journeys, with real-time risk assessment and emergency assistance.</p>
                     </div>
                     
                     <div className="pt-4 flex justify-center">
@@ -335,7 +328,7 @@ export default function HomePage() {
               >
                 <div className="h-full bg-card rounded-xl overflow-hidden border border-border p-6 transition-all duration-300 briki-card">
                   <div className="h-32 flex items-center justify-center mb-6">
-                    <AutoIcon className="w-28 h-28 transition-transform duration-500 group-hover:scale-110" />
+                    <FuturisticAutoIcon className="w-28 h-28 transition-transform duration-500 group-hover:scale-110" />
                   </div>
                   <div className="space-y-4">
                     <div className="flex flex-col items-center text-center">
@@ -376,7 +369,7 @@ export default function HomePage() {
               >
                 <div className="h-full bg-card rounded-xl overflow-hidden border border-border p-6 transition-all duration-300 briki-card">
                   <div className="h-32 flex items-center justify-center mb-6">
-                    <PetIcon className="w-28 h-28 transition-transform duration-500 group-hover:scale-110" />
+                    <FuturisticPetIcon className="w-28 h-28 transition-transform duration-500 group-hover:scale-110" />
                   </div>
                   <div className="space-y-4">
                     <div className="flex flex-col items-center text-center">
@@ -417,7 +410,7 @@ export default function HomePage() {
               >
                 <div className="h-full bg-card rounded-xl overflow-hidden border border-border p-6 transition-all duration-300 briki-card">
                   <div className="h-32 flex items-center justify-center mb-6">
-                    <HealthIcon className="w-28 h-28 transition-transform duration-500 group-hover:scale-110" />
+                    <FuturisticHealthIcon className="w-28 h-28 transition-transform duration-500 group-hover:scale-110" />
                   </div>
                   <div className="space-y-4">
                     <div className="flex flex-col items-center text-center">
@@ -534,8 +527,8 @@ export default function HomePage() {
           
           <div className="rounded-xl overflow-hidden border border-border backdrop-blur-sm bg-card/50 p-6">
             <div className="mb-8">
-              <h3 className="text-xl font-bold section-header mb-2">Planes de Seguro Populares</h3>
-              <p className="text-foreground/70">Nuestros planes más populares basados en selecciones reales de usuarios</p>
+              <h3 className="text-xl font-bold section-header mb-2">Trending Insurance Plans</h3>
+              <p className="text-foreground/70">Our most popular plans based on real user selections</p>
             </div>
             
             <PopularPlansSlider plans={popularPlans} />
@@ -543,8 +536,8 @@ export default function HomePage() {
 
           <div className="mt-12 rounded-xl overflow-hidden border border-border backdrop-blur-sm bg-card/50 p-6">
             <div className="mb-8">
-              <h3 className="text-xl font-bold section-header mb-2">Planes Vistos Recientemente</h3>
-              <p className="text-foreground/70">Continúa explorando los planes que has visto</p>
+              <h3 className="text-xl font-bold section-header mb-2">Recently Viewed Plans</h3>
+              <p className="text-foreground/70">Continue exploring plans you've viewed</p>
             </div>
             
             <RecentlyViewedPlans category="travel" />
@@ -690,7 +683,7 @@ export default function HomePage() {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div className="flex flex-col items-center text-center">
                   <div className="w-20 h-20 mb-4">
-                    <TravelIcon className="w-full h-full" />
+                    <FuturisticTravelIcon className="w-full h-full" />
                   </div>
                   <div className="h-3 w-full bg-muted rounded-full overflow-hidden">
                     <motion.div 
@@ -706,7 +699,7 @@ export default function HomePage() {
                 
                 <div className="flex flex-col items-center text-center">
                   <div className="w-20 h-20 mb-4">
-                    <AutoIcon className="w-full h-full" />
+                    <FuturisticAutoIcon className="w-full h-full" />
                   </div>
                   <div className="h-3 w-full bg-muted rounded-full overflow-hidden">
                     <motion.div 
@@ -722,7 +715,7 @@ export default function HomePage() {
                 
                 <div className="flex flex-col items-center text-center">
                   <div className="w-20 h-20 mb-4">
-                    <PetIcon className="w-full h-full" />
+                    <FuturisticPetIcon className="w-full h-full" />
                   </div>
                   <div className="h-3 w-full bg-muted rounded-full overflow-hidden">
                     <motion.div 
@@ -738,7 +731,7 @@ export default function HomePage() {
                 
                 <div className="flex flex-col items-center text-center">
                   <div className="w-20 h-20 mb-4">
-                    <HealthIcon className="w-full h-full" />
+                    <FuturisticHealthIcon className="w-full h-full" />
                   </div>
                   <div className="h-3 w-full bg-muted rounded-full overflow-hidden">
                     <motion.div 
