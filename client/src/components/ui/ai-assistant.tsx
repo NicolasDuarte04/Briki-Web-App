@@ -382,7 +382,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3 }}
-                    className={`rounded-2xl p-3 ${isMobile ? 'max-w-[90%]' : 'max-w-[80%]'} ${
+                    className={`rounded-2xl p-3 ${isMobile ? 'max-w-[85%]' : 'max-w-[75%]'} ${
                       message.role === 'user' 
                         ? 'bg-blue-600 text-white ml-auto' 
                         : 'bg-gray-800/60 text-white border border-border'
