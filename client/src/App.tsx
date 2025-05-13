@@ -29,6 +29,16 @@ import AutoQuotePage from "@/pages/auto-quote-page";
 import AIAssistantDemo from "@/pages/ai-assistant-demo";
 import CountdownPage from "@/pages/countdown-page";
 
+// Company pages
+import CompanyPage from "@/pages/company-page";
+import CompanyLoginPage from "@/pages/company-login-page";
+import CompanyRegisterPage from "@/pages/company-register-page";
+import CompanyDashboardPage from "@/pages/company-dashboard-page";
+import CompanyQuoteUploadPage from "@/pages/company-quote-upload-page";
+import CompanyPreviewPage from "@/pages/company-preview-page";
+import CompanyRequestPilotPage from "@/pages/company-request-pilot-page";
+import ContactSalesPage from "@/pages/contact-sales-page";
+
 // Removed unused ConditionalAIProvider
 
 function Router() {
@@ -57,6 +67,17 @@ function Router() {
         <ProtectedRoute path="/profile" component={ProfilePage} />
         <ProtectedRoute path="/settings" component={SettingsPage} />
         <ProtectedRoute path="/api-settings" component={ApiSettingsPage} />
+        
+        {/* Company/Partner Routes */}
+        <Route path="/company" component={CompanyPage} />
+        <Route path="/company-login" component={CompanyLoginPage} />
+        <Route path="/company-register" component={CompanyRegisterPage} />
+        <Route path="/contact-sales" component={ContactSalesPage} />
+        <ProtectedRoute path="/company-dashboard" component={CompanyDashboardPage} />
+        <ProtectedRoute path="/company-dashboard/upload" component={CompanyQuoteUploadPage} />
+        <ProtectedRoute path="/company-dashboard/preview" component={CompanyPreviewPage} />
+        <ProtectedRoute path="/company-dashboard/request-pilot" component={CompanyRequestPilotPage} />
+        
         <Route component={NotFound} />
       </Switch>
     </PageTransition>

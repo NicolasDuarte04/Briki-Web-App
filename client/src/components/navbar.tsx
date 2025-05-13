@@ -88,6 +88,14 @@ export default function Navbar() {
             <Link href="/support" className={`hover:text-primary px-3 py-2 text-sm font-medium ${isActivePath("/support")}`}>
               {t('support')}
             </Link>
+            <Link 
+              href="/company" 
+              className={`hover:text-primary px-3 py-2 text-sm font-medium border border-blue-200 rounded-full bg-blue-50 text-blue-600 ${
+                isActivePath("/company") || location.startsWith("/company-") ? "bg-blue-100" : ""
+              }`}
+            >
+              For Companies
+            </Link>
           </div>
           
           {isLoading ? (
@@ -253,6 +261,18 @@ export default function Navbar() {
                       onClick={() => setIsOpen(false)}
                     >
                       {t('support')}
+                    </Link>
+                    
+                    <Link 
+                      href="/company" 
+                      className={`mt-2 block px-3 py-2 rounded-md text-base font-medium ${
+                        isActivePath("/company") || location.startsWith("/company-") 
+                          ? "bg-blue-100 text-blue-600" 
+                          : "bg-blue-50 text-blue-600 hover:bg-blue-100"
+                      }`}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      For Companies
                     </Link>
                   </div>
                   
