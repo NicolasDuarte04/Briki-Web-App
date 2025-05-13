@@ -1,0 +1,42 @@
+We’re preparing Briki for public demo launch. Before connecting the briki.app domain, I need your help confirming the current readiness of the following launch-related features.
+
+Please go through this checklist and answer with the current status of each. Based on your answers, we’ll determine what to implement next.
+
+---
+
+### ✅ Deployment Readiness Checklist
+
+#### 1. Email Capture Setup
+- [ ] Is there a working email capture field in the app (e.g. on countdown or home screen)?
+- [ ] Does it store the email or send it to a service (e.g. Formspree, Mailchimp, Google Sheet)?
+- [ ] If yes, where is the captured data going currently?
+
+#### 2. Feedback Collection Form
+- [ ] Is there a feedback form accessible from all pages (e.g. floating button)?
+- [ ] Does it include:
+  - UI, Navigation, and Experience ratings?
+  - Open-ended questions (e.g. "What would you improve?")
+- [ ] Where does this feedback get stored or sent?
+
+#### 3. Analytics Integration
+- [ ] Is any analytics tool currently integrated? (Google Analytics, Plausible, PostHog, etc.)
+- [ ] If yes, which provider is used and how is it being loaded in the app?
+- [ ] Are key events tracked (e.g. category views, AI assistant use, login success)?
+
+#### 4. OpenGraph Metadata (Social Sharing Optimization)
+- [ ] Are OpenGraph tags set for the site? (title, description, image)
+- [ ] What does the current sharing preview look like when Briki is linked in WhatsApp or Instagram bios?
+
+#### 5. Mobile Optimization
+- [ ] Have all pages (including category pages and auth) been tested on mobile?
+- [ ] Are layouts responsive and touch interactions smooth on both iOS and Android?
+- [ ] Any known issues with specific screen sizes?
+
+#### 6. Final UI/UX Sweep
+- [ ] Are all icons updated to the new Apple-style gradient versions?
+- [ ] Is the new visual tone (gradient background like the reference image) applied across all screens?
+- [ ] Does the assistant no longer pop up automatically?
+
+---
+
+Please go through each item and give a short answer. Once we review your responses, we’ll confirm next implementation steps and proceed with deployment. 
