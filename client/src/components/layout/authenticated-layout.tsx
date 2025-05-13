@@ -1,19 +1,19 @@
 import React from 'react';
-// Removed the FloatingAssistantButton import to avoid duplicate buttons
+import { FloatingAssistantButton } from './floating-assistant-button';
 
 interface AuthenticatedLayoutProps {
   children: React.ReactNode;
 }
 
 /**
- * Layout component that wraps the app content
- * Note: The AI Assistant button is now handled at the App level
+ * Layout component that wraps the app content and includes the AI Assistant button
+ * Note: The FloatingAssistantButton handles its own visibility logic
  */
 export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
   return (
     <>
       {children}
-      {/* Removed FloatingAssistantButton to prevent duplicate buttons */}
+      <FloatingAssistantButton />
     </>
   );
 }
