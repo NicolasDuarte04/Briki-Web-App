@@ -98,12 +98,12 @@ const EmptyState = ({ onStartConversation }: { onStartConversation: (message: st
   return (
     <div className="flex flex-col items-center justify-center h-full p-6 text-center space-y-6">
       <div className="h-20 w-20 rounded-full bg-gradient-to-r from-violet-500/20 to-indigo-500/20 flex items-center justify-center">
-        <Bot size={40} className="text-primary" />
+        <Bot size={40} className="text-violet-600 dark:text-violet-400" />
       </div>
       
       <div className="space-y-2">
-        <h3 className="text-lg font-semibold">Briki AI Assistant</h3>
-        <p className="text-sm text-muted-foreground max-w-md">
+        <h3 className="text-lg font-semibold text-foreground">Briki AI Assistant</h3>
+        <p className="text-sm text-foreground/70 max-w-md">
           I'm your insurance assistant. Ask me anything about insurance plans, 
           coverage options, or insurance terms.
         </p>
@@ -116,10 +116,10 @@ const EmptyState = ({ onStartConversation }: { onStartConversation: (message: st
             <Button
               key={index}
               variant="outline"
-              className="justify-start h-auto py-2 px-3 text-left text-sm"
+              className="justify-start h-auto py-2 px-3 text-left text-sm border-white/20 dark:border-white/10 bg-white/60 dark:bg-white/5 backdrop-blur-sm hover:bg-white/80 dark:hover:bg-white/10"
               onClick={() => onStartConversation(suggestion)}
             >
-              <Lightbulb size={14} className="mr-2 text-primary" />
+              <Lightbulb size={14} className="mr-2 text-violet-600 dark:text-violet-400" />
               {suggestion}
             </Button>
           ))}
