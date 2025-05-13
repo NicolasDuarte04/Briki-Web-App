@@ -156,10 +156,8 @@ export default function AuthPage() {
 
   return (
     <div className="flex min-h-screen bg-background">
-      {/* Background elements */}
-      <div className="absolute inset-0 z-0 overflow-hidden">
-        <FuturisticBackground particleCount={60} />
-      </div>
+      {/* Updated gradient background */}
+      <div className="auth-background"></div>
       
       {/* Left column: Auth form */}
       <div className="flex flex-col justify-center w-full max-w-md px-4 py-12 mx-auto sm:px-6 lg:flex-none lg:px-20 xl:px-24 relative z-10">
@@ -167,54 +165,62 @@ export default function AuthPage() {
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-8"
+            transition={{ duration: 0.6, ease: [0.21, 0.61, 0.35, 1] }}
+            className="text-center mb-10"
           >
-            <h1 className="text-4xl font-extrabold text-foreground section-header mb-4">Briki</h1>
-            <p className="text-foreground/70 mt-2">AI-Powered Insurance Platform</p>
-            <div className="flex justify-center mt-8 space-x-8">
+            <h1 className="text-4xl font-extrabold headline-text mb-3">
+              <span className="section-header">Briki</span>
+            </h1>
+            <p className="text-foreground/70 mt-2 body-text">AI-Powered Insurance Platform</p>
+            
+            {/* Animated insurance category icons */}
+            <div className="flex justify-center mt-10 space-x-8 animate-slide-in-stagger">
               <motion.div 
                 className="flex flex-col items-center"
-                whileHover={{ scale: 1.1 }}
-                transition={{ type: "spring", stiffness: 300 }}
+                whileHover={{ scale: 1.05, y: -5 }}
+                transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >
-                <div className="h-12 w-12 mb-3">
-                  <TravelIcon className="h-full w-full" />
+                <div className="h-12 w-12 mb-3 rounded-md flex items-center justify-center" 
+                  style={{background: "var(--gradient-travel)", boxShadow: "0 4px 12px rgba(99, 102, 241, 0.15)"}}>
+                  <TravelIcon className="h-6 w-6 text-white" />
                 </div>
-                <span className="text-xs text-foreground/80">Travel</span>
+                <span className="text-xs font-medium text-foreground/80">Travel</span>
               </motion.div>
               
               <motion.div 
                 className="flex flex-col items-center"
-                whileHover={{ scale: 1.1 }}
-                transition={{ type: "spring", stiffness: 300 }}
+                whileHover={{ scale: 1.05, y: -5 }}
+                transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >
-                <div className="h-12 w-12 mb-3">
-                  <AutoIcon className="h-full w-full" />
+                <div className="h-12 w-12 mb-3 rounded-md flex items-center justify-center"
+                  style={{background: "var(--gradient-auto)", boxShadow: "0 4px 12px rgba(14, 165, 233, 0.15)"}}>
+                  <AutoIcon className="h-6 w-6 text-white" />
                 </div>
-                <span className="text-xs text-foreground/80">Auto</span>
+                <span className="text-xs font-medium text-foreground/80">Auto</span>
               </motion.div>
               
               <motion.div 
                 className="flex flex-col items-center"
-                whileHover={{ scale: 1.1 }}
-                transition={{ type: "spring", stiffness: 300 }}
+                whileHover={{ scale: 1.05, y: -5 }}
+                transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >
-                <div className="h-12 w-12 mb-3">
-                  <PetIcon className="h-full w-full" />
+                <div className="h-12 w-12 mb-3 rounded-md flex items-center justify-center"
+                  style={{background: "var(--gradient-pet)", boxShadow: "0 4px 12px rgba(139, 92, 246, 0.15)"}}>
+                  <PetIcon className="h-6 w-6 text-white" />
                 </div>
-                <span className="text-xs text-foreground/80">Pet</span>
+                <span className="text-xs font-medium text-foreground/80">Pet</span>
               </motion.div>
               
               <motion.div 
                 className="flex flex-col items-center"
-                whileHover={{ scale: 1.1 }}
-                transition={{ type: "spring", stiffness: 300 }}
+                whileHover={{ scale: 1.05, y: -5 }}
+                transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >
-                <div className="h-12 w-12 mb-3">
-                  <HealthIcon className="h-full w-full" />
+                <div className="h-12 w-12 mb-3 rounded-md flex items-center justify-center"
+                  style={{background: "var(--gradient-health)", boxShadow: "0 4px 12px rgba(244, 63, 94, 0.15)"}}>
+                  <HealthIcon className="h-6 w-6 text-white" />
                 </div>
-                <span className="text-xs text-foreground/80">Health</span>
+                <span className="text-xs font-medium text-foreground/80">Health</span>
               </motion.div>
             </div>
           </motion.div>
@@ -222,9 +228,9 @@ export default function AuthPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={{ duration: 0.5, delay: 0.3, ease: [0.21, 0.61, 0.35, 1] }}
           >
-            <div className="bg-card border border-border rounded-xl p-6 shadow-lg backdrop-blur-sm">
+            <div className="auth-card">
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="grid w-full grid-cols-2 mb-6">
                   <TabsTrigger value="login">Sign In</TabsTrigger>
