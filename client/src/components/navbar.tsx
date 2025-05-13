@@ -52,11 +52,13 @@ export default function Navbar() {
   // Active path helper
   const [currentPath] = useLocation();
   const isActivePath = (path: string) => {
-    return currentPath === path ? "text-primary" : "text-gray-500";
+    return currentPath === path 
+      ? "text-blue-500 dark:text-blue-400 font-medium" 
+      : "text-foreground/70 hover:text-blue-500 dark:hover:text-blue-400";
   };
 
   return (
-    <nav className="bg-white shadow-sm">
+    <nav className="bg-white dark:bg-white/5 backdrop-blur-md shadow-sm border-b border-blue-100 dark:border-blue-500/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
@@ -99,21 +101,21 @@ export default function Navbar() {
                   <Button 
                     variant="ghost" 
                     size="icon" 
-                    className="relative p-2 rounded-full text-gray-400 hover:text-gray-500"
+                    className="relative p-2 rounded-full text-blue-500 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/10"
                     onClick={toggleAssistant}
                   >
                     <span className="sr-only">Open AI Assistant</span>
                     <Bot className="h-5 w-5" />
-                    <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-primary ring-2 ring-white"></span>
+                    <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-blue-500 ring-2 ring-white dark:ring-gray-900"></span>
                   </Button>
                 </div>
               )}
               
               <div className="flex-shrink-0 ml-2">
-                <Button variant="ghost" size="icon" className="relative p-2 rounded-full text-gray-400 hover:text-gray-500">
+                <Button variant="ghost" size="icon" className="relative p-2 rounded-full text-foreground/50 hover:text-foreground/70 hover:bg-gray-100 dark:hover:bg-gray-800/20">
                   <span className="sr-only">View notifications</span>
                   <Bell className="h-5 w-5" />
-                  <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
+                  <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white dark:ring-gray-900"></span>
                 </Button>
               </div>
               
