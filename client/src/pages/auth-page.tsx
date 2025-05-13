@@ -337,7 +337,7 @@ export default function AuthPage() {
                           <FormItem>
                             <FormLabel className="text-foreground">Nombre de usuario</FormLabel>
                             <FormControl>
-                              <Input placeholder="username" className="bg-background/50 border-border" {...field} />
+                              <Input placeholder="nombre de usuario" className="bg-background/50 border-border" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -349,9 +349,9 @@ export default function AuthPage() {
                         name="email"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-foreground">Email</FormLabel>
+                            <FormLabel className="text-foreground">Correo electrónico</FormLabel>
                             <FormControl>
-                              <Input type="email" placeholder="your@email.com" className="bg-background/50 border-border" {...field} />
+                              <Input type="email" placeholder="tu@correo.com" className="bg-background/50 border-border" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -363,7 +363,7 @@ export default function AuthPage() {
                         name="password"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-foreground">Password</FormLabel>
+                            <FormLabel className="text-foreground">Contraseña</FormLabel>
                             <FormControl>
                               <Input type="password" placeholder="••••••••" className="bg-background/50 border-border" {...field} />
                             </FormControl>
@@ -377,7 +377,7 @@ export default function AuthPage() {
                         name="confirmPassword"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-foreground">Confirm Password</FormLabel>
+                            <FormLabel className="text-foreground">Confirmar Contraseña</FormLabel>
                             <FormControl>
                               <Input type="password" placeholder="••••••••" className="bg-background/50 border-border" {...field} />
                             </FormControl>
@@ -425,7 +425,7 @@ export default function AuthPage() {
                         <Separator className="bg-border" />
                       </div>
                       <div className="relative flex justify-center text-sm">
-                        <span className="px-2 bg-card text-foreground/70">Or continue with</span>
+                        <span className="px-2 bg-card text-foreground/70">O continúa con</span>
                       </div>
                     </div>
                     
