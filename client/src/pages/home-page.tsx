@@ -13,11 +13,11 @@ import { FuturisticBackground } from "@/components/ui/futuristic-background";
 import { AIAssistant, getTravelInsuranceTips, getAutoInsuranceTips, getHealthInsuranceTips, getPetInsuranceTips } from "@/components/ui/ai-assistant";
 import { ComparisonChart, RadarChart, CoverageComparison } from "@/components/ui/data-visualization";
 import { 
-  FuturisticTravelIcon, 
-  FuturisticAutoIcon, 
-  FuturisticPetIcon, 
-  FuturisticHealthIcon 
-} from "@/components/icons/futuristic-icons";
+  MinimalTravelIcon, 
+  MinimalAutoIcon, 
+  MinimalPetIcon, 
+  MinimalHealthIcon 
+} from "@/components/icons/minimal-icons";
 import { popularPlans } from "@/data/popular-plans";
 
 export default function HomePage() {
@@ -287,7 +287,7 @@ export default function HomePage() {
               >
                 <div className="h-full bg-card rounded-xl overflow-hidden border border-border p-6 transition-all duration-300 briki-card">
                   <div className="h-32 flex items-center justify-center mb-6">
-                    <FuturisticTravelIcon className="w-28 h-28 transition-transform duration-500 group-hover:scale-110" />
+                    <MinimalTravelIcon className="w-28 h-28 transition-transform duration-500 group-hover:scale-110" />
                   </div>
                   <div className="space-y-4">
                     <div className="flex flex-col items-center text-center">
@@ -328,7 +328,7 @@ export default function HomePage() {
               >
                 <div className="h-full bg-card rounded-xl overflow-hidden border border-border p-6 transition-all duration-300 briki-card">
                   <div className="h-32 flex items-center justify-center mb-6">
-                    <FuturisticAutoIcon className="w-28 h-28 transition-transform duration-500 group-hover:scale-110" />
+                    <MinimalAutoIcon className="w-28 h-28 transition-transform duration-500 group-hover:scale-110" />
                   </div>
                   <div className="space-y-4">
                     <div className="flex flex-col items-center text-center">
@@ -369,7 +369,7 @@ export default function HomePage() {
               >
                 <div className="h-full bg-card rounded-xl overflow-hidden border border-border p-6 transition-all duration-300 briki-card">
                   <div className="h-32 flex items-center justify-center mb-6">
-                    <FuturisticPetIcon className="w-28 h-28 transition-transform duration-500 group-hover:scale-110" />
+                    <MinimalPetIcon className="w-28 h-28 transition-transform duration-500 group-hover:scale-110" />
                   </div>
                   <div className="space-y-4">
                     <div className="flex flex-col items-center text-center">
@@ -410,7 +410,7 @@ export default function HomePage() {
               >
                 <div className="h-full bg-card rounded-xl overflow-hidden border border-border p-6 transition-all duration-300 briki-card">
                   <div className="h-32 flex items-center justify-center mb-6">
-                    <FuturisticHealthIcon className="w-28 h-28 transition-transform duration-500 group-hover:scale-110" />
+                    <MinimalHealthIcon className="w-28 h-28 transition-transform duration-500 group-hover:scale-110" />
                   </div>
                   <div className="space-y-4">
                     <div className="flex flex-col items-center text-center">
