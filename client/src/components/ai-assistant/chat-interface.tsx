@@ -247,7 +247,7 @@ export default function ChatInterface({
             transition={{ duration: 0.2 }}
             className={cn(
               positionClasses[placement],
-              placement === 'inline' ? 'h-[500px]' : 'w-[350px] h-[450px]', // Updated size
+              placement === 'inline' ? 'h-[500px]' : 'w-[300px] h-[400px]', // Smaller dimensions
               className
             )}
           >

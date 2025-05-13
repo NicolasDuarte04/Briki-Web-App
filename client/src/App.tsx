@@ -8,7 +8,7 @@ import { ProtectedRoute } from "@/lib/protected-route";
 import { LanguageProvider } from "@/components/language-selector";
 import { PageTransition } from "@/components/ui/transition-effect";
 import { RecentlyViewedProvider } from "@/contexts/recently-viewed-context";
-import { AIAssistantProvider, AuthenticatedLayout } from "@/components/layout";
+import { AIAssistantProvider, AuthenticatedLayout, FloatingAssistantButton } from "@/components/layout";
 
 import NotFound from "@/pages/not-found";
 import HomePage from "@/pages/home-page";
@@ -90,6 +90,8 @@ function AppContent() {
       <AIAssistantProvider>
         <AuthenticatedLayout>
           <Router />
+          {/* Single instance of the FloatingAssistantButton */}
+          <FloatingAssistantButton />
         </AuthenticatedLayout>
       </AIAssistantProvider>
     );
