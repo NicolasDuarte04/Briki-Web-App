@@ -133,8 +133,10 @@ export default function AuthPage() {
 
   return (
     <div className="auth-layout">
-      {/* Subtle gradient background */}
+      {/* Animated liquid background blobs */}
       <div className="auth-background"></div>
+      <div className="blob-1"></div>
+      <div className="blob-2"></div>
       
       {/* Centered auth container */}
       <div className="relative z-10 w-full max-w-md">
