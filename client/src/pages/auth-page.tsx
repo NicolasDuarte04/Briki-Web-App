@@ -29,21 +29,21 @@ import {
 } from "@/components/icons/contemporary-icons";
 
 const loginSchema = z.object({
-  username: z.string().min(1, "Username is required"),
-  password: z.string().min(1, "Password is required"),
+  username: z.string().min(1, "Nombre de usuario es requerido"),
+  password: z.string().min(1, "Contraseña es requerida"),
   rememberMe: z.boolean().optional(),
 });
 
 const registerSchema = insertUserSchema.extend({
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
   confirmPassword: z.string(),
-  email: z.string().email("Invalid email address"),
+  email: z.string().email("Dirección de correo electrónico inválida"),
   terms: z.literal(true, {
-    errorMap: () => ({ message: "You must accept the terms and conditions" }),
+    errorMap: () => ({ message: "Debes aceptar los términos y condiciones" }),
   }),
 }).refine((data) => data.password === data.confirmPassword, {
   path: ["confirmPassword"],
-  message: "Passwords do not match",
+  message: "Las contraseñas no coinciden",
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -227,8 +227,8 @@ export default function AuthPage() {
             <div className="bg-card border border-border rounded-xl p-6 shadow-lg backdrop-blur-sm">
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="grid w-full grid-cols-2 mb-6">
-                  <TabsTrigger value="login">Sign In</TabsTrigger>
-                  <TabsTrigger value="register">Sign Up</TabsTrigger>
+                  <TabsTrigger value="login">Iniciar Sesión</TabsTrigger>
+                  <TabsTrigger value="register">Registrarse</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="login">
