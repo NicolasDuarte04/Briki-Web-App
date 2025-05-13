@@ -6,36 +6,34 @@ export const TravelIcon: React.FC<{ className?: string }> = ({ className = "w-20
     viewBox="0 0 24 24"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
-    stroke="currentColor"
-    strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
   >
     <defs>
       <linearGradient id="travel-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stopColor="#60A5FA" />
-        <stop offset="100%" stopColor="#2563EB" />
+        <stop offset="100%" stopColor="#3B82F6" />
       </linearGradient>
-      <filter id="travel-glow" x="-10%" y="-10%" width="120%" height="120%">
-        <feGaussianBlur stdDeviation="1" result="blur" />
+      <filter id="travel-soft-glow" x="-10%" y="-10%" width="120%" height="120%">
+        <feGaussianBlur stdDeviation="0.5" result="blur" />
         <feComposite in="SourceGraphic" in2="blur" operator="over" />
       </filter>
     </defs>
     
-    {/* Plane icon with subtle animation */}
-    <g filter="url(#travel-glow)" fill="url(#travel-gradient)" stroke="url(#travel-gradient)">
-      <path d="M22 16.32A3.73 3.73 0 0 1 18.32 20h-.45a.86.86 0 0 1-.82-.67L16 14l-7 3v3c0 .34-.1.66-.28.94l-2.5 4.44A.56.56 0 0 1 5.5 25h-.06a.62.62 0 0 1-.56-.53l-1.5-6.2a3 3 0 0 1 2.17-3.54L12 13 8.73 9.74a1.36 1.36 0 0 1-.35-1.22l.33-1.59A.8.8 0 0 1 9.5 6.3l2.12.42L16.32 3a.8.8 0 0 1 .68-.18l2.19.54a1.58 1.58 0 0 1 1.19 1.4c.03.4-.12.8-.43 1.11L16.24 10l5.1 1.26a.86.86 0 0 1 .66.82v4.24z" />
-    </g>
+    {/* Apple-style minimalist plane icon */}
+    <circle cx="12" cy="12" r="10" fill="white" className="transition-all duration-300" />
     
-    {/* Animated flight path */}
-    <path 
-      d="M8 12 L18 8" 
-      className="animate-pulse" 
-      stroke="white" 
-      strokeWidth="0.5" 
-      strokeDasharray="1,1"
-      opacity="0.7"
-    />
+    <g filter="url(#travel-soft-glow)" className="transition-transform duration-300 hover:scale-105">
+      {/* Plane outline */}
+      <path 
+        d="M18.5 8.5L14 12H10L5.5 9.5M18.5 8.5L19.5 5.5L16.5 6.5L14 12M18.5 8.5L14 12M14 12V16L12 17L10 16V12M10 12L5.5 9.5M5.5 9.5L4.5 10L6 13L10 12" 
+        stroke="url(#travel-gradient)" 
+        strokeWidth="1.5" 
+        strokeLinecap="round" 
+        strokeLinejoin="round"
+        fill="none" 
+      />
+    </g>
   </svg>
 );
 
@@ -45,36 +43,38 @@ export const AutoIcon: React.FC<{ className?: string }> = ({ className = "w-20 h
     viewBox="0 0 24 24"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
-    stroke="currentColor"
-    strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
   >
     <defs>
       <linearGradient id="auto-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#34D399" />
-        <stop offset="100%" stopColor="#10B981" />
+        <stop offset="0%" stopColor="#2DD4BF" />
+        <stop offset="100%" stopColor="#14B8A6" />
       </linearGradient>
-      <filter id="auto-glow" x="-10%" y="-10%" width="120%" height="120%">
-        <feGaussianBlur stdDeviation="1" result="blur" />
+      <filter id="auto-soft-glow" x="-10%" y="-10%" width="120%" height="120%">
+        <feGaussianBlur stdDeviation="0.5" result="blur" />
         <feComposite in="SourceGraphic" in2="blur" operator="over" />
       </filter>
     </defs>
     
-    {/* Car icon with subtle glow */}
-    <g filter="url(#auto-glow)" fill="url(#auto-gradient)" stroke="url(#auto-gradient)">
-      <path d="M19 17h2v2h-2m0-6h2v2h-2m-7-2h2v2h-2m0-6h2v2h-2M5 17h2v2H5m0-6h2v2H5m0 6h14v-3h3v-9a3 3 0 0 0-3-3H5a3 3 0 0 0-3 3v9h3v3m14-10h-3V5h-8v2H5v2h14v-2Z" />
-    </g>
+    {/* Apple-style minimalist car icon */}
+    <circle cx="12" cy="12" r="10" fill="white" className="transition-all duration-300" />
     
-    {/* Subtle animation */}
-    <path 
-      d="M5 14h14" 
-      className="animate-pulse" 
-      stroke="white" 
-      strokeWidth="0.5" 
-      strokeDasharray="1,1"
-      opacity="0.5"
-    />
+    <g filter="url(#auto-soft-glow)" className="transition-transform duration-300 hover:scale-105">
+      {/* Car outline */}
+      <path 
+        d="M6 12.5H18M6 12.5L7 8.5H17L18 12.5M6 12.5V15.5H7M18 12.5V15.5H17M7 15.5V16.5H9M7 15.5H17M17 15.5V16.5H15M9 16.5V15.5M9 16.5H15M15 16.5V15.5"
+        stroke="url(#auto-gradient)" 
+        strokeWidth="1.5" 
+        strokeLinecap="round" 
+        strokeLinejoin="round"
+        fill="none" 
+      />
+      
+      {/* Wheels */}
+      <circle cx="9" cy="15.5" r="1.5" stroke="url(#auto-gradient)" strokeWidth="1.5" fill="none" />
+      <circle cx="15" cy="15.5" r="1.5" stroke="url(#auto-gradient)" strokeWidth="1.5" fill="none" />
+    </g>
   </svg>
 );
 
