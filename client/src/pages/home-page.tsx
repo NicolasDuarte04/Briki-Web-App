@@ -133,35 +133,56 @@ export default function HomePage() {
                 </motion.p>
                 
                 <motion.div 
-                  className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start"
+                  className="mt-5 sm:mt-8 flex flex-col sm:flex-row sm:justify-center lg:justify-start"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.7, delay: 0.5, type: "spring" }}
                 >
-                  <motion.div 
-                    className="rounded-md"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Button 
-                      className="w-full px-8 py-3 md:py-4 md:text-lg md:px-10 briki-button"
-                      onClick={handleGetStarted}
+                  <div className="flex flex-col sm:flex-row">
+                    <motion.div 
+                      className="rounded-md"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                     >
-                      Get Started
-                    </Button>
-                  </motion.div>
+                      <Button 
+                        className="w-full px-8 py-3 md:py-4 md:text-lg md:px-10 briki-button"
+                        onClick={handleGetStarted}
+                      >
+                        Get Started
+                      </Button>
+                    </motion.div>
+                    
+                    <motion.div 
+                      className="mt-3 sm:mt-0 sm:ml-3"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <Button 
+                        variant="secondary"
+                        className="w-full px-8 py-3 md:py-4 md:text-lg md:px-10 briki-button-secondary"
+                        onClick={() => navigate("/learn-more")}
+                      >
+                        Learn More
+                      </Button>
+                    </motion.div>
+                  </div>
                   
+                  {/* Company button below other buttons */}
                   <motion.div 
-                    className="mt-3 sm:mt-0 sm:ml-3"
+                    className="mt-4 sm:ml-0 lg:ml-0 flex w-full sm:w-auto justify-center"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5, delay: 0.7 }}
                   >
                     <Button 
-                      variant="secondary"
-                      className="w-full px-8 py-3 md:py-4 md:text-lg md:px-10 briki-button-secondary"
-                      onClick={() => navigate("/learn-more")}
+                      variant="outline" 
+                      className="w-full sm:w-auto px-8 py-3 md:py-4 md:text-lg md:px-10 text-indigo-700 border border-indigo-200 bg-indigo-50/80 hover:bg-indigo-100 hover:text-indigo-800 transition-all shadow-sm flex items-center justify-center"
+                      onClick={() => navigate("/company")}
                     >
-                      Learn More
+                      <span>For Insurance Companies</span>
+                      <span className="ml-2 text-xs opacity-70">→</span>
                     </Button>
                   </motion.div>
                 </motion.div>
@@ -776,7 +797,7 @@ export default function HomePage() {
               </p>
             </motion.div>
             
-            <div className="mt-8 flex flex-col sm:flex-row lg:mt-0 lg:ml-8">
+            <div className="mt-8 flex flex-col lg:mt-0 lg:ml-8">
               <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -801,6 +822,26 @@ export default function HomePage() {
                     onClick={() => navigate("/learn-more")}
                   >
                     Learn More
+                  </Button>
+                </motion.div>
+              </motion.div>
+              
+              {/* Company button below other buttons */}
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.5 }}
+                viewport={{ once: true }}
+                className="mt-4 flex justify-center sm:justify-start"
+              >
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button 
+                    variant="outline" 
+                    className="w-full px-6 py-2 text-indigo-700 border border-indigo-200 bg-indigo-50/80 hover:bg-indigo-100 hover:text-indigo-800 transition-all shadow-sm flex items-center justify-center"
+                    onClick={() => navigate("/company")}
+                  >
+                    <span>For Insurance Companies</span>
+                    <span className="ml-2 text-xs opacity-70">→</span>
                   </Button>
                 </motion.div>
               </motion.div>
