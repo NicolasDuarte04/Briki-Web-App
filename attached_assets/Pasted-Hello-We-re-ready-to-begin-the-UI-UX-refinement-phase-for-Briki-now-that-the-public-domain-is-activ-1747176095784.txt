@@ -1,0 +1,49 @@
+Hello! We're ready to begin the UI/UX refinement phase for Briki now that the public domain is active. We've reviewed your recommendations and have some specific directions to guide the implementation:
+
+---
+
+### ✅ Phase 1: Design Direction Confirmation
+
+1. **Color Palette Preference**
+   - We want a bolder, more **vibrant UI**, especially for the **consumer side**.
+   - Please take inspiration from **Stripe’s color dynamics**, but with more **dominant blues** and **polished white space**. Add tasteful gradients and animations that pop visually without overwhelming the user.
+   - Use **indigo, sky blue, and soft neutrals** as the base. Gradients and accent layers can evolve from that.
+
+2. **Typography**
+   - Use **Inter** for body text and **Satoshi or DM Sans** for headlines. Prioritize readability and elegance.
+   - Let’s go with **Google Fonts** (for now — custom uploads may come later).
+   - Headings should feel modern and bold, not generic.
+
+3. **Visual Identity**
+   - Keep the distinction between **consumer UI** and **company portal**, but with a unified design language.
+     - **Consumer side**: Friendly, clean, animated, soft gradients, white dominance with electric blue highlights.
+     - **Company side**: Futuristic, more subdued with dark neutrals, glowing edge visuals, and a professional dashboard feel.
+   - Introduce background elements like **pattern overlays** or **branded visual motifs** in subtle ways.
+
+4. **Component Prioritization**
+   - Start with a **complete redesign of the Login & Auth screen**. It currently feels unprofessional and uninviting (see photo for reference).
+   - Then move on to:
+     - Insurance Plan Cards
+     - Navigation Bar & Sidebar
+     - Buttons and Forms
+     - Company Dashboard Shell UI (separate visual tone)
+     - Feedback & Voting Modules
+
+---
+
+### ⚙️ Other Notes
+
+- Animations should be **fluid**, not gimmicky. Use **micro-interactions**, **delays**, **hover/press feedback**, and **progress indicators**.
+- Keep everything fully **responsive** and tested on mobile and desktop.
+- Once the login/auth screens are fully redesigned, we’ll approve and continue with the rest of the system.
+
+---
+
+### ❓Before You Begin
+
+Is there **anything specific** you need from me before starting? For example:
+- Brand assets or logos
+- Color hex codes
+- References for dashboard UX inspiration
+
+Please reply with a **summary of what you understood** before starting. Once I confirm, you can proceed.
