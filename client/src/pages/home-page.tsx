@@ -683,7 +683,7 @@ export default function HomePage() {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div className="flex flex-col items-center text-center">
                   <div className="w-20 h-20 mb-4">
-                    <FuturisticTravelIcon className="w-full h-full" />
+                    <MinimalTravelIcon className="w-full h-full" />
                   </div>
                   <div className="h-3 w-full bg-muted rounded-full overflow-hidden">
                     <motion.div 
@@ -699,7 +699,7 @@ export default function HomePage() {
                 
                 <div className="flex flex-col items-center text-center">
                   <div className="w-20 h-20 mb-4">
-                    <FuturisticAutoIcon className="w-full h-full" />
+                    <MinimalAutoIcon className="w-full h-full" />
                   </div>
                   <div className="h-3 w-full bg-muted rounded-full overflow-hidden">
                     <motion.div 
@@ -715,7 +715,7 @@ export default function HomePage() {
                 
                 <div className="flex flex-col items-center text-center">
                   <div className="w-20 h-20 mb-4">
-                    <FuturisticPetIcon className="w-full h-full" />
+                    <MinimalPetIcon className="w-full h-full" />
                   </div>
                   <div className="h-3 w-full bg-muted rounded-full overflow-hidden">
                     <motion.div 
@@ -731,7 +731,7 @@ export default function HomePage() {
                 
                 <div className="flex flex-col items-center text-center">
                   <div className="w-20 h-20 mb-4">
-                    <FuturisticHealthIcon className="w-full h-full" />
+                    <MinimalHealthIcon className="w-full h-full" />
                   </div>
                   <div className="h-3 w-full bg-muted rounded-full overflow-hidden">
                     <motion.div 
