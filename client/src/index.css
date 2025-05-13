@@ -569,7 +569,7 @@
     100% { background-position: 0% 50%; }
   }
   
-  /* Liquid blob animations in the background - blue tones */
+  /* Liquid blob animations in the background - soft glows */
   .auth-layout::before,
   .auth-layout::after {
     content: "";
@@ -577,10 +577,10 @@
     width: 60vw;
     height: 60vw;
     border-radius: 50%;
-    background: linear-gradient(135deg, rgba(14, 165, 233, 0.4) 0%, rgba(56, 189, 248, 0.3) 100%);
-    filter: blur(80px);
+    background: linear-gradient(135deg, rgba(176, 219, 255, 0.35) 0%, rgba(168, 199, 255, 0.25) 100%);
+    filter: blur(90px);
     z-index: 0;
-    opacity: 0.6;
+    opacity: 0.5;
     mix-blend-mode: soft-light;
     animation: liquidMove 18s infinite alternate cubic-bezier(0.37, 0, 0.63, 1);
   }
@@ -594,39 +594,39 @@
   .auth-layout::after {
     bottom: -20%;
     left: -10%;
-    background: linear-gradient(135deg, rgba(79, 70, 229, 0.4) 0%, rgba(99, 102, 241, 0.35) 100%);
+    background: linear-gradient(135deg, rgba(191, 200, 248, 0.35) 0%, rgba(168, 199, 255, 0.25) 100%);
     animation-delay: -9s;
     animation-direction: alternate-reverse;
     width: 50vw;
     height: 50vw;
   }
   
-  /* Additional smaller blobs for visual interest */
+  /* Additional subtle floating particles */
   .auth-layout .blob-1,
   .auth-layout .blob-2 {
     position: absolute;
     border-radius: 50%;
-    filter: blur(60px);
+    filter: blur(70px);
     z-index: 0;
-    opacity: 0.4;
+    opacity: 0.3;
     mix-blend-mode: soft-light;
   }
   
   .auth-layout .blob-1 {
     width: 30vw;
     height: 30vw;
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.4) 0%, rgba(37, 99, 235, 0.3) 100%);
-    top: 20%;
-    left: -10%;
+    background: linear-gradient(135deg, rgba(208, 241, 255, 0.3) 0%, rgba(176, 219, 255, 0.2) 100%);
+    top: 25%;
+    left: -15%;
     animation: liquidMove 15s infinite alternate-reverse cubic-bezier(0.37, 0, 0.63, 1);
   }
   
   .auth-layout .blob-2 {
     width: 25vw;
     height: 25vw;
-    background: linear-gradient(135deg, rgba(6, 182, 212, 0.35) 0%, rgba(14, 165, 233, 0.25) 100%);
-    bottom: 20%;
-    right: -5%;
+    background: linear-gradient(135deg, rgba(168, 199, 255, 0.25) 0%, rgba(191, 200, 248, 0.15) 100%);
+    bottom: 15%;
+    right: -10%;
     animation: liquidMove 17s infinite alternate cubic-bezier(0.37, 0, 0.63, 1);
     animation-delay: -5s;
   }
@@ -768,32 +768,52 @@
     background-position: right center;
   }
   
-  /* Loudly animated background for auth page - liquid motion effect with more blue */
+  /* Branded Animated Gradient Background - Stripe-inspired */
   .auth-background {
     @apply fixed inset-0 overflow-hidden;
-    background: linear-gradient(125deg, #d0f0ff 0%, #d4e2ff 100%);
-    background-size: 400% 400%;
-    animation: gradientPosition 15s ease infinite;
+    background: radial-gradient(
+      circle at 30% 30%,
+      #D0F1FF,
+      #B0DBFF,
+      #A8C7FF,
+      #BFC8F8,
+      #F0F4FF
+    );
+    background-size: 300% 300%;
+    animation: gradientShift 15s ease infinite;
   }
   
   .auth-background::before {
     content: "";
     @apply absolute inset-0;
     background: 
-      radial-gradient(circle at 20% 35%, rgba(56, 189, 248, 0.5) 0%, transparent 50%),
-      radial-gradient(circle at 85% 20%, rgba(79, 70, 229, 0.45) 0%, transparent 50%),
-      radial-gradient(circle at 10% 85%, rgba(14, 165, 233, 0.45) 0%, transparent 55%),
-      radial-gradient(circle at 90% 80%, rgba(59, 130, 246, 0.5) 0%, transparent 50%);
-    animation: pulse 15s infinite alternate;
-    opacity: 0.8;
+      radial-gradient(circle at 20% 35%, rgba(56, 189, 248, 0.35) 0%, transparent 60%),
+      radial-gradient(circle at 85% 20%, rgba(79, 70, 229, 0.25) 0%, transparent 60%),
+      radial-gradient(circle at 10% 90%, rgba(14, 165, 233, 0.3) 0%, transparent 65%),
+      radial-gradient(circle at 90% 80%, rgba(90, 103, 216, 0.3) 0%, transparent 60%);
+    animation: pulse 18s infinite alternate;
+    opacity: 0.7;
     mix-blend-mode: soft-light;
   }
   
   .auth-background::after {
     content: "";
     @apply absolute inset-0 z-0;
-    /* No background pattern to remove the dots */
-    opacity: 0.7;
+    background: 
+      linear-gradient(125deg, rgba(208, 241, 255, 0.1) 0%, rgba(176, 219, 255, 0.1) 50%, rgba(240, 244, 255, 0.1) 100%);
+    opacity: 0.4;
+  }
+  
+  @keyframes gradientShift {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
   }
   
   @keyframes gradientPosition {
@@ -841,6 +861,29 @@
     50% { transform: translate(10%, -5%) scale(0.95) rotate(10deg); }
     75% { transform: translate(-5%, 5%) scale(1.05) rotate(5deg); }
     100% { transform: translate(0%, 0%) scale(1) rotate(0deg); }
+  }
+  
+  /* Login notification toast styling */
+  .login-notification-toast {
+    background: linear-gradient(135deg, rgba(208, 241, 255, 0.95), rgba(168, 199, 255, 0.95));
+    border: 1px solid rgba(176, 219, 255, 0.6);
+    backdrop-filter: blur(10px);
+    box-shadow: 
+      0 10px 20px rgba(79, 70, 229, 0.15),
+      0 3px 6px rgba(0, 0, 0, 0.1);
+    color: #1a1a2e;
+    animation: toastSlideIn 0.5s cubic-bezier(0.21, 0.61, 0.35, 1);
+  }
+  
+  @keyframes toastSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
   
   /* Social login buttons */

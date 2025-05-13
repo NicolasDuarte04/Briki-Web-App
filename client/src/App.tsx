@@ -9,6 +9,7 @@ import { LanguageProvider } from "@/components/language-selector";
 import { PageTransition } from "@/components/ui/transition-effect";
 import { RecentlyViewedProvider } from "@/contexts/recently-viewed-context";
 import { AIAssistantProvider, AuthenticatedLayout } from "@/components/layout";
+import { LoginNotification } from "@/components/login-notification";
 
 import NotFound from "@/pages/not-found";
 import HomePage from "@/pages/home-page";
@@ -110,6 +111,7 @@ function AppContent() {
     return (
       <AIAssistantProvider>
         <AuthenticatedLayout>
+          <LoginNotification />
           <Router />
         </AuthenticatedLayout>
       </AIAssistantProvider>
