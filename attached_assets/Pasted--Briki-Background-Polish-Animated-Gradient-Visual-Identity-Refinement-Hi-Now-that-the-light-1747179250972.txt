@@ -1,0 +1,73 @@
+### Briki Background Polish – Animated Gradient & Visual Identity Refinement
+
+Hi! Now that the light mode UI is implemented, the background feels clean but a bit too bland. We want to give it **visual richness and branded personality**, without returning to the dark theme.
+
+Please update the **background on both the Countdown screen and the Auth/Login screen** with the following approach:
+
+---
+
+### 1. Animated Gradient Background (Soft Futuristic AI Style)
+
+**Visual Style Goals:**
+- Brighter, modern, and energetic (like Stripe or Apple’s AI demos)
+- Soft animation to add life and motion
+- High readability for interface elements (buttons, forms, etc.)
+
+**Target Color Gradient:**
+```css
+background: radial-gradient(
+  circle at 30% 30%,
+  #D0F1FF,
+  #B0DBFF,
+  #A8C7FF,
+  #BFC8F8,
+  #F0F4FF
+);
+```
+
+**Tailwind version:**
+```js
+from-[#D0F1FF] via-[#B0DBFF] to-[#F0F4FF]
+```
+
+---
+
+### 2. Subtle Animated Effects (Optional but Recommended)
+
+If feasible, apply one of the following subtle background animations:
+
+- **Slow animated gradient shift** (CSS keyframe loop or animated background position)
+- **Floating glowing particles** (faded pulse or AI-like dots)
+- **Pulsing radial glow** around center/focus areas
+- Ensure **mobile-friendly performance**
+
+These effects should feel elegant and premium — not distracting.
+
+---
+
+### 3. Where to Apply
+
+Please apply the new background to:
+
+- `/` (Countdown Screen)
+- `/auth` (Login/Register Screen)
+- Optionally, also to the main Home page or Plan Selector for visual consistency
+
+---
+
+### 4. Visual Reference
+
+We want something inspired by **Stripe's elegant gradients** or **Apple’s Editor’s Choice app animations**. Here’s a sample reference:
+
+**Visual Reference (inspired blend):**
+![Briki Gradient Reference](https://www.transparenttextures.com/patterns/gradient-squares.png)
+
+[Alternatively use this base palette reference for visual inspiration:](https://uigradients.com/#BrightVault)
+
+---
+
+### 5. Final Notes
+
+Let us know if you need fallback versions for low-end devices, or if you want branded SVG overlays (e.g., subtle floating icons or logos). We're aiming for a UI that feels **playful yet premium**, soft yet futuristic.
+
+Let us know when you're ready to implement!
