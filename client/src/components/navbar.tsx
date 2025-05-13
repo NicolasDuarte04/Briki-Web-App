@@ -88,6 +88,10 @@ export default function Navbar() {
             </Link>
           </div>
           
+          <div className="flex items-center">
+            <LanguageSelector />
+          </div>
+          
           {isLoading ? (
             <div className="flex items-center">
               <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
@@ -132,7 +136,7 @@ export default function Navbar() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <div className="px-4 py-3">
-                      <p className="text-sm">Signed in as</p>
+                      <p className="text-sm">Conectado como</p>
                       <p className="text-sm font-medium truncate">{user.email}</p>
                     </div>
                     <DropdownMenuSeparator />
@@ -141,7 +145,7 @@ export default function Navbar() {
                       onClick={() => navigate("/profile")}
                     >
                       <User className="mr-2 h-4 w-4" />
-                      <span>Profile</span>
+                      <span>Perfil</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem 
                       className="cursor-pointer" 
