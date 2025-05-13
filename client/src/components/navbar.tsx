@@ -56,34 +56,34 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-white shadow-sm">
+    <nav className="bg-white/80 dark:bg-black/20 backdrop-blur-md shadow-sm border-b border-slate-200/50 dark:border-slate-800/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
             <Link href="/" className="flex-shrink-0 flex items-center">
-              <h1 className="briki-logo">
+              <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-violet-600 to-indigo-600 dark:from-purple-400 dark:via-violet-400 dark:to-indigo-400">
                 briki
               </h1>
             </Link>
           </div>
           
-          <div className="hidden sm:ml-6 sm:flex sm:items-center space-x-8">
-            <Link href="/" className={`hover:text-primary px-3 py-2 text-sm font-medium ${isActivePath("/")}`}>
+          <div className="hidden sm:ml-6 sm:flex sm:items-center space-x-6">
+            <Link href="/" className={`hover:text-violet-600 dark:hover:text-violet-400 px-3 py-2 text-sm font-medium transition-colors ${currentPath === "/" ? "text-violet-600 dark:text-violet-400 font-semibold" : "text-foreground/70"}`}>
               {t('home')}
             </Link>
-            <Link href="/insurance-plans" className={`hover:text-primary px-3 py-2 text-sm font-medium ${isActivePath("/insurance-plans")}`}>
+            <Link href="/insurance-plans" className={`hover:text-violet-600 dark:hover:text-violet-400 px-3 py-2 text-sm font-medium transition-colors ${currentPath === "/insurance-plans" ? "text-violet-600 dark:text-violet-400 font-semibold" : "text-foreground/70"}`}>
               {t('travelInsurance')}
             </Link>
-            <Link href="/auto-insurance" className={`hover:text-primary px-3 py-2 text-sm font-medium ${isActivePath("/auto-insurance")}`}>
+            <Link href="/auto-insurance" className={`hover:text-violet-600 dark:hover:text-violet-400 px-3 py-2 text-sm font-medium transition-colors ${currentPath === "/auto-insurance" ? "text-violet-600 dark:text-violet-400 font-semibold" : "text-foreground/70"}`}>
               {t('autoInsurance')}
             </Link>
-            <Link href="/pet-insurance" className={`hover:text-primary px-3 py-2 text-sm font-medium ${isActivePath("/pet-insurance")}`}>
+            <Link href="/pet-insurance" className={`hover:text-violet-600 dark:hover:text-violet-400 px-3 py-2 text-sm font-medium transition-colors ${currentPath === "/pet-insurance" ? "text-violet-600 dark:text-violet-400 font-semibold" : "text-foreground/70"}`}>
               {t('petInsurance')}
             </Link>
-            <Link href="/health-insurance" className={`hover:text-primary px-3 py-2 text-sm font-medium ${isActivePath("/health-insurance")}`}>
+            <Link href="/health-insurance" className={`hover:text-violet-600 dark:hover:text-violet-400 px-3 py-2 text-sm font-medium transition-colors ${currentPath === "/health-insurance" ? "text-violet-600 dark:text-violet-400 font-semibold" : "text-foreground/70"}`}>
               {t('healthInsurance')}
             </Link>
-            <Link href="/support" className={`hover:text-primary px-3 py-2 text-sm font-medium ${isActivePath("/support")}`}>
+            <Link href="/support" className={`hover:text-violet-600 dark:hover:text-violet-400 px-3 py-2 text-sm font-medium transition-colors ${currentPath === "/support" ? "text-violet-600 dark:text-violet-400 font-semibold" : "text-foreground/70"}`}>
               {t('support')}
             </Link>
           </div>
@@ -179,13 +179,13 @@ export default function Navbar() {
               <Button 
                 variant="ghost" 
                 onClick={() => navigate("/auth")}
-                className="text-gray-500 hover:text-primary"
+                className="text-foreground/70 hover:text-violet-600 dark:hover:text-violet-400 transition-colors"
               >
                 {t('signIn')}
               </Button>
               <Button 
                 onClick={() => navigate("/auth")}
-                className="ml-2"
+                className="ml-2 bg-gradient-to-r from-violet-500 to-indigo-500 hover:from-violet-600 hover:to-indigo-600 text-white border-0"
               >
                 {t('signUp')}
               </Button>
@@ -344,15 +344,15 @@ export default function Navbar() {
                   )}
                   
                   {!user && !isLoading && (
-                    <div className="pt-4 pb-3 border-t border-gray-200 mt-4">
-                      <div className="space-y-1">
+                    <div className="pt-4 pb-3 border-t border-gray-200 dark:border-gray-800 mt-4">
+                      <div className="space-y-3">
                         <Button
                           variant="outline"
                           onClick={() => {
                             navigate("/auth");
                             setIsOpen(false);
                           }}
-                          className="w-full mb-2"
+                          className="w-full mb-2 border-violet-200 dark:border-violet-900 text-violet-700 dark:text-violet-300"
                         >
                           {t('signIn')}
                         </Button>
@@ -361,7 +361,7 @@ export default function Navbar() {
                             navigate("/auth");
                             setIsOpen(false);
                           }}
-                          className="w-full"
+                          className="w-full bg-gradient-to-r from-violet-500 to-indigo-500 hover:from-violet-600 hover:to-indigo-600 text-white border-0"
                         >
                           {t('signUp')}
                         </Button>
