@@ -328,14 +328,28 @@ export const RadarChart: React.FC<RadarChartProps> = ({
           
           {/* Category labels */}
           {categories.map((category, index) => {
-            const { x, y } = getPointCoordinates(index, 115, categories.length);
+            const { x, y } = getPointCoordinates(index, 125, categories.length);
+            
+            // Adjust positions to avoid overlapping
+            let adjustedX = x;
+            let adjustedY = y;
+            
+            // Create custom positioning for specific labels to avoid overlaps
+            if (category === "Medical") {
+              adjustedY -= 5; // Move "Medical" up slightly
+            } else if (category === "Evacuation") {
+              adjustedX += 10; // Move "Evacuation" right
+            }
+            
             return (
               <div
                 key={index}
                 className="absolute text-xs font-medium text-foreground transform -translate-x-1/2 -translate-y-1/2"
                 style={{
-                  left: `${x + size / 2}px`,
-                  top: `${y + size / 2}px`,
+                  left: `${adjustedX + size / 2}px`,
+                  top: `${adjustedY + size / 2}px`,
+                  maxWidth: "80px",
+                  lineHeight: "1.2",
                 }}
               >
                 {category}
@@ -369,6 +383,7 @@ export const CoverageComparison: React.FC<CoverageComparisonProps> = ({
 }) => {
   const [selectedPlan, setSelectedPlan] = useState(0);
   const [isVisible, setIsVisible] = useState(!animated);
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
   const comparisonRef = useRef<HTMLDivElement>(null);
   
   // Group all categories from all plans
@@ -399,6 +414,15 @@ export const CoverageComparison: React.FC<CoverageComparisonProps> = ({
       };
     }
   }, [animated]);
+  
+  // Check if plan data is loaded properly
+  useEffect(() => {
+    if (plans && plans.length > 0 && plans[0].coverage && plans[0].coverage.length > 0) {
+      setIsDataLoaded(true);
+    } else {
+      setIsDataLoaded(false);
+    }
+  }, [plans]);
   
   const getValueForCategory = (planIndex: number, category: string) => {
     const plan = plans[planIndex];
