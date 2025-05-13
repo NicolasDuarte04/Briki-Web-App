@@ -1,67 +1,76 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Satoshi:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  /* Emotionally intelligent AI aesthetic with warmer, calmer colors */
-  --background: 220 20% 97%; /* Light warm background instead of dark */
-  --foreground: 222 47% 11%; /* Dark text for contrast */
-  --muted: 215 16% 90%;
-  --muted-foreground: 215 25% 40%;
-  --popover: 210 20% 98%;
-  --popover-foreground: 222 47% 11%;
-  --card: 210 20% 98%;
-  --card-foreground: 222 47% 11%;
-  --border: 214 32% 91%;
-  --input: 214 32% 91%;
-  --primary: 221 83% 53%; /* Keeping blue for primary but will use it more subtly */
-  --primary-foreground: 210 40% 98%;
-  --secondary: 217 33% 17%;
-  --secondary-foreground: 210 40% 98%;
-  --accent: 262 83% 58%; /* Warmer purple accent */
-  --accent-foreground: 210 40% 98%;
+  /* Stripe-inspired vibrant UI with dominant blues */
+  --background: 210 50% 98%; /* Clean white background with slight blue tint */
+  --foreground: 229 84% 5%; /* Nearly black text for strong contrast */
+  --muted: 214 32% 91%;
+  --muted-foreground: 215 25% 27%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 229 84% 5%;
+  --card: 0 0% 100%;
+  --card-foreground: 229 84% 5%;
+  --border: 220 13% 91%;
+  --input: 220 13% 91%;
+  --primary: 239 84% 56%; /* Vibrant indigo/blue for primary */
+  --primary-foreground: 0 0% 100%;
+  --secondary: 199 89% 48%; /* Sky blue */
+  --secondary-foreground: 0 0% 100%;
+  --accent: 224 76% 48%; /* Electric blue accent for highlights */
+  --accent-foreground: 0 0% 100%;
   --destructive: 0 84% 60%;
-  --destructive-foreground: 210 40% 98%;
-  --ring: 221 69% 56%;
+  --destructive-foreground: 0 0% 100%;
+  --ring: 239 84% 56%;
   --radius: 0.75rem;
   
-  /* Updated gradients for warmer, emotionally intelligent aesthetic */
-  --glow-primary: 0 0 10px rgba(59, 130, 246, 0.3); /* Softer glow */
-  --glow-accent: 0 0 12px rgba(147, 51, 234, 0.25); /* Softer accent glow */
-  --gradient-primary: linear-gradient(135deg, #60a5fa, #3b82f6); /* Softer blue gradient */
-  --gradient-secondary: linear-gradient(135deg, #8b5cf6, #7c3aed); /* Violet blend */
-  --gradient-accent: linear-gradient(135deg, #c084fc, #a855f7); /* Softer purple */
-  --gradient-teal: linear-gradient(135deg, #2dd4bf, #14b8a6); /* Teal for Auto category */
-  --gradient-orange: linear-gradient(135deg, #fb923c, #f97316); /* Soft orange for Pet category */
-  --gradient-red: linear-gradient(135deg, #f87171, #ef4444); /* Subtle red for Health category */
-  --gradient-background: linear-gradient(135deg, #f8fafc, #e2e8f0); /* Light gradient background */
+  /* Updated gradients for more vibrant, Stripe-inspired aesthetic */
+  --glow-primary: 0 0 20px rgba(79, 70, 229, 0.4); /* Stronger glow */
+  --glow-accent: 0 0 20px rgba(96, 165, 250, 0.4); /* Sky blue glow */
+  --gradient-primary: linear-gradient(135deg, #4F46E5, #6366F1); /* Vibrant indigo gradient */
+  --gradient-secondary: linear-gradient(135deg, #0EA5E9, #38BDF8); /* Vibrant sky blue */
+  --gradient-accent: linear-gradient(135deg, #60A5FA, #93C5FD); /* Electric blue */
+  --gradient-auto: linear-gradient(135deg, #0EA5E9, #0284C7); /* Auto category */
+  --gradient-pet: linear-gradient(135deg, #8B5CF6, #A78BFA); /* Pet category */
+  --gradient-health: linear-gradient(135deg, #F43F5E, #FB7185); /* Health category */
+  --gradient-travel: linear-gradient(135deg, #6366F1, #818CF8); /* Travel category */
+  --gradient-background: linear-gradient(145deg, #F8FAFC, #F1F5F9); /* Light gradient background */
+  --gradient-card-hover: linear-gradient(145deg, rgba(79, 70, 229, 0.05), rgba(96, 165, 250, 0.05)); /* Subtle hover gradient */
 }
 
 .dark {
-  /* Softer dark mode that aligns with the warmer aesthetic */
-  --background: 222 30% 12%; /* Softer, less dark background */
+  /* Futuristic dark mode for company portal */
+  --background: 230 30% 7%; /* Deep navy background */
   --foreground: 210 40% 98%;
-  --muted: 223 25% 20%;
-  --muted-foreground: 215 20% 65%;
-  --popover: 224 40% 16%;
+  --muted: 224 25% 15%;
+  --muted-foreground: 215 20% 75%;
+  --popover: 224 71% 4%;
   --popover-foreground: 210 40% 98%;
-  --card: 224 40% 16%; 
+  --card: 224 71% 4%;
   --card-foreground: 210 40% 98%;
-  --border: 215 27% 25%;
-  --input: 215 27% 25%;
-  --primary: 221 70% 60%; /* Slightly brighter primary */
+  --border: 215 27% 17%;
+  --input: 215 27% 17%;
+  --primary: 239 84% 67%; /* Brighter primary in dark mode */
   --primary-foreground: 210 40% 98%;
-  --secondary: 215 27% 25%;
+  --secondary: 199 89% 60%; /* Brighter sky blue */
   --secondary-foreground: 210 40% 98%;
-  --accent: 262 70% 60%; /* Warmer accent in dark mode */
+  --accent: 224 76% 60%; /* Brighter electric blue */
   --accent-foreground: 210 40% 98%;
   --destructive: 0 84% 60%;
   --destructive-foreground: 210 40% 98%;
-  --ring: 221 70% 60%;
+  --ring: 239 84% 67%;
   --radius: 0.75rem;
+  
+  /* Company portal-specific gradients */
+  --gradient-primary: linear-gradient(135deg, #4F46E5, #6366F1); /* Vibrant indigo gradient */
+  --gradient-futuristic: linear-gradient(135deg, #1E293B, #0F172A); /* Deep navy gradient */
+  --gradient-glow: linear-gradient(145deg, rgba(79, 70, 229, 0.1), rgba(99, 102, 241, 0.05));
+  --glow-edge: 0 0 30px rgba(79, 70, 229, 0.4); /* Glowing edge visual */
 }
 
 @layer base {
@@ -71,81 +80,131 @@
 
   body {
     @apply antialiased bg-background text-foreground;
-    font-family: 'Space Grotesk', 'Inter', sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
   }
   
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'DM Sans', 'Satoshi', sans-serif;
     letter-spacing: -0.03em;
+    @apply font-bold;
+  }
+  
+  h1 {
+    @apply text-4xl md:text-5xl;
+  }
+  
+  h2 {
+    @apply text-3xl md:text-4xl;
+  }
+  
+  h3 {
+    @apply text-2xl md:text-3xl;
+  }
+  
+  h4 {
+    @apply text-xl md:text-2xl;
   }
   
   p, span, button, a {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  
+  .headline-text {
+    font-family: 'DM Sans', 'Satoshi', sans-serif;
+    letter-spacing: -0.03em;
+    @apply font-bold;
+  }
+  
+  .body-text {
+    font-family: 'Inter', system-ui, sans-serif;
   }
 }
 
-/* Briki custom styles - AI-driven Futuristic design */
+/* Briki custom styles - Modern Stripe-inspired design */
 @layer components {
-  /* Updated Logo styles for warmer aesthetic */
+  /* Updated Logo styles for modern vibrant aesthetic */
   .briki-logo {
     @apply text-4xl font-bold tracking-tighter relative;
-    font-family: 'Space Grotesk', sans-serif;
-    letter-spacing: -0.01em; /* Slightly less tight tracking */
-    background: linear-gradient(to right, #3B82F6, #8B5CF6); /* Blue to purple gradient */
+    font-family: 'DM Sans', 'Satoshi', sans-serif;
+    letter-spacing: -0.02em; /* Tighter tracking for modern look */
+    background: var(--gradient-primary); /* Indigo gradient */
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow: 0 0 10px rgba(59, 130, 246, 0.2); /* Softer glow */
+    filter: drop-shadow(0 0 8px rgba(79, 70, 229, 0.3)); /* Subtle glow */
   }
   
   .briki-logo .checkmark {
-    @apply text-primary absolute;
+    @apply absolute;
     font-size: 2.2rem;
-    top: -5px;
-    right: -4px;
-    background: linear-gradient(to right, #60A5FA, #8B5CF6); /* Blue to purple */
+    top: -6px;
+    right: -8px;
+    background: var(--gradient-secondary); /* Sky blue gradient */
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.4)); /* Softer glow */
+    filter: drop-shadow(0 0 6px rgba(14, 165, 233, 0.4));
   }
   
-  /* Card styles for modern, calm, emotionally intelligent design */
+  /* Card styles for modern, vibrant Stripe-inspired design */
   .briki-card {
-    @apply bg-card p-6 mb-4 border border-muted;
+    @apply bg-card p-6 mb-4 border border-transparent;
     border-radius: var(--radius);
-    background: linear-gradient(145deg, hsl(var(--card)), hsl(var(--card) / 0.95));
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08); /* Lighter shadow */
-    backdrop-filter: blur(10px);
-    transition: all 0.3s ease;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s cubic-bezier(0.21, 0.61, 0.35, 1);
+    position: relative;
+  }
+  
+  .briki-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius);
+    padding: 1px; /* Border width */
+    background: var(--gradient-primary);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.2s ease;
   }
   
   .briki-card:hover {
-    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.12); /* Subtle hover effect */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06), 0 15px 40px -5px rgba(79, 70, 229, 0.12);
     transform: translateY(-2px);
   }
   
-  /* Form inputs styled for modern clean UI */
+  .briki-card:hover::before {
+    opacity: 1;
+  }
+  
+  /* Form inputs styled for Stripe-inspired clean UI */
   .briki-input {
     @apply w-full px-4 py-3.5 text-base;
     border-radius: var(--radius);
-    background: hsl(var(--input) / 0.95);
+    background: white;
     border: 1px solid hsl(var(--border));
-    transition: all 0.2s ease;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.04); /* Lighter shadow */
-    letter-spacing: 0.01em; /* Slightly spaced text */
+    transition: all 0.15s ease;
+    letter-spacing: 0.01em;
+  }
+  
+  .briki-input:hover {
+    border-color: hsl(var(--primary) / 0.5);
   }
   
   .briki-input:focus {
-    box-shadow: 0 0 0 2px hsl(var(--ring) / 0.2), inset 0 2px 4px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 0 0 2px hsl(var(--primary) / 0.2);
     border-color: hsl(var(--primary));
+    outline: none;
   }
   
-  /* Primary action button - Modern, clean style */
+  /* Primary action button - Modern, Stripe-like style */
   .briki-button {
-    @apply w-full text-white py-3.5 font-medium transition-all relative overflow-hidden;
+    @apply w-full text-white py-3.5 font-medium relative overflow-hidden;
     border-radius: var(--radius);
     background: var(--gradient-primary);
-    box-shadow: 0 4px 10px rgba(59, 130, 246, 0.15); /* Softer shadow */
-    letter-spacing: 0.01em; /* Slightly spaced text */
+    box-shadow: 0 2px 5px rgba(79, 70, 229, 0.2);
+    letter-spacing: 0.01em;
+    transition: all 0.2s cubic-bezier(0.21, 0.61, 0.35, 1);
   }
   
   .briki-button::before {
@@ -158,10 +217,10 @@
     background: linear-gradient(
       90deg,
       transparent,
-      rgba(255, 255, 255, 0.15), /* Subtler animation */
+      rgba(255, 255, 255, 0.2),
       transparent
     );
-    transition: 0.5s;
+    transition: 0.6s;
   }
   
   .briki-button:hover::before {
@@ -169,27 +228,34 @@
   }
   
   .briki-button:hover {
-    transform: translateY(-1px); /* More subtle movement */
-    box-shadow: 0 8px 15px rgba(59, 130, 246, 0.2); /* Softer hover glow */
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
   }
   
   .briki-button:active {
     transform: translateY(1px);
+    box-shadow: 0 2px 3px rgba(79, 70, 229, 0.15);
   }
   
   /* Secondary action button - Clean outline style */
   .briki-button-secondary {
-    @apply w-full text-primary py-3.5 font-medium transition-all relative overflow-hidden;
+    @apply w-full py-3.5 font-medium relative overflow-hidden;
     border-radius: var(--radius);
     background: transparent;
-    border: 1px solid hsl(var(--primary) / 0.3); /* Softer border */
-    box-shadow: 0 0 4px rgba(59, 130, 246, 0.1); /* Subtle shadow */
-    letter-spacing: 0.01em; /* Slightly spaced text */
+    color: hsl(var(--primary));
+    border: 1px solid hsl(var(--primary) / 0.3);
+    transition: all 0.2s cubic-bezier(0.21, 0.61, 0.35, 1);
+    letter-spacing: 0.01em;
   }
   
   .briki-button-secondary:hover {
-    background: hsl(var(--primary) / 0.05); /* Very subtle hover background */
-    box-shadow: 0 0 8px rgba(59, 130, 246, 0.15);
+    background: hsl(var(--primary) / 0.05);
+    border-color: hsl(var(--primary) / 0.5);
+    transform: translateY(-1px);
+  }
+  
+  .briki-button-secondary:active {
+    transform: translateY(1px);
   }
   
   /* Mobile version styles with safe area for notches */
@@ -201,25 +267,41 @@
     padding-right: env(safe-area-inset-right, 1.25rem);
   }
   
-  /* Plan card styles - Futuristic design */
+  /* Plan card styles - Stripe-inspired design */
   .briki-plan-card {
-    @apply bg-card p-5 mb-4 flex flex-col;
-    border-radius: var(--radius);
-    background: linear-gradient(145deg, hsl(var(--card)), hsl(var(--card) / 0.8));
-    border: 1px solid hsl(var(--border));
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-    transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
+    @apply bg-white p-6 mb-4 flex flex-col;
+    border-radius: calc(var(--radius) + 2px);
+    border: 1px solid transparent;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05), 0 8px 25px -5px rgba(0, 0, 0, 0.1);
+    transition: all 0.25s cubic-bezier(0.21, 0.61, 0.35, 1);
+    position: relative;
+  }
+  
+  .briki-plan-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: calc(var(--radius) + 2px);
+    padding: 1px;
+    background: var(--gradient-primary);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.25s ease;
   }
   
   .briki-plan-card:hover {
-    transform: translateY(-4px) scale(1.01);
-    box-shadow: 0 10px 25px rgba(59, 130, 246, 0.2);
-    border-color: hsl(var(--primary) / 0.3);
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), 0 20px 40px -5px rgba(79, 70, 229, 0.15);
+  }
+  
+  .briki-plan-card:hover::before {
+    opacity: 1;
   }
   
   .briki-plan-header {
-    @apply flex justify-between items-center mb-4;
+    @apply flex justify-between items-center mb-6;
   }
   
   .briki-plan-provider {
@@ -227,76 +309,77 @@
   }
   
   .briki-plan-provider-logo {
-    @apply h-11 w-11 flex items-center justify-center p-2;
-    border-radius: var(--radius);
-    background: linear-gradient(145deg, hsl(var(--primary) / 0.2), hsl(var(--primary) / 0.1));
-    box-shadow: 0 4px 10px rgba(59, 130, 246, 0.15);
+    @apply h-12 w-12 flex items-center justify-center p-2.5 rounded-md;
+    background: var(--gradient-card-hover);
+    box-shadow: 0 2px 10px rgba(79, 70, 229, 0.12);
   }
   
   .briki-plan-type {
-    @apply text-sm font-medium;
+    @apply text-sm font-medium mt-2;
     color: hsl(var(--muted-foreground));
+    letter-spacing: 0.02em;
   }
   
   .briki-plan-price {
-    @apply text-xl font-bold;
-    background: linear-gradient(to right, #3B82F6, #60A5FA);
+    @apply text-3xl font-bold;
+    background: var(--gradient-primary);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 12px rgba(79, 70, 229, 0.2));
   }
   
   .briki-feature-list {
-    @apply text-sm space-y-3 mb-4;
+    @apply space-y-3.5 mb-5;
   }
   
   .briki-feature-item {
-    @apply flex items-center;
-    transition: transform 0.2s ease;
+    @apply flex items-center text-sm;
+    transition: transform 0.15s ease;
   }
   
   .briki-feature-item:hover {
-    transform: translateX(2px);
+    transform: translateX(3px);
   }
   
   .briki-feature-item-check {
-    @apply mr-2.5;
-    color: hsl(var(--primary));
-    filter: drop-shadow(0 0 2px rgba(59, 130, 246, 0.5));
+    @apply mr-3 text-primary flex-shrink-0;
+    filter: drop-shadow(0 0 4px rgba(79, 70, 229, 0.3));
   }
   
   .briki-help-link {
-    @apply flex items-center text-sm mt-4;
-    color: hsl(var(--muted-foreground));
-    transition: color 0.2s ease;
+    @apply flex items-center text-sm mt-5 gap-1.5;
+    color: hsl(var(--primary) / 0.7);
+    transition: all 0.15s ease;
   }
   
   .briki-help-link:hover {
     color: hsl(var(--primary));
+    transform: translateX(2px);
   }
   
-  /* Compare feature enhancements - Futuristic table */
+  /* Compare feature enhancements - Modern Stripe-inspired table */
   .briki-compare-table {
     @apply w-full overflow-hidden;
     border-radius: var(--radius);
-    background: linear-gradient(145deg, hsl(var(--card)), hsl(var(--card) / 0.8));
+    background: white;
     border: 1px solid hsl(var(--border));
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 22px -5px rgba(0, 0, 0, 0.1);
   }
   
   .briki-compare-header {
-    @apply p-4 flex justify-between items-center;
-    background: linear-gradient(to right, hsl(var(--muted) / 0.7), hsl(var(--muted)));
+    @apply p-5 flex justify-between items-center;
+    background: var(--gradient-background);
     border-bottom: 1px solid hsl(var(--border));
   }
   
   .briki-compare-row {
-    @apply p-4 flex items-center;
-    border-bottom: 1px solid hsl(var(--border) / 0.5);
-    transition: background-color 0.2s ease;
+    @apply p-5 flex items-center;
+    border-bottom: 1px solid hsl(var(--border));
+    transition: background-color 0.15s ease;
   }
   
   .briki-compare-row:hover {
-    background-color: hsl(var(--muted) / 0.3);
+    background-color: var(--gradient-card-hover);
   }
   
   .briki-compare-label {
@@ -306,10 +389,10 @@
   
   .briki-compare-value {
     @apply text-sm w-2/3 flex justify-between;
-    color: hsl(var(--foreground) / 0.8);
+    color: hsl(var(--foreground) / 0.9);
   }
   
-  /* Futuristic toggle switch */
+  /* Modern toggle switch */
   .briki-toggle {
     @apply relative inline-flex items-center cursor-pointer;
   }
@@ -319,82 +402,198 @@
   }
   
   .briki-toggle-slider {
-    @apply w-12 h-6 rounded-full transition-colors;
+    @apply w-[48px] h-6 rounded-full transition-all duration-300;
     background-color: hsl(var(--muted));
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15);
   }
   
   .briki-toggle-slider:after {
     content: '';
-    @apply absolute left-1 top-1 w-4 h-4 rounded-full transition-all;
-    background: linear-gradient(145deg, #f5f5f5, #ededed);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    @apply absolute left-1 top-1 w-4 h-4 rounded-full transition-all duration-300;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
   }
   
   .briki-toggle-input:checked + .briki-toggle-slider {
     background: var(--gradient-primary);
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 10px rgba(59, 130, 246, 0.3);
   }
   
   .briki-toggle-input:checked + .briki-toggle-slider:after {
-    transform: translateX(1.5rem);
+    transform: translateX(calc(100% + 8px));
     background: white;
   }
   
-  /* Futuristic badge - Glowing edge effect */
+  /* Modern badge with subtle gradient */
   .briki-badge {
-    @apply inline-flex items-center justify-center px-2.5 py-0.5 text-xs font-medium;
-    border-radius: 9999px;
-    background: linear-gradient(145deg, hsl(var(--muted) / 0.7), hsl(var(--muted)));
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    border: 1px solid hsl(var(--border) / 0.5);
-    backdrop-filter: blur(5px);
+    @apply inline-flex items-center justify-center px-2.5 py-1 text-xs font-medium;
+    border-radius: 20px;
+    background: hsl(var(--muted) / 0.6);
+    color: hsl(var(--muted-foreground) / 0.9);
+    transition: all 0.15s ease;
   }
   
   .briki-badge-primary {
-    background: linear-gradient(145deg, hsl(var(--primary) / 0.2), hsl(var(--primary) / 0.1));
+    background: var(--gradient-card-hover);
     color: hsl(var(--primary));
-    border-color: hsl(var(--primary) / 0.3);
-    box-shadow: 0 0 8px rgba(59, 130, 246, 0.2);
+    box-shadow: 0 0 0 1px hsl(var(--primary) / 0.2);
+  }
+  
+  .briki-badge-primary:hover {
+    box-shadow: 0 0 0 1px hsl(var(--primary) / 0.3), 0 2px 5px rgba(79, 70, 229, 0.1);
+    transform: translateY(-1px);
   }
   
   .briki-badge-success {
-    background: linear-gradient(145deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.1));
+    background: linear-gradient(145deg, rgba(16, 185, 129, 0.05), rgba(16, 185, 129, 0.1));
     color: #10B981;
-    border-color: rgba(16, 185, 129, 0.3);
-    box-shadow: 0 0 8px rgba(16, 185, 129, 0.2);
+    box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.2);
+  }
+  
+  .briki-badge-success:hover {
+    box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.3), 0 2px 5px rgba(16, 185, 129, 0.1);
+    transform: translateY(-1px);
   }
 
-  /* New AI-powered visualization elements */
+  /* Enhanced AI-powered visualization elements */
   .ai-data-visual {
     @apply relative overflow-hidden;
     border-radius: var(--radius);
-    background: linear-gradient(145deg, hsl(var(--card)), hsl(var(--card) / 0.8));
+    background: white;
     border: 1px solid hsl(var(--border));
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 30px -5px rgba(0, 0, 0, 0.12);
   }
 
   .ai-data-particle {
-    @apply absolute w-1 h-1 rounded-full;
-    background: hsl(var(--primary));
-    opacity: 0.6;
+    @apply absolute rounded-full;
+    background: var(--gradient-primary);
     filter: blur(1px);
-    animation: float 8s infinite ease-in-out;
+    animation: ai-particle-float 10s infinite cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .ai-data-particle-sm {
+    @apply w-1 h-1;
+    opacity: 0.4;
+  }
+  
+  .ai-data-particle-md {
+    @apply w-1.5 h-1.5;
+    opacity: 0.35;
+  }
+  
+  .ai-data-particle-lg {
+    @apply w-2 h-2;
+    opacity: 0.25;
   }
 
-  @keyframes float {
+  @keyframes ai-particle-float {
     0%, 100% { transform: translate(0, 0); }
-    25% { transform: translate(10px, -10px); }
-    50% { transform: translate(15px, 5px); }
-    75% { transform: translate(-5px, 10px); }
+    20% { transform: translate(15px, -15px) scale(1.05); }
+    40% { transform: translate(20px, 10px) scale(0.95); }
+    60% { transform: translate(-10px, 15px) scale(1.1); }
+    80% { transform: translate(-15px, -5px) scale(0.9); }
+  }
+  
+  /* Animation for elements entrance */
+  .animate-slide-up {
+    animation: slide-up 0.5s cubic-bezier(0.21, 0.61, 0.35, 1) forwards;
+  }
+  
+  @keyframes slide-up {
+    from { 
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to { 
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Animation for items list entrance */
+  .animate-slide-in-stagger > * {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  
+  .animate-slide-in-stagger > *:nth-child(1) { animation: slide-in 0.3s cubic-bezier(0.21, 0.61, 0.35, 1) forwards 0.1s; }
+  .animate-slide-in-stagger > *:nth-child(2) { animation: slide-in 0.3s cubic-bezier(0.21, 0.61, 0.35, 1) forwards 0.15s; }
+  .animate-slide-in-stagger > *:nth-child(3) { animation: slide-in 0.3s cubic-bezier(0.21, 0.61, 0.35, 1) forwards 0.2s; }
+  .animate-slide-in-stagger > *:nth-child(4) { animation: slide-in 0.3s cubic-bezier(0.21, 0.61, 0.35, 1) forwards 0.25s; }
+  .animate-slide-in-stagger > *:nth-child(5) { animation: slide-in 0.3s cubic-bezier(0.21, 0.61, 0.35, 1) forwards 0.3s; }
+  
+  @keyframes slide-in {
+    from { 
+      opacity: 0;
+      transform: translateX(10px);
+    }
+    to { 
+      opacity: 1;
+      transform: translateX(0);
+    }
   }
 
-  /* Futuristic section headers with gradient text */
+  /* Stripe-inspired gradient text headers */
   .section-header {
     @apply font-bold tracking-tight;
-    background: linear-gradient(to right, #3B82F6, #60A5FA);
+    background: var(--gradient-primary);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+    position: relative;
+    z-index: 1;
+  }
+  
+  .section-header::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 30%;
+    left: 0;
+    bottom: 0.1em;
+    background: var(--gradient-primary);
+    opacity: 0.1;
+    z-index: -1;
+    border-radius: 4px;
+  }
+  
+  /* Auth page specific styles */
+  .auth-card {
+    @apply rounded-2xl bg-white shadow-xl p-8 border border-transparent relative overflow-hidden;
+    transition: all 0.25s cubic-bezier(0.21, 0.61, 0.35, 1);
+  }
+  
+  .auth-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.03) 0%, rgba(14, 165, 233, 0.03) 100%);
+    z-index: 0;
+  }
+  
+  .auth-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 1rem;
+    padding: 1px;
+    background: var(--gradient-primary);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0.5;
+  }
+  
+  .auth-card > * {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .auth-background {
+    @apply fixed inset-0 opacity-20;
+    background-image: 
+      radial-gradient(circle at 25% 25%, rgba(79, 70, 229, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 75% 75%, rgba(14, 165, 233, 0.1) 0%, transparent 50%);
   }
 }
