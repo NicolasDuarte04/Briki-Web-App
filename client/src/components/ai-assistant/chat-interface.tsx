@@ -44,15 +44,15 @@ const ChatMessage = ({ message }: { message: Message }) => {
       >
         <div className="flex items-center gap-2">
           {!isUser && (
-            <div className="bg-primary text-primary-foreground w-8 h-8 rounded-full flex items-center justify-center">
+            <div className="bg-gradient-to-r from-violet-500 to-indigo-500 text-white w-8 h-8 rounded-full flex items-center justify-center shadow-sm">
               <Bot size={16} />
             </div>
           )}
-          <Badge variant={isUser ? "outline" : "default"} className="h-6">
+          <Badge variant={isUser ? "outline" : "secondary"} className="h-6">
             {isUser ? 'You' : 'Briki AI'}
           </Badge>
           {isUser && (
-            <div className="bg-primary text-primary-foreground w-8 h-8 rounded-full flex items-center justify-center">
+            <div className="bg-gradient-to-r from-violet-500 to-indigo-500 text-white w-8 h-8 rounded-full flex items-center justify-center shadow-sm">
               <MessageSquare size={14} />
             </div>
           )}
@@ -60,10 +60,10 @@ const ChatMessage = ({ message }: { message: Message }) => {
         
         <div
           className={cn(
-            "px-4 py-3 rounded-lg",
+            "px-4 py-3 rounded-lg shadow-sm",
             isUser
-              ? "bg-primary text-primary-foreground rounded-tr-none"
-              : "bg-muted rounded-tl-none"
+              ? "bg-gradient-to-r from-violet-500 to-indigo-500 text-white rounded-tr-none"
+              : "bg-white/80 dark:bg-white/10 backdrop-blur-sm border border-white/20 dark:border-white/5 text-foreground rounded-tl-none"
           )}
         >
           <div className="text-sm leading-relaxed">
@@ -97,7 +97,7 @@ const EmptyState = ({ onStartConversation }: { onStartConversation: (message: st
 
   return (
     <div className="flex flex-col items-center justify-center h-full p-6 text-center space-y-6">
-      <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center">
+      <div className="h-20 w-20 rounded-full bg-gradient-to-r from-violet-500/20 to-indigo-500/20 flex items-center justify-center">
         <Bot size={40} className="text-primary" />
       </div>
       
@@ -254,12 +254,12 @@ export default function ChatInterface({
             <Card className="shadow-lg border border-white/20 dark:border-white/10 backdrop-blur-md bg-white/80 dark:bg-black/40 flex flex-col h-full overflow-hidden">
               <CardHeader className="px-4 py-3 border-b flex flex-row items-center justify-between space-y-0">
                 <div className="flex items-center space-x-2">
-                  <div className="bg-primary text-primary-foreground w-8 h-8 rounded-full flex items-center justify-center">
+                  <div className="bg-gradient-to-r from-violet-500 to-indigo-500 text-white w-8 h-8 rounded-full flex items-center justify-center shadow-sm">
                     <Bot size={18} />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-base">Briki AI Assistant</h3>
-                    <p className="text-xs text-muted-foreground">
+                    <h3 className="font-semibold text-base text-foreground">Briki AI Assistant</h3>
+                    <p className="text-xs text-foreground/60">
                       {isLoading ? 'Thinking...' : 'Ready to help'}
                     </p>
                   </div>
@@ -309,7 +309,7 @@ export default function ChatInterface({
                 )}
               </CardContent>
               
-              <CardFooter className="p-3 pt-2 border-t">
+              <CardFooter className="p-3 pt-2 border-t border-slate-200/50 dark:border-slate-800/50">
                 <form onSubmit={handleSubmit} className="flex w-full gap-2">
                   <Input
                     ref={inputRef}
@@ -318,13 +318,13 @@ export default function ChatInterface({
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     disabled={isLoading}
-                    className="flex-grow"
+                    className="flex-grow bg-white/50 dark:bg-white/5 border-white/20 dark:border-white/10 backdrop-blur-sm"
                   />
                   <Button 
                     type="submit" 
                     size="icon" 
                     disabled={!input.trim() || isLoading}
-                    className={isLoading ? 'animate-pulse' : ''}
+                    className={`bg-gradient-to-r from-violet-500 to-indigo-500 hover:from-violet-600 hover:to-indigo-600 text-white border-0 ${isLoading ? 'animate-pulse' : ''}`}
                   >
                     {isLoading ? (
                       <RefreshCw size={18} className="animate-spin" />
