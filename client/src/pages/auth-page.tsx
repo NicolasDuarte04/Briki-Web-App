@@ -481,8 +481,8 @@ export default function AuthPage() {
                 whileHover={{ scale: 1.1, y: -5 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >
-                <div className="h-16 w-16 mb-3">
-                  <TravelIcon className="h-full w-full" />
+                <div className="h-16 w-16 mb-3 relative">
+                  <AppleTravelIcon className="h-full w-full absolute inset-0" />
                 </div>
                 <span className="text-foreground/90">Travel Insurance</span>
               </motion.div>
@@ -492,8 +492,8 @@ export default function AuthPage() {
                 whileHover={{ scale: 1.1, y: -5 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >
-                <div className="h-16 w-16 mb-3">
-                  <AutoIcon className="h-full w-full" />
+                <div className="h-16 w-16 mb-3 relative">
+                  <AppleAutoIcon className="h-full w-full absolute inset-0" />
                 </div>
                 <span className="text-foreground/90">Auto Insurance</span>
               </motion.div>
@@ -503,8 +503,8 @@ export default function AuthPage() {
                 whileHover={{ scale: 1.1, y: -5 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >
-                <div className="h-16 w-16 mb-3">
-                  <PetIcon className="h-full w-full" />
+                <div className="h-16 w-16 mb-3 relative">
+                  <ApplePetIcon className="h-full w-full absolute inset-0" />
                 </div>
                 <span className="text-foreground/90">Pet Insurance</span>
               </motion.div>
@@ -514,8 +514,8 @@ export default function AuthPage() {
                 whileHover={{ scale: 1.1, y: -5 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >
-                <div className="h-16 w-16 mb-3">
-                  <HealthIcon className="h-full w-full" />
+                <div className="h-16 w-16 mb-3 relative">
+                  <AppleHealthIcon className="h-full w-full absolute inset-0" />
                 </div>
                 <span className="text-foreground/90">Health Insurance</span>
               </motion.div>
