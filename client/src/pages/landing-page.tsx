@@ -91,7 +91,7 @@ export default function LandingPage() {
             <div className="flex items-center gap-3">
               <Button 
                 variant="outline" 
-                onClick={() => navigate("/company")}
+                onClick={() => navigate("/company-login")}
                 className="hidden sm:flex items-center justify-center px-5 py-2.5 text-sm font-medium text-indigo-700 border border-indigo-300 bg-white hover:bg-indigo-50/80 hover:text-indigo-800 transition-all shadow-sm rounded-md"
               >
                 <span>For Insurance Companies</span>

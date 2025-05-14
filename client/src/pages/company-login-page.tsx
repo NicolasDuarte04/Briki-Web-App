@@ -52,8 +52,8 @@ export default function CompanyLoginPage() {
         role: 'company'
       });
       
-      // Redirect to company dashboard on success
-      navigate("/company-dashboard");
+      // NOTE: Redirection is now handled centrally by the auth hook
+      // This ensures consistent routing behavior across all login points
       
     } catch (error) {
       console.error("Login error:", error);

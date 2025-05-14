@@ -12,7 +12,7 @@ export default function PartnerSection() {
   const [, navigate] = useLocation();
 
   const handlePartnerClick = () => {
-    navigate('/company');
+    navigate('/company-login');
   };
 
   const features = [
