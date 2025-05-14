@@ -55,8 +55,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.log("Company user detected, redirecting to company dashboard");
       navigate("/company-dashboard");
     } else {
-      console.log("Standard user detected, redirecting to trip info page");
-      navigate("/trip-info");
+      console.log("Standard user detected, redirecting to home page");
+      navigate("/home");
     }
   };
   
