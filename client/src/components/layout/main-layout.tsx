@@ -317,7 +317,7 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
                         <>
                           <div className="border-t border-gray-200 my-4"></div>
                           <Link 
-                            href="/company" 
+                            href="/company-login" 
                             className="block px-3 py-2 rounded-md text-base font-medium text-blue-600 hover:bg-blue-50"
                             onClick={() => setIsOpen(false)}
                           >
