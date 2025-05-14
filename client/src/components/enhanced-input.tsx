@@ -247,7 +247,7 @@ const EnhancedInput = React.forwardRef<HTMLInputElement, EnhancedInputProps>(
       if (label && !hideLabel) {
         labelStyles = cn(
           labelStyles,
-          "mb-2 block text-sm font-medium text-foreground"
+          "mb-2 block text-sm font-semibold text-slate-800"
         );
       }
     }

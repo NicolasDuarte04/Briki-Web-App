@@ -150,20 +150,20 @@ export default function AuthPageNew() {
   }, [loginMutation.isSuccess, registerMutation.isSuccess, toast]);
 
   return (
-    <AnimatedBackground variant="auth" className="flex min-h-screen items-center justify-center px-4 py-16">
+    <AnimatedBackground variant="auth" className="flex min-h-screen items-center justify-center px-4 py-24">
       {/* Centered auth container */}
-      <div className="relative z-10 w-full max-w-lg px-8 py-6">
+      <div className="relative z-10 w-full max-w-lg px-4 py-8 mt-16">
         {/* Logo and branding */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.21, 0.61, 0.35, 1] }}
-          className="text-center mb-6"
+          className="text-center mb-10"
         >
           <h1 className="text-4xl font-bold tracking-tighter bg-gradient-to-r from-[#4C6EFF] to-[#5F9FFF] bg-clip-text text-transparent drop-shadow-md">
             Briki
           </h1>
-          <p className="text-lg text-white/90 font-medium drop-shadow-md mt-1">
+          <p className="text-lg text-slate-800 font-semibold mt-1 px-2 py-1 bg-white/50 rounded-md backdrop-blur-sm inline-block">
             AI-Powered Insurance Platform
           </p>
         </motion.div>
@@ -173,8 +173,9 @@ export default function AuthPageNew() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2, ease: [0.21, 0.61, 0.35, 1] }}
+          className="relative z-20"
         >
-          <GlassCard className="p-6 md:p-8">
+          <GlassCard className="p-6 md:p-8 shadow-xl">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid grid-cols-2 mb-6 bg-white/10 p-1 rounded-lg">
                 <TabsTrigger 
