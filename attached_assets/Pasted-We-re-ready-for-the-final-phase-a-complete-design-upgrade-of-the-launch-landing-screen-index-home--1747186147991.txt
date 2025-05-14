@@ -1,0 +1,33 @@
+We’re ready for the final phase: a complete design upgrade of the launch/landing screen (index/home) of the Briki web app. We want this page to instantly impress visitors, reflect our brand values (AI-powered, modern, accessible, trustworthy), and elevate the visual impact while keeping existing structure and content.
+
+Please implement the following changes without deleting any functionality:
+
+1. **Hero Section Improvements**
+   - Improve the layout and design of the countdown timer (reduce size, align beside or below title in a stylish way).
+   - Rewrite and visually upgrade the heading “The easiest way to compare and understand insurance plans” with a strong headline font and more prominent sizing.
+   - Add microanimations or visual movement to the timer and headline (subtle entrance effects or animated background behind the countdown).
+
+2. **CTA & Action Area**
+   - Redesign the “Pre-Test the App” button to match the new blue theme (#4C6EFF to #5F9FFF) with soft hover-glow, shadow, and arrow animation.
+   - Reorganize the benefits grid (Personalized Insurance, Secure Platform, etc.) to be more compact and mobile-responsive with icons enlarged and better spaced.
+   - Make the Briki Pilot visible in a small animated floating state (can be subtle), maybe reacting when the user hovers near the CTA.
+
+3. **Brand & Identity Integration**
+   - Replace the static logo with the new version we’ve generated (uploaded to assets).
+   - Add an animated version of the gradient background (inspired by Stripe) that loops subtly and gives motion to the background layer.
+   - Use soft floating elements or liquid effect bubbles in the corner for ambient movement.
+
+4. **Layout Refinement**
+   - Improve spacing between elements to avoid excessive white space.
+   - Align section blocks with better visual flow between countdown → headline → features → CTA.
+   - Add very soft glassmorphism shadows behind cards and CTA for depth.
+
+5. **Footer Notice**
+   - Keep the Beta Notice but make it compact, semi-transparent, and anchored visually below the fold, so it doesn't interrupt flow.
+
+Final notes:
+- Do not delete any existing components or features like login routes or the timer logic.
+- We want this redesign to be as transformative as the previous "futuristic AI version," but now focused on **modern SaaS clarity, motion, and elegance**—Stripe-level quality.
+- Make sure design is fully responsive and optimized for mobile-first experience.
+
+Let us know if you need anything else to complete this redesign.
