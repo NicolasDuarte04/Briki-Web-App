@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/form";
 
 // Icons
-import { Mail, Lock, User, Info, LockKeyhole } from "lucide-react";
+import { Mail, Lock, User, Info } from "lucide-react";
 
 // Form schemas
 const loginSchema = z.object({
@@ -100,15 +100,9 @@ export default function AuthPageNew() {
     // Check auth on load
     const checkAuth = async () => {
       try {
-        const authToken = localStorage.getItem('auth_token');
-        if (!authToken) {
-          console.log("AuthPage: No auth token found in storage");
-          return;
-        }
-        
         const response = await fetch('/api/user', {
+          credentials: 'include',
           headers: {
-            'Authorization': `Bearer ${authToken}`,
             'Cache-Control': 'no-cache',
             'Accept': 'application/json',
           }
@@ -118,8 +112,6 @@ export default function AuthPageNew() {
           console.log("AuthPage: Direct auth check - User is authenticated");
         } else {
           console.log("AuthPage: Direct auth check - No authenticated user");
-          // Clear invalid token
-          localStorage.removeItem('auth_token');
         }
       } catch (error) {
         console.error("AuthPage: Error checking auth status:", error);
@@ -139,7 +131,7 @@ export default function AuthPageNew() {
     }
   }, [user]);
   
-  // Handle auth flow redirects and errors
+  // Handle auth flow redirects
   useEffect(() => {
     if (loginMutation.isSuccess || registerMutation.isSuccess) {
       console.log("AuthPage: Auth successful, redirecting to home page");
@@ -153,49 +145,25 @@ export default function AuthPageNew() {
       
       setTimeout(() => {
         window.location.href = '/home';
-      }, 500); // Slightly longer delay for smoother transition
+      }, 100);
     }
-    
-    // Reset form when there's an error
-    if (loginMutation.isError) {
-      loginForm.reset({
-        ...loginForm.getValues(),
-        password: '' // Clear password field on error
-      });
-    }
-    
-    if (registerMutation.isError) {
-      registerForm.reset({
-        ...registerForm.getValues(),
-        password: '',
-        confirmPassword: ''
-      });
-    }
-  }, [
-    loginMutation.isSuccess, 
-    registerMutation.isSuccess, 
-    loginMutation.isError,
-    registerMutation.isError,
-    loginForm,
-    registerForm,
-    toast
-  ]);
+  }, [loginMutation.isSuccess, registerMutation.isSuccess, toast]);
 
   return (
-    <AnimatedBackground variant="auth" className="flex min-h-screen items-center justify-center p-4">
-      {/* Centered auth container - fixed width with better responsive behavior */}
-      <div className="relative z-10 flex flex-col items-center justify-center w-full max-w-[420px] mx-auto">
+    <AnimatedBackground variant="auth" className="flex min-h-screen items-center justify-center px-4 py-16">
+      {/* Centered auth container */}
+      <div className="relative z-10 w-full max-w-lg px-8 py-6">
         {/* Logo and branding */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.21, 0.61, 0.35, 1] }}
-          className="text-center mb-8"
+          className="text-center mb-6"
         >
-          <h1 className="text-5xl font-bold tracking-tighter bg-gradient-to-r from-[#3D70F5] to-[#59A0FF] bg-clip-text text-transparent drop-shadow-md">
+          <h1 className="text-4xl font-bold tracking-tighter bg-gradient-to-r from-[#4C6EFF] to-[#5F9FFF] bg-clip-text text-transparent drop-shadow-md">
             Briki
           </h1>
-          <p className="text-lg text-slate-800 font-semibold mt-2 px-3 py-1.5 bg-white/60 rounded-md backdrop-blur-sm inline-block shadow-sm">
+          <p className="text-lg text-white/90 font-medium drop-shadow-md mt-1">
             AI-Powered Insurance Platform
           </p>
         </motion.div>
@@ -205,26 +173,25 @@ export default function AuthPageNew() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2, ease: [0.21, 0.61, 0.35, 1] }}
-          className="relative z-20 w-full"
         >
-          <GlassCard variant="default" hover="glow" className="p-6 sm:p-8 md:p-10 shadow-2xl">
+          <GlassCard className="p-6 md:p-8">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid grid-cols-2 mb-8 bg-white/20 p-1.5 rounded-lg border border-white/30 shadow-inner">
+              <TabsList className="grid grid-cols-2 mb-6 bg-white/10 p-1 rounded-lg">
                 <TabsTrigger 
                   value="login" 
-                  className={`rounded-md py-3 text-sm font-semibold transition-all duration-300
+                  className={`rounded-md py-2.5 text-sm font-medium transition-all
                     ${activeTab === 'login' 
-                      ? 'bg-gradient-to-r from-[#3D70F5] to-[#59A0FF] text-white shadow-md' 
-                      : 'text-slate-700 hover:text-slate-900 hover:bg-white/30'}`}
+                      ? 'bg-white text-primary shadow-sm' 
+                      : 'text-foreground/70 hover:text-foreground/90'}`}
                 >
                   Sign In
                 </TabsTrigger>
                 <TabsTrigger 
                   value="register" 
-                  className={`rounded-md py-3 text-sm font-semibold transition-all duration-300
+                  className={`rounded-md py-2.5 text-sm font-medium transition-all
                     ${activeTab === 'register' 
-                      ? 'bg-gradient-to-r from-[#3D70F5] to-[#59A0FF] text-white shadow-md' 
-                      : 'text-slate-700 hover:text-slate-900 hover:bg-white/30'}`}
+                      ? 'bg-white text-primary shadow-sm' 
+                      : 'text-foreground/70 hover:text-foreground/90'}`}
                 >
                   Sign Up
                 </TabsTrigger>
@@ -242,12 +209,9 @@ export default function AuthPageNew() {
                           <EnhancedInput
                             label="Username" 
                             placeholder="Enter your username"
-                            icon={<User size={16} className="text-slate-500" />}
-                            containerClassName="shadow-sm"
-                            className="border-2 border-white/40 placeholder:text-slate-500/80 text-slate-800 font-medium h-12"
+                            icon={<User size={18} />}
                             {...field} 
                           />
-                          <FormMessage className="font-medium text-red-500" />
                         </FormItem>
                       )}
                     />
@@ -261,12 +225,9 @@ export default function AuthPageNew() {
                             label="Password"
                             type="password"
                             placeholder="Enter your password"
-                            icon={<Lock size={16} className="text-slate-500" />}
-                            containerClassName="shadow-sm"
-                            className="border-2 border-white/40 placeholder:text-slate-500/80 text-slate-800 font-medium h-12"
+                            icon={<Lock size={18} />}
                             {...field} 
                           />
-                          <FormMessage className="font-medium text-red-500" />
                         </FormItem>
                       )}
                     />
@@ -281,28 +242,28 @@ export default function AuthPageNew() {
                               <Checkbox
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
-                                className="rounded border-2 border-slate-300 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                                className="rounded border-input data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                               />
                             </FormControl>
-                            <FormLabel className="text-sm font-medium text-slate-700 cursor-pointer">Remember me</FormLabel>
+                            <FormLabel className="text-sm font-normal text-foreground/80 cursor-pointer">Remember me</FormLabel>
                           </FormItem>
                         )}
                       />
                       <button 
                         type="button" 
-                        className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
+                        className="text-sm text-primary hover:text-primary/80 transition-colors"
                       >
                         Forgot password?
                       </button>
                     </div>
                     
-                    <div className="pt-5">
+                    <div className="pt-2">
                       <GradientButton
                         type="submit"
                         size="lg"
                         loading={loginMutation.isPending}
                         loadingText="Signing in..."
-                        className="w-full py-6 text-base font-semibold shadow-lg hover:shadow-xl transition-shadow"
+                        className="w-full"
                       >
                         Sign in
                       </GradientButton>
@@ -310,20 +271,20 @@ export default function AuthPageNew() {
                   </form>
                 </Form>
                 
-                <div className="relative flex items-center justify-center my-8">
+                <div className="relative flex items-center justify-center my-6">
                   <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-white/30"></div>
+                    <div className="w-full border-t border-white/20"></div>
                   </div>
-                  <div className="relative z-10 bg-white/70 px-4 py-1 text-sm font-medium text-slate-700 rounded-md backdrop-blur-sm shadow-sm">
+                  <div className="relative z-10 bg-[rgba(255,255,255,0.8)] px-4 text-sm text-foreground/70 backdrop-blur-sm">
                     Or continue with
                   </div>
                 </div>
                   
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3">
                   <motion.button 
-                    whileHover={{ scale: 1.03, y: -2 }} 
+                    whileHover={{ scale: 1.02 }} 
                     whileTap={{ scale: 0.98 }}
-                    className="flex h-12 items-center justify-center gap-3 rounded-xl bg-white/80 text-sm font-semibold text-slate-800 shadow-md backdrop-blur-sm transition-all duration-300 hover:bg-white/95 hover:shadow-lg border border-white/40"
+                    className="flex h-11 items-center justify-center gap-2 rounded-xl bg-white/70 text-sm font-medium text-foreground shadow-sm backdrop-blur-sm transition hover:bg-white/90 border border-white/40"
                     type="button"
                   >
                     <svg className="w-5 h-5 text-[#4285F4]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">
@@ -333,9 +294,9 @@ export default function AuthPageNew() {
                   </motion.button>
                   
                   <motion.button 
-                    whileHover={{ scale: 1.03, y: -2 }} 
+                    whileHover={{ scale: 1.02 }} 
                     whileTap={{ scale: 0.98 }}
-                    className="flex h-12 items-center justify-center gap-3 rounded-xl bg-white/80 text-sm font-semibold text-slate-800 shadow-md backdrop-blur-sm transition-all duration-300 hover:bg-white/95 hover:shadow-lg border border-white/40"
+                    className="flex h-11 items-center justify-center gap-2 rounded-xl bg-white/70 text-sm font-medium text-foreground shadow-sm backdrop-blur-sm transition hover:bg-white/90 border border-white/40"
                     type="button"
                   >
                     <svg className="w-5 h-5 text-[#1877F2]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
@@ -358,12 +319,9 @@ export default function AuthPageNew() {
                           <EnhancedInput
                             label="Username" 
                             placeholder="Choose a username"
-                            icon={<User size={16} className="text-slate-500" />}
-                            containerClassName="shadow-sm"
-                            className="border-2 border-white/40 placeholder:text-slate-500/80 text-slate-800 font-medium h-12"
+                            icon={<User size={18} />}
                             {...field} 
                           />
-                          <FormMessage className="font-medium text-red-500" />
                         </FormItem>
                       )}
                     />
@@ -376,12 +334,9 @@ export default function AuthPageNew() {
                           <EnhancedInput
                             label="Email" 
                             placeholder="Enter your email"
-                            icon={<Mail size={16} className="text-slate-500" />}
-                            containerClassName="shadow-sm"
-                            className="border-2 border-white/40 placeholder:text-slate-500/80 text-slate-800 font-medium h-12"
+                            icon={<Mail size={18} />}
                             {...field} 
                           />
-                          <FormMessage className="font-medium text-red-500" />
                         </FormItem>
                       )}
                     />
@@ -395,12 +350,9 @@ export default function AuthPageNew() {
                             label="Password"
                             type="password"
                             placeholder="Create a password"
-                            icon={<Lock size={16} className="text-slate-500" />}
-                            containerClassName="shadow-sm"
-                            className="border-2 border-white/40 placeholder:text-slate-500/80 text-slate-800 font-medium h-12"
+                            icon={<Lock size={18} />}
                             {...field} 
                           />
-                          <FormMessage className="font-medium text-red-500" />
                         </FormItem>
                       )}
                     />
@@ -414,12 +366,9 @@ export default function AuthPageNew() {
                             label="Confirm Password"
                             type="password"
                             placeholder="Confirm your password"
-                            icon={<Lock size={16} className="text-slate-500" />}
-                            containerClassName="shadow-sm"
-                            className="border-2 border-white/40 placeholder:text-slate-500/80 text-slate-800 font-medium h-12"
+                            icon={<Lock size={18} />}
                             {...field} 
                           />
-                          <FormMessage className="font-medium text-red-500" />
                         </FormItem>
                       )}
                     />
@@ -453,13 +402,13 @@ export default function AuthPageNew() {
                       )}
                     />
                     
-                    <div className="pt-5">
+                    <div className="pt-2">
                       <GradientButton
                         type="submit"
                         size="lg"
                         loading={registerMutation.isPending}
                         loadingText="Creating account..."
-                        className="w-full py-6 text-base font-semibold shadow-lg hover:shadow-xl transition-shadow"
+                        className="w-full"
                       >
                         Create account
                       </GradientButton>
@@ -476,11 +425,11 @@ export default function AuthPageNew() {
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3">
                   <motion.button 
-                    whileHover={{ scale: 1.03, y: -2 }} 
+                    whileHover={{ scale: 1.02 }} 
                     whileTap={{ scale: 0.98 }}
-                    className="flex h-12 items-center justify-center gap-3 rounded-xl bg-white/80 text-sm font-semibold text-slate-800 shadow-md backdrop-blur-sm transition-all duration-300 hover:bg-white/95 hover:shadow-lg border border-white/40"
+                    className="flex h-11 items-center justify-center gap-2 rounded-xl bg-white/70 text-sm font-medium text-foreground shadow-sm backdrop-blur-sm transition hover:bg-white/90 border border-white/40"
                     type="button"
                   >
                     <svg className="w-5 h-5 text-[#4285F4]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">
@@ -490,9 +439,9 @@ export default function AuthPageNew() {
                   </motion.button>
                   
                   <motion.button 
-                    whileHover={{ scale: 1.03, y: -2 }} 
+                    whileHover={{ scale: 1.02 }} 
                     whileTap={{ scale: 0.98 }}
-                    className="flex h-12 items-center justify-center gap-3 rounded-xl bg-white/80 text-sm font-semibold text-slate-800 shadow-md backdrop-blur-sm transition-all duration-300 hover:bg-white/95 hover:shadow-lg border border-white/40"
+                    className="flex h-11 items-center justify-center gap-2 rounded-xl bg-white/70 text-sm font-medium text-foreground shadow-sm backdrop-blur-sm transition hover:bg-white/90 border border-white/40"
                     type="button"
                   >
                     <svg className="w-5 h-5 text-[#1877F2]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">

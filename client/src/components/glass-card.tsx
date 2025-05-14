@@ -4,17 +4,17 @@ import { cn } from "@/lib/utils";
 import { motion, type HTMLMotionProps } from "framer-motion";
 
 const glassCardVariants = cva(
-  "relative overflow-hidden rounded-xl border backdrop-blur-lg",
+  "relative overflow-hidden rounded-xl border shadow-sm backdrop-blur-md",
   {
     variants: {
       variant: {
-        default: "bg-white/60 border-white/30 shadow-[0_8px_32px_rgba(0,0,0,0.12)]",
-        dark: "bg-gray-900/70 border-gray-700/50 shadow-[0_8px_32px_rgba(0,0,0,0.25)] text-white",
-        blue: "bg-blue-50/70 border-blue-200/40 shadow-[0_8px_32px_rgba(59,130,246,0.15)]",
-        primary: "bg-primary/15 border-primary/30 shadow-[0_8px_32px_rgba(59,130,246,0.18)]",
-        danger: "bg-red-50/70 border-red-200/40 shadow-[0_8px_32px_rgba(239,68,68,0.15)]",
-        warning: "bg-orange-50/70 border-orange-200/40 shadow-[0_8px_32px_rgba(249,115,22,0.15)]",
-        success: "bg-green-50/70 border-green-200/40 shadow-[0_8px_32px_rgba(34,197,94,0.15)]",
+        default: "bg-white/60 border-gray-100/40 shadow-gray-200/30",
+        dark: "bg-gray-900/70 border-gray-700/50 shadow-gray-900/40 text-white",
+        blue: "bg-blue-50/60 border-blue-100/40 shadow-blue-200/30",
+        primary: "bg-primary/10 border-primary/20 shadow-primary/20",
+        danger: "bg-red-50/60 border-red-100/40 shadow-red-200/30",
+        warning: "bg-orange-50/60 border-orange-100/40 shadow-orange-200/30",
+        success: "bg-green-50/60 border-green-100/40 shadow-green-200/30",
         transparent: "bg-transparent border-transparent shadow-none",
       },
       size: {
@@ -26,10 +26,10 @@ const glassCardVariants = cva(
       },
       hover: {
         none: "",
-        lift: "hover:translate-y-[-4px] transition-transform duration-300",
-        glow: "hover:shadow-xl hover:shadow-primary/25 transition-shadow duration-300",
-        border: "hover:border-primary/50 transition-colors duration-300",
-        full: "hover:translate-y-[-4px] hover:shadow-xl hover:shadow-primary/25 hover:border-primary/50 transition-all duration-300",
+        lift: "hover:translate-y-[-4px] transition-transform",
+        glow: "hover:shadow-lg hover:shadow-primary/20 transition-shadow",
+        border: "hover:border-primary/40 transition-colors",
+        full: "hover:translate-y-[-4px] hover:shadow-lg hover:shadow-primary/20 hover:border-primary/40 transition-all",
       },
       interactive: {
         true: "cursor-pointer active:translate-y-[1px]",
@@ -46,13 +46,11 @@ const glassCardVariants = cva(
 );
 
 export interface GlassCardProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, keyof HTMLMotionProps<"div">>,
+  extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof glassCardVariants> {
   // Add any additional properties here
   disableMotion?: boolean;
-  motionProps?: Partial<HTMLMotionProps<"div">>;
-  className?: string;
-  children?: React.ReactNode;
+  motionProps?: HTMLMotionProps<"div">;
 }
 
 /**
@@ -84,9 +82,6 @@ const GlassCard = React.forwardRef<HTMLDivElement, GlassCardProps>(
       );
     }
     
-    // Cast to avoid TypeScript errors with motion props
-    const safeProps = props as Omit<React.HTMLAttributes<HTMLDivElement>, keyof HTMLMotionProps<"div">>;
-    
     return (
       <motion.div
         ref={ref}
@@ -95,7 +90,7 @@ const GlassCard = React.forwardRef<HTMLDivElement, GlassCardProps>(
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, ease: "easeOut" }}
         {...motionProps}
-        {...safeProps}
+        {...props}
       />
     );
   }
