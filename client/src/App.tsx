@@ -10,6 +10,7 @@ import { PageTransition } from "@/components/ui/transition-effect";
 import { RecentlyViewedProvider } from "@/contexts/recently-viewed-context";
 import { AIAssistantProvider, AuthenticatedLayout } from "@/components/layout";
 import { LoginNotification } from "@/components/login-notification";
+import NavbarNew from "@/components/navbar-new";
 
 import NotFound from "@/pages/not-found";
 import HomePage from "@/pages/home-page";
@@ -120,7 +121,13 @@ function AppContent() {
   }
   
   // Otherwise just render the Router without AI Assistant
-  return <Router />;
+  return (
+    <>
+      {/* Only show navbar on non-auth pages */}
+      {location !== '/auth' && <NavbarNew />}
+      <Router />
+    </>
+  );
 }
 
 function App() {
