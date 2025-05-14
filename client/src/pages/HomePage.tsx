@@ -1,387 +1,309 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'wouter';
 import { motion } from 'framer-motion';
-import { ArrowRight, ArrowUpRight, ShieldCheck, Heart, Car, Plane } from 'lucide-react';
-
+import { useAuth } from '@/hooks/use-auth';
 import NavigationBar from '@/components/NavigationBar';
 import AnimatedBackground from '@/components/AnimatedBackground';
-import GlassCard from '@/components/GlassCard';
-import FloatingElement from '@/components/FloatingElement';
-import AnimatedLogo from '@/components/AnimatedLogo';
-import CountdownTimer from '@/components/CountdownTimer';
 import AnimatedCTAButton from '@/components/AnimatedCTAButton';
-import AIAssistant from '@/components/AIAssistant';
-
+import GlassCard from '@/components/GlassCard';
+import { MdAutoAwesome, MdHealthAndSafety, MdPets, MdCardTravel } from 'react-icons/md';
+import { LuArrowRight } from 'react-icons/lu';
+import { IoShieldCheckmark } from 'react-icons/io5';
 import '@/styles/design-system.css';
 
+// Insurance categories for the cards
+const insuranceCategories = [
+  {
+    id: 'travel',
+    name: 'Travel Insurance',
+    icon: <MdCardTravel size={24} />,
+    description: 'Protect your journey with comprehensive coverage',
+    link: '/travel',
+    gradient: 'from-blue-500 to-cyan-400'
+  },
+  {
+    id: 'auto',
+    name: 'Auto Insurance',
+    icon: <MdAutoAwesome size={24} />,
+    description: 'Coverage that moves with you and your vehicle',
+    link: '/auto',
+    gradient: 'from-violet-500 to-purple-400'
+  },
+  {
+    id: 'pet',
+    name: 'Pet Insurance',
+    icon: <MdPets size={24} />,
+    description: 'Keep your furry friends protected and healthy',
+    link: '/pet',
+    gradient: 'from-amber-500 to-orange-400'
+  },
+  {
+    id: 'health',
+    name: 'Health Insurance',
+    icon: <MdHealthAndSafety size={24} />,
+    description: 'Quality health coverage for you and your family',
+    link: '/health',
+    gradient: 'from-emerald-500 to-teal-400'
+  }
+];
+
+// Benefits list for the feature section
+const benefits = [
+  {
+    title: 'AI-Powered Recommendations',
+    description: 'Our intelligent system analyzes your needs to suggest the perfect coverage'
+  },
+  {
+    title: 'Compare Multiple Providers',
+    description: 'See side-by-side comparisons of top insurance companies'
+  },
+  {
+    title: 'Instant Digital Coverage',
+    description: 'Get protected immediately with our digital insurance certificates'
+  },
+  {
+    title: 'Multilingual Support',
+    description: 'Access support in your preferred language through our chatbot'
+  }
+];
+
 const HomePage = () => {
-  // Setting launch date 30 days from now
-  const launchDate = new Date();
-  launchDate.setDate(launchDate.getDate() + 30);
+  const { user } = useAuth();
+  const isAuthenticated = !!user;
+  const [scrollY, setScrollY] = useState(0);
 
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        delayChildren: 0.3,
-        staggerChildren: 0.2
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: { duration: 0.6, ease: [0.21, 0.61, 0.35, 1] }
-    }
-  };
-
-  // Insurance categories with icons
-  const categories = [
-    { name: 'Travel', icon: <Plane className="h-6 w-6" />, path: '/travel' },
-    { name: 'Auto', icon: <Car className="h-6 w-6" />, path: '/auto' },
-    { name: 'Pet', icon: <Heart className="h-6 w-6" />, path: '/pet' },
-    { name: 'Health', icon: <ShieldCheck className="h-6 w-6" />, path: '/health' }
-  ];
+  // Handle scroll position for parallax effects
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
-    <div className="min-h-screen overflow-x-hidden">
+    <div className="min-h-screen text-gray-800 overflow-hidden relative">
+      {/* Animated background with light gradients */}
+      <AnimatedBackground />
+      
+      {/* Navigation */}
       <NavigationBar />
       
       {/* Hero Section */}
-      <AnimatedBackground variant="default">
-        <div className="container mx-auto pt-32 pb-20 px-4 md:px-6">
-          <motion.div
-            className="max-w-4xl mx-auto text-center"
-            initial="hidden"
-            animate="visible"
-            variants={containerVariants}
+      <header className="relative pt-24 pb-20 px-4 md:px-8 lg:px-16 xl:px-24">
+        <div className="max-w-7xl mx-auto">
+          <motion.div 
+            className="text-center md:text-left md:max-w-3xl"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <motion.div 
-              className="mb-6"
-              variants={itemVariants}
-            >
-              <FloatingElement amplitude={8} duration={6}>
-                <AnimatedLogo size="lg" withText={true} variant="gradient" />
-              </FloatingElement>
-            </motion.div>
-            
-            <motion.h1 
-              className="text-5xl md:text-7xl font-bold mb-6 text-white"
-              variants={itemVariants}
-            >
-              AI-Powered
-              <br />
-              Insurance Platform
-            </motion.h1>
-            
-            <motion.p
-              className="text-xl md:text-2xl mb-10 text-white/90 max-w-2xl mx-auto"
-              variants={itemVariants}
-            >
-              Compare and analyze insurance options across multiple categories using our advanced AI technology. Get personalized recommendations based on your unique needs and preferences.
-            </motion.p>
-            
-            <motion.div className="mb-10" variants={itemVariants}>
-              <CountdownTimer targetDate={launchDate} />
-              <p className="mt-4 text-white/80">Time until launch</p>
-            </motion.div>
-            
-            <motion.div
-              className="flex flex-wrap justify-center gap-4"
-              variants={itemVariants}
-            >
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-600 leading-tight">
+              The Intelligent Insurance Marketplace
+            </h1>
+            <p className="mt-6 text-xl text-gray-600 md:max-w-xl">
+              Find and compare the best insurance options across multiple categories with our AI-powered platform. Save time and money with personalized recommendations.
+            </p>
+            <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
               <AnimatedCTAButton 
+                onClick={() => {}} 
                 size="lg" 
-                variant="primary"
-                onClick={() => {/* Navigate to get started */}}
+                withSparkle={true}
+                icon={<LuArrowRight />}
               >
                 Get Started
               </AnimatedCTAButton>
-              
-              <AnimatedCTAButton 
-                size="lg" 
-                variant="secondary" 
-                icon={<ArrowUpRight className="h-5 w-5" />}
-              >
-                Learn More
-              </AnimatedCTAButton>
-            </motion.div>
+              <Link href="/learn-more">
+                <a className="inline-flex items-center justify-center h-12 px-6 font-medium text-gray-600 transition-colors bg-white/70 border border-gray-200 rounded-lg hover:bg-gray-50 hover:text-primary">
+                  Learn More
+                </a>
+              </Link>
+            </div>
           </motion.div>
         </div>
-      </AnimatedBackground>
+      </header>
       
-      {/* Insurance Categories Section */}
-      <section className="py-20 bg-gradient-to-b from-white to-gray-50">
-        <div className="container mx-auto px-4 md:px-6">
-          <motion.div 
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
+      {/* Categories Section */}
+      <section className="py-16 px-4 md:px-8 lg:px-16 xl:px-24 relative">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <h2 className="text-4xl font-bold mb-4">Smart Insurance Comparison</h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Explore our range of insurance categories and find the perfect coverage for your needs with AI-powered recommendations.
-            </p>
+            <h2 className="text-3xl font-bold text-center mb-12">
+              Insurance <span className="text-primary">Categories</span>
+            </h2>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {insuranceCategories.map((category) => (
+                <motion.div
+                  key={category.id}
+                  whileHover={{ scale: 1.03, transition: { duration: 0.2 } }}
+                  className="h-full"
+                >
+                  <Link href={category.link}>
+                    <a className="block h-full">
+                      <GlassCard 
+                        className="p-6 h-full"
+                        variant="elevated" 
+                        hover="glow"
+                      >
+                        <div className="flex flex-col h-full">
+                          <div className={`w-14 h-14 rounded-full flex items-center justify-center text-white mb-4 bg-gradient-to-r ${category.gradient}`}>
+                            {category.icon}
+                          </div>
+                          <h3 className="text-xl font-semibold mb-2">{category.name}</h3>
+                          <p className="text-gray-600 mb-4 flex-grow">{category.description}</p>
+                          <div className="flex items-center text-primary font-medium">
+                            Explore
+                            <LuArrowRight className="ml-2" />
+                          </div>
+                        </div>
+                      </GlassCard>
+                    </a>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
           </motion.div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {categories.map((category, index) => (
-              <motion.div
-                key={category.name}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-              >
-                <Link href={category.path}>
-                  <a>
-                    <GlassCard 
-                      hover="lift" 
-                      className="p-6 text-center h-full flex flex-col items-center justify-center"
-                    >
-                      <div className="mb-4 p-4 rounded-full bg-gradient-to-r from-accent-blue/10 to-accent-purple/10">
-                        {category.icon}
-                      </div>
-                      <h3 className="text-xl font-semibold mb-2">{category.name} Insurance</h3>
-                      <p className="text-gray-600 mb-4">Find the best {category.name.toLowerCase()} coverage for your needs</p>
-                      <div className="mt-auto flex items-center text-accent-blue font-medium">
-                        <span>Compare Plans</span>
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </div>
-                    </GlassCard>
-                  </a>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
         </div>
       </section>
       
-      {/* Briki AI Assistant Preview */}
-      <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+      {/* Features Section */}
+      <section className="py-16 px-4 md:px-8 lg:px-16 xl:px-24 relative">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
             >
-              <h2 className="text-4xl font-bold mb-4">Briki AI Assistant</h2>
-              <p className="text-lg text-gray-600 mb-6">
-                Your intelligent insurance guide that helps you navigate through options, compare plans, and make informed decisions tailored to your specific needs.
+              <h2 className="text-3xl font-bold mb-6">
+                Why Choose <span className="text-primary">Briki</span>
+              </h2>
+              <p className="text-gray-600 mb-8">
+                Briki uses cutting-edge AI technology to find the best insurance options for your specific needs across multiple categories. Our platform makes comparing and purchasing insurance simpler than ever.
               </p>
               
-              <div className="mb-8 space-y-4">
-                {[
-                  'Smart insurance comparison across providers',
-                  'Personalized recommendations based on your profile',
-                  'Instant answers to insurance coverage questions',
-                  'Help with policy selection and claims processes'
-                ].map((feature, i) => (
-                  <div key={i} className="flex items-start">
-                    <div className="flex-shrink-0 h-6 w-6 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
-                      <svg className="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
+              <div className="space-y-4">
+                {benefits.map((benefit, index) => (
+                  <div key={index} className="flex">
+                    <div className="flex-shrink-0 mr-4 mt-1">
+                      <IoShieldCheckmark className="w-5 h-5 text-primary" />
                     </div>
-                    <p className="ml-3 text-gray-700">{feature}</p>
+                    <div>
+                      <h3 className="font-medium">{benefit.title}</h3>
+                      <p className="text-gray-600 text-sm">{benefit.description}</p>
+                    </div>
                   </div>
                 ))}
               </div>
-              
-              <AnimatedCTAButton 
-                variant="primary"
-                onClick={() => {/* Navigate to AI assistant demo */}}
-              >
-                Try Briki AI
-              </AnimatedCTAButton>
             </motion.div>
             
             <motion.div
-              className="relative"
               initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="relative"
             >
-              <FloatingElement amplitude={10} duration={8}>
-                <GlassCard variant="elevated" className="p-6 sm:p-8">
-                  <div className="flex items-center mb-4">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-r from-accent-blue to-accent-purple flex items-center justify-center text-white mr-4">
-                      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-semibold">Briki AI Assistant</h3>
-                      <p className="text-sm text-gray-600">Your intelligent insurance guide</p>
-                    </div>
+              <GlassCard 
+                className="p-6 overflow-hidden"
+                variant="elevated"
+              >
+                <div className="aspect-w-4 aspect-h-3 rounded-lg overflow-hidden relative">
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/30 to-purple-500/30 rounded-lg" />
+                  <img 
+                    src="https://images.unsplash.com/photo-1557426272-fc759fdf7a8d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2340&q=80"
+                    alt="AI-powered insurance comparison" 
+                    className="object-cover w-full h-full rounded-lg mix-blend-overlay"
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/60 to-transparent">
+                    <h3 className="text-xl font-semibold text-white">AI-Powered Analysis</h3>
+                    <p className="text-white/90 text-sm">Find the perfect coverage with our intelligent recommendation engine</p>
                   </div>
-                  
-                  <div className="bg-gray-100 p-4 rounded-lg mb-4">
-                    <p className="text-gray-800">
-                      Hi there! I'm your Briki AI assistant. How can I help you with your insurance needs today?
-                    </p>
-                  </div>
-                  
-                  <div className="flex flex-col space-y-4">
-                    {[
-                      "Compare travel insurance for my trip to Japan",
-                      "What's the best car insurance for a new driver?",
-                      "Help me understand pet insurance coverage options"
-                    ].map((question, i) => (
-                      <motion.div
-                        key={i}
-                        className="bg-blue-50 p-3 rounded-lg border border-blue-100 cursor-pointer hover:bg-blue-100 transition-colors"
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        {question}
-                      </motion.div>
-                    ))}
-                  </div>
-                  
-                  <div className="mt-6 pt-4 border-t border-gray-200">
-                    <div className="relative">
-                      <input
-                        type="text"
-                        placeholder="Ask me anything about insurance..."
-                        className="w-full p-3 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-blue focus:border-transparent"
-                      />
-                      <button className="absolute right-3 top-1/2 transform -translate-y-1/2 text-accent-blue">
-                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-                </GlassCard>
-              </FloatingElement>
-              
-              {/* Decorative elements */}
-              <div className="absolute top-1/4 right-0 transform translate-x-1/2 w-20 h-20 rounded-full bg-green-400/30 filter blur-3xl"></div>
-              <div className="absolute bottom-1/4 left-0 transform -translate-x-1/2 w-32 h-32 rounded-full bg-purple-400/20 filter blur-3xl"></div>
+                </div>
+              </GlassCard>
             </motion.div>
           </div>
         </div>
       </section>
       
-      {/* Smart Comparison Section */}
-      <section className="py-20 bg-gradient-to-b from-white to-gray-50">
-        <div className="container mx-auto px-4 md:px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="max-w-3xl mx-auto"
+      {/* CTA Section */}
+      <section className="py-20 px-4 md:px-8 lg:px-16 xl:px-24 relative">
+        <div className="max-w-5xl mx-auto text-center">
+          <GlassCard 
+            className="p-10 md:p-12"
+            variant="elevated"
           >
-            <GlassCard className="p-8">
-              <h3 className="text-2xl font-bold mb-6">Smart Insurance Comparison</h3>
-              
-              <div className="space-y-6">
-                {[
-                  { label: 'Coverage', value: 80 },
-                  { label: 'Price', value: 70 },
-                  { label: 'Benefits', value: 60 },
-                  { label: 'Claims Process', value: 50 }
-                ].map((item, i) => (
-                  <div key={i}>
-                    <div className="flex justify-between mb-2">
-                      <span className="font-medium">{item.label}</span>
-                      <span className="font-semibold">{item.value}</span>
-                    </div>
-                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <motion.div
-                        className="h-full bg-gradient-to-r from-accent-blue to-accent-purple"
-                        initial={{ width: 0 }}
-                        whileInView={{ width: `${item.value}%` }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 1, delay: 0.1 * i }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-              
-              <div className="mt-8 text-center">
-                <AnimatedCTAButton 
-                  variant="primary"
-                  onClick={() => {/* Navigate to comparison page */}}
-                >
-                  View Full Comparison
-                </AnimatedCTAButton>
-              </div>
-            </GlassCard>
-          </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <h2 className="text-3xl md:text-4xl font-bold mb-6">
+                Ready to Discover Your <span className="text-primary">Perfect Insurance</span>?
+              </h2>
+              <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
+                Join thousands of satisfied customers who have found the ideal coverage through Briki's intelligent marketplace. Start your journey to better protection today.
+              </p>
+              <AnimatedCTAButton 
+                onClick={() => {}} 
+                size="lg"
+                icon={<LuArrowRight />}
+              >
+                {isAuthenticated ? 'Explore Plans' : 'Create Free Account'}
+              </AnimatedCTAButton>
+            </motion.div>
+          </GlassCard>
         </div>
       </section>
       
       {/* Footer */}
-      <footer className="bg-gray-50 border-t border-gray-200 py-12">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
-            <div className="col-span-2">
-              <AnimatedLogo size="md" withText={true} variant="default" />
-              <p className="mt-4 text-gray-600 max-w-xs">
-                AI-powered insurance platform helping you make smarter coverage decisions.
+      <footer className="py-12 px-4 md:px-8 lg:px-16 xl:px-24 relative">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+              <h3 className="font-bold text-lg mb-4">Briki</h3>
+              <p className="text-gray-600 text-sm">
+                The intelligent insurance marketplace powered by AI technology.
               </p>
             </div>
-            
-            {[
-              {
-                title: 'Products',
-                links: ['Travel Insurance', 'Auto Insurance', 'Pet Insurance', 'Health Insurance']
-              },
-              {
-                title: 'Company',
-                links: ['About', 'FAQ', 'Careers', 'Press']
-              },
-              {
-                title: 'Legal',
-                links: ['Terms', 'Privacy', 'Cookies', 'Licenses']
-              }
-            ].map((column, i) => (
-              <div key={i}>
-                <h4 className="font-semibold mb-4">{column.title}</h4>
-                <ul className="space-y-2">
-                  {column.links.map((link, j) => (
-                    <li key={j}>
-                      <a href="#" className="text-gray-600 hover:text-accent-blue transition-colors">
-                        {link}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-          
-          <div className="mt-12 pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-500 text-sm">
-              © {new Date().getFullYear()} Briki. All rights reserved.
-            </p>
-            <div className="flex space-x-6 mt-4 md:mt-0">
-              {['Twitter', 'LinkedIn', 'Instagram', 'Facebook'].map((social, i) => (
-                <a key={i} href="#" className="text-gray-400 hover:text-accent-blue transition-colors">
-                  {social}
-                </a>
-              ))}
+            <div>
+              <h4 className="font-medium mb-4">Insurance</h4>
+              <ul className="space-y-2 text-sm">
+                <li><Link href="/travel"><a className="text-gray-600 hover:text-primary">Travel Insurance</a></Link></li>
+                <li><Link href="/auto"><a className="text-gray-600 hover:text-primary">Auto Insurance</a></Link></li>
+                <li><Link href="/pet"><a className="text-gray-600 hover:text-primary">Pet Insurance</a></Link></li>
+                <li><Link href="/health"><a className="text-gray-600 hover:text-primary">Health Insurance</a></Link></li>
+              </ul>
             </div>
+            <div>
+              <h4 className="font-medium mb-4">Company</h4>
+              <ul className="space-y-2 text-sm">
+                <li><Link href="/about"><a className="text-gray-600 hover:text-primary">About Us</a></Link></li>
+                <li><Link href="/partners"><a className="text-gray-600 hover:text-primary">Partners</a></Link></li>
+                <li><Link href="/careers"><a className="text-gray-600 hover:text-primary">Careers</a></Link></li>
+                <li><Link href="/for-companies"><a className="text-gray-600 hover:text-primary">For Insurance Companies</a></Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-medium mb-4">Legal</h4>
+              <ul className="space-y-2 text-sm">
+                <li><Link href="/terms"><a className="text-gray-600 hover:text-primary">Terms of Service</a></Link></li>
+                <li><Link href="/privacy"><a className="text-gray-600 hover:text-primary">Privacy Policy</a></Link></li>
+                <li><Link href="/cookies"><a className="text-gray-600 hover:text-primary">Cookie Policy</a></Link></li>
+                <li><Link href="/licensing"><a className="text-gray-600 hover:text-primary">Licensing</a></Link></li>
+              </ul>
+            </div>
+          </div>
+          <div className="mt-12 pt-8 border-t border-gray-200">
+            <p className="text-gray-500 text-sm text-center">
+              © {new Date().getFullYear()} Briki Insurance Marketplace. All rights reserved.
+            </p>
           </div>
         </div>
       </footer>
-      
-      {/* AI Assistant floating button */}
-      <AIAssistant />
     </div>
   );
 };
