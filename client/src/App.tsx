@@ -55,7 +55,7 @@ function Router() {
   return (
     <PageTransition>
       <Switch>
-        <Route path="/" component={CountdownPageNew} />
+        <Route path="/" component={CountdownPage} />
         <Route path="/home" component={HomePageNew} />
         <Route path="/auth" component={AuthPageEnhanced} />
         <Route path="/categories" component={InsuranceCategoriesPage} />
