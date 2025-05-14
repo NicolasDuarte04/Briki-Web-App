@@ -149,7 +149,7 @@ const EnhancedInput = React.forwardRef<HTMLInputElement, EnhancedInputProps>(
         return;
       }
       
-      const value = innerRef.current?.value || "";
+      const value = inputElement?.value || "";
       
       for (const rule of validations) {
         if (!rule.check(value)) {
