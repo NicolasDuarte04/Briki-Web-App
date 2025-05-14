@@ -36,6 +36,7 @@ import AIAssistantDemo from "@/pages/ai-assistant-demo";
 import CountdownPage from "@/pages/countdown-page";
 import CountdownPageNew from "@/pages/countdown-page-new";
 import BrikiPilotPortal from "@/pages/briki-pilot-portal";
+import LandingPage from "@/pages/landing-page";
 
 // Company pages
 import CompanyPage from "@/pages/company-page";
@@ -55,7 +56,8 @@ function Router() {
   return (
     <PageTransition>
       <Switch>
-        <Route path="/" component={CountdownPage} />
+        <Route path="/" component={LandingPage} />
+        <Route path="/countdown" component={CountdownPage} />
         <Route path="/home" component={HomePageNew} />
         <Route path="/auth" component={AuthPageEnhanced} />
         <Route path="/categories" component={InsuranceCategoriesPage} />
@@ -102,7 +104,7 @@ function AppContent() {
   const { user } = useAuth();
   
   // List of paths where AI Assistant should NOT be provided
-  const excludedPaths = ['/', '/auth', '/countdown', '/login', '/register', '/terms', '/learn-more'];
+  const excludedPaths = ['/', '/auth', '/countdown', '/login', '/register', '/terms', '/learn-more', '/landing'];
   const isExcludedPath = excludedPaths.some(path => 
     location === path || location.startsWith(`${path}/`)
   );
