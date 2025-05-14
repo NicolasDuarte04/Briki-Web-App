@@ -10,6 +10,9 @@ import RecentlyViewedPlans from "@/components/recently-viewed-plans";
 import AnimatedBackground from "@/components/animated-background";
 import GlassCard from "@/components/glass-card";
 import GradientButton from "@/components/gradient-button";
+import FeaturesGrid from "@/components/features-grid";
+import CTASection from "@/components/cta-section";
+import BetaNotice from "@/components/beta-notice";
 import Footer from "@/components/footer";
 import { AIAssistant, getTravelInsuranceTips, getAutoInsuranceTips, getHealthInsuranceTips, getPetInsuranceTips } from "@/components/ui/ai-assistant";
 import { ComparisonChart, RadarChart, CoverageComparison } from "@/components/ui/data-visualization";
@@ -26,6 +29,7 @@ export default function HomePage() {
   const [location, navigate] = useLocation();
   const { user, isLoading } = useAuth();
   const { t } = useLanguage();
+  const [showBeta, setShowBeta] = useState(true);
   
   // Add debugging information
   console.log("HomePage mounted, current location:", location);
@@ -294,49 +298,12 @@ export default function HomePage() {
       </div>
       
       {/* Features Section */}
-      <div className="bg-gradient-to-b from-white to-indigo-50/50 dark:from-gray-900 dark:to-gray-800 py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7 }}
-              viewport={{ once: true }}
-            >
-              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-blue-500">
-                Advanced Features for Smart Insurance
-              </h2>
-              <p className="mt-3 max-w-2xl mx-auto text-xl text-foreground/70">
-                Powered by AI technology to provide you with the best insurance experience
-              </p>
-            </motion.div>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
-              >
-                <GlassCard 
-                  className="h-full" 
-                  variant="default"
-                  hover="lift"
-                >
-                  <div className="p-2 bg-primary/10 rounded-lg inline-flex mb-4">
-                    {feature.icon}
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
-                  <p className="text-foreground/70">{feature.description}</p>
-                </GlassCard>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </div>
+      <FeaturesGrid 
+        features={features} 
+        title="Advanced Features for Smart Insurance"
+        subtitle="Powered by AI technology to provide you with the best insurance experience"
+        columns={4}
+      />
       
       {/* Insurance Categories */}
       <div className="bg-white dark:bg-gray-900 py-20 relative overflow-hidden">
@@ -495,34 +462,21 @@ export default function HomePage() {
       </div>
       
       {/* CTA Section */}
-      <div className="bg-gradient-to-r from-indigo-600 to-blue-500 py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
-            viewport={{ once: true }}
-            className="max-w-3xl mx-auto"
-          >
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl text-white mb-4">
-              Ready to find your perfect insurance match?
-            </h2>
-            <p className="text-xl text-white/80 mb-8">
-              Let our AI technology guide you to the best coverage options for your needs
-            </p>
-            
-            <GradientButton
-              size="lg"
-              className="px-8 py-3 text-lg bg-white text-indigo-600 hover:bg-white/90"
-              onClick={handleGetStarted}
-              gradientFrom="from-white"
-              gradientTo="to-white/90"
-            >
-              Get Started Now
-            </GradientButton>
-          </motion.div>
-        </div>
-      </div>
+      <CTASection 
+        title="Ready to find your perfect insurance match?"
+        description="Let our AI technology guide you to the best coverage options for your needs"
+        buttonText="Get Started Now"
+        buttonIcon={<ArrowRight className="ml-2 h-5 w-5" />}
+        onButtonClick={handleGetStarted}
+        gradientColors={{
+          from: "from-indigo-600",
+          to: "to-blue-500"
+        }}
+        buttonGradient={{
+          from: "from-white",
+          to: "to-white/90"
+        }}
+      />
       
       {/* Footer */}
       <Footer />
