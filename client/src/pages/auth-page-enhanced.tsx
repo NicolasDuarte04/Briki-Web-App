@@ -424,6 +424,7 @@ export default function AuthPageEnhanced() {
                               placeholder="Create a password"
                               icon={<Lock size={18} />}
                               error={registerForm.formState.errors.password?.message}
+                              className="h-12"
                               {...field} 
                             />
                           </FormItem>
@@ -441,6 +442,7 @@ export default function AuthPageEnhanced() {
                               placeholder="Confirm your password"
                               icon={<Lock size={18} />}
                               error={registerForm.formState.errors.confirmPassword?.message}
+                              className="h-12"
                               {...field} 
                             />
                           </FormItem>
@@ -452,27 +454,27 @@ export default function AuthPageEnhanced() {
                       control={registerForm.control}
                       name="terms"
                       render={({ field }) => (
-                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 mt-4">
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 mt-6">
                           <FormControl>
                             <Checkbox
                               checked={field.value}
                               onCheckedChange={field.onChange}
-                              className="rounded border-input data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                              className="rounded border-input mt-0.5 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                             />
                           </FormControl>
-                          <div className="space-y-1 leading-none">
-                            <FormLabel className="text-sm font-normal text-foreground/80 cursor-pointer">
+                          <div className="space-y-1 leading-snug">
+                            <FormLabel className="text-sm font-medium text-gray-700 cursor-pointer">
                               I agree to the{" "}
-                              <a href="#" className="text-primary hover:text-primary/80 underline underline-offset-2 transition-colors">
+                              <a href="#" className="text-primary font-semibold hover:text-primary/80 underline underline-offset-2 transition-colors">
                                 Terms of Service
                               </a>{" "}
                               and{" "}
-                              <a href="#" className="text-primary hover:text-primary/80 underline underline-offset-2 transition-colors">
+                              <a href="#" className="text-primary font-semibold hover:text-primary/80 underline underline-offset-2 transition-colors">
                                 Privacy Policy
                               </a>
                             </FormLabel>
                             {registerForm.formState.errors.terms && (
-                              <p className="text-xs text-red-500">{registerForm.formState.errors.terms.message}</p>
+                              <p className="text-xs font-medium text-red-500 mt-1">{registerForm.formState.errors.terms.message}</p>
                             )}
                           </div>
                         </FormItem>
