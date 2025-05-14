@@ -1,0 +1,36 @@
+Please answer the following questions before rebuilding the Travel, Auto, Pet, and Health insurance category screens:
+
+1. **Routing & Pages**
+   - Are the current routes for each of the four insurance categories properly defined in the router?
+   - Which of them currently result in a 404? Should we start fresh with new files (e.g., /insurance/travel.tsx, /insurance/pet.tsx, etc.)?
+
+2. **Header Overlap**
+   - Do the current insurance plan screens still contain the older fixed tab bar or navbar component?
+   - If so, can you remove it completely and wrap these new category pages in the global `MainLayout` component for consistent header behavior?
+
+3. **Navigation Flicker**
+   - What is causing the visual flicker or transition delay when navigating between sections (e.g., showing the previous screen briefly)?
+   - Can you ensure smooth transitions and scroll-to-top behavior across category pages?
+
+4. **Visual Redesign**
+   - We want to **redesign all four category pages** using the latest design system (colors, font weights, soft cards, gradients, buttons).
+   - Can you confirm if we’re using a unified style config or Tailwind setup across the project to apply this cleanly?
+
+5. **Icons**
+   - The icons currently used for Travel, Auto, Pet, and Health categories in the homepage are visually outdated.
+   - Can we replace them with **more modern, Apple-style SVG icons** or suggest a location in the project where we can drop in new ones ourselves?
+
+6. **Get Quote / Learn More Functionality**
+   - None of the “Get Quote” or “Learn More” buttons currently work — can you add **mock functionality or navigation placeholders** that simulate future quote screens?
+
+7. **Mock Plan Display**
+   - Can each insurance category screen include a sample section that:
+     - Displays 3–4 mocked plans (title, provider, features, price)
+     - Allows "Compare" or "Select" interaction with a non-functional button
+     - Is ready to be connected to real data later?
+
+8. **Final Clean-Up**
+   - Ensure no double navbars, scroll glitches, or hardcoded layout hacks are left behind.
+   - These new pages should work seamlessly with the existing app structure.
+
+Once these are answered, we’ll be ready to issue the final implementation prompt. Let us know what you confirm.
