@@ -100,9 +100,15 @@ export default function AuthPageNew() {
     // Check auth on load
     const checkAuth = async () => {
       try {
+        const authToken = localStorage.getItem('auth_token');
+        if (!authToken) {
+          console.log("AuthPage: No auth token found in storage");
+          return;
+        }
+        
         const response = await fetch('/api/user', {
-          credentials: 'include',
           headers: {
+            'Authorization': `Bearer ${authToken}`,
             'Cache-Control': 'no-cache',
             'Accept': 'application/json',
           }
@@ -112,6 +118,8 @@ export default function AuthPageNew() {
           console.log("AuthPage: Direct auth check - User is authenticated");
         } else {
           console.log("AuthPage: Direct auth check - No authenticated user");
+          // Clear invalid token
+          localStorage.removeItem('auth_token');
         }
       } catch (error) {
         console.error("AuthPage: Error checking auth status:", error);
