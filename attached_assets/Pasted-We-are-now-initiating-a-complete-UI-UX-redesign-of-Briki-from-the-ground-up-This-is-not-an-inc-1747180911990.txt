@@ -1,0 +1,84 @@
+We are now initiating a **complete UI/UX redesign** of Briki from the ground up.
+
+This is not an incremental update — we are fully demolishing the current UI to build something exceptional. Think of it as replacing a basic structure with a world-class digital experience. The goal is to create a platform that looks and feels like it belongs among companies like **Stripe, Apple, and Linear**, while remaining true to Briki’s mission of being the most user-friendly, AI-powered insurance marketplace in Latin America.
+
+---
+
+### CONTEXT
+
+Briki is an AI-powered insurance comparison platform that simplifies the process of understanding and selecting plans in **Travel, Pet, Auto, and Health** insurance. It features real-time analysis, an AI assistant ("Briki Pilot"), and clear educational UI. We want the app to feel:
+
+- **Elegant, confident, and visually stunning** for consumers
+- **Sharp, high-tech, and insightful** for providers and partners
+- **Clean and approachable** while showcasing AI, automation, and intelligence
+- With subtle **animated fluidity and futuristic softness** (no rigid or boring sections)
+
+---
+
+### GOALS FOR THIS PHASE
+
+#### 1. **Full Redesign of UI Base and Layout**
+- Remove all current UI layouts, containers, spacing, font systems, button styles, gradients.
+- Implement a **new design system** based on a Stripe-inspired UI:
+  - Smooth **animated radial gradient backgrounds**
+  - **Glassmorphism**, subtle blurs, and shadows
+  - Clean sans-serif fonts (Satoshi, Inter, or DM Sans)
+  - Fewer hard lines, more **floating elements**, fluid motion
+
+#### 2. **Color & Motion System**
+- Primary base: soft **electric blue gradients (#4C6EFF to #59F9F7)**
+- Accents: bold but not over-saturated colors
+- Maintain **white spacing** but make it feel alive and elegant, not pale
+- Use soft **animated transitions** between sections, buttons, hovers, and loaders
+- Background should gently move (e.g., subtle pulse, shifting color flows, or noise)
+
+#### 3. **Redesign of Core Screens**
+Start with these:
+- Home Screen (marketing + CTA landing for users)
+- Login & Signup (glass-style Apple modals over animated BG)
+- Plan Explorer
+- Plan Comparison
+- Checkout
+- Briki Assistant ("Briki Pilot") Chat UI
+- Company Portal (for providers)
+
+These should have unified styling, but with visual distinction between:
+- **User side** (soft, gradient-based, encouraging exploration)
+- **Company side** (dark, intelligent, more serious with technical elegance)
+
+---
+
+### ADDITIONAL REQUIREMENTS
+
+#### Briki Pilot Assistant
+- Rework the Briki Assistant interface to look like a **smart AI agent**.
+- Add **micro-animations** when idle or replying.
+- Floating bubble icon with animation on hover.
+- When activated, the assistant appears in a sleek, non-obtrusive modal.
+
+#### Button & Input Design
+- Ditch all current button styles.
+- Introduce Apple-style shadows, **liquid-feeling hover effects**, and clear distinctions between primary/secondary.
+- Inputs should feel like part of a high-end OS — minimal borders, subtle feedback.
+
+#### Typography
+- Use distinct weights and responsive scaling.
+- Ensure **hero headings** feel designed — not default font styles.
+- Use motion on value props, stats, or quotes to guide attention.
+
+---
+
+### YOUR TASK
+
+1. Start from the **Home screen** and apply the new design foundation: animated background, updated fonts/colors/buttons.
+2. Then rebuild the Auth screens, Plan Explorer, and so on using this new system.
+3. Apply consistent **glassmorphism, animation, and spacing** across the app.
+4. Refactor the Briki Pilot to feel like a real co-pilot, not just a support widget.
+
+---
+
+Please confirm when the new layout scaffolding is ready, and I’ll provide any visual assets, content copy, or layout guides you need.
+
+This is our boldest UI phase yet — treat it like you’re building the **Stripe of InsurTech**.
+
+Let’s make Briki unforgettable.

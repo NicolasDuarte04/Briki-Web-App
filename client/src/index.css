@@ -6,71 +6,135 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Briki Design System - Inspired by Stripe, Apple, and AI-first products */
+
 :root {
-  /* Updated UI with harmonious blue gradients - Phase 2 refinement */
-  --background: 220 60% 98%; /* Light blue-gray background */
-  --foreground: 229 84% 5%; /* Nearly black text for strong contrast */
-  --muted: 214 32% 91%;
-  --muted-foreground: 215 25% 27%;
+  /* Core color palette - bright AI-first approach */
+  --background: 220 60% 99%; /* Very light blue-gray background */
+  --foreground: 224 71% 4%; /* Deep navy text (not pure black) */
+  --muted: 220 14% 96%;
+  --muted-foreground: 220 8% 46%;
   --popover: 0 0% 100%;
-  --popover-foreground: 229 84% 5%;
+  --popover-foreground: 224 71% 4%;
   --card: 0 0% 100%;
-  --card-foreground: 229 84% 5%;
+  --card-foreground: 224 71% 4%;
   --border: 220 13% 91%;
   --input: 220 13% 91%;
-  --primary: 225 82% 63%; /* Modern indigo for buttons/logo #4C6EF5 */
+  
+  /* Primary color scheme from design spec */
+  --primary: 224 100% 65%; /* #4C6EFF - Main brand color */
   --primary-foreground: 0 0% 100%;
-  --secondary: 199 100% 50%; /* Bright blue #00C2FF */
+  --primary-hover: 225 95% 68%; /* Slightly brighter on hover */
+  --primary-active: 224 90% 62%; /* Slightly darker on active */
+  
+  /* Supporting colors */
+  --secondary: 196 100% 50%; /* Soft electric aqua accent #00C2FF */
   --secondary-foreground: 0 0% 100%;
-  --accent: 227 91% 63%; /* Indigo accent #3B5BFA */
+  --accent: 195 80% 50%; /* Subtle aqua flair */
   --accent-foreground: 0 0% 100%;
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
-  --ring: 225 82% 63%;
-  --radius: 0.75rem;
+  --success: 160 84% 39%;
+  --ring: 224 100% 65%;
+  --radius: 0.85rem; /* Slightly increased corner radius for modern feel */
   
-  /* Updated gradients for more unified, refined aesthetics */
-  --glow-primary: 0 0 25px rgba(76, 110, 245, 0.5); /* Modern blue glow */
-  --glow-accent: 0 0 20px rgba(0, 194, 255, 0.4); /* Sky blue glow */
-  --gradient-primary: linear-gradient(135deg, #4C6EF5, #5F99F7); /* Modern indigo to blue gradient */
+  /* Enhanced gradient system */
+  --glow-primary: 0 0 30px rgba(76, 110, 255, 0.25);
+  --glow-hover: 0 0 35px rgba(76, 110, 255, 0.35), inset 0 0 15px rgba(255, 255, 255, 0.2);
+  --glow-accent: 0 0 25px rgba(0, 194, 255, 0.3);
+  
+  /* Visually rich gradients */
+  --gradient-primary: linear-gradient(135deg, #4C6EFF, #5F9FFF); /* Primary brand gradient */
   --gradient-secondary: linear-gradient(135deg, #00C2FF, #38BDF8); /* Vibrant sky blue */
   --gradient-accent: linear-gradient(135deg, #5D5FEF, #748FFC); /* Indigo blue fade */
-  --gradient-auto: linear-gradient(135deg, #0284C7, #38BDF8); /* Auto category */
-  --gradient-pet: linear-gradient(135deg, #5D5FEF, #748FFC); /* Pet category */
-  --gradient-health: linear-gradient(135deg, #F43F5E, #FB7185); /* Health category */
-  --gradient-travel: linear-gradient(135deg, #4C6EF5, #5F99F7); /* Travel category */
-  --gradient-background: linear-gradient(145deg, #E0E8FF, #D8E6FF); /* Enhanced blue background */
-  --gradient-card-hover: linear-gradient(145deg, rgba(76, 110, 245, 0.08), rgba(95, 153, 247, 0.08)); /* Refined hover gradient */
+  --gradient-electric: linear-gradient(135deg, #00CFFD, #00A3FF); /* Electric aqua */
+  
+  /* Category-specific gradients */
+  --gradient-auto: linear-gradient(135deg, #4F6AFF, #33C1FF); 
+  --gradient-pet: linear-gradient(135deg, #6E59FF, #A289FF);
+  --gradient-health: linear-gradient(135deg, #F43F5E, #FB7185);
+  --gradient-travel: linear-gradient(135deg, #4C6EFF, #5F9FFF);
+  
+  /* Background gradients */
+  --gradient-background: linear-gradient(145deg, #EEF2FF, #E4EDFF);
+  --gradient-background-alt: radial-gradient(circle at 30% 30%, #F0F7FF, #E6F1FF, #DFE9FF, #E9EEFF, #F6F8FF);
+  --gradient-card-hover: linear-gradient(145deg, rgba(76, 110, 255, 0.06), rgba(95, 159, 255, 0.06));
+  
+  /* Animation timings */
+  --transition-fast: 0.15s cubic-bezier(0.21, 0.61, 0.35, 1);
+  --transition-normal: 0.25s cubic-bezier(0.21, 0.61, 0.35, 1);
+  --transition-slow: 0.5s cubic-bezier(0.21, 0.61, 0.35, 1);
+  
+  /* Glass morphism values */
+  --glass-background: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.4);
+  --glass-blur: 15px;
+  --glass-shadow: 
+    0 10px 30px rgba(76, 110, 255, 0.08),
+    0 4px 10px rgba(0, 0, 0, 0.03);
+    
+  /* Shadows for depth */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(76, 110, 255, 0.05);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.03), 0 2px 15px -2px rgba(76, 110, 255, 0.08);
+  --shadow-lg: 0 10px 30px -5px rgba(76, 110, 255, 0.08), 0 5px 15px -5px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 50px -10px rgba(76, 110, 255, 0.12), 0 10px 20px -10px rgba(0, 0, 0, 0.06);
 }
 
 .dark {
-  /* Futuristic dark mode for company portal */
-  --background: 230 30% 7%; /* Deep navy background */
-  --foreground: 210 40% 98%;
-  --muted: 224 25% 15%;
-  --muted-foreground: 215 20% 75%;
-  --popover: 224 71% 4%;
-  --popover-foreground: 210 40% 98%;
-  --card: 224 71% 4%;
-  --card-foreground: 210 40% 98%;
-  --border: 215 27% 17%;
-  --input: 215 27% 17%;
-  --primary: 239 84% 67%; /* Brighter primary in dark mode */
-  --primary-foreground: 210 40% 98%;
-  --secondary: 199 89% 60%; /* Brighter sky blue */
-  --secondary-foreground: 210 40% 98%;
-  --accent: 224 76% 60%; /* Brighter electric blue */
-  --accent-foreground: 210 40% 98%;
-  --destructive: 0 84% 60%;
-  --destructive-foreground: 210 40% 98%;
-  --ring: 239 84% 67%;
-  --radius: 0.75rem;
+  /* Futuristic dark mode for company/partner portal - sleek, glassy, data-focused theme */
+  --background: 226 30% 8%; /* Deep navy background */
+  --foreground: 213 31% 95%; /* Bright white text */
+  --muted: 225 25% 12%;
+  --muted-foreground: 215 20% 70%;
+  --popover: 224 71% 7%;
+  --popover-foreground: 215 20% 75%;
+  --border: 216 34% 17%;
+  --input: 216 34% 17%;
+  --card: 226 35% 10%;
+  --card-foreground: 213 31% 95%;
   
-  /* Company portal-specific gradients */
-  --gradient-primary: linear-gradient(135deg, #4F46E5, #6366F1); /* Vibrant indigo gradient */
-  --gradient-futuristic: linear-gradient(135deg, #1E293B, #0F172A); /* Deep navy gradient */
-  --gradient-glow: linear-gradient(145deg, rgba(79, 70, 229, 0.1), rgba(99, 102, 241, 0.05));
-  --glow-edge: 0 0 30px rgba(79, 70, 229, 0.4); /* Glowing edge visual */
+  /* More vibrant primary colors for dark mode */
+  --primary: 224 85% 70%; /* Brighter blue for dark backgrounds */
+  --primary-foreground: 0 0% 100%;
+  --primary-hover: 225 90% 75%;
+  --primary-active: 224 80% 65%;
+  
+  /* Supporting colors */
+  --secondary: 196 90% 60%; /* Brighter aqua for dark mode */
+  --secondary-foreground: 0 0% 100%;
+  --accent: 225 70% 60%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --ring: 224 85% 70%;
+  --success: 160 84% 50%;
+  --radius: 0.85rem;
+  
+  /* Futuristic company portal gradients */
+  --gradient-primary: linear-gradient(135deg, #4C6EFF, #5F9FFF); /* Match the light mode gradient */
+  --gradient-futuristic: linear-gradient(135deg, #111827, #1E293B); /* Deep navy gradient */
+  --gradient-glow: linear-gradient(145deg, rgba(76, 110, 255, 0.15), rgba(95, 159, 255, 0.08));
+  --gradient-card: linear-gradient(145deg, rgba(22, 26, 38, 0.95), rgba(28, 32, 46, 0.95));
+  
+  /* Enhanced gradient system for dark mode */
+  --glow-primary: 0 0 30px rgba(76, 110, 255, 0.35);
+  --glow-hover: 0 0 40px rgba(76, 110, 255, 0.45), inset 0 0 20px rgba(255, 255, 255, 0.1);
+  --glow-accent: 0 0 25px rgba(0, 194, 255, 0.4);
+  --glow-edge: 0 0 1px rgba(76, 110, 255, 0.4);
+  
+  /* Glass morphism values for dark mode */
+  --glass-background: rgba(22, 25, 37, 0.75);
+  --glass-border: rgba(76, 110, 255, 0.2);
+  --glass-blur: 15px;
+  --glass-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.3),
+    0 4px 10px rgba(0, 0, 0, 0.2);
+    
+  /* Dark mode shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(76, 110, 255, 0.15);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.3), 0 2px 15px -2px rgba(76, 110, 255, 0.2);
+  --shadow-lg: 0 10px 30px -5px rgba(0, 0, 0, 0.4), 0 5px 15px -5px rgba(76, 110, 255, 0.2);
+  --shadow-xl: 0 20px 50px -10px rgba(0, 0, 0, 0.5), 0 10px 20px -10px rgba(76, 110, 255, 0.25);
 }
 
 @layer base {
@@ -78,32 +142,78 @@
     @apply border-border;
   }
 
+  /* Modern typography system with Inter and DM Sans as specified */
   body {
     @apply antialiased bg-background text-foreground;
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
   
+  /* Headings with DM Sans */
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'DM Sans', 'Satoshi', sans-serif;
-    letter-spacing: -0.03em;
-    @apply font-bold;
+    font-family: 'DM Sans', 'Inter', sans-serif;
+    @apply font-bold tracking-tight text-foreground;
   }
   
+  /* Refined typography scale */
   h1 {
-    @apply text-4xl md:text-5xl;
+    @apply text-4xl md:text-5xl lg:text-6xl;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
   }
   
   h2 {
     @apply text-3xl md:text-4xl;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
   }
   
   h3 {
     @apply text-2xl md:text-3xl;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
   }
   
   h4 {
     @apply text-xl md:text-2xl;
+    line-height: 1.4;
   }
+  
+  /* Body text */
+  p {
+    @apply text-base leading-relaxed;
+    color: hsl(var(--foreground) / 0.9);
+  }
+  
+  /* Text components */
+  .lead {
+    @apply text-xl text-foreground/80 font-normal;
+    line-height: 1.6;
+  }
+  
+  .subtitle {
+    @apply text-lg text-muted-foreground font-medium;
+  }
+  
+  .caption {
+    @apply text-sm text-muted-foreground;
+  }
+  
+  /* Links */
+  a {
+    @apply text-primary transition-colors duration-300;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+  
+  a:hover {
+    color: hsl(var(--primary-hover));
+  }
+  
+
+  
   
   p, span, button, a {
     font-family: 'Inter', system-ui, sans-serif;
