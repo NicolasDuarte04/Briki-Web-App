@@ -152,18 +152,18 @@ export default function AuthPageNew() {
   return (
     <AnimatedBackground variant="auth" className="flex min-h-screen items-center justify-center px-4 py-24">
       {/* Centered auth container */}
-      <div className="relative z-10 w-full max-w-lg px-4 py-8 mt-16">
+      <div className="relative z-10 w-full max-w-md px-4 py-8">
         {/* Logo and branding */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.21, 0.61, 0.35, 1] }}
-          className="text-center mb-10"
+          className="text-center mb-12"
         >
-          <h1 className="text-4xl font-bold tracking-tighter bg-gradient-to-r from-[#4C6EFF] to-[#5F9FFF] bg-clip-text text-transparent drop-shadow-md">
+          <h1 className="text-5xl font-bold tracking-tighter bg-gradient-to-r from-[#3D70F5] to-[#59A0FF] bg-clip-text text-transparent drop-shadow-md">
             Briki
           </h1>
-          <p className="text-lg text-slate-800 font-semibold mt-1 px-2 py-1 bg-white/50 rounded-md backdrop-blur-sm inline-block">
+          <p className="text-lg text-slate-800 font-semibold mt-2 px-3 py-1.5 bg-white/60 rounded-md backdrop-blur-sm inline-block shadow-sm">
             AI-Powered Insurance Platform
           </p>
         </motion.div>
@@ -175,24 +175,24 @@ export default function AuthPageNew() {
           transition={{ duration: 0.5, delay: 0.2, ease: [0.21, 0.61, 0.35, 1] }}
           className="relative z-20"
         >
-          <GlassCard className="p-6 md:p-8 shadow-xl">
+          <GlassCard variant="default" hover="glow" className="p-8 md:p-10 shadow-2xl">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid grid-cols-2 mb-6 bg-white/10 p-1 rounded-lg">
+              <TabsList className="grid grid-cols-2 mb-8 bg-white/20 p-1.5 rounded-lg border border-white/30 shadow-inner">
                 <TabsTrigger 
                   value="login" 
-                  className={`rounded-md py-2.5 text-sm font-medium transition-all
+                  className={`rounded-md py-3 text-sm font-semibold transition-all duration-300
                     ${activeTab === 'login' 
-                      ? 'bg-white text-primary shadow-sm' 
-                      : 'text-foreground/70 hover:text-foreground/90'}`}
+                      ? 'bg-gradient-to-r from-[#3D70F5] to-[#59A0FF] text-white shadow-md' 
+                      : 'text-slate-700 hover:text-slate-900 hover:bg-white/30'}`}
                 >
                   Sign In
                 </TabsTrigger>
                 <TabsTrigger 
                   value="register" 
-                  className={`rounded-md py-2.5 text-sm font-medium transition-all
+                  className={`rounded-md py-3 text-sm font-semibold transition-all duration-300
                     ${activeTab === 'register' 
-                      ? 'bg-white text-primary shadow-sm' 
-                      : 'text-foreground/70 hover:text-foreground/90'}`}
+                      ? 'bg-gradient-to-r from-[#3D70F5] to-[#59A0FF] text-white shadow-md' 
+                      : 'text-slate-700 hover:text-slate-900 hover:bg-white/30'}`}
                 >
                   Sign Up
                 </TabsTrigger>
@@ -201,7 +201,7 @@ export default function AuthPageNew() {
               {/* Login form */}
               <TabsContent value="login">
                 <Form {...loginForm}>
-                  <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-7">
+                  <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-8">
                     <FormField
                       control={loginForm.control}
                       name="username"
@@ -210,9 +210,12 @@ export default function AuthPageNew() {
                           <EnhancedInput
                             label="Username" 
                             placeholder="Enter your username"
-                            icon={<User size={18} />}
+                            icon={<User size={18} className="text-slate-600" />}
+                            containerClassName="shadow-sm"
+                            className="border-2 border-white/40 placeholder:text-slate-500/80 text-slate-800 font-medium"
                             {...field} 
                           />
+                          <FormMessage className="font-medium text-red-500" />
                         </FormItem>
                       )}
                     />
@@ -226,9 +229,12 @@ export default function AuthPageNew() {
                             label="Password"
                             type="password"
                             placeholder="Enter your password"
-                            icon={<Lock size={18} />}
+                            icon={<Lock size={18} className="text-slate-600" />}
+                            containerClassName="shadow-sm"
+                            className="border-2 border-white/40 placeholder:text-slate-500/80 text-slate-800 font-medium"
                             {...field} 
                           />
+                          <FormMessage className="font-medium text-red-500" />
                         </FormItem>
                       )}
                     />
@@ -243,28 +249,28 @@ export default function AuthPageNew() {
                               <Checkbox
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
-                                className="rounded border-input data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                                className="rounded border-2 border-slate-300 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                               />
                             </FormControl>
-                            <FormLabel className="text-sm font-normal text-foreground/80 cursor-pointer">Remember me</FormLabel>
+                            <FormLabel className="text-sm font-medium text-slate-700 cursor-pointer">Remember me</FormLabel>
                           </FormItem>
                         )}
                       />
                       <button 
                         type="button" 
-                        className="text-sm text-primary hover:text-primary/80 transition-colors"
+                        className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
                       >
                         Forgot password?
                       </button>
                     </div>
                     
-                    <div className="pt-2">
+                    <div className="pt-4">
                       <GradientButton
                         type="submit"
                         size="lg"
                         loading={loginMutation.isPending}
                         loadingText="Signing in..."
-                        className="w-full"
+                        className="w-full py-6 text-base"
                       >
                         Sign in
                       </GradientButton>

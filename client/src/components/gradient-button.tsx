@@ -26,8 +26,8 @@ interface GradientButtonProps
 const GradientButton = React.forwardRef<HTMLButtonElement, GradientButtonProps>(
   ({
     className,
-    gradientFrom = "from-blue-500",
-    gradientTo = "to-indigo-500",
+    gradientFrom = "from-[#3D70F5]",
+    gradientTo = "to-[#59A0FF]",
     gradientDirection = "to-r",
     variant = "default",
     size = "default",
@@ -46,7 +46,7 @@ const GradientButton = React.forwardRef<HTMLButtonElement, GradientButtonProps>(
     const isLoading = loading || disabled;
     
     // Base gradient class
-    const gradientClass = `bg-gradient-${gradientDirection} ${gradientFrom} ${gradientTo} hover:shadow-lg hover:shadow-${gradientFrom.replace("from-", "")}/20 active:scale-[0.98] transition-all`;
+    const gradientClass = `bg-gradient-${gradientDirection} ${gradientFrom} ${gradientTo} hover:shadow-lg hover:shadow-${gradientFrom.replace("from-", "")}/30 active:scale-[0.98] font-semibold transition-all duration-300 border border-white/20`;
     
     // Choose button styling based on variant
     let buttonClass = className || "";
