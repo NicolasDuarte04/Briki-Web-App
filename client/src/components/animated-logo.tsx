@@ -141,9 +141,7 @@ export function DynamicLogo({
         amplitude={0.15} 
         duration={2.5}
         className={`absolute -right-2 bottom-0 rounded-full ${dotSize} ${dotColor}`}
-      >
-        <div />
-      </PulsingElement>
+      />
     </div>
   );
 }
