@@ -622,37 +622,38 @@ export default function HomePage() {
         </div>
       </div>
       
-      {/* Popular Plans Slider */}
-      <div className="bg-indigo-50/50 dark:bg-gray-800 py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7 }}
-              viewport={{ once: true }}
-            >
-              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-blue-500">
-                Popular Insurance Plans
-              </h2>
-              <p className="mt-3 max-w-2xl mx-auto text-xl text-foreground/70">
-                Top-rated plans selected by our AI based on coverage quality and user satisfaction
-              </p>
-            </motion.div>
-          </div>
+      {/* Popular Plans Slider - Apple Style */}
+      <div className="bg-gradient-to-b from-blue-50/30 to-white dark:from-blue-950/10 dark:to-gray-900 py-24 relative overflow-hidden">
+        {/* Decorative light beams - Apple style */}
+        <div className="absolute inset-0 overflow-hidden opacity-40">
+          <motion.div 
+            className="absolute top-0 left-1/4 w-[300px] h-[600px] bg-gradient-to-b from-blue-400/10 to-transparent transform -rotate-45 origin-top"
+            animate={{ 
+              opacity: [0.1, 0.3, 0.1],
+              scale: [1, 1.1, 1],
+            }}
+            transition={{ 
+              duration: 8, 
+              ease: "easeInOut", 
+              repeat: Infinity,
+            }}
+          />
           
-          <PopularPlansSlider plans={popularPlans} />
-          
-          {user && <RecentlyViewedPlans category="travel" />}
+          <motion.div 
+            className="absolute top-1/4 right-1/3 w-[400px] h-[700px] bg-gradient-to-b from-indigo-400/10 to-transparent transform rotate-45 origin-top"
+            animate={{ 
+              opacity: [0.15, 0.35, 0.15],
+              scale: [1, 1.05, 1],
+            }}
+            transition={{ 
+              duration: 10, 
+              ease: "easeInOut", 
+              repeat: Infinity,
+              delay: 2,
+            }}
+          />
         </div>
-      </div>
       
-      {/* Testimonials */}
-      <div className="bg-white dark:bg-gray-900 py-20 relative overflow-hidden">
-        <div className="absolute inset-0 z-0 opacity-10">
-          <AnimatedBackground variant="consumer" intensity="low" />
-        </div>
-        
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-16">
             <motion.div
@@ -661,12 +662,103 @@ export default function HomePage() {
               transition={{ duration: 0.7 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-blue-500">
+              <motion.h2 
+                className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-blue-500"
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                viewport={{ once: true }}
+              >
+                Popular Insurance Plans
+              </motion.h2>
+              
+              <motion.p 
+                className="mt-4 max-w-2xl mx-auto text-lg md:text-xl text-foreground/70 leading-relaxed"
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                viewport={{ once: true }}
+              >
+                Top-rated plans selected by our AI based on coverage quality and user satisfaction
+              </motion.p>
+            </motion.div>
+          </div>
+          
+          {/* Wrapper with enhanced styling */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.3 }}
+            viewport={{ once: true }}
+            className="relative pb-4"
+          >
+            <div className="absolute inset-x-0 -bottom-6 h-16 bg-gradient-to-r from-blue-50/0 via-indigo-100/30 to-blue-50/0 dark:from-blue-950/0 dark:via-indigo-900/20 dark:to-blue-950/0 blur-xl rounded-full"></div>
+            
+            <PopularPlansSlider plans={popularPlans} />
+          </motion.div>
+          
+          {/* Recently Viewed Plans with enhanced styling */}
+          {user && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.5 }}
+              viewport={{ once: true }}
+              className="mt-12 pt-8 border-t border-indigo-100/50 dark:border-indigo-900/30"
+            >
+              <RecentlyViewedPlans category="travel" />
+            </motion.div>
+          )}
+        </div>
+      </div>
+      
+      {/* Testimonials - Apple Style */}
+      <div className="bg-gradient-to-b from-white to-indigo-50/20 dark:from-gray-900 dark:to-indigo-950/10 py-24 relative overflow-hidden">
+        {/* Subtle background elements */}
+        <div className="absolute inset-0 z-0 opacity-20">
+          <AnimatedBackground variant="consumer" intensity="low" />
+        </div>
+        
+        {/* Decorative elements */}
+        <motion.div 
+          className="absolute bottom-0 left-0 right-0 h-[400px] bg-gradient-to-t from-indigo-50/30 to-transparent dark:from-indigo-950/10 dark:to-transparent"
+          animate={{ 
+            opacity: [0.2, 0.4, 0.2],
+          }}
+          transition={{ 
+            duration: 10, 
+            ease: "easeInOut", 
+            repeat: Infinity,
+          }}
+        />
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-20">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7 }}
+              viewport={{ once: true }}
+            >
+              <motion.h2 
+                className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-blue-500"
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                viewport={{ once: true }}
+              >
                 What Our Users Are Saying
-              </h2>
-              <p className="mt-3 max-w-2xl mx-auto text-xl text-foreground/70">
+              </motion.h2>
+              
+              <motion.p 
+                className="mt-4 max-w-2xl mx-auto text-lg md:text-xl text-foreground/70 leading-relaxed"
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                viewport={{ once: true }}
+              >
                 Real experiences from users who found their perfect insurance match
-              </p>
+              </motion.p>
             </motion.div>
           </div>
           
@@ -674,35 +766,72 @@ export default function HomePage() {
             {testimonials.map((testimonial, index) => (
               <motion.div
                 key={testimonial.author}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 * index }}
+                transition={{ 
+                  duration: 0.7, 
+                  delay: 0.1 * index,
+                  type: "spring",
+                  stiffness: 50,
+                  damping: 20
+                }}
                 viewport={{ once: true }}
+                whileHover={{ 
+                  y: -10,
+                  transition: { type: "spring", stiffness: 300, damping: 15 }
+                }}
               >
-                <GlassCard className="h-full flex flex-col justify-between" hover="lift">
-                  <div>
-                    {/* Rating stars */}
-                    <div className="flex mb-4">
+                <GlassCard 
+                  className="h-full flex flex-col justify-between shadow-lg hover:shadow-xl transition-all duration-300 backdrop-blur-md relative overflow-hidden" 
+                  hover="glow"
+                >
+                  {/* Apple-style highlight corner */}
+                  <div className="absolute -top-10 -right-10 w-20 h-20 bg-gradient-to-br from-blue-400/10 to-indigo-400/10 rounded-full blur-xl"></div>
+                  
+                  <div className="relative z-10">
+                    {/* Rating stars with enhanced Apple-style */}
+                    <div className="flex mb-5">
                       {[...Array(5)].map((_, i) => (
-                        <Star
+                        <motion.div
                           key={i}
-                          className={`h-5 w-5 ${
-                            i < testimonial.rating
-                              ? "text-yellow-400 fill-yellow-400"
-                              : "text-gray-300"
-                          }`}
-                        />
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          whileInView={{ 
+                            opacity: 1, 
+                            scale: 1,
+                            transition: { 
+                              delay: 0.3 + (i * 0.1),
+                              type: "spring",
+                              stiffness: 300
+                            }
+                          }}
+                          viewport={{ once: true }}
+                        >
+                          <Star
+                            className={`h-5 w-5 ${
+                              i < testimonial.rating
+                                ? "text-yellow-400 fill-yellow-400 drop-shadow-sm"
+                                : "text-gray-300"
+                            }`}
+                          />
+                        </motion.div>
                       ))}
                     </div>
                     
-                    {/* Quote */}
-                    <p className="text-lg font-medium mb-6">"{testimonial.quote}"</p>
+                    {/* Quote with enhanced typography */}
+                    <p className="text-lg font-medium mb-6 leading-relaxed text-foreground/90 italic">"{testimonial.quote}"</p>
                   </div>
                   
-                  {/* Author info */}
-                  <div>
-                    <p className="font-semibold">{testimonial.author}</p>
-                    <p className="text-sm text-foreground/70">{testimonial.location}</p>
+                  {/* Author info with Apple-style design */}
+                  <div className="pt-4 border-t border-indigo-100/20 dark:border-indigo-900/20 mt-auto">
+                    <div className="flex items-center">
+                      <div className="h-8 w-8 rounded-full bg-gradient-to-br from-indigo-500 to-blue-500 flex items-center justify-center text-white font-semibold text-sm mr-3">
+                        {testimonial.author.charAt(0)}
+                      </div>
+                      <div>
+                        <p className="font-semibold">{testimonial.author}</p>
+                        <p className="text-sm text-foreground/60">{testimonial.location}</p>
+                      </div>
+                    </div>
                   </div>
                 </GlassCard>
               </motion.div>
