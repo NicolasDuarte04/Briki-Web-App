@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
-import Navbar from "@/components/navbar";
+import { MainLayout } from "@/components/layout/main-layout";
 import Footer from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
@@ -69,8 +69,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
+    <MainLayout>
       
       {/* Hero Section - Futuristic AI-driven design */}
       <div className="relative overflow-hidden bg-background">
@@ -818,8 +817,6 @@ export default function HomePage() {
           </div>
         </div>
       </div>
-      
-      <Footer />
-    </div>
+    </MainLayout>
   );
 }
