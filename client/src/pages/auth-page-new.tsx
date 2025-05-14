@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/form";
 
 // Icons
-import { Mail, Lock, User, Info } from "lucide-react";
+import { Mail, Lock, User, Info, LockKeyhole } from "lucide-react";
 
 // Form schemas
 const loginSchema = z.object({
@@ -414,7 +414,7 @@ export default function AuthPageNew() {
                             label="Confirm Password"
                             type="password"
                             placeholder="Confirm your password"
-                            icon={<LockKeyhole size={16} className="text-slate-500" />}
+                            icon={<Lock size={16} className="text-slate-500" />}
                             containerClassName="shadow-sm"
                             className="border-2 border-white/40 placeholder:text-slate-500/80 text-slate-800 font-medium h-12"
                             {...field} 
@@ -476,11 +476,11 @@ export default function AuthPageNew() {
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-4">
                   <motion.button 
-                    whileHover={{ scale: 1.02 }} 
+                    whileHover={{ scale: 1.03, y: -2 }} 
                     whileTap={{ scale: 0.98 }}
-                    className="flex h-11 items-center justify-center gap-2 rounded-xl bg-white/70 text-sm font-medium text-foreground shadow-sm backdrop-blur-sm transition hover:bg-white/90 border border-white/40"
+                    className="flex h-12 items-center justify-center gap-3 rounded-xl bg-white/80 text-sm font-semibold text-slate-800 shadow-md backdrop-blur-sm transition-all duration-300 hover:bg-white/95 hover:shadow-lg border border-white/40"
                     type="button"
                   >
                     <svg className="w-5 h-5 text-[#4285F4]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">
@@ -490,9 +490,9 @@ export default function AuthPageNew() {
                   </motion.button>
                   
                   <motion.button 
-                    whileHover={{ scale: 1.02 }} 
+                    whileHover={{ scale: 1.03, y: -2 }} 
                     whileTap={{ scale: 0.98 }}
-                    className="flex h-11 items-center justify-center gap-2 rounded-xl bg-white/70 text-sm font-medium text-foreground shadow-sm backdrop-blur-sm transition hover:bg-white/90 border border-white/40"
+                    className="flex h-12 items-center justify-center gap-3 rounded-xl bg-white/80 text-sm font-semibold text-slate-800 shadow-md backdrop-blur-sm transition-all duration-300 hover:bg-white/95 hover:shadow-lg border border-white/40"
                     type="button"
                   >
                     <svg className="w-5 h-5 text-[#1877F2]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
