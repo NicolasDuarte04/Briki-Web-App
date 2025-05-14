@@ -424,9 +424,9 @@ export default function HomePage() {
             </motion.div>
           </div>
           
-          <PopularPlansSlider />
+          <PopularPlansSlider plans={popularPlans} />
           
-          {user && <RecentlyViewedPlans className="mt-16" />}
+          {user && <RecentlyViewedPlans category="travel" />}
         </div>
       </div>
       
