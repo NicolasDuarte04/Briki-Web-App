@@ -14,6 +14,7 @@ import NavbarNew from "@/components/navbar-new";
 
 import NotFound from "@/pages/not-found";
 import HomePage from "@/pages/home-page";
+import HomePageNew from "@/pages/home-page-new";
 import AuthPage from "@/pages/auth-page";
 import AuthPageNew from "@/pages/auth-page-new";
 import TripInfoPage from "@/pages/trip-info-page";
@@ -50,8 +51,8 @@ function Router() {
   return (
     <PageTransition>
       <Switch>
-        <Route path="/" component={CountdownPage} />
-        <Route path="/home" component={HomePage} />
+        <Route path="/" component={HomePageNew} />
+        <Route path="/home" component={HomePageNew} />
         <Route path="/auth" component={AuthPageNew} />
         <ProtectedRoute path="/trip-info" component={TripInfoPage} />
         <ProtectedRoute path="/insurance-plans" component={InsurancePlansPage} />
