@@ -431,7 +431,7 @@ const translations: Translations = {
     governingLaw: 'Lei Aplicável',
     governingLawText: 'Estes Termos são regidos pelas leis da Colômbia e do México, dependendo da sua localização. Quaisquer disputas decorrentes do seu uso do Briki serão resolvidas nos tribunais apropriados dessas jurisdições.',
     contactUs: 'Contate-nos',
-    contactUsText: 'Se você tiver alguma dúvida ou preocupação sobre estes Termos, por favor, entre em contato com nossa equipe de suporte ao cliente em:',
+    contactUsText: 'Se você tiver alguma dúvida ou preocupação sobre estes Termos, por favor, entre em contato com nossa equipe de suporte ao cliente em contact@briki.app:',
     
     // Common elements
     yes: 'Sim',
