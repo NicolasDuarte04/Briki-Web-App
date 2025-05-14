@@ -1,16 +1,15 @@
-# Briki Multi-Category Insurance Platform
+# Briki Travel Insurance Platform
 
-Briki is a cutting-edge insurance marketplace that leverages AI and cross-platform technologies to deliver intelligent, personalized insurance protection across multiple categories including travel, auto, pet, and health insurance for customers in Colombia and Mexico. The platform features both consumer-facing interfaces and a specialized B2B "Briki Pilot" portal for insurance providers.
+Briki is a cutting-edge travel insurance comparison platform that leverages AI and cross-platform technologies to deliver intelligent, personalized travel protection for travelers in Colombia and Mexico.
 
 ## Project Structure
 
-This repository contains both the backend and frontend components of the Briki multi-category insurance platform:
+This repository contains both the backend and frontend components of the Briki travel insurance platform:
 
 - `/server`: Express.js backend with PostgreSQL database integration
-- `/client`: React web application frontend with consumer interface and B2B portal
+- `/client`: React web application frontend
 - `/mobile-app`: React Native mobile application with Expo
 - `/shared`: Shared types and utilities between frontend and backend
-- `/assets`: Application assets including images and branding materials
 
 ## Key Technologies
 
@@ -74,21 +73,12 @@ See the [mobile app README](./mobile-app/README.md) for instructions on setting 
 
 ## Features
 
-### Consumer Platform
 - **User Authentication**: Secure login, registration, and profile management
-- **Multi-Category Insurance**: Support for travel, auto, pet, and health insurance
+- **Trip Information**: Input and storage of trip details for insurance quotes
 - **Insurance Plan Comparison**: Compare multiple insurance plans with detailed coverage information
-- **Weather Risk Analysis**: AI-powered weather risk assessment for travel destinations
+- **Weather Risk Analysis**: AI-powered weather risk assessment for destinations
 - **Checkout Process**: Secure payment processing with Stripe
 - **Mobile Integration**: Seamless experience across web and mobile platforms
-- **AI Assistant**: Interactive assistant for personalized recommendations
-
-### Briki Pilot Portal (B2B)
-- **Analytics Dashboard**: Real-time metrics and performance tracking for insurance providers
-- **Plan Management**: Upload and manage insurance plan offerings
-- **Customer Insights**: Data-driven insights into customer preferences and behaviors
-- **API Integration**: Tools for connecting with other insurance platforms
-- **AI Risk Assessment**: Advanced risk modeling and forecasting tools
 
 ## API Documentation
 

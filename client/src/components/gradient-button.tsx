@@ -26,8 +26,8 @@ interface GradientButtonProps
 const GradientButton = React.forwardRef<HTMLButtonElement, GradientButtonProps>(
   ({
     className,
-    gradientFrom = "from-[#3D70F5]",
-    gradientTo = "to-[#59A0FF]",
+    gradientFrom = "from-blue-500",
+    gradientTo = "to-indigo-500",
     gradientDirection = "to-r",
     variant = "default",
     size = "default",
@@ -46,7 +46,7 @@ const GradientButton = React.forwardRef<HTMLButtonElement, GradientButtonProps>(
     const isLoading = loading || disabled;
     
     // Base gradient class
-    const gradientClass = `bg-gradient-${gradientDirection} ${gradientFrom} ${gradientTo} hover:shadow-lg hover:shadow-${gradientFrom.replace("from-", "")}/30 active:scale-[0.98] font-semibold transition-all duration-300 border border-white/20`;
+    const gradientClass = `bg-gradient-${gradientDirection} ${gradientFrom} ${gradientTo} hover:shadow-lg hover:shadow-${gradientFrom.replace("from-", "")}/20 active:scale-[0.98] transition-all`;
     
     // Choose button styling based on variant
     let buttonClass = className || "";
@@ -84,24 +84,18 @@ const GradientButton = React.forwardRef<HTMLButtonElement, GradientButtonProps>(
     
     const content = (
       <>
-        {loading ? (
-          <div className="flex items-center justify-center gap-2.5">
-            <Loader2
-              className="h-5 w-5 animate-spin"
-              aria-hidden="true"
-            />
-            <span className="font-semibold">{loadingText || "Loading..."}</span>
-          </div>
-        ) : (
-          <div className="flex items-center justify-center">
-            {icon && iconPosition === "left" && (
-              <span className="mr-2.5">{icon}</span>
-            )}
-            <span className="font-semibold">{children}</span>
-            {icon && iconPosition === "right" && (
-              <span className="ml-2.5">{icon}</span>
-            )}
-          </div>
+        {loading && (
+          <Loader2
+            className="mr-2 h-4 w-4 animate-spin"
+            aria-hidden="true"
+          />
+        )}
+        {!loading && icon && iconPosition === "left" && (
+          <span className="mr-2">{icon}</span>
+        )}
+        {loading && loadingText ? loadingText : children}
+        {!loading && icon && iconPosition === "right" && (
+          <span className="ml-2">{icon}</span>
         )}
       </>
     );

@@ -171,19 +171,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       toast({
         title: "Login successful",
         description: `Welcome back, ${data.user.username}!`,
-        variant: "success",
-        duration: 5000,
       });
     },
     onError: (error: Error) => {
       console.error("Login mutation error:", error);
       toast({
-        title: "Authentication Failed",
-        description: error.message === "Invalid username or password" 
-          ? "The username or password you entered is incorrect. Please try again." 
-          : error.message || "Could not log in. Please try again.",
+        title: "Login failed",
+        description: error.message || "Could not log in. Please try again.",
         variant: "destructive",
-        duration: 5000,
       });
     },
   });
