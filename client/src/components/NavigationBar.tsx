@@ -48,7 +48,8 @@ const NavLink = ({ href, label, current, hasDropdown, dropdownItems }: NavLinkPr
 
 const NavigationBar = () => {
   const [location] = useLocation();
-  const { user, isAuthenticated } = useAuth();
+  const { user } = useAuth();
+  const isAuthenticated = !!user;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
