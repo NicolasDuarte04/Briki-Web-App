@@ -158,12 +158,9 @@ export default function AuthPageEnhanced() {
     }
   }, [user, navigate, toast]);
   
-  // Handle auth flow redirects with role-based routing
+  // Handle welcome notification on successful auth
   useEffect(() => {
     if (loginMutation.isSuccess || registerMutation.isSuccess) {
-      // Get the user data from the query cache
-      const userData = queryClient.getQueryData<SelectUser>(["/api/user"]);
-      
       // Show welcome toast notification
       toast({
         title: "Welcome to Briki!",
@@ -171,18 +168,10 @@ export default function AuthPageEnhanced() {
         variant: "default",
       });
       
-      // Role-based redirection
-      setTimeout(() => {
-        if (userData?.role === "company") {
-          console.log("Company user detected, redirecting to company dashboard");
-          navigate('/company-dashboard');
-        } else {
-          console.log("Standard user detected, redirecting to home");
-          navigate('/home');
-        }
-      }, 1000);
+      // NOTE: Role-based redirection is now handled centrally in the auth hook
+      // This ensures consistent routing behavior across all login/registration points
     }
-  }, [loginMutation.isSuccess, registerMutation.isSuccess, navigate, toast]);
+  }, [loginMutation.isSuccess, registerMutation.isSuccess, toast]);
 
   // Handle login errors
   useEffect(() => {

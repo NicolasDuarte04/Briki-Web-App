@@ -29,6 +29,7 @@ type LoginData = Pick<InsertUser, "username" | "password">;
 export const AuthContext = createContext<AuthContextType | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
+  const [, navigate] = useLocation();
   const [authToken, setAuthToken] = useState<string | null>(() => {
     // Try to get token from localStorage on initial load
     return localStorage.getItem('auth_token');
@@ -42,6 +43,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setAuthToken(token);
     }
   }, []);
+  
+  // Centralized role-based redirection function
+  const handleRoleBasedRedirection = (userData: SelectUser) => {
+    console.log("Handling role-based redirection for user:", userData.username);
+    console.log("User role:", userData.role);
+    
+    if (userData.role === "company") {
+      console.log("Company user detected, redirecting to company dashboard");
+      navigate("/company-dashboard");
+    } else {
+      console.log("Standard user detected, redirecting to home");
+      navigate("/home");
+    }
+  };
   
   const {
     data: user,
@@ -165,15 +180,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             // Get the latest user data and handle role-based redirection
             const userData = await verifyResponse.json();
             
-            // Centralized role-based redirection
-            console.log("Redirecting based on user role:", userData.role);
-            if (userData.role === "company") {
-              console.log("Company user detected, redirecting to company dashboard");
-              wouter_navigate("/company-dashboard");
-            } else {
-              console.log("Standard user detected, redirecting to home");
-              wouter_navigate("/home");
-            }
+            // Use the centralized role-based redirection function
+            handleRoleBasedRedirection(userData);
           } else {
             console.log("Token verification failed:", verifyResponse.status);
           }
@@ -259,6 +267,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           });
           if (verifyResponse.ok) {
             console.log("Token verification successful after registration");
+            
+            // Get the latest user data and handle role-based redirection
+            const userData = await verifyResponse.json();
+            
+            // Use the centralized role-based redirection function
+            handleRoleBasedRedirection(userData);
           } else {
             console.log("Token verification failed after registration:", verifyResponse.status);
           }
