@@ -154,7 +154,19 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col relative">      
+    <div className="min-h-screen flex flex-col relative">
+      {/* Beta Notice */}
+      {showBeta && (
+        <BetaNotice 
+          message="Briki is currently in beta. We're constantly adding new insurance options!"
+          detailText="Your feedback helps us improve."
+          variant="beta"
+          position="top"
+          dismissible={true}
+          icon={<Sparkles size={18} />}
+        />
+      )}
+      
       {/* Hero Section with Animated Background */}
       <div className="relative overflow-hidden min-h-screen flex items-center">
         <div className="absolute inset-0 z-0">
