@@ -1,7 +1,7 @@
 import React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
-import { motion, type HTMLMotionProps } from "framer-motion";
+import { motion } from "framer-motion";
 
 const glassCardVariants = cva(
   "relative overflow-hidden rounded-xl border shadow-sm backdrop-blur-md",
@@ -45,14 +45,21 @@ const glassCardVariants = cva(
   }
 );
 
+// Define a safe motion props type
+type SafeMotionProps = {
+  whileHover?: Record<string, any>;
+  whileTap?: Record<string, any>;
+  initial?: Record<string, any>;
+  animate?: Record<string, any>;
+  exit?: Record<string, any>;
+  transition?: Record<string, any>;
+};
+
 export interface GlassCardProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, keyof HTMLMotionProps<"div">>,
+  extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof glassCardVariants> {
-  // Add any additional properties here
   disableMotion?: boolean;
-  motionProps?: Partial<HTMLMotionProps<"div">>;
-  className?: string;
-  children?: React.ReactNode;
+  motionProps?: SafeMotionProps;
 }
 
 /**
@@ -67,6 +74,7 @@ const GlassCard = React.forwardRef<HTMLDivElement, GlassCardProps>(
     interactive,
     disableMotion = false,
     motionProps = {},
+    children,
     ...props 
   }, ref) => {
     const combinedClassName = cn(
@@ -80,12 +88,11 @@ const GlassCard = React.forwardRef<HTMLDivElement, GlassCardProps>(
           ref={ref}
           className={combinedClassName}
           {...props}
-        />
+        >
+          {children}
+        </div>
       );
     }
-    
-    // Cast to avoid TypeScript errors with motion props
-    const safeProps = props as Omit<React.HTMLAttributes<HTMLDivElement>, keyof HTMLMotionProps<"div">>;
     
     return (
       <motion.div
@@ -95,8 +102,10 @@ const GlassCard = React.forwardRef<HTMLDivElement, GlassCardProps>(
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, ease: "easeOut" }}
         {...motionProps}
-        {...safeProps}
-      />
+        {...props}
+      >
+        {children}
+      </motion.div>
     );
   }
 );
