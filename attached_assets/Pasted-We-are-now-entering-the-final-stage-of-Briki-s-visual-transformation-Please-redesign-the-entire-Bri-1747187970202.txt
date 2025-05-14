@@ -1,0 +1,101 @@
+We are now entering the final stage of Briki’s visual transformation. Please redesign the entire Briki application using Apple Human Interface Guidelines and Stripe-like UI quality as visual references. Use the gradient aesthetic and clean font layout from the image provided. DO NOT delete any screen—this is a visual and UX transformation, not a reset of routes or logic.
+
+---
+
+### 1. VISUAL STYLE
+- Use a bold gradient background for the hero section (like the provided image) and gentle blurred gradients or soft light backgrounds for inner sections.
+- Use Apple-style typography: clean, legible, high-contrast. Headings should use semibold sans-serif fonts. Body text should be neutral but readable.
+- All cards and buttons must include:
+  - Micro-interactions
+  - Glassmorphism/light frosted blur effects
+  - Shadows and soft hover states
+- Input fields must follow macOS/iOS standards with clean borders, full width, and perfect focus states.
+
+---
+
+### 2. GLOBAL NAVIGATION SYSTEM (Desktop and Mobile):
+Rebuild the navigation bar as follows:
+- **Logo (top-left)**: Briki (as image or text)
+- **Links (center)**:
+  - Home
+  - Travel Insurance
+  - Auto Insurance
+  - Pet Insurance
+  - Health Insurance
+  - For Companies (Dropdown with options: “Join as Partner”, “Dashboard Login”)
+- **Buttons (top-right)**:
+  - Sign In
+  - Sign Up (Highlighted CTA)
+- **Mobile Navigation**: Collapsible hamburger menu with same links in vertical order. Animations must follow Apple-style motion.
+
+---
+
+### 3. SCREENS TO BE REDESIGNED
+
+#### 1. Home Screen (`/`)
+- Hero Section: Use a bright animated gradient background.
+- Countdown to launch.
+- Animated icons for insurance categories.
+- Animated CTA (“Pre-Test the App”).
+- Rebuild Briki Pilot preview window with better microcopy, layout, and animation.
+
+#### 2. Login & Signup Screens (`/auth`)
+- Center the glassmorphic login card.
+- Fix all padding and alignment bugs in fields.
+- Add social login buttons styled like Apple/Facebook sign-in.
+- Keep the Briki logo and brand colors clean and consistent.
+
+#### 3. Insurance Categories (`/travel`, `/auto`, `/pet`, `/health`)
+- Each screen should begin with a clean header and category-specific hero animation.
+- Animated card deck with interactive sorting: Coverage, Price, Ratings.
+- Highlight recommended plans using color tags and Apple-like motion.
+
+#### 4. Plan Comparison Screen (`/compare-plans`)
+- Animated swipeable columns (up to 3 visible).
+- Floating control to remove/add plans.
+- Animated dots or tab selector to show comparison pages.
+- Haptic-like micro-interactions on hover or selection.
+
+#### 5. Checkout Screen (`/checkout`)
+- Clean, secure layout with a card UI for summary and input fields.
+- Mock payment flow still included for now.
+- Use shadows and blur behind the form box.
+- Confirmation screen must be redesigned with a proper summary, plan image, and congratulatory animation.
+
+#### 6. Profile and Settings (`/profile`)
+- Redesign user settings in sections:
+  - Edit Profile
+  - Change Password
+  - Dark/Light Mode toggle
+  - Notification Preferences
+- Use tab-style layout with soft transitions.
+
+#### 7. Active Plans (`/my-plans`)
+- Display cards of purchased plans.
+- Add a toggle for filtering by insurance type.
+- Highlight expiration or active status.
+
+#### 8. Company Dashboard Login (`/company-login`)
+- Follow same login redesign.
+- Add “Request Access” and “Partner with Briki” as links.
+
+#### 9. Countdown Screen
+- Refine visual appeal: animated background, new typography, better animation of the clock.
+
+---
+
+### 4. ADDITIONAL COMPONENTS
+
+- Briki Pilot Assistant:
+  - Replace old Briko with a cleaner AI card on homepage and internal screens.
+  - Use soft chat bubble animation or a pop-up card with AI guidance.
+  - Add a button for “Get a recommendation” in key locations.
+
+- Footer:
+  - Minimal Apple-like footer:
+    - About | FAQ | Contact | Terms | Privacy
+    - Copyright notice
+
+---
+
+Let me know if you need exact HEX codes, fonts, or motion guides, but follow the image provided for inspiration. This is a complete mansion-level rebuild—visual, modern, world-class.
