@@ -96,18 +96,28 @@ const EnhancedInput = React.forwardRef<HTMLInputElement, EnhancedInputProps>(
         if (typeof ref === 'function') {
           ref(node);
         } else if (ref) {
-          // Safe assignment since we're not directly modifying the ref
-          (ref as any).current = node;
+          // Using a type assertion to correctly assign the ref
+          (ref as React.MutableRefObject<HTMLInputElement | null>).current = node;
         }
         
         // Set our internal ref
-        innerRef.current = node;
+        if (innerRef) {
+          innerRef.current = node;
+        }
       },
       [ref]
     );
     
-    // Update hasValue when input changes
+    // Update hasValue when input changes or props update
     useEffect(() => {
+      // Set initial value state based on props
+      if (props.value !== undefined) {
+        setHasValue(!!props.value);
+      } else if (props.defaultValue !== undefined) {
+        setHasValue(!!props.defaultValue);
+      }
+      
+      // Setup listener for future changes
       const handleInput = () => {
         if (innerRef.current) {
           setHasValue(!!innerRef.current.value);
@@ -116,12 +126,19 @@ const EnhancedInput = React.forwardRef<HTMLInputElement, EnhancedInputProps>(
       
       const inputElement = innerRef.current;
       if (inputElement) {
+        // Apply initial focus if autofocus is set
+        if (props.autoFocus) {
+          setTimeout(() => {
+            inputElement.focus();
+          }, 0);
+        }
+        
         inputElement.addEventListener('input', handleInput);
         return () => {
           inputElement.removeEventListener('input', handleInput);
         };
       }
-    }, []);
+    }, [props.value, props.defaultValue, props.autoFocus]);
     
     // Run validations
     useEffect(() => {
@@ -280,7 +297,7 @@ const EnhancedInput = React.forwardRef<HTMLInputElement, EnhancedInputProps>(
             </div>
           )}
           
-          {/* Input element */}
+          {/* Input element with improved initialization */}
           <Input
             {...props}
             ref={combinedRef}
@@ -288,6 +305,14 @@ const EnhancedInput = React.forwardRef<HTMLInputElement, EnhancedInputProps>(
             className={inputStyles}
             onFocus={handleFocus}
             onBlur={handleBlur}
+            onChange={(e) => {
+              // Ensure onChange handler is properly called even for first keystroke
+              if (props.onChange) {
+                props.onChange(e);
+              }
+              // This helps ensure state is properly updated on first keystroke
+              setHasValue(!!e.target.value);
+            }}
           />
           
           {/* Right content - either custom icon, validation status, or password toggle */}

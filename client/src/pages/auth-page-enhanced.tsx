@@ -197,8 +197,9 @@ export default function AuthPageEnhanced() {
   }, [registerMutation.isError, toast]);
 
   return (
-    <AnimatedBackground variant="auth" className="flex min-h-screen items-center justify-center px-4 py-16">
-      {/* Floating decorative elements */}
+    <AnimatedBackground variant="auth" className="flex min-h-screen items-center justify-center px-4 py-0">
+      {/* Floating decorative elements with subtle gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 to-cyan-500/5 backdrop-blur-[80px] opacity-30"></div>
       <FloatingElements />
       
       {/* Back to home button */}
@@ -214,14 +215,14 @@ export default function AuthPageEnhanced() {
         <span className="text-sm font-medium">Back to home</span>
       </motion.button>
       
-      {/* Centered auth container - increased max width */}
-      <div className="relative z-10 w-full max-w-xl px-5 sm:px-8 py-6">
-        {/* Logo and branding */}
+      {/* Centered auth container with reduced spacing */}
+      <div className="relative z-10 w-full max-w-xl px-5 sm:px-8 py-2">
+        {/* Logo and branding with reduced bottom margin */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.21, 0.61, 0.35, 1] }}
-          className="text-center mb-8"
+          className="text-center mb-4"
         >
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tighter bg-gradient-to-r from-[#4C6EFF] to-[#5F9FFF] bg-clip-text text-transparent drop-shadow-md">
             Briki
@@ -237,9 +238,9 @@ export default function AuthPageEnhanced() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2, ease: [0.21, 0.61, 0.35, 1] }}
         >
-          <GlassCard className="p-6 sm:p-8 rounded-2xl">
+          <GlassCard className="p-5 sm:p-6 rounded-2xl">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid grid-cols-2 mb-8 bg-white/10 p-1.5 rounded-lg shadow-inner">
+              <TabsList className="grid grid-cols-2 mb-5 bg-white/10 p-1.5 rounded-lg shadow-inner">
                 <TabsTrigger 
                   value="login" 
                   className={`rounded-md py-3 text-sm font-semibold transition-all
@@ -261,9 +262,9 @@ export default function AuthPageEnhanced() {
               </TabsList>
               
               {/* Login form */}
-              <TabsContent value="login" className="space-y-2">
+              <TabsContent value="login" className="space-y-1">
                 <Form {...loginForm}>
-                  <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-7">
+                  <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-5">
                     <FormField
                       control={loginForm.control}
                       name="username"
@@ -375,9 +376,9 @@ export default function AuthPageEnhanced() {
               </TabsContent>
               
               {/* Register form */}
-              <TabsContent value="register" className="space-y-2">
+              <TabsContent value="register" className="space-y-1">
                 <Form {...registerForm}>
-                  <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-7">
+                  <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-4">
                     <FormField
                       control={registerForm.control}
                       name="username"
