@@ -151,7 +151,7 @@ const translations: Translations = {
     governingLaw: 'Governing Law',
     governingLawText: 'These Terms are governed by the laws of Colombia and Mexico, depending on your location. Any disputes arising from your use of Briki will be resolved in the appropriate courts of these jurisdictions.',
     contactUs: 'Contact Us',
-    contactUsText: 'If you have any questions or concerns about these Terms, please contact our customer support team at:',
+    contactUsText: 'If you have any questions or concerns about these Terms, please contact our customer support team at contact@briki.app:',
 
     // Common elements
     yes: 'Yes',
@@ -291,7 +291,7 @@ const translations: Translations = {
     governingLaw: 'Ley Aplicable',
     governingLawText: 'Estos Términos se rigen por las leyes de Colombia y México, dependiendo de tu ubicación. Cualquier disputa que surja de tu uso de Briki se resolverá en los tribunales correspondientes de estas jurisdicciones.',
     contactUs: 'Contáctanos',
-    contactUsText: 'Si tienes alguna pregunta o inquietud sobre estos Términos, por favor contacta a nuestro equipo de soporte al cliente en:',
+    contactUsText: 'Si tienes alguna pregunta o inquietud sobre estos Términos, por favor contacta a nuestro equipo de soporte al cliente en contact@briki.app:',
     
     // Common elements
     yes: 'Sí',

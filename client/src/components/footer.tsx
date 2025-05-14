@@ -66,9 +66,9 @@ export default function Footer() {
                     </Link>
                   </li>
                   <li>
-                    <Link href="/" className="text-base text-gray-500 hover:text-gray-900">
+                    <a href="mailto:contact@briki.app" className="text-base text-gray-500 hover:text-gray-900">
                       Contact Us
-                    </Link>
+                    </a>
                   </li>
                   <li>
                     <Link href="/" className="text-base text-gray-500 hover:text-gray-900">

@@ -106,7 +106,7 @@ export default function CompanyRequestPilotPage() {
       
       toast({
         title: "Request Submitted Successfully",
-        description: "Your pilot program request has been submitted. Our team will contact you shortly.",
+        description: "Your pilot program request has been submitted. Our team at contact@briki.app will contact you shortly.",
       });
       
       setIsSubmitted(true);
