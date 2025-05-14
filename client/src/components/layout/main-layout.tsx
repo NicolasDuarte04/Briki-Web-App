@@ -121,16 +121,16 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
               
               {/* Desktop Navigation */}
               <nav className="hidden md:flex items-center space-x-1">
-                <Link href="/insurance-plans" className={`px-4 py-2 text-sm font-medium transition-colors ${isActivePath("/insurance-plans")}`}>
+                <Link href="/insurance/travel" className={`px-4 py-2 text-sm font-medium transition-colors ${isActivePath("/insurance/travel")}`}>
                   {t('travelInsurance')}
                 </Link>
-                <Link href="/auto-insurance" className={`px-4 py-2 text-sm font-medium transition-colors ${isActivePath("/auto-insurance")}`}>
+                <Link href="/insurance/auto" className={`px-4 py-2 text-sm font-medium transition-colors ${isActivePath("/insurance/auto")}`}>
                   {t('autoInsurance')}
                 </Link>
-                <Link href="/pet-insurance" className={`px-4 py-2 text-sm font-medium transition-colors ${isActivePath("/pet-insurance")}`}>
+                <Link href="/insurance/pet" className={`px-4 py-2 text-sm font-medium transition-colors ${isActivePath("/insurance/pet")}`}>
                   {t('petInsurance')}
                 </Link>
-                <Link href="/health-insurance" className={`px-4 py-2 text-sm font-medium transition-colors ${isActivePath("/health-insurance")}`}>
+                <Link href="/insurance/health" className={`px-4 py-2 text-sm font-medium transition-colors ${isActivePath("/insurance/health")}`}>
                   {t('healthInsurance')}
                 </Link>
               </nav>
@@ -284,29 +284,29 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
                   <div className="py-4">
                     <div className="space-y-1">
                       <Link 
-                        href="/insurance-plans" 
-                        className={`block px-3 py-2 rounded-md text-base font-medium ${location === "/insurance-plans" ? "bg-blue-50 text-blue-600" : "text-gray-500 hover:bg-gray-50 hover:text-blue-600"}`}
+                        href="/insurance/travel" 
+                        className={`block px-3 py-2 rounded-md text-base font-medium ${location === "/insurance/travel" ? "bg-blue-50 text-blue-600" : "text-gray-500 hover:bg-gray-50 hover:text-blue-600"}`}
                         onClick={() => setIsOpen(false)}
                       >
                         {t('travelInsurance')}
                       </Link>
                       <Link 
-                        href="/auto-insurance" 
-                        className={`block px-3 py-2 rounded-md text-base font-medium ${location === "/auto-insurance" ? "bg-blue-50 text-blue-600" : "text-gray-500 hover:bg-gray-50 hover:text-blue-600"}`}
+                        href="/insurance/auto" 
+                        className={`block px-3 py-2 rounded-md text-base font-medium ${location === "/insurance/auto" ? "bg-blue-50 text-blue-600" : "text-gray-500 hover:bg-gray-50 hover:text-blue-600"}`}
                         onClick={() => setIsOpen(false)}
                       >
                         {t('autoInsurance')}
                       </Link>
                       <Link 
-                        href="/pet-insurance" 
-                        className={`block px-3 py-2 rounded-md text-base font-medium ${location === "/pet-insurance" ? "bg-blue-50 text-blue-600" : "text-gray-500 hover:bg-gray-50 hover:text-blue-600"}`}
+                        href="/insurance/pet" 
+                        className={`block px-3 py-2 rounded-md text-base font-medium ${location === "/insurance/pet" ? "bg-blue-50 text-blue-600" : "text-gray-500 hover:bg-gray-50 hover:text-blue-600"}`}
                         onClick={() => setIsOpen(false)}
                       >
                         {t('petInsurance')}
                       </Link>
                       <Link 
-                        href="/health-insurance" 
-                        className={`block px-3 py-2 rounded-md text-base font-medium ${location === "/health-insurance" ? "bg-blue-50 text-blue-600" : "text-gray-500 hover:bg-gray-50 hover:text-blue-600"}`}
+                        href="/insurance/health" 
+                        className={`block px-3 py-2 rounded-md text-base font-medium ${location === "/insurance/health" ? "bg-blue-50 text-blue-600" : "text-gray-500 hover:bg-gray-50 hover:text-blue-600"}`}
                         onClick={() => setIsOpen(false)}
                       >
                         {t('healthInsurance')}
