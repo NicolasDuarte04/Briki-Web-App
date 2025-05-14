@@ -139,7 +139,7 @@ export default function AuthPageNew() {
     }
   }, [user]);
   
-  // Handle auth flow redirects
+  // Handle auth flow redirects and errors
   useEffect(() => {
     if (loginMutation.isSuccess || registerMutation.isSuccess) {
       console.log("AuthPage: Auth successful, redirecting to home page");
@@ -153,9 +153,33 @@ export default function AuthPageNew() {
       
       setTimeout(() => {
         window.location.href = '/home';
-      }, 100);
+      }, 500); // Slightly longer delay for smoother transition
     }
-  }, [loginMutation.isSuccess, registerMutation.isSuccess, toast]);
+    
+    // Reset form when there's an error
+    if (loginMutation.isError) {
+      loginForm.reset({
+        ...loginForm.getValues(),
+        password: '' // Clear password field on error
+      });
+    }
+    
+    if (registerMutation.isError) {
+      registerForm.reset({
+        ...registerForm.getValues(),
+        password: '',
+        confirmPassword: ''
+      });
+    }
+  }, [
+    loginMutation.isSuccess, 
+    registerMutation.isSuccess, 
+    loginMutation.isError,
+    registerMutation.isError,
+    loginForm,
+    registerForm,
+    toast
+  ]);
 
   return (
     <AnimatedBackground variant="auth" className="flex min-h-screen items-center justify-center px-4 py-24">
@@ -286,20 +310,20 @@ export default function AuthPageNew() {
                   </form>
                 </Form>
                 
-                <div className="relative flex items-center justify-center my-6">
+                <div className="relative flex items-center justify-center my-8">
                   <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-white/20"></div>
+                    <div className="w-full border-t border-white/30"></div>
                   </div>
-                  <div className="relative z-10 bg-[rgba(255,255,255,0.8)] px-4 text-sm text-foreground/70 backdrop-blur-sm">
+                  <div className="relative z-10 bg-white/70 px-4 py-1 text-sm font-medium text-slate-700 rounded-md backdrop-blur-sm shadow-sm">
                     Or continue with
                   </div>
                 </div>
                   
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-4">
                   <motion.button 
-                    whileHover={{ scale: 1.02 }} 
+                    whileHover={{ scale: 1.03, y: -2 }} 
                     whileTap={{ scale: 0.98 }}
-                    className="flex h-11 items-center justify-center gap-2 rounded-xl bg-white/70 text-sm font-medium text-foreground shadow-sm backdrop-blur-sm transition hover:bg-white/90 border border-white/40"
+                    className="flex h-12 items-center justify-center gap-3 rounded-xl bg-white/80 text-sm font-semibold text-slate-800 shadow-md backdrop-blur-sm transition-all duration-300 hover:bg-white/95 hover:shadow-lg border border-white/40"
                     type="button"
                   >
                     <svg className="w-5 h-5 text-[#4285F4]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">
@@ -309,9 +333,9 @@ export default function AuthPageNew() {
                   </motion.button>
                   
                   <motion.button 
-                    whileHover={{ scale: 1.02 }} 
+                    whileHover={{ scale: 1.03, y: -2 }} 
                     whileTap={{ scale: 0.98 }}
-                    className="flex h-11 items-center justify-center gap-2 rounded-xl bg-white/70 text-sm font-medium text-foreground shadow-sm backdrop-blur-sm transition hover:bg-white/90 border border-white/40"
+                    className="flex h-12 items-center justify-center gap-3 rounded-xl bg-white/80 text-sm font-semibold text-slate-800 shadow-md backdrop-blur-sm transition-all duration-300 hover:bg-white/95 hover:shadow-lg border border-white/40"
                     type="button"
                   >
                     <svg className="w-5 h-5 text-[#1877F2]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
