@@ -82,34 +82,35 @@ export default function CompanyPreviewPage() {
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-white">Preview</CardTitle>
-                  <Tabs defaultValue={selectedTab} className="w-[400px]" onValueChange={setSelectedTab}>
-                    <TabsList className="grid grid-cols-3 bg-[#002050] border border-[#003087]">
-                      <TabsTrigger 
-                        value="standard-view" 
-                        className="data-[state=active]:bg-[#0055CC] data-[state=active]:text-white"
-                      >
-                        Standard
-                      </TabsTrigger>
-                      <TabsTrigger 
-                        value="compare-view"
-                        className="data-[state=active]:bg-[#0055CC] data-[state=active]:text-white"
-                      >
-                        Compare
-                      </TabsTrigger>
-                      <TabsTrigger 
-                        value="ai-view"
-                        className="data-[state=active]:bg-[#0055CC] data-[state=active]:text-white"
-                      >
-                        AI Assistant
-                      </TabsTrigger>
-                    </TabsList>
-                  </Tabs>
                 </div>
                 <CardDescription className="text-gray-400">
                   How users will see your plan in different sections
                 </CardDescription>
               </CardHeader>
               <CardContent className="pt-4">
+                {/* Using proper Tabs structure */}
+                <Tabs defaultValue={selectedTab} className="w-full" onValueChange={setSelectedTab}>
+                  <TabsList className="grid grid-cols-3 bg-[#002050] border border-[#003087] mb-6">
+                    <TabsTrigger 
+                      value="standard-view" 
+                      className="data-[state=active]:bg-[#0055CC] data-[state=active]:text-white"
+                    >
+                      Standard
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="compare-view"
+                      className="data-[state=active]:bg-[#0055CC] data-[state=active]:text-white"
+                    >
+                      Compare
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="ai-view"
+                      className="data-[state=active]:bg-[#0055CC] data-[state=active]:text-white"
+                    >
+                      AI Assistant
+                    </TabsTrigger>
+                  </TabsList>
+                  
                 {/* Standard view */}
                 <TabsContent value="standard-view" className="mt-0">
                   <div className="border rounded-lg p-6 bg-[#001E47]/70 border-[#002C7A]">
@@ -366,6 +367,7 @@ export default function CompanyPreviewPage() {
                     </div>
                   </div>
                 </TabsContent>
+                </Tabs>
               </CardContent>
             </Card>
           </motion.div>
