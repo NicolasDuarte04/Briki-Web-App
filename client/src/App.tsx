@@ -14,6 +14,7 @@ import { LoginNotification } from "@/components/login-notification";
 import NotFound from "@/pages/not-found";
 import HomePage from "@/pages/home-page";
 import AuthPage from "@/pages/auth-page";
+import AuthPageNew from "@/pages/auth-page-new";
 import TripInfoPage from "@/pages/trip-info-page";
 import InsurancePlansPage from "@/pages/insurance-plans-page";
 import CheckoutPage from "@/pages/checkout-page";
@@ -50,7 +51,7 @@ function Router() {
       <Switch>
         <Route path="/" component={CountdownPage} />
         <Route path="/home" component={HomePage} />
-        <Route path="/auth" component={AuthPage} />
+        <Route path="/auth" component={AuthPageNew} />
         <ProtectedRoute path="/trip-info" component={TripInfoPage} />
         <ProtectedRoute path="/insurance-plans" component={InsurancePlansPage} />
         <ProtectedRoute path="/checkout/:planId" component={CheckoutPage} />
