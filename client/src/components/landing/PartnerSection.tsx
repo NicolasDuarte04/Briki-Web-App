@@ -74,7 +74,7 @@ export default function PartnerSection() {
             transition={{ duration: 0.7 }}
           >
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
-              <span className="text-[#33BFFF]">Insurance Companies:</span> Supercharge Your Distribution
+              <span className="text-[#33BFFF]">Insurance Companies:</span> <span className="text-white drop-shadow-md">Supercharge Your Distribution</span>
             </h2>
             <p className="text-lg text-blue-100/90 mb-8 leading-relaxed">
               Join Colombia and Mexico's most advanced insurance marketplace. Briki's AI-powered platform connects you directly with qualified customers seeking your exact offerings.
