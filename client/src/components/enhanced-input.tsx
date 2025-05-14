@@ -103,8 +103,13 @@ const EnhancedInput = React.forwardRef<HTMLInputElement, EnhancedInputProps>(
           });
         }
         
-        // Update innerRef safely with the input element
-        innerRef.current = node;
+        // Update innerRef safely using same pattern
+        if (innerRef) {
+          Object.defineProperty(innerRef, 'current', {
+            value: node,
+            configurable: true
+          });
+        }
       },
       [ref]
     );

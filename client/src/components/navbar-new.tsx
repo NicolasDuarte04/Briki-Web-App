@@ -409,7 +409,7 @@ export default function NavbarNew() {
                         {showAIAssistant && (
                           <div className="mt-5 px-4">
                             <GradientButton
-                              variant="primary"
+                              variant="default"
                               size="sm"
                               className="w-full gap-2 shadow-md"
                               onClick={() => {
