@@ -377,7 +377,7 @@ export default function AuthPageEnhanced() {
               {/* Register form */}
               <TabsContent value="register" className="space-y-2">
                 <Form {...registerForm}>
-                  <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-6">
+                  <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-7">
                     <FormField
                       control={registerForm.control}
                       name="username"
@@ -487,7 +487,7 @@ export default function AuthPageEnhanced() {
                         size="lg"
                         loading={registerMutation.isPending}
                         loadingText="Creating account..."
-                        className="w-full"
+                        className="w-full h-12 font-semibold"
                       >
                         Create Account
                       </GradientButton>
