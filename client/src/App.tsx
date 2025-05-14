@@ -34,6 +34,7 @@ import AutoQuotePage from "@/pages/auto-quote-page";
 import AIAssistantDemo from "@/pages/ai-assistant-demo";
 import CountdownPage from "@/pages/countdown-page";
 import CountdownPageNew from "@/pages/countdown-page-new";
+import BrikiPilotPortal from "@/pages/briki-pilot-portal";
 
 // Company pages
 import CompanyPage from "@/pages/company-page";
@@ -77,6 +78,7 @@ function Router() {
         
         {/* Company/Partner Routes */}
         <Route path="/company" component={CompanyPage} />
+        <Route path="/briki-pilot" component={BrikiPilotPortal} />
         <Route path="/company-login" component={CompanyLoginPage} />
         <Route path="/company-register" component={CompanyRegisterPage} />
         <Route path="/contact-sales" component={ContactSalesPage} />

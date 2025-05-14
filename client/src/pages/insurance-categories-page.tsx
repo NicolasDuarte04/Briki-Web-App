@@ -49,7 +49,7 @@ export default function InsuranceCategoriesPage() {
       id: "pet" as InsuranceCategory,
       name: "Pet Insurance",
       description: "Care for your pets with veterinary coverage",
-      icon: <Paw size={24} />,
+      icon: <Cat size={24} />,
       gradient: "from-[#6E59FF] to-[#A289FF]",
       active: false,
     }
