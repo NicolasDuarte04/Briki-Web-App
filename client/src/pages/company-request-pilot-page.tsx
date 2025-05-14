@@ -191,7 +191,7 @@ export default function CompanyRequestPilotPage() {
               <Button 
                 variant="outline"
                 onClick={() => {
-                  window.open('mailto:partnerships@briki.com', '_blank');
+                  window.open('mailto:contact@briki.app', '_blank');
                 }}
                 className="border-[#002C7A] text-gray-300 hover:text-white hover:bg-[#002C7A]/50 hover:border-[#0074FF]/50"
               >
