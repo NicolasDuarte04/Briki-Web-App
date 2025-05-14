@@ -6,8 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigation } from "@/hooks/use-navigation";
 import { useToast } from "@/hooks/use-toast";
 
-import Navbar from "@/components/navbar";
-import Footer from "@/components/footer";
+import { MainLayout } from "@/components/layout/main-layout";
 import CompareModal from "@/components/compare-modal";
 import TripSummary from "@/components/trip-summary";
 import { PlanGrid } from "@/components/plan-grid";
@@ -129,8 +128,7 @@ export default function InsurancePlansPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <Navbar />
+    <MainLayout>
       
       {/* Background elements */}
       <div className="absolute inset-0 z-0 overflow-hidden">
@@ -481,7 +479,6 @@ export default function InsurancePlansPage() {
         plans={selectedPlans} 
       />
       
-      <Footer />
-    </div>
+    </MainLayout>
   );
 }

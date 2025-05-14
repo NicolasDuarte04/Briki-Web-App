@@ -3,8 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLanguage } from "@/components/language-selector";
 import { useLocation } from "wouter";
-import Navbar from "@/components/navbar";
-import Footer from "@/components/footer";
+import { MainLayout } from "@/components/layout/main-layout";
 
 export default function HealthInsurancePage() {
   const { t } = useLanguage();
