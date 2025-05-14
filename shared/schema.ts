@@ -95,3 +95,6 @@ export type InsurancePlan = typeof insurancePlans.$inferSelect;
 
 export type InsertOrder = z.infer<typeof insertOrderSchema>;
 export type Order = typeof orders.$inferSelect;
+
+// Insurance category types for the app
+export type InsuranceCategory = 'travel' | 'auto' | 'health' | 'pet';
