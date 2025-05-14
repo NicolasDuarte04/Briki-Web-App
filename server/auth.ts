@@ -94,8 +94,14 @@ export function setupAuth(app: Express) {
       }
 
       console.log('POST /api/register - Creating new user:', req.body.username);
+      
+      // If registering from company pages, set role to "company"
+      const role = req.body.role || (req.body.isCompany ? "company" : "user");
+      console.log(`POST /api/register - User role: ${role}`);
+
       const user = await storage.createUser({
         ...req.body,
+        role,
         password: await hashPassword(req.body.password),
       });
       console.log('POST /api/register - User created successfully, ID:', user.id);
