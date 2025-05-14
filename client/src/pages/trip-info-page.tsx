@@ -8,8 +8,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
 
-import Navbar from "@/components/navbar";
-import Footer from "@/components/footer";
+import { MainLayout } from "@/components/layout/main-layout";
 import { useLanguage } from "@/components/language-selector";
 import { CountryCombobox } from "@/components/country-combobox";
 import { Input } from "@/components/ui/input";
@@ -237,8 +236,7 @@ export default function TripInfoPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <Navbar />
+    <MainLayout>
       
       {/* Background elements */}
       <div className="absolute inset-0 z-0 overflow-hidden">
@@ -736,7 +734,6 @@ export default function TripInfoPage() {
         </motion.div>
       </div>
       
-      <Footer />
-    </div>
+    </MainLayout>
   );
 }
