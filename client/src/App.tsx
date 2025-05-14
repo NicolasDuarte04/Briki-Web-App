@@ -32,6 +32,7 @@ import HealthInsurancePage from "@/pages/health-insurance-page";
 import AutoQuotePage from "@/pages/auto-quote-page";
 import AIAssistantDemo from "@/pages/ai-assistant-demo";
 import CountdownPage from "@/pages/countdown-page";
+import CountdownPageNew from "@/pages/countdown-page-new";
 
 // Company pages
 import CompanyPage from "@/pages/company-page";
@@ -51,7 +52,7 @@ function Router() {
   return (
     <PageTransition>
       <Switch>
-        <Route path="/" component={HomePageNew} />
+        <Route path="/" component={CountdownPageNew} />
         <Route path="/home" component={HomePageNew} />
         <Route path="/auth" component={AuthPageNew} />
         <ProtectedRoute path="/trip-info" component={TripInfoPage} />

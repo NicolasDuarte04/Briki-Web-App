@@ -150,7 +150,7 @@ export default function AuthPageNew() {
   }, [loginMutation.isSuccess, registerMutation.isSuccess, toast]);
 
   return (
-    <AnimatedBackground variant="vibrant" className="flex min-h-screen items-center justify-center px-4 py-16">
+    <AnimatedBackground variant="auth" className="flex min-h-screen items-center justify-center px-4 py-16">
       {/* Centered auth container */}
       <div className="relative z-10 w-full max-w-md">
         {/* Logo and branding */}
@@ -261,7 +261,7 @@ export default function AuthPageNew() {
                       <GradientButton
                         type="submit"
                         size="lg"
-                        isLoading={loginMutation.isPending}
+                        loading={loginMutation.isPending}
                         loadingText="Signing in..."
                         className="w-full"
                       >
@@ -406,7 +406,7 @@ export default function AuthPageNew() {
                       <GradientButton
                         type="submit"
                         size="lg"
-                        isLoading={registerMutation.isPending}
+                        loading={registerMutation.isPending}
                         loadingText="Creating account..."
                         className="w-full"
                       >
