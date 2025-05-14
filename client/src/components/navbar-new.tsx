@@ -154,6 +154,12 @@ export default function NavbarNew() {
                 >
                   <span>Partner Dashboard</span>
                 </DropdownMenuItem>
+                <DropdownMenuItem 
+                  className="cursor-pointer"
+                  onClick={() => navigate("/briki-pilot")}
+                >
+                  <span>Briki Pilot Portal</span>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem 
                   className="cursor-pointer"
@@ -364,6 +370,19 @@ export default function NavbarNew() {
                         onClick={() => setIsOpen(false)}
                       >
                         {t('forCompanies')}
+                      </Link>
+                    </motion.div>
+                    
+                    <motion.div
+                      whileHover={{ x: 5 }}
+                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    >
+                      <Link 
+                        href="/briki-pilot" 
+                        className="block px-3 py-2.5 ml-3 rounded-md text-base font-medium text-indigo-600 bg-indigo-50/50 hover:bg-indigo-100/80"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        Briki Pilot Portal
                       </Link>
                     </motion.div>
                   </div>
