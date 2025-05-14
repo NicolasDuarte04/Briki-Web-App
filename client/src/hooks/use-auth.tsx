@@ -24,7 +24,9 @@ type AuthContextType = {
   refetchUser: () => Promise<any>;
 };
 
-type LoginData = Pick<InsertUser, "username" | "password">;
+type LoginData = Pick<InsertUser, "username" | "password"> & {
+  role?: string; // Add optional role parameter for company login
+};
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -53,8 +55,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.log("Company user detected, redirecting to company dashboard");
       navigate("/company-dashboard");
     } else {
-      console.log("Standard user detected, redirecting to home");
-      navigate("/home");
+      console.log("Standard user detected, redirecting to trip info page");
+      navigate("/trip-info");
     }
   };
   
