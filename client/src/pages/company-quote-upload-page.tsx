@@ -16,6 +16,7 @@ import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FileUploader } from "@/components/ui/file-uploader";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import { 
   Upload, 
   FileText, 
@@ -628,14 +629,18 @@ export default function CompanyQuoteUploadPage() {
                           Upload a CSV file with your plan details. The file should include columns for plan name, ID, price, and features.
                         </p>
                         
-                        <FileUploader 
-                          onUpload={handleFileUpload}
-                          accept=".csv"
+                        <Button 
+                          onClick={() => document.getElementById('file-upload')?.click()}
                           className="bg-[#002050] border-[#002C7A] text-white hover:bg-[#002C7A]/70 hover:border-[#0074FF]/50"
                         >
                           <Upload className="mr-2 h-4 w-4" />
                           {uploadedFile ? "Replace CSV" : "Upload CSV"}
-                        </FileUploader>
+                        </Button>
+                        <FileUploader 
+                          onFileSelected={handleFileUpload}
+                          accept=".csv"
+                          className="hidden"
+                        />
                         
                         {uploadedFile && (
                           <div className="mt-4 flex items-center text-sm text-[#33BFFF]">
