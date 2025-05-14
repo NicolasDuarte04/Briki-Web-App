@@ -1,0 +1,102 @@
+// Prompt for Agent – Briki Home + Explore Page Redesign
+
+We're doing a full visual and UX redesign of the Briki homepage (`@home-page-new.tsx`) and explore/learn more screen (`@learn-more-page.tsx`). Please follow the updated Briki UI direction as seen in our current countdown page and the latest UI mockups.
+
+---
+
+### GOAL:
+Deliver a consistent, elegant, animated user experience that:
+- Aligns visually with the new `@countdown-page.tsx`
+- Reflects our AI-first, high-trust insurance platform brand
+- Looks like an “Editor’s Choice” App Store product
+- Performs smoothly on both desktop and mobile
+
+---
+
+### GENERAL INSTRUCTIONS:
+- Use a **modern, Apple-style layout** with subtle gradients and soft shadows
+- Use **Framer Motion** for entrance animations (e.g. fade in, slide in, pulse)
+- Use **Tailwind CSS** with the Briki theme (light mode default, dark supported)
+- Match the **font sizes, padding, and spacing** of the updated countdown page
+- All icons must be consistent in **style, size (48x48 or 64x64)**, and alignment
+
+---
+
+### @home-page-new.tsx Redesign Tasks:
+
+**1. Header / NavBar**
+- Add slight `bg-white/80` + `backdrop-blur` on scroll
+- Use animated logo entrance
+- Improve visual separation from the page
+
+**2. Hero Section**
+- Add animated `motion.div` fade-in + upward motion
+- Enhance “AI-Powered Insurance Platform” headline with modern font tracking and size
+- Primary CTA: “Get Started”
+- Secondary CTA: “Learn More”
+- Add a floating gradient orb or blob in background (low opacity)
+
+**3. Graph / Analytics Panel**
+- Animate the bar chart fill with Framer Motion width transitions
+- Each metric should animate into view on scroll
+- Use color-coded indicators for Premium vs Standard Plans
+- Style the container to match our card aesthetic (`GlassCard`)
+
+**4. Features / Highlights Section**
+- Real-Time Risk Assessment
+- AI Recommendations
+- Claims Automation
+- Animate each card in with slight delay for scroll appearance
+- Add subtle hover animation on icon containers
+
+**5. Category Cards**
+- Travel, Auto, Pet, Health Insurance
+- Standardize icon sizes and spacing
+- Add `motion.div` hover lift effect
+- Use `Explore Plans` buttons on each with animated gradient hover
+
+**6. Popular Plans Carousel**
+- Make swipeable on mobile
+- Add pagination dots or arrows
+- Add subtle `motion.div` pulse or glow on CTA buttons
+- Plan cards should be consistent in font size, padding, and spacing
+
+**7. Testimonials**
+- Show 2–3 at a time on desktop, 1 at a time mobile
+- Animate entrance one-by-one
+- Align avatar/name vertically with the quote for better readability
+
+**8. Final CTA**
+- Full-width gradient background
+- Large heading like “Ready to find your perfect insurance match?”
+- CTA Button: “Get Started Now”
+- Add pulse or shine animation to button on hover
+
+**9. Beta Banner**
+- Convert existing banner into a **dismissible notification**
+- Store dismissal in `localStorage` so it doesn’t return once dismissed
+- Subtle animation on mount
+
+---
+
+### @learn-more-page.tsx (Explore)
+
+- Same visual system and design language as Home
+- Add Framer Motion entrance animations on section titles and cards
+- Consider scroll-triggered parallax or offset motion for advanced feel
+- Remove or consolidate repeated content (e.g. don’t duplicate testimonials if shown on home)
+- All icons should match new system
+
+---
+
+### VISUAL SYSTEM REFERENCES:
+Use same system as seen in:
+- `@countdown-page.tsx`
+- New background and typography from final mockup (light gradient, large titles, soft shadows)
+
+---
+
+### FINAL REMARKS
+Do not modify the BrikiPilotPortal or any company-specific portal screens. Focus only on the public-facing user experience. The new version should feel cohesive, polished, animated, and ready for an App Store-level launch.
+
+Let me know once complete so I can verify it against the new design system.
