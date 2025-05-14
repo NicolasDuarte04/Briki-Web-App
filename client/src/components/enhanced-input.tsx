@@ -86,7 +86,8 @@ const EnhancedInput = React.forwardRef<HTMLInputElement, EnhancedInputProps>(
     const [isFocused, setIsFocused] = useState(false);
     const [validationState, setValidationState] = useState<boolean | null>(null);
     const [validationMessage, setValidationMessage] = useState<string>("");
-    const innerRef = useRef<HTMLInputElement>(null);
+    // Instead of using innerRef which causes TypeScript errors, use state to track the element
+    const [inputElement, setInputElement] = useState<HTMLInputElement | null>(null);
     const [hasValue, setHasValue] = useState(!!props.value || !!props.defaultValue);
     
     // Handle ref combination without causing type errors
@@ -100,9 +101,11 @@ const EnhancedInput = React.forwardRef<HTMLInputElement, EnhancedInputProps>(
           (ref as React.MutableRefObject<HTMLInputElement | null>).current = node;
         }
         
-        // Set our internal ref
-        if (innerRef) {
-          innerRef.current = node;
+        // Store a reference to the node for internal use
+        // Skip setting the ref directly to avoid TypeScript errors
+        if (node) {
+          // Store reference for our internal use in a way that doesn't trigger TypeScript errors
+          setInputElement(node);
         }
       },
       [ref]
@@ -119,12 +122,10 @@ const EnhancedInput = React.forwardRef<HTMLInputElement, EnhancedInputProps>(
       
       // Setup listener for future changes
       const handleInput = () => {
-        if (innerRef.current) {
-          setHasValue(!!innerRef.current.value);
+        if (inputElement) {
+          setHasValue(!!inputElement.value);
         }
       };
-      
-      const inputElement = innerRef.current;
       if (inputElement) {
         // Apply initial focus if autofocus is set
         if (props.autoFocus) {
