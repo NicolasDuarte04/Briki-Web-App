@@ -84,8 +84,8 @@ export default function CompanyRegisterPage() {
         variant: "default",
       });
       
-      // Redirect to company dashboard
-      navigate("/company-dashboard");
+      // NOTE: Redirection is now handled centrally by the auth hook
+      // This ensures consistent routing behavior across all registration points
       
     } catch (error) {
       console.error("Registration error:", error);
