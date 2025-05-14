@@ -1,210 +1,97 @@
-import { useEffect, useRef } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import '@/styles/design-system.css';
 
-type AnimatedBackgroundProps = {
-  children: React.ReactNode;
-  variant?: 'default' | 'auth' | 'travel' | 'auto' | 'pet' | 'health' | 'company';
-  className?: string;
-};
-
-// Define gradient maps for different variants
-const gradientMap = {
-  default: {
-    colors: ['#ff6b6b', '#ffb347', '#4d7cff'],
-    directions: '135deg',
-  },
-  auth: {
-    colors: ['#ff9966', '#ff5e62', '#6543d2'],
-    directions: '135deg',
-  },
-  travel: {
-    colors: ['#00c6fb', '#005bea', '#72EDF2'],
-    directions: '135deg',
-  },
-  auto: {
-    colors: ['#f093fb', '#f5576c', '#4b96f3'],
-    directions: '135deg',
-  },
-  pet: {
-    colors: ['#a1c4fd', '#c2e9fb', '#7f7fd5'],
-    directions: '135deg',
-  },
-  health: {
-    colors: ['#84fab0', '#8fd3f4', '#65c4f7'],
-    directions: '135deg',
-  },
-  company: {
-    colors: ['#6b46c1', '#4534b9', '#3c1874'],
-    directions: '135deg',
-  },
-};
-
-const AnimatedBackground: React.FC<AnimatedBackgroundProps> = ({
-  children,
-  variant = 'default',
-  className = '',
+// Gradient orb component used in the background
+const GradientOrb = ({ 
+  size = 400, 
+  color = 'from-blue-400 to-indigo-500', 
+  initialPosition = { x: 0, y: 0 },
+  animate = true,
+  animationProps = {},
+  opacity = 0.2,
+  zIndex = -10,
+}: { 
+  size?: number; 
+  color?: string; 
+  initialPosition?: { x: number; y: number };
+  animate?: boolean;
+  animationProps?: any;
+  opacity?: number;
+  zIndex?: number;
 }) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const colors = gradientMap[variant].colors;
-  const direction = gradientMap[variant].directions;
-
-  // Canvas animation for the flowing liquid gradient effect
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    let width = window.innerWidth;
-    let height = window.innerHeight;
-    let animationId: number;
-    
-    // Handle resize
-    const handleResize = () => {
-      width = window.innerWidth;
-      height = window.innerHeight;
-      canvas.width = width;
-      canvas.height = height;
-    };
-    
-    window.addEventListener('resize', handleResize);
-    handleResize();
-
-    // Create gradient background
-    const createGradientBackground = (ctx: CanvasRenderingContext2D) => {
-      const gradient = ctx.createLinearGradient(0, 0, width, height);
-      colors.forEach((color, index) => {
-        gradient.addColorStop(index / (colors.length - 1), color);
-      });
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, width, height);
-    };
-
-    // Create flowing effect particles
-    class Particle {
-      x: number;
-      y: number;
-      size: number;
-      vx: number;
-      vy: number;
-      color: string;
-      opacity: number;
-      life: number;
-      maxLife: number;
-
-      constructor() {
-        this.x = Math.random() * width;
-        this.y = Math.random() * height;
-        this.size = Math.random() * 40 + 20;
-        this.vx = Math.random() * 2 - 1;
-        this.vy = Math.random() * 2 - 1;
-        this.color = colors[Math.floor(Math.random() * colors.length)];
-        this.opacity = Math.random() * 0.2 + 0.1; // Lower opacity for subtle effect
-        this.life = 0;
-        this.maxLife = Math.random() * 200 + 100;
-      }
-
-      update() {
-        this.x += this.vx;
-        this.y += this.vy;
-        this.life++;
-        
-        // Fade in and out
-        if (this.life < 20) {
-          this.opacity = (this.life / 20) * 0.2;
-        } else if (this.life > this.maxLife - 20) {
-          this.opacity = ((this.maxLife - this.life) / 20) * 0.2;
-        }
-
-        // Respawn when life is over or out of bounds
-        if (this.life >= this.maxLife || 
-            this.x < -this.size || this.x > width + this.size || 
-            this.y < -this.size || this.y > height + this.size) {
-          this.x = Math.random() * width;
-          this.y = Math.random() * height;
-          this.life = 0;
-          this.vx = Math.random() * 2 - 1;
-          this.vy = Math.random() * 2 - 1;
-        }
-      }
-
-      draw(ctx: CanvasRenderingContext2D) {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fillStyle = `${this.color}${Math.floor(this.opacity * 255).toString(16).padStart(2, '0')}`;
-        ctx.fill();
-        ctx.closePath();
-      }
-    }
-
-    // Create particles
-    const particles: Particle[] = [];
-    const particleCount = Math.min(Math.max(width, height) / 20, 30); // Responsive count
-
-    for (let i = 0; i < particleCount; i++) {
-      particles.push(new Particle());
-    }
-
-    // Animation loop
-    const animate = () => {
-      // Apply a semi-transparent layer to create trailing effect
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.01)'; // Very subtle fade
-      ctx.fillRect(0, 0, width, height);
-      
-      // Redraw the gradient base periodically
-      if (Math.random() < 0.02) { // ~2% chance each frame
-        createGradientBackground(ctx);
-      }
-
-      // Apply blur for smoother effect (can be performance intensive)
-      ctx.filter = 'blur(60px)';
-      
-      // Update and draw particles
-      particles.forEach(particle => {
-        particle.update();
-        particle.draw(ctx);
-      });
-      
-      // Reset filter
-      ctx.filter = 'none';
-      
-      animationId = requestAnimationFrame(animate);
-    };
-
-    // Initial gradient
-    createGradientBackground(ctx);
-    
-    // Start animation
-    animate();
-
-    // Cleanup
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      cancelAnimationFrame(animationId);
-    };
-  }, [variant, colors]);
-
   return (
-    <div className={`relative min-h-screen overflow-hidden ${className}`}>
-      {/* Animated gradient canvas */}
-      <canvas
-        ref={canvasRef}
-        className="absolute top-0 left-0 w-full h-full z-0"
-        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-      />
+    <motion.div
+      className={`absolute blur-3xl rounded-full opacity-${opacity * 100} bg-gradient-to-br ${color}`}
+      style={{ 
+        width: size, 
+        height: size, 
+        zIndex,
+        ...initialPosition
+      }}
+      initial={animate ? { x: initialPosition.x, y: initialPosition.y } : undefined}
+      animate={animate ? {
+        x: [initialPosition.x - 20, initialPosition.x + 20, initialPosition.x - 20],
+        y: [initialPosition.y - 20, initialPosition.y + 20, initialPosition.y - 20],
+        ...animationProps
+      } : undefined}
+      transition={animate ? {
+        duration: 8 + Math.random() * 5, // Random duration for variety
+        repeat: Infinity,
+        ease: "easeInOut",
+      } : undefined}
+    />
+  );
+};
+
+const AnimatedBackground = ({ density = 'medium' }: { density?: 'low' | 'medium' | 'high' }) => {
+  // Define how many orbs to show based on density
+  const orbCount = {
+    low: 3,
+    medium: 5,
+    high: 8
+  }[density];
+  
+  // Pre-defined orb configurations for consistent layout
+  const orbConfigs = [
+    { size: 700, color: 'from-blue-300/30 to-indigo-300/30', position: { x: '10%', y: '10%' } },
+    { size: 600, color: 'from-sky-400/20 to-cyan-300/20', position: { x: '70%', y: '15%' } },
+    { size: 550, color: 'from-violet-400/20 to-purple-300/20', position: { x: '20%', y: '60%' } },
+    { size: 600, color: 'from-blue-400/20 to-teal-300/20', position: { x: '80%', y: '60%' } },
+    { size: 500, color: 'from-indigo-300/20 to-blue-200/20', position: { x: '40%', y: '30%' } },
+    { size: 450, color: 'from-teal-300/30 to-sky-400/30', position: { x: '60%', y: '80%' } },
+    { size: 400, color: 'from-purple-300/20 to-pink-300/20', position: { x: '5%', y: '75%' } },
+    { size: 480, color: 'from-cyan-300/20 to-blue-300/20', position: { x: '90%', y: '90%' } },
+  ].slice(0, orbCount);
+  
+  return (
+    <div className="fixed inset-0 overflow-hidden pointer-events-none">
+      {/* Overlay for gradient texture */}
+      <div className="absolute inset-0 z-[-5] noise-texture opacity-[0.03]" />
       
-      {/* Content overlay */}
-      <div className="relative z-10">{children}</div>
+      {/* Main gradient background */}
+      <div className="absolute inset-0 bg-gradient-to-b from-white via-blue-50/50 to-blue-100/30 z-[-20]" />
       
-      {/* Optional subtle pattern overlay */}
-      <div 
-        className="absolute inset-0 z-[1] opacity-20 pointer-events-none"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.2' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='1'/%3E%3Ccircle cx='13' cy='13' r='1'/%3E%3C/g%3E%3C/svg%3E")`,
-        }}
-      />
+      {/* Gradient orbs */}
+      {orbConfigs.map((config, index) => (
+        <div 
+          key={index}
+          className="absolute" 
+          style={{ 
+            left: config.position.x, 
+            top: config.position.y,
+            transform: 'translate(-50%, -50%)'
+          }}
+        >
+          <GradientOrb
+            size={config.size}
+            color={config.color}
+            initialPosition={{ x: 0, y: 0 }}
+            animate={true}
+            opacity={0.4}
+          />
+        </div>
+      ))}
     </div>
   );
 };

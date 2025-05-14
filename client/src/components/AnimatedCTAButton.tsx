@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Sparkles } from 'lucide-react';
 import '@/styles/design-system.css';
 
 type AnimatedCTAButtonProps = {
@@ -13,42 +12,44 @@ type AnimatedCTAButtonProps = {
   withSparkle?: boolean;
 };
 
-const AnimatedCTAButton: React.FC<AnimatedCTAButtonProps> = ({
-  children,
-  onClick,
-  size = 'md',
-  variant = 'primary',
+const AnimatedCTAButton = ({ 
+  children, 
+  onClick, 
+  size = 'md', 
+  variant = 'primary', 
   className = '',
-  icon = <ArrowRight />,
-  withSparkle = true,
-}) => {
-  const [isHovered, setIsHovered] = useState(false);
-
-  // Size variants
-  const sizeVariants = {
-    sm: 'px-4 py-2 text-sm gap-1',
-    md: 'px-6 py-3 text-base gap-2',
-    lg: 'px-8 py-4 text-lg gap-3',
-  };
-
-  // Style variants
-  const styleVariants = {
-    primary: 'bg-gradient-to-r from-accent-blue to-accent-purple text-white',
-    secondary: 'bg-white bg-opacity-20 backdrop-blur-md text-gray-800 border border-white/30',
-  };
-
-  // Animation variants
-  const buttonVariants = {
-    initial: { 
-      scale: 1,
-      boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)'
+  icon,
+  withSparkle = false
+}: AnimatedCTAButtonProps) => {
+  // Size styles
+  const sizeStyles = {
+    sm: {
+      height: '36px',
+      padding: '0 16px',
+      fontSize: '14px',
     },
-    hover: { 
-      scale: 1.05,
-      boxShadow: '0px 10px 20px rgba(0, 0, 0, 0.15)'
+    md: {
+      height: '44px',
+      padding: '0 20px',
+      fontSize: '15px',
     },
-    tap: { 
-      scale: 0.98,
+    lg: {
+      height: '52px',
+      padding: '0 24px',
+      fontSize: '16px',
+    }
+  };
+  
+  // Variant styles
+  const variantStyles = {
+    primary: {
+      backgroundColor: 'var(--color-primary)',
+      color: 'white',
+      boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.1)'
+    },
+    secondary: {
+      backgroundColor: 'white',
+      color: 'var(--color-text)',
       boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.1)'
     }
   };
@@ -59,7 +60,7 @@ const AnimatedCTAButton: React.FC<AnimatedCTAButtonProps> = ({
       x: 5,
       transition: {
         repeat: Infinity,
-        repeatType: "reverse" as const, // Type assertion to fix the issue
+        repeatType: "reverse" as const,
         duration: 0.6
       }
     }
@@ -76,58 +77,51 @@ const AnimatedCTAButton: React.FC<AnimatedCTAButtonProps> = ({
         left,
       }}
       initial={{ opacity: 0, scale: 0 }}
-      animate={{ 
+      animate={{
         opacity: [0, 1, 0],
-        scale: [0, 1, 0]
+        scale: [0, 1, 0],
       }}
       transition={{
         duration: 1.5,
-        delay,
+        delay: delay,
         repeat: Infinity,
-        repeatDelay: Math.random() * 3 + 1
+        repeatDelay: Math.random() * 3 + 3,
       }}
     />
   );
 
+  // Generate a few random sparkles
+  const sparkles = withSparkle ? Array.from({ length: 6 }).map((_, index) => (
+    <Sparkle
+      key={index}
+      delay={Math.random() * 2}
+      size={Math.random() * 3 + 2}
+      top={`${Math.random() * 100}%`}
+      left={`${Math.random() * 100}%`}
+    />
+  )) : null;
+
   return (
     <motion.button
-      className={`
-        relative overflow-hidden
-        rounded-full font-medium
-        ${styleVariants[variant]}
-        ${sizeVariants[size]}
-        flex items-center justify-center
-        ${className}
-      `}
-      variants={buttonVariants}
-      initial="initial"
-      whileHover="hover"
-      whileTap="tap"
+      className={`relative overflow-hidden rounded-lg font-medium flex items-center justify-center gap-2 transition-transform ${className}`}
       onClick={onClick}
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
+      style={{
+        ...sizeStyles[size],
+        ...variantStyles[variant],
+      }}
+      whileHover={{ 
+        scale: 1.03,
+        boxShadow: '0px 5px 10px rgba(0, 0, 0, 0.15)' 
+      }}
+      whileTap={{ scale: 0.98 }}
     >
-      {/* Sparkles animation (visible when hovered if withSparkle is true) */}
-      {withSparkle && isHovered && (
-        <>
-          <Sparkle delay={0.1} size={3} top="20%" left="10%" />
-          <Sparkle delay={0.3} size={4} top="60%" left="15%" />
-          <Sparkle delay={0.2} size={2} top="30%" left="85%" />
-          <Sparkle delay={0.5} size={3} top="70%" left="80%" />
-          <Sparkle delay={0.4} size={2} top="10%" left="30%" />
-          <Sparkle delay={0.6} size={3} top="50%" left="50%" />
-          <Sparkle delay={0.2} size={4} top="80%" left="35%" />
-          <Sparkle delay={0.4} size={3} top="15%" left="65%" />
-        </>
-      )}
-      
-      {/* Text content */}
+      {sparkles}
       <span>{children}</span>
-      
-      {/* Icon animation */}
       {icon && (
         <motion.span
           variants={iconVariants}
+          initial="initial"
+          whileHover="hover"
           className="inline-flex items-center"
         >
           {icon}
