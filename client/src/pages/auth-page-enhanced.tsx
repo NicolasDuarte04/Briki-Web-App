@@ -239,22 +239,22 @@ export default function AuthPageEnhanced() {
         >
           <GlassCard className="p-6 sm:p-8 rounded-2xl">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid grid-cols-2 mb-8 bg-white/10 p-1 rounded-lg">
+              <TabsList className="grid grid-cols-2 mb-8 bg-white/10 p-1.5 rounded-lg shadow-inner">
                 <TabsTrigger 
                   value="login" 
-                  className={`rounded-md py-3 text-sm font-medium transition-all
+                  className={`rounded-md py-3 text-sm font-semibold transition-all
                     ${activeTab === 'login' 
                       ? 'bg-white text-primary shadow-sm' 
-                      : 'text-foreground/70 hover:text-foreground/90'}`}
+                      : 'text-foreground/80 hover:text-foreground'}`}
                 >
                   Sign In
                 </TabsTrigger>
                 <TabsTrigger 
                   value="register" 
-                  className={`rounded-md py-3 text-sm font-medium transition-all
+                  className={`rounded-md py-3 text-sm font-semibold transition-all
                     ${activeTab === 'register' 
                       ? 'bg-white text-primary shadow-sm' 
-                      : 'text-foreground/70 hover:text-foreground/90'}`}
+                      : 'text-foreground/80 hover:text-foreground'}`}
                 >
                   Sign Up
                 </TabsTrigger>
@@ -263,7 +263,7 @@ export default function AuthPageEnhanced() {
               {/* Login form */}
               <TabsContent value="login" className="space-y-2">
                 <Form {...loginForm}>
-                  <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-6">
+                  <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-7">
                     <FormField
                       control={loginForm.control}
                       name="username"
@@ -274,6 +274,7 @@ export default function AuthPageEnhanced() {
                             placeholder="Enter your username"
                             icon={<User size={18} />}
                             error={loginForm.formState.errors.username?.message}
+                            className="h-12"
                             {...field} 
                           />
                         </FormItem>
@@ -291,13 +292,14 @@ export default function AuthPageEnhanced() {
                             placeholder="Enter your password"
                             icon={<Lock size={18} />}
                             error={loginForm.formState.errors.password?.message}
+                            className="h-12"
                             {...field} 
                           />
                         </FormItem>
                       )}
                     />
                     
-                    <div className="flex items-center justify-between pt-2">
+                    <div className="flex items-center justify-between pt-1">
                       <FormField
                         control={loginForm.control}
                         name="rememberMe"
@@ -310,13 +312,13 @@ export default function AuthPageEnhanced() {
                                 className="rounded border-input data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                               />
                             </FormControl>
-                            <FormLabel className="text-sm font-normal text-foreground/80 cursor-pointer">Remember me</FormLabel>
+                            <FormLabel className="text-sm font-medium text-gray-700 cursor-pointer">Remember me</FormLabel>
                           </FormItem>
                         )}
                       />
                       <button 
                         type="button" 
-                        className="text-sm text-primary hover:text-primary/80 transition-colors"
+                        className="text-sm font-medium text-primary hover:text-primary/80 transition-colors"
                       >
                         Forgot password?
                       </button>
@@ -328,7 +330,7 @@ export default function AuthPageEnhanced() {
                         size="lg"
                         loading={loginMutation.isPending}
                         loadingText="Signing in..."
-                        className="w-full"
+                        className="w-full h-12 font-semibold"
                       >
                         Sign in
                       </GradientButton>
@@ -386,6 +388,7 @@ export default function AuthPageEnhanced() {
                             placeholder="Choose a username"
                             icon={<User size={18} />}
                             error={registerForm.formState.errors.username?.message}
+                            className="h-12"
                             {...field} 
                           />
                         </FormItem>
@@ -402,6 +405,7 @@ export default function AuthPageEnhanced() {
                             placeholder="Enter your email"
                             icon={<Mail size={18} />}
                             error={registerForm.formState.errors.email?.message}
+                            className="h-12"
                             {...field} 
                           />
                         </FormItem>

@@ -173,8 +173,9 @@ const EnhancedInput = React.forwardRef<HTMLInputElement, EnhancedInputProps>(
     // Define the default styling for various components
     let inputContainerStyles = "relative";
     let inputStyles = cn(
-      "w-full rounded-lg transition-all duration-200 pr-10",
-      leftIcon && "pl-12", // Increased left padding to prevent text overlap with icon
+      "w-full rounded-lg transition-all duration-200 pr-10 font-medium placeholder:font-medium placeholder:text-gray-600",
+      leftIcon && "pl-12", // Fixed left padding to prevent text overlap with icon
+      "hover:border-primary/60 focus:border-primary/80 focus:ring-2 focus:ring-primary/20",
       className
     );
     let labelStyles = cn(
@@ -239,7 +240,7 @@ const EnhancedInput = React.forwardRef<HTMLInputElement, EnhancedInputProps>(
       if (label && !hideLabel) {
         labelStyles = cn(
           labelStyles,
-          "mb-2 block text-sm font-medium text-foreground"
+          "mb-2 block text-sm font-semibold text-gray-700"
         );
       }
     }
@@ -274,7 +275,7 @@ const EnhancedInput = React.forwardRef<HTMLInputElement, EnhancedInputProps>(
           
           {/* Left icon */}
           {(leftIcon || icon) && (
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+            <div className="absolute left-0 top-0 bottom-0 w-10 flex items-center justify-center text-gray-500">
               {leftIcon || icon}
             </div>
           )}
