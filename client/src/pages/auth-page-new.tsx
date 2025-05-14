@@ -296,13 +296,13 @@ export default function AuthPageNew() {
                       </button>
                     </div>
                     
-                    <div className="pt-4">
+                    <div className="pt-5">
                       <GradientButton
                         type="submit"
                         size="lg"
                         loading={loginMutation.isPending}
                         loadingText="Signing in..."
-                        className="w-full py-6 text-base"
+                        className="w-full py-6 text-base font-semibold shadow-lg hover:shadow-xl transition-shadow"
                       >
                         Sign in
                       </GradientButton>
@@ -358,9 +358,12 @@ export default function AuthPageNew() {
                           <EnhancedInput
                             label="Username" 
                             placeholder="Choose a username"
-                            icon={<User size={18} />}
+                            icon={<User size={16} className="text-slate-500" />}
+                            containerClassName="shadow-sm"
+                            className="border-2 border-white/40 placeholder:text-slate-500/80 text-slate-800 font-medium h-12"
                             {...field} 
                           />
+                          <FormMessage className="font-medium text-red-500" />
                         </FormItem>
                       )}
                     />
@@ -373,9 +376,12 @@ export default function AuthPageNew() {
                           <EnhancedInput
                             label="Email" 
                             placeholder="Enter your email"
-                            icon={<Mail size={18} />}
+                            icon={<Mail size={16} className="text-slate-500" />}
+                            containerClassName="shadow-sm"
+                            className="border-2 border-white/40 placeholder:text-slate-500/80 text-slate-800 font-medium h-12"
                             {...field} 
                           />
+                          <FormMessage className="font-medium text-red-500" />
                         </FormItem>
                       )}
                     />
@@ -389,9 +395,12 @@ export default function AuthPageNew() {
                             label="Password"
                             type="password"
                             placeholder="Create a password"
-                            icon={<Lock size={18} />}
+                            icon={<Lock size={16} className="text-slate-500" />}
+                            containerClassName="shadow-sm"
+                            className="border-2 border-white/40 placeholder:text-slate-500/80 text-slate-800 font-medium h-12"
                             {...field} 
                           />
+                          <FormMessage className="font-medium text-red-500" />
                         </FormItem>
                       )}
                     />
@@ -405,9 +414,12 @@ export default function AuthPageNew() {
                             label="Confirm Password"
                             type="password"
                             placeholder="Confirm your password"
-                            icon={<Lock size={18} />}
+                            icon={<LockKeyhole size={16} className="text-slate-500" />}
+                            containerClassName="shadow-sm"
+                            className="border-2 border-white/40 placeholder:text-slate-500/80 text-slate-800 font-medium h-12"
                             {...field} 
                           />
+                          <FormMessage className="font-medium text-red-500" />
                         </FormItem>
                       )}
                     />
@@ -441,13 +453,13 @@ export default function AuthPageNew() {
                       )}
                     />
                     
-                    <div className="pt-2">
+                    <div className="pt-5">
                       <GradientButton
                         type="submit"
                         size="lg"
                         loading={registerMutation.isPending}
                         loadingText="Creating account..."
-                        className="w-full"
+                        className="w-full py-6 text-base font-semibold shadow-lg hover:shadow-xl transition-shadow"
                       >
                         Create account
                       </GradientButton>
