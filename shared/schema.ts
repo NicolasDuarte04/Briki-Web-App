@@ -8,6 +8,7 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
   name: text("name"),
   email: text("email").notNull().unique(),
+  role: text("role").default("user"), // "user" or "company"
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -57,6 +58,7 @@ export const insertUserSchema = createInsertSchema(users).pick({
   password: true,
   name: true,
   email: true,
+  role: true,
 });
 
 export const insertTripSchema = createInsertSchema(trips).pick({
