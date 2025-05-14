@@ -167,143 +167,288 @@ export default function HomePage() {
         />
       )}
       
-      {/* Hero Section with Animated Background */}
+      {/* Hero Section with Enhanced Animated Background */}
       <div className="relative overflow-hidden min-h-screen flex items-center">
-        <div className="absolute inset-0 z-0">
-          <AnimatedBackground intensity="high" />
+        {/* Enhanced Background with Floating Orbs */}
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          {/* Large primary gradient orb */}
+          <motion.div 
+            className="absolute top-[20%] right-[20%] bg-gradient-to-br from-indigo-400/30 to-blue-500/30 w-[500px] h-[500px] rounded-full blur-3xl"
+            animate={{ 
+              y: [0, 15, 0],
+              scale: [1, 1.05, 1],
+              opacity: [0.25, 0.35, 0.25],
+            }}
+            transition={{ 
+              duration: 10,
+              ease: "easeInOut",
+              repeat: Infinity,
+            }}
+          />
+          
+          {/* Secondary floating gradient orb */}
+          <motion.div 
+            className="absolute bottom-[10%] left-[15%] bg-gradient-to-br from-purple-400/20 to-indigo-500/20 w-[400px] h-[400px] rounded-full blur-3xl"
+            animate={{ 
+              y: [0, -20, 0],
+              scale: [1, 1.1, 1],
+              opacity: [0.2, 0.3, 0.2],
+            }}
+            transition={{ 
+              duration: 12,
+              ease: "easeInOut",
+              repeat: Infinity,
+              delay: 1,
+            }}
+          />
+          
+          {/* Soft glow accent */}
+          <motion.div 
+            className="absolute top-[40%] left-[30%] bg-gradient-to-br from-blue-300/10 to-cyan-400/10 w-[300px] h-[300px] rounded-full blur-3xl"
+            animate={{ 
+              scale: [1, 1.2, 1],
+              opacity: [0.15, 0.25, 0.15],
+            }}
+            transition={{ 
+              duration: 8,
+              ease: "easeInOut",
+              repeat: Infinity,
+              delay: 2,
+            }}
+          />
+          
+          <div className="absolute inset-0">
+            <AnimatedBackground intensity="medium" variant="consumer" />
+          </div>
         </div>
         
         <div className="max-w-7xl mx-auto w-full relative z-10 px-4 sm:px-6 lg:px-8 py-20 lg:py-28">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            {/* Hero Content */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            {/* Hero Content with Enhanced Animations and Typography */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, type: "spring", stiffness: 50 }}
+              transition={{ 
+                duration: 0.8, 
+                type: "spring", 
+                stiffness: 50,
+                damping: 20
+              }}
               className="text-center lg:text-left"
             >
-              <h1 className="text-4xl tracking-tight font-extrabold sm:text-5xl md:text-6xl lg:text-7xl bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-blue-500 drop-shadow-sm">
-                <span className="block mb-2">AI-Powered</span>
-                <span className="block">Insurance Platform</span>
-              </h1>
+              <motion.h1 
+                className="text-4xl tracking-tight font-extrabold sm:text-5xl md:text-6xl lg:text-7xl bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-blue-500 drop-shadow-sm"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ 
+                  duration: 0.8, 
+                  delay: 0.1,
+                  type: "spring"
+                }}
+              >
+                <motion.span 
+                  className="block mb-2"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.1 }}
+                >
+                  AI-Powered
+                </motion.span>
+                <motion.span 
+                  className="block"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.3 }}
+                >
+                  Insurance Platform
+                </motion.span>
+              </motion.h1>
               
               <motion.p 
-                className="mt-6 text-base sm:text-lg sm:max-w-xl md:text-xl text-foreground/80"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.7, delay: 0.3 }}
+                className="mt-6 text-base sm:text-lg sm:max-w-xl md:text-xl text-foreground/80 leading-relaxed"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.4 }}
               >
                 Compare and analyze insurance options across multiple categories using our advanced AI technology. Get personalized recommendations based on your unique needs.
               </motion.p>
               
               <motion.div 
-                className="mt-8 sm:flex sm:justify-center lg:justify-start gap-4"
+                className="mt-10 sm:flex sm:justify-center lg:justify-start gap-4"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.5, type: "spring" }}
+                transition={{ duration: 0.7, delay: 0.5 }}
               >
-                <GradientButton 
-                  size="lg"
-                  className="w-full sm:w-auto px-8 py-3 md:py-4 text-lg shadow-lg"
-                  onClick={handleGetStarted}
-                  gradientFrom="from-indigo-600"
-                  gradientTo="to-blue-500"
-                  icon={<Sparkles className="h-5 w-5" />}
-                  iconPosition="left"
+                <motion.div
+                  whileHover={{ y: -5, scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 15 }}
                 >
-                  Get Started
-                </GradientButton>
+                  <GradientButton 
+                    size="lg"
+                    className="w-full sm:w-auto px-8 py-3 md:py-4 text-lg shadow-xl"
+                    onClick={handleGetStarted}
+                    gradientFrom="from-indigo-600"
+                    gradientTo="to-blue-500"
+                    icon={<Sparkles className="h-5 w-5" />}
+                    iconPosition="left"
+                  >
+                    Get Started
+                  </GradientButton>
+                </motion.div>
                 
-                <GradientButton 
-                  variant="outline"
-                  size="lg"
-                  className="w-full sm:w-auto px-8 py-3 md:py-4 text-lg mt-3 sm:mt-0"
-                  onClick={() => navigate("/learn-more")}
-                  gradientFrom="from-blue-500"
-                  gradientTo="to-blue-500"
+                <motion.div
+                  whileHover={{ y: -5, scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 15 }}
                 >
-                  Learn More
-                </GradientButton>
+                  <GradientButton 
+                    variant="outline"
+                    size="lg"
+                    className="w-full sm:w-auto px-8 py-3 md:py-4 text-lg mt-3 sm:mt-0"
+                    onClick={() => navigate("/learn-more")}
+                    gradientFrom="from-blue-500"
+                    gradientTo="to-indigo-600"
+                  >
+                    Learn More
+                  </GradientButton>
+                </motion.div>
               </motion.div>
               
-              {/* Company button */}
+              {/* Enhanced Company button with subtle animation */}
               <motion.div 
-                className="mt-6 flex"
+                className="mt-8 flex justify-center lg:justify-start"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5, delay: 0.7 }}
               >
-                <Button 
-                  variant="ghost" 
-                  className="text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50/50 transition-all"
-                  onClick={() => navigate("/company")}
+                <motion.div
+                  whileHover={{ x: 5 }}
+                  transition={{ type: "spring", stiffness: 300 }}
                 >
-                  <span>For Insurance Companies</span>
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
+                  <Button 
+                    variant="ghost" 
+                    className="text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50/30 dark:hover:bg-indigo-950/20 transition-all px-4 py-2 rounded-full"
+                    onClick={() => navigate("/company")}
+                  >
+                    <span>For Insurance Companies</span>
+                    <motion.div
+                      animate={{ x: [0, 3, 0] }}
+                      transition={{ 
+                        duration: 1.5, 
+                        ease: "easeInOut", 
+                        repeat: Infinity,
+                        repeatDelay: 2
+                      }}
+                    >
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </motion.div>
+                  </Button>
+                </motion.div>
               </motion.div>
             </motion.div>
             
-            {/* Hero visual element */}
+            {/* Enhanced Hero Visual with Apple-style floating card */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, delay: 0.5 }}
+              initial={{ opacity: 0, x: 40 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ 
+                duration: 0.8, 
+                delay: 0.4, 
+                type: "spring", 
+                stiffness: 50,
+                damping: 20
+              }}
               className="flex justify-center lg:justify-end"
             >
-              <GlassCard 
-                variant="blue"
-                size="lg"
-                className="max-w-md w-full"
-                hover="glow"
-                motionProps={{
-                  whileHover: { y: -5 },
-                  transition: { type: "spring", stiffness: 300, damping: 20 }
+              <motion.div
+                animate={{ 
+                  y: [0, -10, 0],
+                }}
+                transition={{ 
+                  duration: 6, 
+                  ease: "easeInOut", 
+                  repeat: Infinity,
+                  repeatType: "reverse"
                 }}
               >
-                <h3 className="text-lg font-semibold text-primary mb-6">AI-Powered Insurance Analytics</h3>
-                
-                {/* Coverage comparison visualization */}
-                <div className="space-y-5">
-                  {['Coverage', 'Price', 'Benefits', 'Claims Process'].map((category, i) => (
-                    <motion.div 
-                      key={category}
-                      className="space-y-2"
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.5, delay: 0.8 + (i * 0.1) }}
+                <GlassCard 
+                  variant="blue"
+                  size="lg"
+                  className="max-w-md w-full shadow-xl backdrop-blur-lg"
+                  hover="glow"
+                  motionProps={{
+                    whileHover: { y: -5 },
+                    transition: { type: "spring", stiffness: 300, damping: 20 }
+                  }}
+                >
+                  <div className="flex items-center mb-6">
+                    <motion.div
+                      animate={{ 
+                        rotate: [0, 10, 0, -10, 0],
+                        scale: [1, 1.1, 1, 1.1, 1]
+                      }}
+                      transition={{ 
+                        duration: 5, 
+                        ease: "easeInOut", 
+                        repeat: Infinity,
+                        repeatDelay: 1
+                      }}
+                      className="mr-3"
                     >
-                      <div className="flex justify-between">
-                        <span className="text-sm font-medium">{category}</span>
-                        <span className="text-sm font-medium text-primary">
-                          {Math.floor(80 - (i * 10))}%
-                        </span>
-                      </div>
-                      
-                      <div className="h-2 w-full bg-blue-100/30 dark:bg-blue-900/20 rounded-full overflow-hidden">
-                        <motion.div 
-                          className="h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full"
-                          initial={{ width: 0 }}
-                          animate={{ width: `${80 - (i * 10)}%` }}
-                          transition={{ duration: 0.8, delay: 1.0 + (i * 0.1), type: "spring" }}
-                        />
-                      </div>
+                      <Sparkles className="h-6 w-6 text-blue-500" />
                     </motion.div>
-                  ))}
+                    <h3 className="text-lg font-semibold text-primary">AI-Powered Insurance Analytics</h3>
+                  </div>
                   
-                  {/* Animated data dots */}
-                  <div className="flex justify-between mt-8">
-                    <div className="flex items-center">
-                      <div className="h-3 w-3 rounded-full bg-green-400"></div>
-                      <span className="ml-2 text-sm">Premium Plans</span>
-                    </div>
-                    <div className="flex items-center">
-                      <div className="h-3 w-3 rounded-full bg-indigo-400"></div>
-                      <span className="ml-2 text-sm">Standard Plans</span>
+                  {/* Enhanced Coverage comparison visualization with Apple-style bars */}
+                  <div className="space-y-6">
+                    {['Coverage', 'Price', 'Benefits', 'Claims Process'].map((category, i) => (
+                      <motion.div 
+                        key={category}
+                        className="space-y-2.5"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.5, delay: 0.8 + (i * 0.1) }}
+                      >
+                        <div className="flex justify-between">
+                          <span className="text-sm font-medium text-foreground/90">{category}</span>
+                          <span className="text-sm font-medium text-primary">
+                            {Math.floor(80 - (i * 10))}%
+                          </span>
+                        </div>
+                        
+                        <div className="h-2.5 w-full bg-blue-100/30 dark:bg-blue-900/20 rounded-full overflow-hidden backdrop-blur-sm">
+                          <motion.div 
+                            className="h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full relative"
+                            initial={{ width: 0 }}
+                            animate={{ width: `${80 - (i * 10)}%` }}
+                            transition={{ duration: 0.8, delay: 1.0 + (i * 0.1), type: "spring" }}
+                          >
+                            <motion.div 
+                              className="absolute right-0 top-0 h-full w-1.5 bg-white/30 blur-[1px]"
+                              animate={{ opacity: [0, 0.7, 0] }}
+                              transition={{ duration: 2, delay: 2 + (i * 0.2), repeat: Infinity, repeatDelay: 5 }}
+                            />
+                          </motion.div>
+                        </div>
+                      </motion.div>
+                    ))}
+                    
+                    {/* Animated data indicators with Apple-style design */}
+                    <div className="flex justify-between mt-8 pt-2 border-t border-blue-200/20">
+                      <div className="flex items-center">
+                        <div className="h-3 w-3 rounded-full bg-gradient-to-r from-green-400 to-emerald-500 shadow-lg shadow-green-400/20"></div>
+                        <span className="ml-2 text-sm font-medium">Premium Plans</span>
+                      </div>
+                      <div className="flex items-center">
+                        <div className="h-3 w-3 rounded-full bg-gradient-to-r from-indigo-400 to-blue-500 shadow-lg shadow-blue-400/20"></div>
+                        <span className="ml-2 text-sm font-medium">Standard Plans</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </GlassCard>
+                </GlassCard>
+              </motion.div>
             </motion.div>
           </div>
         </div>
@@ -317,26 +462,68 @@ export default function HomePage() {
         columns={4}
       />
       
-      {/* Insurance Categories */}
-      <div className="bg-white dark:bg-gray-900 py-20 relative overflow-hidden">
+      {/* Insurance Categories - Apple Style */}
+      <div className="bg-gradient-to-b from-white via-white to-blue-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-blue-950/20 py-24 relative overflow-hidden">
+        {/* Subtle background elements */}
         <div className="absolute inset-0 z-0 opacity-30">
           <AnimatedBackground variant="consumer" intensity="low" />
         </div>
         
+        {/* Decorative gradient orbs */}
+        <motion.div 
+          className="absolute -top-20 -right-20 w-96 h-96 bg-gradient-to-br from-indigo-300/10 to-blue-300/10 rounded-full blur-3xl"
+          animate={{ 
+            scale: [1, 1.05, 1],
+            opacity: [0.2, 0.3, 0.2],
+          }}
+          transition={{ 
+            duration: 8,
+            ease: "easeInOut",
+            repeat: Infinity,
+          }}
+        />
+        
+        <motion.div 
+          className="absolute -bottom-20 -left-20 w-96 h-96 bg-gradient-to-tr from-purple-300/10 to-blue-300/10 rounded-full blur-3xl"
+          animate={{ 
+            scale: [1, 1.05, 1],
+            opacity: [0.1, 0.2, 0.1],
+          }}
+          transition={{ 
+            duration: 10,
+            ease: "easeInOut",
+            repeat: Infinity,
+            delay: 1,
+          }}
+        />
+        
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center mb-16">
+          <div className="text-center mb-20">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-blue-500">
+              <motion.h2 
+                className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-blue-500"
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                viewport={{ once: true }}
+              >
                 AI-Powered Insurance Categories
-              </h2>
-              <p className="mt-3 max-w-2xl mx-auto text-xl text-foreground/70">
+              </motion.h2>
+              
+              <motion.p 
+                className="mt-4 max-w-2xl mx-auto text-lg md:text-xl text-foreground/70 leading-relaxed"
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                viewport={{ once: true }}
+              >
                 Explore different insurance types optimized using advanced analytics and risk assessment
-              </p>
+              </motion.p>
             </motion.div>
           </div>
           
@@ -349,32 +536,83 @@ export default function HomePage() {
                 transition={{ duration: 0.5, delay: 0.1 * index }}
                 viewport={{ once: true }}
                 whileHover={{ y: -10 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={() => navigate(category.path)}
                 className="cursor-pointer group"
               >
                 <GlassCard
-                  className="h-full"
+                  className="h-full shadow-lg hover:shadow-xl transition-all duration-300 backdrop-blur-md"
                   variant={category.color === "blue" ? "blue" : "default"}
                   hover="glow"
                   interactive
                 >
-                  <div className="h-32 flex items-center justify-center mb-6">
-                    {category.icon}
+                  {/* Category icon with enhanced animations */}
+                  <div className="h-32 flex items-center justify-center mb-8 relative">
+                    {/* Decorative background circle */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <motion.div 
+                        className={`w-24 h-24 rounded-full bg-${category.color}-500/10 blur-md`}
+                        animate={{ 
+                          scale: [1, 1.1, 1],
+                          opacity: [0.6, 0.8, 0.6]
+                        }}
+                        transition={{ 
+                          duration: 4, 
+                          ease: "easeInOut", 
+                          repeat: Infinity,
+                          repeatDelay: 1
+                        }}
+                      />
+                    </div>
+                    
+                    {/* Actual icon with hover animation */}
+                    <motion.div
+                      whileHover={{ 
+                        scale: 1.1,
+                        rotate: [0, 2, 0, -2, 0],
+                        transition: { 
+                          duration: 0.8,
+                          ease: "easeInOut",
+                          repeat: Infinity,
+                          repeatType: "loop"
+                        }
+                      }}
+                      className="relative z-10"
+                    >
+                      {category.icon}
+                    </motion.div>
                   </div>
                   
-                  <div className="text-center">
-                    <h3 className="text-xl font-bold text-foreground mb-2">{category.title}</h3>
-                    <p className="text-foreground/70 mb-4">{category.description}</p>
+                  <div className="text-center px-2">
+                    <h3 className="text-xl font-bold text-foreground mb-3">{category.title}</h3>
+                    <p className="text-foreground/70 mb-6 text-sm md:text-base">{category.description}</p>
                     
                     <div className="pt-4 flex justify-center">
-                      <Button 
-                        variant="outline"
-                        size="sm"
-                        className="group-hover:bg-primary/10 group-hover:text-primary group-hover:border-primary/30 transition-all"
+                      {/* Apple-style button */}
+                      <motion.div 
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.98 }}
                       >
-                        Explore Plans
-                        <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                      </Button>
+                        <Button 
+                          variant="outline"
+                          size="sm"
+                          className="group-hover:bg-primary/10 group-hover:text-primary group-hover:border-primary/30 transition-all rounded-full px-4 py-2 shadow-sm group-hover:shadow"
+                        >
+                          <span>Explore Plans</span>
+                          <motion.div
+                            animate={{ x: [0, 3, 0] }}
+                            transition={{ 
+                              duration: 1.5, 
+                              ease: "easeInOut", 
+                              repeat: Infinity,
+                              repeatDelay: 2
+                            }}
+                            className="inline-block"
+                          >
+                            <ArrowRight className="ml-2 h-4 w-4" />
+                          </motion.div>
+                        </Button>
+                      </motion.div>
                     </div>
                   </div>
                 </GlassCard>
