@@ -96,11 +96,14 @@ const EnhancedInput = React.forwardRef<HTMLInputElement, EnhancedInputProps>(
         if (typeof ref === 'function') {
           ref(node);
         } else if (ref) {
-          // Safe assignment since we're not directly modifying the ref
-          (ref as any).current = node;
+          // Using a safer approach to update ref
+          Object.defineProperty(ref, 'current', {
+            value: node,
+            configurable: true
+          });
         }
         
-        // Set our internal ref
+        // Update innerRef safely with the input element
         innerRef.current = node;
       },
       [ref]
