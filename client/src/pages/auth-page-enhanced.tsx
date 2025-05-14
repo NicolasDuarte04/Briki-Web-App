@@ -152,7 +152,7 @@ export default function AuthPageEnhanced() {
         description: "You are already logged in to your account.",
       });
       setTimeout(() => {
-        navigate('/');
+        navigate('/home');
       }, 500);
     }
   }, [user, navigate, toast]);
@@ -167,9 +167,10 @@ export default function AuthPageEnhanced() {
         variant: "default",
       });
       
+      // Navigate to home page
       setTimeout(() => {
-        navigate('/');
-      }, 500);
+        navigate('/home');
+      }, 1000);
     }
   }, [loginMutation.isSuccess, registerMutation.isSuccess, navigate, toast]);
 
