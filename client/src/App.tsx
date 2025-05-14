@@ -8,9 +8,8 @@ import { ProtectedRoute } from "@/lib/protected-route";
 import { LanguageProvider } from "@/components/language-selector";
 import { PageTransition } from "@/components/ui/transition-effect";
 import { RecentlyViewedProvider } from "@/contexts/recently-viewed-context";
-import { AIAssistantProvider, AuthenticatedLayout } from "@/components/layout";
+import { AIAssistantProvider, AuthenticatedLayout, MainLayout } from "@/components/layout";
 import { LoginNotification } from "@/components/login-notification";
-import NavbarNew from "@/components/navbar-new";
 
 import NotFound from "@/pages/not-found";
 import HomePage from "@/pages/home-page";
@@ -129,14 +128,22 @@ function AppContent() {
     );
   }
   
-  // Otherwise just render the Router without AI Assistant
-  return (
-    <>
-      {/* Only show navbar on non-auth pages */}
-      {location !== '/auth' && <NavbarNew />}
-      <Router />
-    </>
-  );
+  // For landing page, just render the Router directly (it has its own layout)
+  if (location === '/') {
+    return <Router />;
+  }
+  
+  // Use MainLayout for B2C routes but not for auth pages (they have their own optimized layout)
+  if (location !== '/auth' && !location.startsWith('/company') && !location.startsWith('/briki-pilot')) {
+    return (
+      <MainLayout>
+        <Router />
+      </MainLayout>
+    );
+  }
+  
+  // Auth pages and B2B routes don't use MainLayout
+  return <Router />;
 }
 
 function App() {
