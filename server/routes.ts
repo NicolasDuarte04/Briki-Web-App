@@ -49,6 +49,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/health", (_req, res) => {
     res.json({ status: "ok" });
   });
+  
+  // Database reset endpoint - ONLY FOR PRE-LAUNCH
+  app.get("/api/admin/reset-users", async (req, res) => {
+    const { confirm } = req.query;
+    
+    if (confirm !== 'yes-reset-all-users') {
+      return res.status(400).json({ 
+        error: "Missing confirmation parameter. Add '?confirm=yes-reset-all-users' to confirm this action." 
+      });
+    }
+    
+    try {
+      await storage.resetUsers();
+      res.json({ success: true, message: "All user data has been reset successfully" });
+    } catch (error) {
+      console.error('Error resetting user database:', error);
+      res.status(500).json({ 
+        error: "Failed to reset user database", 
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
 
   // Trip Endpoints
   app.post("/api/trips", requireAuth, async (req: AuthenticatedRequest, res) => {

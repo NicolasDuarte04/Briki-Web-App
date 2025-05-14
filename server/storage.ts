@@ -37,8 +37,9 @@ export interface IStorage {
   // Session store
   sessionStore: any;
   
-  // Seed necessary data
+  // Seed and reset data
   seedDataIfNeeded(): Promise<void>;
+  resetUsers(): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -259,6 +260,29 @@ export class DatabaseStorage implements IStorage {
       }
     } catch (error) {
       console.error('Error seeding database:', error);
+    }
+  }
+  
+  async resetUsers(): Promise<void> {
+    try {
+      console.log('Resetting users database...');
+      
+      // Delete all orders
+      await db.delete(orders);
+      console.log('Deleted all orders');
+      
+      // Delete all trips
+      await db.delete(trips);
+      console.log('Deleted all trips');
+      
+      // Delete all users
+      await db.delete(users);
+      console.log('Deleted all users');
+      
+      console.log('All user data has been reset successfully');
+    } catch (error) {
+      console.error('Error resetting user database:', error);
+      throw error;
     }
   }
 }
