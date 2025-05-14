@@ -1,0 +1,69 @@
+You will now help us redesign and standardize the **Briki B2B (Pilot) Portal** to achieve a visually cohesive, powerful, and futuristic experience that aligns with our intended identity.
+
+### Scope:
+This redesign is strictly for the **Briki Pilot (company-facing) portal**, which includes the following files:
+
+1. `company-page.tsx` (Marketing welcome page for insurance companies)
+2. `company-login-page.tsx` (Partner login)
+3. `company-register-page.tsx` (Partner registration)
+4. `briki-pilot-portal.tsx` (Main dashboard/overview)
+5. `company-dashboard-page.tsx` (Analytics dashboard)
+6. `company-preview-page.tsx` (Consumer plan appearance preview)
+7. `company-quote-upload-page.tsx` (Plan & quote submission)
+8. `company-request-pilot-page.tsx` (Request access to pilot tools)
+
+### Goal:
+Create a unified, high-end B2B platform that reflects Briki's AI-powered, data-centric business intelligence. It must be visually distinguished from the consumer app, but still maintain brand consistency. The design should feel like a mix between **Cursor**, **Stripe Dashboard**, and **Ramp**, with smart animations, crisp visual hierarchy, and functional modularity.
+
+---
+
+### Global Design Requirements for These Pages:
+
+- **Color System:** Use navy-based tones across the entire B2B portal.
+  - Replace all purple hues with a new color palette:
+    - Primary: `#003087` (navy)
+    - Accent: `#0074FF` (bright blue)
+    - Glow: `#33BFFF` (electric blue for lighting & outlines)
+  - Remove purples (`indigo`, `violet`, `fuchsia`) from components, borders, glows, and text.
+
+- **Typography:** Unify font sizing and spacing between cards, buttons, and titles. Ensure a clean visual rhythm.
+
+- **Component Consistency:** Use the same card type (dark theme) throughout `briki-pilot-portal.tsx`, `company-dashboard-page.tsx`, `company-preview-page.tsx`, and future data modules. Avoid mixing light and dark cards unless there's a defined contrast purpose.
+
+- **Shared Layout:**
+  - Replace any remaining `company-layout.tsx` references with a dedicated and unified layout for all partner portal pages.
+  - Ensure the top NavBar is consistent across all authenticated pages (use the one in `briki-pilot-portal.tsx` as the base).
+
+- **Chart Style:** Charts should blend into the background using a dark theme. Use glowing gradients for active bars/lines and soft axes to reduce clutter.
+
+- **Dashboard Animations:** Use subtle `motion.div` transitions when switching sections or viewing stats (already used well in `briki-pilot-portal.tsx`).
+
+- **AI Assistant Section:** Should be retained and stylized consistently within the portal using navy tones and improved layout spacing.
+
+---
+
+### Visual & UX References:
+Use these UI inspirations as your base:
+- Cursor.com (hero layout, dark + rainbow glow)
+- Stripe Dashboard (modular cards, clean fonts)
+- Linear.app (modern spacing and shadow depth)
+- Your existing `briki-pilot-portal.tsx` design (good base, needs refinement and unification)
+
+---
+
+### Task Flow:
+1. Send a confirmation message that you understood the structure and design goals listed above.
+2. Wait for us to confirm before making any changes.
+3. When confirmed, begin by redesigning `briki-pilot-portal.tsx` first.
+4. Then proceed with the other files in the following order:
+   - `company-dashboard-page.tsx`
+   - `company-preview-page.tsx`
+   - `company-quote-upload-page.tsx`
+   - `company-request-pilot-page.tsx`
+   - `company-page.tsx` (public landing)
+   - `company-login-page.tsx`
+   - `company-register-page.tsx`
+
+---
+
+Please confirm you understood the full prompt, its structure, and the redesign goals. Wait for our explicit confirmation before proceeding.
