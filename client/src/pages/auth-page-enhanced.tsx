@@ -5,7 +5,8 @@ import { useLocation } from "wouter";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { insertUserSchema } from "@shared/schema";
+import { insertUserSchema, User as SelectUser } from "@shared/schema";
+import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
 // Import our new components
@@ -157,9 +158,12 @@ export default function AuthPageEnhanced() {
     }
   }, [user, navigate, toast]);
   
-  // Handle auth flow redirects
+  // Handle auth flow redirects with role-based routing
   useEffect(() => {
     if (loginMutation.isSuccess || registerMutation.isSuccess) {
+      // Get the user data from the query cache
+      const userData = queryClient.getQueryData<SelectUser>(["/api/user"]);
+      
       // Show welcome toast notification
       toast({
         title: "Welcome to Briki!",
@@ -167,9 +171,15 @@ export default function AuthPageEnhanced() {
         variant: "default",
       });
       
-      // Navigate to home page
+      // Role-based redirection
       setTimeout(() => {
-        navigate('/home');
+        if (userData?.role === "company") {
+          console.log("Company user detected, redirecting to company dashboard");
+          navigate('/company-dashboard');
+        } else {
+          console.log("Standard user detected, redirecting to home");
+          navigate('/home');
+        }
       }, 1000);
     }
   }, [loginMutation.isSuccess, registerMutation.isSuccess, navigate, toast]);
