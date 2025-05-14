@@ -412,7 +412,7 @@ export default function AuthPageEnhanced() {
                       )}
                     />
                     
-                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <div className="space-y-6">
                       <FormField
                         control={registerForm.control}
                         name="password"
@@ -518,14 +518,14 @@ export default function AuthPageEnhanced() {
         </motion.div>
         
         {/* Footer */}
-        <div className="mt-8 text-center text-xs text-white/60">
+        <div className="mt-8 text-center text-xs text-foreground/60">
           <p>© 2025 Briki. All rights reserved.</p>
           <p className="mt-1">
-            <a href="#" className="text-white/80 hover:text-white transition-colors">Terms</a>
+            <a href="#" className="text-foreground/70 hover:text-foreground transition-colors">Terms</a>
             <span className="mx-2">•</span>
-            <a href="#" className="text-white/80 hover:text-white transition-colors">Privacy</a>
+            <a href="#" className="text-foreground/70 hover:text-foreground transition-colors">Privacy</a>
             <span className="mx-2">•</span>
-            <a href="#" className="text-white/80 hover:text-white transition-colors">Help</a>
+            <a href="#" className="text-foreground/70 hover:text-foreground transition-colors">Help</a>
           </p>
         </div>
       </div>
