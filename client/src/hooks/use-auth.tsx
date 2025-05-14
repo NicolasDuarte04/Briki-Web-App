@@ -4,6 +4,7 @@ import {
   useMutation,
   UseMutationResult,
 } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { insertUserSchema, User as SelectUser, InsertUser } from "@shared/schema";
 import { getQueryFn, apiRequest, queryClient } from "../lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -160,6 +161,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           });
           if (verifyResponse.ok) {
             console.log("Token verification successful");
+            
+            // Get the latest user data and handle role-based redirection
+            const userData = await verifyResponse.json();
+            
+            // Centralized role-based redirection
+            console.log("Redirecting based on user role:", userData.role);
+            if (userData.role === "company") {
+              console.log("Company user detected, redirecting to company dashboard");
+              wouter_navigate("/company-dashboard");
+            } else {
+              console.log("Standard user detected, redirecting to home");
+              wouter_navigate("/home");
+            }
           } else {
             console.log("Token verification failed:", verifyResponse.status);
           }
