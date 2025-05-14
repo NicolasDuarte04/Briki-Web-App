@@ -10,10 +10,13 @@ import { PageTransition } from "@/components/ui/transition-effect";
 import { RecentlyViewedProvider } from "@/contexts/recently-viewed-context";
 import { AIAssistantProvider, AuthenticatedLayout } from "@/components/layout";
 import { LoginNotification } from "@/components/login-notification";
-import NavbarNew from "@/components/navbar-new";
 
+// Import new components
+import NavigationBar from "@/components/NavigationBar";
+
+// Import pages
 import NotFound from "@/pages/not-found";
-import HomePage from "@/pages/home-page";
+import HomePage from "@/pages/HomePage"; // Our new HomePage component
 import HomePageNew from "@/pages/home-page-new";
 import AuthPage from "@/pages/auth-page";
 import AuthPageNew from "@/pages/auth-page-new";
@@ -46,29 +49,33 @@ import CompanyPreviewPage from "@/pages/company-preview-page";
 import CompanyRequestPilotPage from "@/pages/company-request-pilot-page";
 import ContactSalesPage from "@/pages/contact-sales-page";
 
-// Removed unused ConditionalAIProvider
-
 function Router() {
   const [location] = useLocation();
   
   return (
     <PageTransition>
       <Switch>
-        <Route path="/" component={CountdownPageNew} />
-        <Route path="/home" component={HomePageNew} />
+        {/* Using our new HomePage component as the main landing page */}
+        <Route path="/" component={HomePage} />
+        <Route path="/home" component={HomePage} />
+        <Route path="/countdown" component={CountdownPageNew} />
         <Route path="/auth" component={AuthPageNew} />
         <Route path="/categories" component={InsuranceCategoriesPage} />
         <ProtectedRoute path="/trip-info" component={TripInfoPage} />
         <ProtectedRoute path="/insurance-plans" component={InsurancePlansPage} />
         <ProtectedRoute path="/checkout/:planId" component={CheckoutPage} />
         <Route path="/weather-risk" component={WeatherRiskPage} />
-        <Route path="/auto-insurance" component={AutoInsurancePage} />
+        
+        {/* Insurance category routes */}
+        <Route path="/travel" component={InsurancePlansPage} />
+        <Route path="/auto" component={AutoInsurancePage} />
         <ProtectedRoute path="/auto-quote" component={AutoQuotePage} />
         <Route path="/auto-compare" component={AutoQuotePage} /> {/* Placeholder until we create AutoComparePage */}
-        <Route path="/pet-insurance" component={PetInsurancePage} />
+        <Route path="/pet" component={PetInsurancePage} />
         <Route path="/pet-compare" component={PetInsurancePage} /> {/* Placeholder until we create PetComparePage */}
-        <Route path="/health-insurance" component={HealthInsurancePage} />
+        <Route path="/health" component={HealthInsurancePage} />
         <Route path="/health-compare" component={HealthInsurancePage} /> {/* Placeholder until we create HealthComparePage */}
+        
         <Route path="/learn-more" component={LearnMorePage} />
         <Route path="/terms" component={TermsPage} />
         <Route path="/ai-assistant" component={AIAssistantDemo} />
@@ -77,7 +84,8 @@ function Router() {
         <ProtectedRoute path="/api-settings" component={ApiSettingsPage} />
         
         {/* Company/Partner Routes */}
-        <Route path="/company" component={CompanyPage} />
+        <Route path="/for-companies" component={CompanyPage} />
+        <Route path="/partner" component={CompanyPage} />
         <Route path="/briki-pilot" component={BrikiPilotPortal} />
         <Route path="/company-login" component={CompanyLoginPage} />
         <Route path="/company-register" component={CompanyRegisterPage} />
@@ -127,13 +135,8 @@ function AppContent() {
   }
   
   // Otherwise just render the Router without AI Assistant
-  return (
-    <>
-      {/* Only show navbar on non-auth pages */}
-      {location !== '/auth' && <NavbarNew />}
-      <Router />
-    </>
-  );
+  // We let each page handle its own NavigationBar to have more control
+  return <Router />;
 }
 
 function App() {
