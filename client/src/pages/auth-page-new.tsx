@@ -152,7 +152,7 @@ export default function AuthPageNew() {
   return (
     <AnimatedBackground variant="auth" className="flex min-h-screen items-center justify-center px-4 py-16">
       {/* Centered auth container */}
-      <div className="relative z-10 w-full max-w-md">
+      <div className="relative z-10 w-full max-w-lg px-8 py-6">
         {/* Logo and branding */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -200,7 +200,7 @@ export default function AuthPageNew() {
               {/* Login form */}
               <TabsContent value="login">
                 <Form {...loginForm}>
-                  <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-5">
+                  <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-7">
                     <FormField
                       control={loginForm.control}
                       name="username"
@@ -310,7 +310,7 @@ export default function AuthPageNew() {
               {/* Register form */}
               <TabsContent value="register">
                 <Form {...registerForm}>
-                  <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-5">
+                  <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-7">
                     <FormField
                       control={registerForm.control}
                       name="username"
