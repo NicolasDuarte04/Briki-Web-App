@@ -37,6 +37,13 @@ import CountdownPageNew from "@/pages/countdown-page-new";
 import BrikiPilotPortal from "@/pages/briki-pilot-portal";
 import LandingPage from "@/pages/landing-page";
 
+// New insurance category pages
+import TravelInsurance from "@/pages/insurance/travel";
+import AutoInsurance from "@/pages/insurance/auto";
+import PetInsurance from "@/pages/insurance/pet";
+import HealthInsurance from "@/pages/insurance/health";
+import InsuranceQuote from "@/pages/insurance/[category]/quote";
+
 // Company pages
 import CompanyPage from "@/pages/company-page";
 import CompanyLoginPage from "@/pages/company-login-page";
@@ -64,13 +71,19 @@ function Router() {
         <ProtectedRoute path="/insurance-plans" component={InsurancePlansPage} />
         <ProtectedRoute path="/checkout/:planId" component={CheckoutPage} />
         <Route path="/weather-risk" component={WeatherRiskPage} />
+        {/* Legacy routes - redirected to new paths */}
         <Route path="/auto-insurance" component={AutoInsurancePage} />
-        <ProtectedRoute path="/auto-quote" component={AutoQuotePage} />
-        <Route path="/auto-compare" component={AutoQuotePage} /> {/* Placeholder until we create AutoComparePage */}
         <Route path="/pet-insurance" component={PetInsurancePage} />
-        <Route path="/pet-compare" component={PetInsurancePage} /> {/* Placeholder until we create PetComparePage */}
         <Route path="/health-insurance" component={HealthInsurancePage} />
-        <Route path="/health-compare" component={HealthInsurancePage} /> {/* Placeholder until we create HealthComparePage */}
+        
+        {/* New insurance category routes */}
+        <Route path="/insurance/travel" component={TravelInsurance} />
+        <Route path="/insurance/auto" component={AutoInsurance} />
+        <Route path="/insurance/pet" component={PetInsurance} />
+        <Route path="/insurance/health" component={HealthInsurance} />
+        
+        {/* Quote pages for each insurance category */}
+        <Route path="/insurance/:category/quote" component={InsuranceQuote} />
         <Route path="/learn-more" component={LearnMorePage} />
         <Route path="/terms" component={TermsPage} />
         <Route path="/ai-assistant" component={AIAssistantDemo} />
