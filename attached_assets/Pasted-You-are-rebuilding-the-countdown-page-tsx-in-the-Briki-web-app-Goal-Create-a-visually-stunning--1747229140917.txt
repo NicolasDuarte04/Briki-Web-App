@@ -1,0 +1,77 @@
+You are rebuilding the `countdown-page.tsx` in the Briki web app.
+
+Goal:
+Create a visually stunning, clean, Apple-level launch countdown page for Briki’s global release on June 1, 2025. The design must feel modern, futuristic, and minimal, using glassmorphism and soft gradients.
+
+---
+
+A. Overall Design
+- Use a soft animated background with blurred gradient blobs (like in the original countdown-page.tsx)
+- Keep layout minimal and centered with ample white space
+- Use `AnimatedBackground` as fallback if needed
+- Avoid clutter. Focus on clarity, smooth animations, and hierarchy
+
+---
+
+B. Hero Section
+- Briki logo as heading:
+  `text-6xl md:text-7xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-blue-500 drop-shadow-sm`
+- Subtitle:
+  `Global Launch Countdown – June 1, 2025`
+
+---
+
+C. Countdown Timer
+- Use a 4-column grid: Days, Hours, Minutes, Seconds
+- Each time unit in a `GlassCard` (variant="primary") with hover glow and motion animations
+- Inside the card: `motion.span` with animated scaling and `text-3xl md:text-5xl font-bold bg-gradient-to-br from-indigo-600 to-blue-500`
+- Below each card: unit label in lowercase: `text-sm font-medium capitalize text-foreground/70`
+
+---
+
+D. Value Proposition Section
+- Wrap in a `GlassCard` centered on the page
+- Header:
+  `"The easiest way to compare and understand insurance plans"`
+- Subtext:
+  `"Powered by AI to deliver personalized insurance recommendations tailored to your unique needs."`
+
+- Below this, a grid of 2x2 features (reuse the `features` array from countdown-page-new):
+  - Personalized Insurance (StarIcon)
+  - Secure Platform (LockIcon)
+  - Real-Time Alerts (BellIcon)
+  - Trusted Partners (ShieldCheckIcon)
+- Each feature has:
+  - Icon in `text-indigo-500`
+  - Title: `font-medium text-foreground`
+  - Description: `text-sm text-foreground/70`
+
+---
+
+E. Call to Action
+- Use `GradientButton` (size="lg") with text `Pre-Test the App`
+- Icon: ArrowRightIcon (Lucide)
+- On click, navigate to `/auth`
+- Below the button: `text-sm text-foreground/60` — `Early access for our community members`
+
+---
+
+F. Beta Disclaimer (NO `BetaNotice` component)
+- Create a subtle `GlassCard` (variant="blue", size="sm") at the bottom
+- Title: ShieldCheckIcon + `Beta Notice`
+- Text:
+  `"You are accessing a beta version of Briki. Payments are currently disabled for testing purposes."`
+
+---
+
+G. Design Tokens / Tailwind Rules
+- Use `hsl(var(--token))` for colors via Tailwind config:
+  - Examples: `text-foreground`, `bg-card/50`, `border-border`, `text-primary`, `bg-muted`, etc.
+- Avoid hardcoded colors unless for animated gradient blobs
+- Use `motion.div` and `motion.span` for smooth entrance transitions (`scale`, `fade`, `slide`, `pulse`)
+- Maintain accessibility: semantic tags and screen-reader support
+
+---
+
+End Result:
+This screen should feel futuristic, soft, trustworthy, and elegant. It should convey a sense of polish and readiness for launch, aligned with Briki’s visual style and product tone.
