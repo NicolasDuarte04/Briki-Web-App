@@ -10,8 +10,7 @@ export default function HealthInsurancePage() {
   const [, navigate] = useLocation();
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
+    <MainLayout>
       
       {/* Hero Section */}
       <div className="relative bg-white overflow-hidden">
@@ -211,7 +210,6 @@ export default function HealthInsurancePage() {
         </div>
       </div>
       
-      <Footer />
-    </div>
+    </MainLayout>
   );
 }
