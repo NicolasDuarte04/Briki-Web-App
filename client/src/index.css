@@ -46,12 +46,12 @@
   /* Visually rich gradients */
   --gradient-primary: linear-gradient(135deg, #4C6EFF, #5F9FFF); /* Primary brand gradient */
   --gradient-secondary: linear-gradient(135deg, #00C2FF, #38BDF8); /* Vibrant sky blue */
-  --gradient-accent: linear-gradient(135deg, #5D5FEF, #748FFC); /* Indigo blue fade */
+  --gradient-accent: linear-gradient(135deg, #0055CC, #0074FF); /* Navy blue fade */
   --gradient-electric: linear-gradient(135deg, #00CFFD, #00A3FF); /* Electric aqua */
   
   /* Category-specific gradients */
   --gradient-auto: linear-gradient(135deg, #4F6AFF, #33C1FF); 
-  --gradient-pet: linear-gradient(135deg, #6E59FF, #A289FF);
+  --gradient-pet: linear-gradient(135deg, #0074FF, #33BFFF);
   --gradient-health: linear-gradient(135deg, #F43F5E, #FB7185);
   --gradient-travel: linear-gradient(135deg, #4C6EFF, #5F9FFF);
   
@@ -793,8 +793,8 @@
     @apply text-5xl font-extrabold tracking-tight relative;
     font-family: 'DM Sans', 'Satoshi', sans-serif;
     letter-spacing: -0.02em;
-    color: #5D5FEF; /* Solid indigo color for better readability */
-    text-shadow: 0 2px 10px rgba(93, 95, 239, 0.3);
+    color: #003087; /* Navy color for better readability and brand consistency */
+    text-shadow: 0 2px 10px rgba(0, 48, 135, 0.3);
     position: relative;
     z-index: 1;
   }
