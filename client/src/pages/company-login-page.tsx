@@ -46,9 +46,10 @@ export default function CompanyLoginPage() {
 
   const onSubmit = async (data: FormValues) => {
     try {
-      // Add company role flag to login
+      // Map email to username for the login API and add company role flag
       await loginMutation.mutateAsync({
-        ...data,
+        username: data.email, // Using email as username for companies
+        password: data.password,
         role: 'company'
       });
       
