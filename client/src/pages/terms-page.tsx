@@ -98,7 +98,7 @@ export default function TermsPage() {
                 {t('contactUsText')}
               </p>
               <p className="text-gray-700">
-                Email: support@briki.co
+                Email: <a href="mailto:contact@briki.app" className="text-blue-600 hover:underline">contact@briki.app</a>
               </p>
             </section>
           </div>
