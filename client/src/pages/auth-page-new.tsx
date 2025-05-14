@@ -182,15 +182,15 @@ export default function AuthPageNew() {
   ]);
 
   return (
-    <AnimatedBackground variant="auth" className="flex min-h-screen items-center justify-center px-4 py-24">
-      {/* Centered auth container */}
-      <div className="relative z-10 w-full max-w-md px-4 py-8">
+    <AnimatedBackground variant="auth" className="flex min-h-screen items-center justify-center p-4">
+      {/* Centered auth container - fixed width with better responsive behavior */}
+      <div className="relative z-10 flex flex-col items-center justify-center w-full max-w-[420px] mx-auto">
         {/* Logo and branding */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.21, 0.61, 0.35, 1] }}
-          className="text-center mb-12"
+          className="text-center mb-8"
         >
           <h1 className="text-5xl font-bold tracking-tighter bg-gradient-to-r from-[#3D70F5] to-[#59A0FF] bg-clip-text text-transparent drop-shadow-md">
             Briki
@@ -205,9 +205,9 @@ export default function AuthPageNew() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2, ease: [0.21, 0.61, 0.35, 1] }}
-          className="relative z-20"
+          className="relative z-20 w-full"
         >
-          <GlassCard variant="default" hover="glow" className="p-8 md:p-10 shadow-2xl">
+          <GlassCard variant="default" hover="glow" className="p-6 sm:p-8 md:p-10 shadow-2xl">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid grid-cols-2 mb-8 bg-white/20 p-1.5 rounded-lg border border-white/30 shadow-inner">
                 <TabsTrigger 
@@ -233,7 +233,7 @@ export default function AuthPageNew() {
               {/* Login form */}
               <TabsContent value="login">
                 <Form {...loginForm}>
-                  <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-8">
+                  <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-7">
                     <FormField
                       control={loginForm.control}
                       name="username"
@@ -242,9 +242,9 @@ export default function AuthPageNew() {
                           <EnhancedInput
                             label="Username" 
                             placeholder="Enter your username"
-                            icon={<User size={18} className="text-slate-600" />}
+                            icon={<User size={16} className="text-slate-500" />}
                             containerClassName="shadow-sm"
-                            className="border-2 border-white/40 placeholder:text-slate-500/80 text-slate-800 font-medium"
+                            className="border-2 border-white/40 placeholder:text-slate-500/80 text-slate-800 font-medium h-12"
                             {...field} 
                           />
                           <FormMessage className="font-medium text-red-500" />
@@ -261,9 +261,9 @@ export default function AuthPageNew() {
                             label="Password"
                             type="password"
                             placeholder="Enter your password"
-                            icon={<Lock size={18} className="text-slate-600" />}
+                            icon={<Lock size={16} className="text-slate-500" />}
                             containerClassName="shadow-sm"
-                            className="border-2 border-white/40 placeholder:text-slate-500/80 text-slate-800 font-medium"
+                            className="border-2 border-white/40 placeholder:text-slate-500/80 text-slate-800 font-medium h-12"
                             {...field} 
                           />
                           <FormMessage className="font-medium text-red-500" />
