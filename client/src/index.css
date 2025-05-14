@@ -73,6 +73,10 @@
     0 10px 30px rgba(76, 110, 255, 0.08),
     0 4px 10px rgba(0, 0, 0, 0.03);
     
+  /* Grid patterns for Briki Pilot portal */
+  --grid-size: 40px;
+  --grid-color: rgba(255, 255, 255, 0.05);
+    
   /* Shadows for depth */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(76, 110, 255, 0.05);
   --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.03), 0 2px 15px -2px rgba(76, 110, 255, 0.08);
@@ -135,6 +139,29 @@
   --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.3), 0 2px 15px -2px rgba(76, 110, 255, 0.2);
   --shadow-lg: 0 10px 30px -5px rgba(0, 0, 0, 0.4), 0 5px 15px -5px rgba(76, 110, 255, 0.2);
   --shadow-xl: 0 20px 50px -10px rgba(0, 0, 0, 0.5), 0 10px 20px -10px rgba(76, 110, 255, 0.25);
+}
+
+/* Grid patterns for futuristic designs */
+.bg-grid-gray-700\/30 {
+  background-image: linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+                    linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+  background-size: var(--grid-size) var(--grid-size);
+}
+
+.bg-grid-blue-800\/20 {
+  background-image: linear-gradient(to right, rgba(30, 64, 175, 0.1) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(30, 64, 175, 0.1) 1px, transparent 1px);
+  background-size: var(--grid-size) var(--grid-size);
+}
+
+/* Animation for slow pulsing effects */
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 @layer base {
