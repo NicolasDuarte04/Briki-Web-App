@@ -17,6 +17,7 @@ import HomePage from "@/pages/home-page";
 import HomePageNew from "@/pages/home-page-new";
 import AuthPage from "@/pages/auth-page";
 import AuthPageNew from "@/pages/auth-page-new";
+import AuthPageEnhanced from "@/pages/auth-page-enhanced";
 import TripInfoPage from "@/pages/trip-info-page";
 import InsurancePlansPage from "@/pages/insurance-plans-page";
 import InsuranceCategoriesPage from "@/pages/insurance-categories-page";
@@ -56,7 +57,7 @@ function Router() {
       <Switch>
         <Route path="/" component={CountdownPageNew} />
         <Route path="/home" component={HomePageNew} />
-        <Route path="/auth" component={AuthPageNew} />
+        <Route path="/auth" component={AuthPageEnhanced} />
         <Route path="/categories" component={InsuranceCategoriesPage} />
         <ProtectedRoute path="/trip-info" component={TripInfoPage} />
         <ProtectedRoute path="/insurance-plans" component={InsurancePlansPage} />
