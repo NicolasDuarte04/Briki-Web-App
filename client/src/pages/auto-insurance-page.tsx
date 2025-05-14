@@ -3,16 +3,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLanguage } from "@/components/language-selector";
 import { useLocation } from "wouter";
-import Navbar from "@/components/navbar";
-import Footer from "@/components/footer";
+import { MainLayout } from "@/components/layout/main-layout";
 
 export default function AutoInsurancePage() {
   const { t } = useLanguage();
   const [, navigate] = useLocation();
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
+    <MainLayout>
       
       {/* Hero Section */}
       <div className="relative bg-white overflow-hidden">
@@ -188,7 +186,6 @@ export default function AutoInsurancePage() {
         </div>
       </div>
       
-      <Footer />
-    </div>
+    </MainLayout>
   );
 }
