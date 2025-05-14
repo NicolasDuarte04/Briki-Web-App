@@ -84,18 +84,24 @@ const GradientButton = React.forwardRef<HTMLButtonElement, GradientButtonProps>(
     
     const content = (
       <>
-        {loading && (
-          <Loader2
-            className="mr-2 h-4 w-4 animate-spin"
-            aria-hidden="true"
-          />
-        )}
-        {!loading && icon && iconPosition === "left" && (
-          <span className="mr-2">{icon}</span>
-        )}
-        {loading && loadingText ? loadingText : children}
-        {!loading && icon && iconPosition === "right" && (
-          <span className="ml-2">{icon}</span>
+        {loading ? (
+          <div className="flex items-center justify-center gap-2.5">
+            <Loader2
+              className="h-5 w-5 animate-spin"
+              aria-hidden="true"
+            />
+            <span className="font-semibold">{loadingText || "Loading..."}</span>
+          </div>
+        ) : (
+          <div className="flex items-center justify-center">
+            {icon && iconPosition === "left" && (
+              <span className="mr-2.5">{icon}</span>
+            )}
+            <span className="font-semibold">{children}</span>
+            {icon && iconPosition === "right" && (
+              <span className="ml-2.5">{icon}</span>
+            )}
+          </div>
         )}
       </>
     );
