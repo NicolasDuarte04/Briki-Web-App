@@ -181,8 +181,8 @@ const EnhancedInput = React.forwardRef<HTMLInputElement, EnhancedInputProps>(
     // Define the default styling for various components
     let inputContainerStyles = "relative";
     let inputStyles = cn(
-      "w-full rounded-lg transition-all duration-200 pr-10",
-      leftIcon && "pl-10", 
+      "w-full rounded-lg transition-all duration-200 pr-12", // Increased right padding for icons
+      leftIcon && "pl-12", // Increased left padding for icons
       className
     );
     let labelStyles = cn(
@@ -282,7 +282,7 @@ const EnhancedInput = React.forwardRef<HTMLInputElement, EnhancedInputProps>(
           
           {/* Left icon */}
           {(leftIcon || icon) && (
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 flex items-center justify-center w-5 h-5">
               {leftIcon || icon}
             </div>
           )}
@@ -298,7 +298,7 @@ const EnhancedInput = React.forwardRef<HTMLInputElement, EnhancedInputProps>(
           />
           
           {/* Right content - either custom icon, validation status, or password toggle */}
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center space-x-1">
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center space-x-2">
             {/* Show validation status */}
             {showValidationStatus && validationState !== null && (
               <AnimatePresence mode="wait">
