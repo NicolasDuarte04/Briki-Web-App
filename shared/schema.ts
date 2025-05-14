@@ -9,6 +9,7 @@ export const users = pgTable("users", {
   name: text("name"),
   email: text("email").notNull().unique(),
   role: text("role").default("user"), // "user" or "company"
+  companyProfile: jsonb("company_profile"), // JSON data for company accounts
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -59,6 +60,7 @@ export const insertUserSchema = createInsertSchema(users).pick({
   name: true,
   email: true,
   role: true,
+  companyProfile: true,
 });
 
 export const insertTripSchema = createInsertSchema(trips).pick({
