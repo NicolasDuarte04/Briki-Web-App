@@ -44,10 +44,21 @@ export default function Hero() {
       id="for-users" 
       className="w-full py-16 md:py-24 lg:py-32 overflow-hidden relative"
     >
-      {/* Animated blobs background */}
+      {/* Radial gradient background */}
+      <div className="absolute inset-0 -z-20 bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-950"></div>
+      
+      {/* Animated mesh grid pattern */}
+      <div className="absolute inset-0 -z-10 opacity-5">
+        <div className="absolute inset-0" style={{ 
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg stroke='%23${COLORS.primary.substring(1)}' stroke-width='0.5'%3E%3Cpath d='M60 0H0v60h60z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          backgroundSize: '30px 30px'
+        }}></div>
+      </div>
+      
+      {/* Animated blobs background with enhanced colors */}
       <div className="absolute inset-0 -z-10 overflow-hidden">
         <motion.div 
-          className="absolute top-[10%] right-[15%] bg-blue-500/30 w-96 h-96 rounded-full blur-3xl"
+          className="absolute top-[5%] right-[15%] bg-blue-500/30 w-96 h-96 rounded-full blur-3xl"
           animate={{ 
             y: [0, 15, 0],
             scale: [1, 1.05, 1],
@@ -74,7 +85,7 @@ export default function Hero() {
           }}
         />
         <motion.div 
-          className="absolute top-[40%] left-[45%] bg-sky-300/20 w-64 h-64 rounded-full blur-3xl"
+          className="absolute top-[40%] left-[45%] bg-indigo-400/20 w-64 h-64 rounded-full blur-3xl"
           animate={{ 
             scale: [1, 1.2, 1],
             opacity: [0.15, 0.25, 0.15],
@@ -86,6 +97,21 @@ export default function Hero() {
             delay: 2,
           }}
         />
+        {/* Added a new blob with the navy brand color to tie into B2B section */}
+        <motion.div 
+          className="absolute bottom-[30%] right-[20%] w-72 h-72 rounded-full blur-3xl"
+          style={{ backgroundColor: `${COLORS.primary}10` }}
+          animate={{ 
+            scale: [1, 1.15, 1],
+            opacity: [0.1, 0.2, 0.1],
+          }}
+          transition={{ 
+            duration: 15,
+            ease: "easeInOut",
+            repeat: Infinity,
+            delay: 3,
+          }}
+        />
       </div>
 
       <div className="container px-4 md:px-6 mx-auto">
@@ -95,9 +121,9 @@ export default function Hero() {
           initial="hidden"
           animate="show"
         >
-          {/* Main headline */}
+          {/* Main headline - enhanced with drop shadow for depth */}
           <motion.h1 
-            className="text-5xl md:text-6xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-500"
+            className="text-5xl md:text-6xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-500 drop-shadow-sm"
             variants={item}
           >
             Smarter Insurance Starts Here
