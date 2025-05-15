@@ -37,7 +37,6 @@ import {
   InsurancePlansRedirect 
 } from "@/pages/redirects/plans-redirects";
 import AIAssistantDemo from "@/pages/ai-assistant-demo";
-import CountdownPage from "@/pages/countdown-page";
 import CountdownPageNew from "@/pages/countdown-page-new";
 import BrikiPilotPortal from "@/pages/briki-pilot-portal";
 import LandingPage from "@/pages/landing-page";
@@ -74,7 +73,7 @@ function Router() {
     <PageTransition>
       <Switch>
         <Route path="/" component={LandingPage} />
-        <Route path="/countdown" component={CountdownPage} />
+        <Route path="/countdown" component={CountdownPageNew} />
         <Route path="/home" component={HomePageNew} />
         <Route path="/auth" component={AuthPageEnhanced} />
         <Route path="/categories" component={InsuranceCategoriesPage} />
