@@ -27,7 +27,7 @@ export default function InsuranceCategoriesPage() {
       description: "Comprehensive coverage for international and domestic travel",
       icon: <Plane size={24} />,
       gradient: "from-[#4C6EFF] to-[#5F9FFF]",
-      active: true, // Only travel is currently implemented fully
+      active: true,
     },
     {
       id: "auto" as InsuranceCategory,
@@ -35,7 +35,7 @@ export default function InsuranceCategoriesPage() {
       description: "Protection for your vehicle and third-party liability",
       icon: <Car size={24} />,
       gradient: "from-[#4F6AFF] to-[#33C1FF]",
-      active: false,
+      active: true,
     },
     {
       id: "health" as InsuranceCategory,
@@ -43,7 +43,7 @@ export default function InsuranceCategoriesPage() {
       description: "Medical coverage for individuals and families",
       icon: <Heart size={24} />,
       gradient: "from-[#F43F5E] to-[#FB7185]", 
-      active: false,
+      active: true,
     },
     {
       id: "pet" as InsuranceCategory,
@@ -51,7 +51,7 @@ export default function InsuranceCategoriesPage() {
       description: "Care for your pets with veterinary coverage",
       icon: <Cat size={24} />,
       gradient: "from-[#6E59FF] to-[#A289FF]",
-      active: false,
+      active: true,
     }
   ];
 
@@ -60,14 +60,9 @@ export default function InsuranceCategoriesPage() {
     const isActive = categories.find(c => c.id === category)?.active;
     
     if (isActive) {
-      if (category === "travel") {
-        navigate("/trip-info");
-      } else {
-        // For future implementation of other categories
-        navigate(`/${category}-info`);
-      }
+      // Route standardization - all insurance types use the same pattern
+      navigate(`/insurance/${category}`);
     } else {
-      // Show "coming soon" toast or modal for inactive categories
       console.log(`${category} insurance coming soon!`);
     }
   };
