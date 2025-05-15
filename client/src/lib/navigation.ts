@@ -89,5 +89,6 @@ export function useNavigation() {
     navigateBack,
     navPaths,
     isCurrentPath: (path: string) => location === path,
+    isActivePath: (path: string) => location === path || (path !== '/' && location.startsWith(path)),
   };
 }
