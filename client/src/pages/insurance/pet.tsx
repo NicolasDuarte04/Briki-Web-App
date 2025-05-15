@@ -1,11 +1,10 @@
-import { MainLayout } from "@/components/layout";
 import { PlanCard } from "@/components/plans/PlanCard";
 import { petPlans } from "@/components/plans/mockPlans";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { Heart, Shield, ArrowRight, BadgeCheck } from "lucide-react";
+import { Heart, Shield, ArrowRight } from "lucide-react";
 
 export default function PetInsurancePage() {
   const [, navigate] = useLocation();
@@ -32,11 +31,11 @@ export default function PetInsurancePage() {
   };
 
   return (
-    <MainLayout>
+    <div className="min-h-screen flex flex-col">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div 
-          className="absolute inset-0 bg-gradient-to-br from-[#0052aa] via-[#0062cc] to-[#33BFFF]"
+          className="absolute inset-0 bg-gradient-to-br from-[#0052aa] via-[#0062cc] to-[#33BFFF] z-0"
           style={{ 
             backgroundImage: "url('/assets/briki-hero-pattern.svg')",
             backgroundSize: "cover",
@@ -83,7 +82,7 @@ export default function PetInsurancePage() {
       </section>
       
       {/* Key Benefits */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-gray-50 relative z-10 mt-4">
         <div className="container">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -241,6 +240,6 @@ export default function PetInsurancePage() {
           </motion.div>
         </div>
       </section>
-    </MainLayout>
+    </div>
   );
 }

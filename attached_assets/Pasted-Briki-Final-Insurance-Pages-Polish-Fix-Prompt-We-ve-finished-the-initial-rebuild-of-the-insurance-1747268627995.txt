@@ -1,0 +1,73 @@
+Briki Final Insurance Pages Polish – Fix Prompt
+
+We’ve finished the initial rebuild of the insurance category pages, but there are still multiple visual and layout issues that must be resolved before public rollout.
+
+Please fix the following across `/insurance/*` pages (Travel, Auto, Pet, Health):
+
+---
+
+1. ✅ **Fix Double Navbar Conflict**
+• Several insurance pages currently show **two navigation bars** due to double MainLayout usage.
+• ✅ Action:
+  – Remove the individual `<MainLayout>` wrappers inside page files like `pet.tsx`, `travel.tsx`, etc.
+  – Keep the one declared globally in `App.tsx` (lines ~149–155).
+  – Confirm that only one header/nav appears per page.
+
+---
+
+2. ✅ **Fix Hero Image Obstruction**
+• The hero image background is being **partially hidden** by the white content below.
+• Cause: bad `z-index`, overlapping margin, or insufficient padding between sections.
+• ✅ Action:
+  – Add proper `z-index` layering to bring hero image and title to the front.
+  – Adjust margin/padding to ensure the “Why Choose Briki” section doesn’t overlap hero.
+  – Ensure background hero images are **fully visible** across all insurance category pages.
+
+---
+
+3. ✅ **Unify Page Layout & Padding**
+• Pages currently have inconsistent top spacing, margin, and safe-area handling.
+• ✅ Action:
+  – Create a shared layout wrapper (like `<ContentWrapper>` or `<SafeArea>`).
+  – Ensure every `/insurance/*` page:
+    • Starts **below the navbar**
+    • Has consistent `paddingX` and `paddingTop`
+    • Scrolls properly and doesn’t clip content on mobile
+
+---
+
+4. ✅ **Fix Scroll Behavior & Navigation Flicker**
+• Navigation between insurance pages results in a **brief flicker** and inconsistent scroll.
+• ✅ Action:
+  – Add `useEffect(() => window.scrollTo(0, 0))` on mount in each insurance page.
+  – Remove conflicting animation libraries (e.g., Framer Motion vs CSS transitions).
+  – Ensure no page loads show visual glitches on entry.
+
+---
+
+5. ✅ **(Optional but Recommended) Convert Hero to Shared Component**
+• All insurance pages use slightly different hero sections.
+• ✅ Action:
+  – If efficient, extract a shared `<HeroSection />` component into `components/insurance/`
+  – Otherwise, unify each page’s hero section to have **identical structure and style**
+
+---
+
+6. ✅ **Final Consistency Pass**
+• Confirm:
+  – All pages load cleanly, scroll from the top
+  – No double headers
+  – Hero images visible and responsive
+  – Clean spacing between sections
+  – No visual jump/glitch during transitions
+
+---
+
+Once done, please send:
+1. Screenshots of each insurance page after fixes
+2. A short summary of what was implemented
+3. Confirmation that all layout issues are now resolved
+
+You may now begin. Let us know if any additional file structure or layout logic blocks you.
+
+Thank you!

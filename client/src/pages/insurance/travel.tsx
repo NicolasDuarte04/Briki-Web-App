@@ -1,4 +1,3 @@
-import { MainLayout } from "@/components/layout";
 import { PlanCard } from "@/components/plans/PlanCard";
 import { travelPlans } from "@/components/plans/mockPlans";
 import { Button } from "@/components/ui/button";
@@ -32,11 +31,11 @@ export default function TravelInsurancePage() {
   };
 
   return (
-    <MainLayout>
+    <div className="min-h-screen flex flex-col">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div 
-          className="absolute inset-0 bg-gradient-to-br from-primary/90 via-primary/80 to-primary"
+          className="absolute inset-0 bg-gradient-to-br from-primary/90 via-primary/80 to-primary z-0"
           style={{ 
             backgroundImage: "url('/assets/briki-hero-pattern.svg')",
             backgroundSize: "cover",
@@ -83,7 +82,7 @@ export default function TravelInsurancePage() {
       </section>
       
       {/* Key Benefits */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-gray-50 relative z-10 mt-4">
         <div className="container">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -242,6 +241,6 @@ export default function TravelInsurancePage() {
           </motion.div>
         </div>
       </section>
-    </MainLayout>
+    </div>
   );
 }
