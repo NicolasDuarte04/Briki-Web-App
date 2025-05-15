@@ -100,7 +100,7 @@ export default function NavbarNew() {
           {/* Desktop navigation */}
           <div className="hidden md:ml-6 md:flex md:items-center space-x-1">
             {['home', 'travelInsurance', 'autoInsurance', 'petInsurance', 'healthInsurance'].map((item, index) => {
-              const paths = ['/', '/insurance-plans', '/auto-insurance', '/pet-insurance', '/health-insurance'];
+              const paths = ['/', '/explore/travel', '/explore/auto', '/explore/pet', '/explore/health'];
               const active = isActivePath(paths[index]);
               
               return (
@@ -336,10 +336,10 @@ export default function NavbarNew() {
                   <div className="space-y-2">
                     {[
                       { name: 'home', path: '/' },
-                      { name: 'travelInsurance', path: '/insurance-plans' },
-                      { name: 'autoInsurance', path: '/auto-insurance' },
-                      { name: 'petInsurance', path: '/pet-insurance' },
-                      { name: 'healthInsurance', path: '/health-insurance' },
+                      { name: 'travelInsurance', path: '/explore/travel' },
+                      { name: 'autoInsurance', path: '/explore/auto' },
+                      { name: 'petInsurance', path: '/explore/pet' },
+                      { name: 'healthInsurance', path: '/explore/health' },
                     ].map((item) => (
                       <motion.div
                         key={item.name}

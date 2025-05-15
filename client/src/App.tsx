@@ -90,6 +90,9 @@ function Router() {
         
         {/* Public-facing explore pages (for SEO and non-authenticated users) */}
         <Route path="/explore/travel" component={ExploreTravelInsurance} />
+        <Route path="/explore/auto" component={ExploreAutoInsurance} />
+        <Route path="/explore/pet" component={ExplorePetInsurance} />
+        <Route path="/explore/health" component={ExploreHealthInsurance} />
         
         {/* Quote pages for each insurance category */}
         <Route path="/insurance/:category/quote" component={InsuranceQuote} />
