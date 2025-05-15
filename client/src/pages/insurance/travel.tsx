@@ -48,6 +48,7 @@ export default function TravelInsurancePage() {
         title="Why Choose Briki Travel Insurance?"
         description="We offer flexible and comprehensive travel insurance plans that provide coverage for unexpected events during your trip."
         variant="gray"
+        className="mt-4"
       >
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <motion.div
