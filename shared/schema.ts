@@ -25,10 +25,13 @@ export const trips = pgTable("trips", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export type InsuranceCategory = "travel" | "auto" | "pet" | "health";
+
 export const insurancePlans = pgTable("insurance_plans", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
   provider: text("provider").notNull(),
+  category: text("category").notNull().$type<InsuranceCategory>().default("travel"),
   basePrice: integer("base_price").notNull(),
   medicalCoverage: integer("medical_coverage").notNull(),
   tripCancellation: text("trip_cancellation").notNull(),
