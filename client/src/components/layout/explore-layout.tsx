@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { Instagram, Linkedin, ChevronRight, Menu, X } from "lucide-react";
 import { useState } from "react";
+import { Helmet } from "react-helmet";
 
 interface ExploreLayoutProps {
   children: ReactNode;
@@ -25,8 +26,8 @@ export function ExploreLayout({
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
-      {/* SEO and OpenGraph tags */}
-      <head>
+      {/* SEO and OpenGraph tags using React Helmet */}
+      <Helmet>
         <title>{title}</title>
         <meta name="description" content={description} />
         <meta property="og:title" content={title} />
@@ -36,7 +37,7 @@ export function ExploreLayout({
         {ogUrl && <meta property="og:url" content={ogUrl} />}
         <meta property="og:site_name" content="Briki" />
         <meta name="twitter:card" content="summary_large_image" />
-      </head>
+      </Helmet>
 
       {/* Navigation */}
       <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm">
