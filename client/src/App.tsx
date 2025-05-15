@@ -44,6 +44,9 @@ import PetInsurance from "@/pages/insurance/pet";
 import HealthInsurance from "@/pages/insurance/health";
 import InsuranceQuote from "@/pages/insurance/[category]/quote";
 
+// Explore pages (public-facing SEO pages without app layout)
+import ExploreTravelInsurance from "@/pages/explore/travel";
+
 // Company pages
 import CompanyPage from "@/pages/company-page";
 import CompanyLoginPage from "@/pages/company-login-page";
