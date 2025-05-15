@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/use-auth";
 import { Loader2, Bell, Menu, User, Settings, LogOut, Bot, SparklesIcon, ChevronDown } from "lucide-react";
@@ -34,7 +34,7 @@ export default function NavbarNew() {
   const { toggleAssistant } = useAIAssistantUI();
   
   // Use centralized navigation service
-  const { location, navigate, navPaths } = useNavigation();
+  const { location, navigate, navPaths, isActivePath } = useNavigation();
   
   // Check if current page should show AI Assistant
   const excludedPaths = ['/', '/auth', '/countdown', '/login', '/register', '/terms', '/learn-more'];
@@ -66,12 +66,7 @@ export default function NavbarNew() {
     return user.username[0].toUpperCase();
   };
   
-  // Active path helper
-  const [currentPath] = useLocation();
-  const isActivePath = (path: string) => {
-    return currentPath === path || 
-      (path !== '/' && currentPath.startsWith(path));
-  };
+  // Use isActivePath from navigation service
 
   return (
     <motion.nav 
