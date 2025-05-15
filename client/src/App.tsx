@@ -13,13 +13,9 @@ import { LoginNotification } from "@/components/login-notification";
 import { useNavigation } from "@/lib/navigation";
 
 import NotFound from "@/pages/not-found";
-import HomePage from "@/pages/home-page";
 import HomePageNew from "@/pages/home-page-new";
-import AuthPage from "@/pages/auth-page";
-import AuthPageNew from "@/pages/auth-page-new";
 import AuthPageEnhanced from "@/pages/auth-page-enhanced";
 import TripInfoPage from "@/pages/trip-info-page";
-import InsurancePlansPage from "@/pages/insurance-plans-page";
 import InsuranceCategoriesPage from "@/pages/insurance-categories-page";
 import CheckoutPage from "@/pages/checkout-page";
 import WeatherRiskPage from "@/pages/weather-risk-page";
@@ -28,18 +24,18 @@ import TermsPage from "@/pages/terms-page";
 import ProfilePage from "@/pages/profile-page";
 import SettingsPage from "@/pages/settings-page";
 import ApiSettingsPage from "@/pages/api-settings-page";
-import AutoInsurancePage from "@/pages/auto-insurance-page";
-import PetInsurancePage from "@/pages/pet-insurance-page";
-import HealthInsurancePage from "@/pages/health-insurance-page";
-import AutoQuotePage from "@/pages/auto-quote-page";
 
-// Import redirects from barrel file
+// Import redirects from their respective files
 import { 
   AutoInsuranceRedirect,
   PetInsuranceRedirect,
   HealthInsuranceRedirect,
   TravelInsuranceRedirect
-} from "@/pages/redirects";
+} from "@/pages/redirects/insurance-redirects";
+
+import { 
+  InsurancePlansRedirect 
+} from "@/pages/redirects/plans-redirects";
 import AIAssistantDemo from "@/pages/ai-assistant-demo";
 import CountdownPage from "@/pages/countdown-page";
 import CountdownPageNew from "@/pages/countdown-page-new";
@@ -83,7 +79,6 @@ function Router() {
         <Route path="/auth" component={AuthPageEnhanced} />
         <Route path="/categories" component={InsuranceCategoriesPage} />
         <ProtectedRoute path="/trip-info" component={TripInfoPage} />
-        <ProtectedRoute path="/insurance-plans" component={InsurancePlansPage} />
         <ProtectedRoute path="/checkout/:planId" component={CheckoutPage} />
         <Route path="/weather-risk" component={WeatherRiskPage} />
         {/* Legacy routes - redirected to new paths */}
@@ -91,6 +86,7 @@ function Router() {
         <Route path="/pet-insurance" component={PetInsuranceRedirect} />
         <Route path="/health-insurance" component={HealthInsuranceRedirect} />
         <Route path="/travel-insurance" component={TravelInsuranceRedirect} />
+        <Route path="/insurance-plans" component={InsurancePlansRedirect} />
         
         {/* New insurance category routes (for authenticated app) */}
         <Route path="/insurance/travel" component={TravelInsurance} />
