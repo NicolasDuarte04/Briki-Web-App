@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ExploreLayout } from "@/components/layout/explore-layout";
+import { ExploreLayout } from "@/components/layout";
 import { Link } from "wouter";
 import { Plane, Shield, Globe, ArrowRight, BadgeCheck, Clock, User } from "lucide-react";
 
