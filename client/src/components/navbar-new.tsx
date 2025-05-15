@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "wouter";
+import { Link } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/use-auth";
 import { Loader2, Bell, Menu, User, Settings, LogOut, Bot, SparklesIcon, ChevronDown } from "lucide-react";
 import { useLanguage, LanguageSelector } from "@/components/language-selector";
-import { AIAssistantButton } from "@/components/layout";
-import { useAIAssistantUI } from "@/components/layout";
+import { AIAssistantButton, useAIAssistantUI } from "@/components/layout";
 import GlassCard from "@/components/glass-card";
 import GradientButton from "@/components/gradient-button";
+import { useNavigation } from "@/lib/navigation";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -29,20 +29,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 export default function NavbarNew() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [location, navigate] = useLocation();
-  const { user, isLoading, logoutMutation } = useAuth();
+  const { user, isLoading, logoutMutation, isAuthenticated } = useAuth();
   const { t } = useLanguage();
   const { toggleAssistant } = useAIAssistantUI();
   
-  // Determine routes based on authentication status
-  const isAuthenticated = !!user;
-  
-  // Define path sets for authenticated and unauthenticated users
-  const authenticatedPaths = ['/', '/insurance/travel', '/insurance/auto', '/insurance/pet', '/insurance/health'];
-  const unauthenticatedPaths = ['/', '/explore/travel', '/explore/auto', '/explore/pet', '/explore/health'];
-  
-  // Choose appropriate paths based on auth status
-  const navPaths = isAuthenticated ? authenticatedPaths : unauthenticatedPaths;
+  // Use centralized navigation service
+  const { location, navigate, navPaths } = useNavigation();
   
   // Check if current page should show AI Assistant
   const excludedPaths = ['/', '/auth', '/countdown', '/login', '/register', '/terms', '/learn-more'];

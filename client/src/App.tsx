@@ -32,13 +32,13 @@ import PetInsurancePage from "@/pages/pet-insurance-page";
 import HealthInsurancePage from "@/pages/health-insurance-page";
 import AutoQuotePage from "@/pages/auto-quote-page";
 
-// Consolidated redirects for legacy routes
+// Import redirects from barrel file
 import { 
   AutoInsuranceRedirect,
   PetInsuranceRedirect,
   HealthInsuranceRedirect,
   TravelInsuranceRedirect
-} from "@/pages/redirects/insurance-redirects";
+} from "@/pages/redirects";
 import AIAssistantDemo from "@/pages/ai-assistant-demo";
 import CountdownPage from "@/pages/countdown-page";
 import CountdownPageNew from "@/pages/countdown-page-new";
