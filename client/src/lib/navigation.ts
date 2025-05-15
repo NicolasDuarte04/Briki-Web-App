@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { useAuth } from '@/hooks/use-auth';
 
@@ -16,7 +16,25 @@ export function getInsurancePath(category: string, isAuthenticated: boolean): st
  */
 export function useNavigation() {
   const [location, navigate] = useLocation();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
+  
+  // Track navigation history in session storage for smart back navigation
+  useEffect(() => {
+    try {
+      // Don't track authentication page or countdown page in history
+      if (location !== '/auth' && location !== '/') {
+        const history = JSON.parse(sessionStorage.getItem('navigationHistory') || '[]');
+        
+        // Don't add duplicate entries consecutively
+        if (history.length === 0 || history[history.length - 1] !== location) {
+          history.push(location);
+          sessionStorage.setItem('navigationHistory', JSON.stringify(history));
+        }
+      }
+    } catch (error) {
+      console.error('Error updating navigation history:', error);
+    }
+  }, [location]);
 
   const navigateToHome = useCallback(() => {
     navigate('/');
@@ -63,9 +81,33 @@ export function useNavigation() {
     navigate(`/insurance/${category}/quote`);
   }, [navigate, isAuthenticated]);
 
+  /**
+   * Smart back navigation that uses history or falls back to home page
+   */
   const navigateBack = useCallback(() => {
-    window.history.back();
-  }, []);
+    try {
+      const history = JSON.parse(sessionStorage.getItem('navigationHistory') || '[]');
+      
+      // Remove current page from history
+      if (history.length > 0 && history[history.length - 1] === location) {
+        history.pop();
+      }
+      
+      // If we have previous pages in history, go back to the most recent one
+      if (history.length > 0) {
+        const previousPage = history.pop();
+        sessionStorage.setItem('navigationHistory', JSON.stringify(history));
+        navigate(previousPage);
+      } else {
+        // Fallback to appropriate home page
+        navigate(user ? '/home' : '/');
+      }
+    } catch (error) {
+      console.error('Error navigating back:', error);
+      // Fallback to browser history API
+      window.history.back();
+    }
+  }, [location, navigate, user]);
 
   // Generate paths for main navigation items based on auth state
   const navPaths = [
