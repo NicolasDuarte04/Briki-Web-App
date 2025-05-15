@@ -10,7 +10,7 @@
 export type SupportedCountry = 'CO' | 'MX' | 'US' | 'CA' | 'BR' | 'AR' | 'CL' | 'PE';
 
 // Insurance categories
-export type InsuranceCategory = 'travel' | 'auto' | 'pet' | 'health';
+import { InsuranceCategory } from "@shared/schema";
 
 // Authentication types
 export type AuthType = 'apiKey' | 'bearer' | 'oauth' | 'none';
