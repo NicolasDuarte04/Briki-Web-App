@@ -3,3 +3,5 @@ export { AIAssistantButton } from './ai-assistant-button';
 export { FloatingAssistantButton } from './floating-assistant-button';
 export { AuthenticatedLayout } from './authenticated-layout';
 export { MainLayout } from './main-layout';
+export { HeroWrapper } from './HeroWrapper';
+export { ContentWrapper } from './ContentWrapper';
