@@ -140,7 +140,40 @@ export class DatabaseStorage implements IStorage {
   }
   
   async getAllInsurancePlans(): Promise<InsurancePlan[]> {
-    return await db.select().from(insurancePlans);
+    // Use a raw query that excludes the category field since it doesn't exist in the DB yet
+    const plans = await db.execute(
+      `SELECT 
+        id, name, provider, base_price as "basePrice", 
+        medical_coverage as "medicalCoverage", trip_cancellation as "tripCancellation", 
+        baggage_protection as "baggageProtection", emergency_evacuation as "emergencyEvacuation",
+        adventure_activities as "adventureActivities", rental_car_coverage as "rentalCarCoverage",
+        rating, reviews, country, created_at as "createdAt"
+      FROM insurance_plans`
+    );
+    return plans.rows as InsurancePlan[];
+  }
+  
+  async getInsurancePlansByCategory(category: string): Promise<InsurancePlan[]> {
+    // Since we don't have a category column in the database yet, we'll simulate it
+    // based on other fields for now until we can migrate the database
+    const allPlans = await this.getAllInsurancePlans();
+    
+    if (category === 'travel') {
+      // For travel, return plans that have tripCancellation
+      return allPlans.filter(plan => plan.tripCancellation !== null);
+    } else if (category === 'auto') {
+      // For auto, return plans with rental car coverage
+      return allPlans.filter(plan => typeof plan.rentalCarCoverage === 'number' && plan.rentalCarCoverage > 10000);
+    } else if (category === 'pet') {
+      // For pet, select a subset of plans (in a real implementation, we'd have actual pet insurance)
+      return allPlans.slice(0, 2);
+    } else if (category === 'health') {
+      // For health, return plans with high medical coverage
+      return allPlans.filter(plan => plan.medicalCoverage > 200000);
+    }
+    
+    // Default: return all plans
+    return allPlans;
   }
   
   // Order methods
