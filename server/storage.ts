@@ -220,10 +220,11 @@ export class DatabaseStorage implements IStorage {
         console.log('Test user created successfully');
       }
       
-      // Check if plans already exist
-      const existingPlans = await db.select().from(insurancePlans);
+      // Check if plans already exist using raw SQL to avoid schema mismatch
+      const existingPlansQuery = await db.execute(`SELECT COUNT(*) as count FROM insurance_plans`);
+      const existingPlans = existingPlansQuery.rows[0]?.count ? parseInt(existingPlansQuery.rows[0].count as string) : 0;
       
-      if (existingPlans.length === 0) {
+      if (existingPlans === 0) {
         console.log('No existing plans found, seeding database...');
         
         // Insert Colombia plans
