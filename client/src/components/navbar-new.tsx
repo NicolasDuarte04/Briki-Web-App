@@ -34,6 +34,16 @@ export default function NavbarNew() {
   const { t } = useLanguage();
   const { toggleAssistant } = useAIAssistantUI();
   
+  // Determine routes based on authentication status
+  const isAuthenticated = !!user;
+  
+  // Define path sets for authenticated and unauthenticated users
+  const authenticatedPaths = ['/', '/insurance/travel', '/insurance/auto', '/insurance/pet', '/insurance/health'];
+  const unauthenticatedPaths = ['/', '/explore/travel', '/explore/auto', '/explore/pet', '/explore/health'];
+  
+  // Choose appropriate paths based on auth status
+  const navPaths = isAuthenticated ? authenticatedPaths : unauthenticatedPaths;
+  
   // Check if current page should show AI Assistant
   const excludedPaths = ['/', '/auth', '/countdown', '/login', '/register', '/terms', '/learn-more'];
   const showAIAssistant = user && !excludedPaths.some(path => location === path || location.startsWith(`${path}/`));
@@ -100,13 +110,12 @@ export default function NavbarNew() {
           {/* Desktop navigation */}
           <div className="hidden md:ml-6 md:flex md:items-center space-x-1">
             {['home', 'travelInsurance', 'autoInsurance', 'petInsurance', 'healthInsurance'].map((item, index) => {
-              const paths = ['/', '/explore/travel', '/explore/auto', '/explore/pet', '/explore/health'];
-              const active = isActivePath(paths[index]);
+              const active = isActivePath(navPaths[index]);
               
               return (
                 <Link 
                   key={item} 
-                  href={paths[index]}
+                  href={navPaths[index]}
                   className="relative group"
                 >
                   <motion.div
@@ -335,11 +344,11 @@ export default function NavbarNew() {
                 <div className="py-4">
                   <div className="space-y-2">
                     {[
-                      { name: 'home', path: '/' },
-                      { name: 'travelInsurance', path: '/explore/travel' },
-                      { name: 'autoInsurance', path: '/explore/auto' },
-                      { name: 'petInsurance', path: '/explore/pet' },
-                      { name: 'healthInsurance', path: '/explore/health' },
+                      { name: 'home', path: navPaths[0] },
+                      { name: 'travelInsurance', path: navPaths[1] },
+                      { name: 'autoInsurance', path: navPaths[2] },
+                      { name: 'petInsurance', path: navPaths[3] },
+                      { name: 'healthInsurance', path: navPaths[4] },
                     ].map((item) => (
                       <motion.div
                         key={item.name}

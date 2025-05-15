@@ -1,0 +1,76 @@
+Briki App – Final Cleanup & Fix Prompt  
+Goal: Resolve all known inconsistencies, routing bugs, and visual issues affecting navigation between /explore/* and /insurance/* pages to ensure a polished pre-launch experience.
+
+I. Conditional Navigation Logic  
+We need navbar behavior to change based on authentication status:  
+- If isAuthenticated = true:  
+  - Navbar links should point to /insurance/travel, /insurance/auto, /insurance/pet, /insurance/health  
+- If isAuthenticated = false:  
+  - Navbar links should point to /explore/travel, /explore/auto, /explore/pet, /explore/health  
+
+Update target:  
+- client/src/components/navbar-new.tsx (both desktop and mobile)
+
+II. Fix SEO Metadata Handling in Explore Pages  
+React does not support raw <head> tags in component files.  
+Fix:  
+- Use React Helmet (or equivalent) in ExploreLayout to inject:  
+  - title  
+  - meta description  
+  - OpenGraph and Twitter tags  
+
+Update target:  
+- client/src/components/layout/explore-layout.tsx
+
+III. Replace Misaligned Icons in Explore Pages  
+Several Lucide icon substitutions were incorrect (e.g., using Cat instead of Paw).  
+Fix:  
+- Replace mismatched icons with correct ones  
+- Match Briki’s visual design (Apple-style, clean, geometric)  
+
+Update target:  
+- All /client/src/pages/explore/*.tsx files
+
+IV. Add Redirects for Legacy Routes  
+Legacy flat routes like /auto-insurance or /pet-insurance still exist and can override/conflict with new ones.  
+Fix:  
+- Add redirects:  
+  - /auto-insurance → /explore/auto  
+  - /pet-insurance → /explore/pet  
+  - /health-insurance → /explore/health  
+  - /travel-insurance → /explore/travel  
+  - /insurance-plans → /explore/travel or /  
+
+Implementation:  
+- Either redirect in router  
+- Or create wrapper components  
+
+Update target:  
+- Wherever legacy routes are defined (likely client/src/pages/)
+
+V. Fix Primary Button Variant Bug  
+The variant="primary" usage in navbar-new.tsx is invalid.  
+Fix:  
+- Either use valid variant (e.g., "default", "ghost")  
+- OR add "primary" to accepted variants in the base button component  
+
+Update target:  
+- client/src/components/navbar-new.tsx  
+- Possibly your button component
+
+VI. Summary of Final Cleanup Goals  
+Ensure that after these changes:  
+- Navigation is role-aware and consistent  
+- Explore pages are SEO-optimized and bug-free  
+- Icons are visually consistent and professional  
+- Legacy paths no longer break layout or override new ones  
+- Button styling is valid  
+- Separation is maintained:  
+  - Public users → /explore/*  
+  - Authenticated users → /insurance/*  
+  - Company partners → /company/*
+
+✅ Once ready, please confirm:  
+- All items implemented  
+- Updated file structure documented  
+- Any additional issues found
