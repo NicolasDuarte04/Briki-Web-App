@@ -28,6 +28,7 @@ export interface IStorage {
   // Insurance plan methods
   getInsurancePlan(id: number): Promise<InsurancePlan | undefined>;
   getAllInsurancePlans(): Promise<InsurancePlan[]>;
+  getInsurancePlansByCategory(category: string): Promise<InsurancePlan[]>;
   
   // Order methods
   getOrder(id: number): Promise<Order | undefined>;

@@ -7,8 +7,8 @@ import { Award, Check, ExternalLink, Star } from "lucide-react";
 import { useState } from "react";
 import { useLocation } from "wouter";
 
-// Define the types of insurance plans
-export type InsuranceCategory = "travel" | "auto" | "pet" | "health";
+// Import InsuranceCategory type from shared schema
+import { InsuranceCategory } from "@shared/schema";
 
 interface PlanCardProps {
   id: number | string;
