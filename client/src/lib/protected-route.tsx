@@ -1,7 +1,8 @@
 import { useAuth } from "@/hooks/use-auth";
 import { Loader2 } from "lucide-react";
-import { Redirect, Route, useLocation } from "wouter";
+import { Redirect, Route } from "wouter";
 import { useState, useEffect } from "react";
+import { useNavigation } from "@/lib/navigation";
 
 export function ProtectedRoute({
   path,
@@ -11,7 +12,7 @@ export function ProtectedRoute({
   component: () => React.JSX.Element | null;
 }) {
   const { user, isLoading, refetchUser } = useAuth();
-  const [, navigate] = useLocation();
+  const { navigate } = useNavigation();
   const [isVerifying, setIsVerifying] = useState(false);
   const [verificationAttempts, setVerificationAttempts] = useState(0);
   
