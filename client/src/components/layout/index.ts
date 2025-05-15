@@ -8,10 +8,9 @@ export { AuthenticatedLayout } from './authenticated/authenticated-layout';
 export { ExploreLayout as OriginalExploreLayout } from './explore-layout';
 
 // Re-export other layout components
-export { AIAssistantProvider } from './ai-assistant-provider';
+export { AIAssistantProvider, useAIAssistantUI } from './ai-assistant-provider';
 export { AIAssistantButton } from './ai-assistant-button';
 export { FloatingAssistantButton } from './floating-assistant-button';
 export { ContentWrapper } from './ContentWrapper';
 export { HeroWrapper } from './HeroWrapper';
 export { MainLayout } from './main-layout';
-export { useAIAssistantUI } from './ai-assistant-context';
