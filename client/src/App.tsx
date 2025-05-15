@@ -46,6 +46,9 @@ import InsuranceQuote from "@/pages/insurance/[category]/quote";
 
 // Explore pages (public-facing SEO pages without app layout)
 import ExploreTravelInsurance from "@/pages/explore/travel";
+import ExploreAutoInsurance from "@/pages/explore/auto";
+import ExplorePetInsurance from "@/pages/explore/pet";
+import ExploreHealthInsurance from "@/pages/explore/health";
 
 // Company pages
 import CompanyPage from "@/pages/company-page";
@@ -79,11 +82,14 @@ function Router() {
         <Route path="/pet-insurance" component={PetInsurancePage} />
         <Route path="/health-insurance" component={HealthInsurancePage} />
         
-        {/* New insurance category routes */}
+        {/* New insurance category routes (for authenticated app) */}
         <Route path="/insurance/travel" component={TravelInsurance} />
         <Route path="/insurance/auto" component={AutoInsurance} />
         <Route path="/insurance/pet" component={PetInsurance} />
         <Route path="/insurance/health" component={HealthInsurance} />
+        
+        {/* Public-facing explore pages (for SEO and non-authenticated users) */}
+        <Route path="/explore/travel" component={ExploreTravelInsurance} />
         
         {/* Quote pages for each insurance category */}
         <Route path="/insurance/:category/quote" component={InsuranceQuote} />
@@ -146,6 +152,11 @@ function AppContent() {
   
   // For landing page, just render the Router directly (it has its own layout)
   if (location === '/') {
+    return <Router />;
+  }
+  
+  // For explore pages, render the Router directly (they have their own self-contained layout)
+  if (location.startsWith('/explore')) {
     return <Router />;
   }
   
