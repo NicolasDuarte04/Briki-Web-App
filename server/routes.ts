@@ -124,6 +124,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch insurance plans", error: error.message });
     }
   });
+  
+  // Category-specific plan endpoints
+  app.get("/api/plans/:category", async (req, res) => {
+    try {
+      const { category } = req.params;
+      if (!category || !['travel', 'auto', 'pet', 'health'].includes(category)) {
+        return res.status(400).json({ 
+          message: "Invalid insurance category. Must be one of: travel, auto, pet, health" 
+        });
+      }
+      
+      const plans = await storage.getInsurancePlansByCategory(category);
+      res.json(plans);
+    } catch (error: any) {
+      console.error(`GET /api/plans/${req.params.category} - Error:`, error);
+      res.status(500).json({ message: "Failed to fetch insurance plans", error: error.message });
+    }
+  });
+  
+  // Insurance API endpoints for frontend
+  app.get("/api/insurance/plans", async (_req, res) => {
+    try {
+      const plans = await storage.getAllInsurancePlans();
+      res.json(plans);
+    } catch (error: any) {
+      console.error("GET /api/insurance/plans - Error:", error);
+      res.status(500).json({ message: "Failed to fetch insurance plans", error: error.message });
+    }
+  });
+  
+  app.get("/api/insurance/plans/:category", async (req, res) => {
+    try {
+      const { category } = req.params;
+      const plans = await storage.getInsurancePlansByCategory(category);
+      res.json(plans);
+    } catch (error: any) {
+      console.error(`GET /api/insurance/plans/${req.params.category} - Error:`, error);
+      res.status(500).json({ message: "Failed to fetch insurance plans", error: error.message });
+    }
+  });
+  
+  // Specialized search endpoint
+  app.post("/api/insurance/:category/search", async (req, res) => {
+    try {
+      const { category } = req.params;
+      const { criteria } = req.body;
+      
+      // For now, just return all plans for that category
+      // In a real implementation, we'd filter based on criteria
+      const plans = await storage.getInsurancePlansByCategory(category);
+      res.json(plans);
+    } catch (error: any) {
+      console.error(`POST /api/insurance/${req.params.category}/search - Error:`, error);
+      res.status(500).json({ message: "Failed to search insurance plans", error: error.message });
+    }
+  });
 
   // Set up the Stripe payment intent route
   if (stripe) {
