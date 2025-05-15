@@ -1,0 +1,75 @@
+Briki App Final Validation Questions – Are We Achieving the Goal?
+
+I. Navigation & UX
+	1.	Are all navbar links now conditionally routed based on authentication status?
+	•	Example: Do authenticated users see /insurance/* links while public users see /explore/*?
+	2.	Is navigation smooth and scroll-safe across all screens?
+	•	Do all pages scroll to top on navigation?
+	•	Is there any flicker or content jump?
+	3.	Do we still experience any layout shift or double navbar issues?
+	4.	Can you confirm that MainLayout is used only for authenticated routes, and ExploreLayout is used exclusively on public routes?
+
+⸻
+
+II. Explore Page Validation
+	5.	Are the new /explore/* pages fully independent?
+	•	Do they have no dependency on app state, login context, or backend features?
+	6.	Are all hero sections rendering properly across all /explore/* pages?
+	•	Any remaining z-index or image obstruction issues?
+	7.	Are CTA buttons in /explore/* routes always routing to /auth (login/signup)?
+	8.	Are the SEO meta tags rendering correctly inside the <head> of each explore page?
+	•	Do you recommend using react-helmet or another method for OpenGraph, title, and description?
+
+⸻
+
+III. Authenticated App Pages
+	9.	Are all /insurance/* routes still fully functional with:
+	•	Plan comparison
+	•	Quote flow
+	•	Mock data rendering
+	10.	Do authenticated users entering / get routed to the correct post-login homepage?
+	11.	Are there any paths where authenticated users might unintentionally land on /explore/* instead of /insurance/*?
+
+⸻
+
+IV. Routing Conflicts
+	12.	Do legacy routes like /auto-insurance, /travel-insurance, etc., still exist?
+
+	•	If so, are they properly redirected to /explore/*?
+
+	13.	Are there any route priority conflicts where older routes override intended ones?
+	14.	Do dynamic routes (e.g. /insurance/[category]/quote.tsx) still work as expected?
+
+⸻
+
+V. Visual & Component Consistency
+	15.	Are the icons used in all Explore pages now finalized, consistent, and matching Briki’s minimalist style?
+	16.	Are all buttons styled properly now?
+
+	•	Was the variant="primary" error resolved in navbar-new.tsx or in the button component itself?
+
+	17.	Is there any duplicate content or code bloat between /explore/* and /insurance/* that should be refactored?
+
+⸻
+
+VI. Technical Hygiene
+	18.	Is the current client/src/ directory clean and logically organized?
+
+	•	Any unused pages, duplicated components, or legacy files we can delete?
+
+	19.	Are the layouts (MainLayout, ExploreLayout) clearly separated and working without side effects?
+	20.	Are there any bugs, warnings, or console errors currently in the Replit preview or build logs?
+
+⸻
+
+VII. Bonus – Recommended Improvements
+	21.	Is there any technical debt we should clean before launch?
+	22.	Do you recommend unifying any components (like a global Hero.tsx, or shared content models) to reduce duplication?
+	23.	Would you suggest implementing auth-aware navigation as a reusable hook or higher-order component?
+
+⸻
+
+Once we get clear answers to these, we’ll know with certainty:
+	•	if the public/SEO layer (/explore/*) works perfectly for new visitors,
+	•	if the authenticated product layer (/insurance/*) is functionally strong and bug-free, and
+	•	if the navigation and layout systems are now modular, scalable, and cleanly separated.
