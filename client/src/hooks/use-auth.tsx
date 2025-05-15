@@ -8,6 +8,7 @@ import { useLocation } from "wouter";
 import { insertUserSchema, User as SelectUser, InsertUser } from "@shared/schema";
 import { getQueryFn, apiRequest, queryClient } from "../lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigation } from "@/lib/navigation";
 
 type TokenResponse = {
   user: SelectUser;
@@ -32,7 +33,7 @@ type LoginData = Pick<InsertUser, "username" | "password"> & {
 export const AuthContext = createContext<AuthContextType | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
-  const [, navigate] = useLocation();
+  const { navigate } = useNavigation();
   const [authToken, setAuthToken] = useState<string | null>(() => {
     // Try to get token from localStorage on initial load
     return localStorage.getItem('auth_token');
