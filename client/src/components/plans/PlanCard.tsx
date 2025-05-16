@@ -23,6 +23,7 @@ interface PlanCardProps {
   className?: string;
   showCompareToggle?: boolean;
   onCompareToggle?: (id: number | string, isSelected: boolean) => void;
+  isSelected?: boolean;
 }
 
 /**
@@ -42,9 +43,13 @@ export function PlanCard({
   className,
   showCompareToggle = true,
   onCompareToggle,
+  isSelected: externalIsSelected,
 }: PlanCardProps) {
   const [, navigate] = useLocation();
-  const [isSelected, setIsSelected] = useState(false);
+  const [internalIsSelected, setInternalIsSelected] = useState(false);
+  
+  // Use external selection state if provided, otherwise use internal state
+  const isSelected = externalIsSelected !== undefined ? externalIsSelected : internalIsSelected;
 
   // Format price as currency
   const formatPrice = (price: number) => {
@@ -57,7 +62,12 @@ export function PlanCard({
 
   const handleCompareToggle = () => {
     const newSelectedState = !isSelected;
-    setIsSelected(newSelectedState);
+    
+    // Only update internal state if we're not using external state
+    if (externalIsSelected === undefined) {
+      setInternalIsSelected(newSelectedState);
+    }
+    
     if (onCompareToggle) {
       onCompareToggle(id, newSelectedState);
     }

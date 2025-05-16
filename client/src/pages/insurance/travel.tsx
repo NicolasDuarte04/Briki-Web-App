@@ -139,12 +139,13 @@ export default function TravelInsurancePage() {
                 rating={plan.rating}
                 category="travel"
                 onCompareToggle={handleCompareToggle}
+                isSelected={isPlanSelected(plan.id)}
               />
             </motion.div>
           ))}
         </div>
         
-        {selectedPlanIds.length > 1 && (
+        {selectedPlans.length > 1 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -178,6 +179,9 @@ export default function TravelInsurancePage() {
           </Button>
         </div>
       </ContentWrapper>
+      
+      {/* Floating Compare Trigger */}
+      <ComparePageTrigger />
     </div>
   );
 }
