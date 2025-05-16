@@ -65,23 +65,66 @@ export default function ComparePlansPage() {
           navigate('/insurance/travel');
           return;
         }
+
+        // Get unique categories from selected plans for analytics
+        const uniqueCategories = Array.from(new Set(selectedPlans.map(p => p.category)));
         
-        // In a real implementation, we would fetch the actual plan data from an API
-        // For now, we'll dummy fetch them
-        // This is where you would integrate with your plan data API
+        // In a production implementation, we would fetch the plan data from an API
+        // using the plan IDs and categories from selectedPlans
+        //
+        // Example API call (uncomment and modify when ready to connect to real API):
+        // 
+        // const planIds = selectedPlans.map(p => p.id);
+        // const response = await fetch('/api/plans/details', {
+        //   method: 'POST',
+        //   headers: { 'Content-Type': 'application/json' },
+        //   body: JSON.stringify({ planIds, categories }),
+        // });
+        // 
+        // if (!response.ok) throw new Error('Failed to fetch plan data');
+        // const plansData = await response.json();
+        // setFetchedPlans(plansData);
         
-        // Log an analytics event for page view
+        // Log an analytics event for page view with proper category data
         try {
-          // Analytics event tracking would be implemented here
-          console.log('Analytics: view_comparison', { 
-            planCount: selectedPlans.length, 
-            categories: selectedPlans.map(p => p.category) 
-          });
+          // Track the comparison view event
+          import('@/lib/analytics').then(({ trackEvent }) => {
+            trackEvent('view_comparison', {
+              plan_count: selectedPlans.length,
+              categories: uniqueCategories.join(','),
+              plan_ids: selectedPlans.map(p => p.id).join(',')
+            });
+          }).catch(err => console.error('Failed to load analytics module', err));
         } catch (error) {
           console.error('Analytics error:', error);
         }
         
-        // Simulating a data fetch delay
+        // For development, use placeholder data based on the selected plan IDs
+        // This simulates fetching from an API while maintaining the actual selected IDs
+        const placeholderPlans = selectedPlans.map((selectedPlan, index) => {
+          // This matches the IDs from the user's selections for consistency
+          return {
+            id: selectedPlan.id,
+            name: `Plan ${String(selectedPlan.id).slice(-2)}`,
+            provider: `Provider ${String(selectedPlan.id).slice(-2)}`,
+            category: selectedPlan.category,
+            price: 100 + (index * 25),
+            basePrice: 100 + (index * 25),
+            medicalCoverage: 50000 + (index * 50000),
+            tripCancellation: `Up to $${5000 + (index * 1000)}`,
+            baggageProtection: 1000 + (index * 500),
+            emergencyEvacuation: 250000 + (index * 50000),
+            adventureActivities: index % 2 === 0,
+            rentalCarCoverage: index === 0 ? 0 : 25000,
+            rating: (4 + (index * 0.2)).toFixed(1),
+            reviews: 100 + (index * 25),
+          };
+        });
+        
+        // Set the fetched (or placeholder) plans data
+        setFetchedPlans(placeholderPlans);
+        
+        // Simulate network delay
         setTimeout(() => {
           setIsLoading(false);
         }, 500);
@@ -180,14 +223,35 @@ export default function ComparePlansPage() {
   
   // Handle confirmed clear
   const handleConfirmedClear = () => {
+    // Store data for analytics before clearing
+    const planCount = selectedPlans.length;
+    const uniqueCategories = Array.from(new Set(selectedPlans.map(p => p.category)));
+    const planIds = selectedPlans.map(p => p.id);
+    
+    // Clear the plans from state
     clearPlans();
     setIsConfirmDialogOpen(false);
-    navigate('/insurance/travel');
+    
+    // Navigate to the most common category page or default to travel
+    const mostCommonCategory = uniqueCategories.length > 0 
+      ? uniqueCategories.sort((a: string, b: string) => 
+          selectedPlans.filter(p => p.category === a).length - 
+          selectedPlans.filter(p => p.category === b).length
+        )[0] 
+      : 'travel';
+    
+    navigate(`/insurance/${mostCommonCategory}`);
     
     // Log an analytics event for clearing plans
     try {
-      // Analytics event tracking would be implemented here
-      console.log('Analytics: clear_comparison');
+      // Track the clear comparison event with detailed data
+      import('@/lib/analytics').then(({ trackEvent }) => {
+        trackEvent('clear_comparison', {
+          plan_count: planCount,
+          categories: uniqueCategories.join(','),
+          plan_ids: planIds.join(',')
+        });
+      }).catch(err => console.error('Failed to load analytics module', err));
     } catch (error) {
       console.error('Analytics error:', error);
     }
@@ -195,6 +259,11 @@ export default function ComparePlansPage() {
   
   // Handle removing a single plan
   const handleRemovePlan = (id: string | number) => {
+    // Find the plan category before removing it
+    const planToRemove = selectedPlans.find(p => p.id === id);
+    const planCategory = planToRemove?.category || 'unknown';
+    
+    // Remove the plan from state
     removePlan(id);
     
     // Show toast notification
@@ -203,15 +272,22 @@ export default function ComparePlansPage() {
       description: "The plan has been removed from your comparison.",
     });
     
-    // If we're down to just one plan, it's not a comparison anymore, go back to selection
+    // If we're down to less than 2 plans, it's not a comparison anymore, go back to selection
     if (selectedPlans.length <= 2) {
-      navigate('/insurance/travel');
+      // Navigate to the category of the removed plan, or default to travel
+      navigate(`/insurance/${planCategory === 'unknown' ? 'travel' : planCategory}`);
     }
     
     // Log an analytics event for removing a plan
     try {
-      // Analytics event tracking would be implemented here
-      console.log('Analytics: remove_plan', { id });
+      // Track the remove plan event with detailed data
+      import('@/lib/analytics').then(({ trackEvent }) => {
+        trackEvent('remove_plan_from_comparison', {
+          plan_id: String(id),
+          plan_category: planCategory,
+          remaining_plans: selectedPlans.length - 1
+        });
+      }).catch(err => console.error('Failed to load analytics module', err));
     } catch (error) {
       console.error('Analytics error:', error);
     }
