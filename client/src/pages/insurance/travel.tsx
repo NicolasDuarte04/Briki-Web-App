@@ -3,13 +3,17 @@ import { travelPlans } from "@/components/plans/mockPlans";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Plane, Shield, Globe, ArrowRight, BadgeCheck } from "lucide-react";
 import { HeroWrapper, ContentWrapper } from "@/components/layout";
+import { useCompareStore } from "@/store/compare-store";
+import { ComparePageTrigger } from "@/components/compare-page-trigger";
+import { useToast } from "@/hooks/use-toast";
 
 export default function TravelInsurancePage() {
   const [, navigate] = useLocation();
-  const [selectedPlanIds, setSelectedPlanIds] = useState<(string | number)[]>([]);
+  const { selectedPlans, addPlan, removePlan, isPlanSelected } = useCompareStore();
+  const { toast } = useToast();
   
   useEffect(() => {
     // Scroll to top when component mounts
@@ -18,16 +22,25 @@ export default function TravelInsurancePage() {
   
   const handleCompareToggle = (id: string | number, isSelected: boolean) => {
     if (isSelected) {
-      setSelectedPlanIds([...selectedPlanIds, id]);
+      // Check if we're at the maximum number of plans
+      if (selectedPlans.length >= 4) {
+        toast({
+          title: "Máximo de planes alcanzado",
+          description: "Puedes comparar un máximo de 4 planes a la vez.",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      addPlan({ id, category: 'travel' });
+      
+      // Show a toast when a plan is added
+      toast({
+        title: "Plan añadido para comparar",
+        description: `${selectedPlans.length + 1} planes seleccionados.`
+      });
     } else {
-      setSelectedPlanIds(selectedPlanIds.filter(planId => planId !== id));
-    }
-  };
-  
-  const handleComparePlans = () => {
-    if (selectedPlanIds.length > 1) {
-      const planIdsParam = selectedPlanIds.join(',');
-      navigate(`/insurance/travel/compare?plans=${planIdsParam}`);
+      removePlan(id);
     }
   };
 
@@ -139,10 +152,11 @@ export default function TravelInsurancePage() {
           >
             <Button 
               size="lg" 
-              onClick={handleComparePlans}
+              onClick={() => navigate('/compare-plans')}
               className="font-medium"
+              disabled={selectedPlans.length < 2}
             >
-              Compare Selected Plans ({selectedPlanIds.length})
+              Compare Selected Plans ({selectedPlans.length})
             </Button>
           </motion.div>
         )}
