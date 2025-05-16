@@ -179,6 +179,9 @@ export default function AutoInsurancePage() {
           </Button>
         </div>
       </ContentWrapper>
+      
+      {/* Floating Compare Trigger */}
+      <ComparePageTrigger />
     </div>
   );
 }

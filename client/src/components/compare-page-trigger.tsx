@@ -31,10 +31,19 @@ export function ComparePageTrigger({ className }: ComparePageTriggerProps) {
         <Button
           onClick={() => navigate('/compare-plans')}
           size="lg"
-          className="py-6 px-8 rounded-full bg-primary text-white font-medium shadow-lg"
+          className="py-6 px-8 rounded-full bg-primary text-white font-medium shadow-lg relative"
         >
           <FileBarChart className="mr-2 h-5 w-5" />
-          Comparar {selectedPlans.length} {selectedPlans.length === 1 ? 'plan' : 'planes'}
+          Comparar 
+          <motion.span 
+            className="inline-flex items-center justify-center bg-white text-primary rounded-full h-6 w-6 mx-2 font-bold text-sm"
+            initial={{ scale: 0.5 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 500 }}
+          >
+            {selectedPlans.length}
+          </motion.span>
+          {selectedPlans.length === 1 ? 'plan' : 'planes'}
         </Button>
       </motion.div>
     </AnimatePresence>
