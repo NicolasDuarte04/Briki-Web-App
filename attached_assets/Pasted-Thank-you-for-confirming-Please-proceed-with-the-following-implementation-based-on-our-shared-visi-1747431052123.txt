@@ -1,0 +1,80 @@
+Thank you for confirming. Please proceed with the following implementation, based on our shared vision for Briki:
+
+---
+
+### **Briki – Final Comparison Tool Feature Scope**
+
+This is the full set of features and behaviors we want to implement in the comparison system, ensuring it becomes a fully functional, production-ready module:
+
+---
+
+### 1. **Dedicated `/compare-plans` Screen**
+- Replace the modal-based comparison flow with a fully responsive standalone screen.
+- The new route will serve as the default comparison environment for all insurance categories.
+
+---
+
+### 2. **Global Plan Selection (Zustand + Persistence)**
+- Use Zustand with `persist` middleware to maintain selected plans across:
+  - Page refreshes
+  - App navigation
+  - Session reloads
+- Store: `/store/compare-store.ts`
+- State: `selectedPlans: { id, category }[]`
+
+---
+
+### 3. **Confirmation Dialog on Clear**
+- Implement a `Dialog` component when users:
+  - Press “Clear Comparison”
+  - Try to leave `/compare-plans` with active selections
+- Use shadcn UI’s dialog pattern for visual consistency
+
+---
+
+### 4. **Plan Limit + UX Guidance**
+- Set a soft limit of 4 plans in the comparison state
+- If exceeded:
+  - Show a tooltip or toast warning (not a blocker)
+  - Highlight UI to discourage comparing more than 4 at once
+
+---
+
+### 5. **Plan Loading from Any Context**
+- Ensure that if a user visits `/compare-plans` directly:
+  - Plan data for selected IDs is still loaded
+  - This works even if the user hasn’t visited the insurance category pages
+- Can use fallback lazy fetching or plan metadata caching
+
+---
+
+### 6. **Analytics Integration**
+- Log compare events using the existing tracking setup:
+  - View comparison
+  - Add/remove plan from comparison
+  - Click to compare
+- Optional: integrate a separate analytics layer (Google Analytics, etc.)
+
+---
+
+### 7. **High-Quality UX**
+- Maintain the responsive layout and styling from existing components
+- Support full scroll, mobile friendliness, and dark/light compatibility
+
+---
+
+### 8. **Scalability for Licensing**
+- Modularize the comparison logic so we can:
+  - Reuse the code for other clients
+  - Extract into an embeddable component if needed
+  - Adapt for other datasets and insurance APIs later
+
+---
+
+### Deployment Notes:
+- This module will become a key asset for potential business deals and tech licensing
+- Please ensure the system is stable, scalable, and easy to maintain
+
+---
+
+Please confirm this scope and let us know once implementation begins.
