@@ -464,17 +464,27 @@ export default function ComparePlansPage() {
       <AlertDialog open={isConfirmDialogOpen} onOpenChange={setIsConfirmDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Clear your comparison?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will remove all selected plans from your comparison. This action cannot be undone.
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-amber-500" />
+              Clear your comparison?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="space-y-2">
+              <p>
+                This will remove all <strong>{selectedPlans.length}</strong> selected plans from your comparison. 
+                Your selections will be lost and this action cannot be undone.
+              </p>
+              <p className="text-muted-foreground text-sm">
+                If you want to keep comparing your current selection, click Cancel.
+              </p>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="font-medium">Keep my comparison</AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleConfirmedClear}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-red-600 hover:bg-red-700 text-white flex items-center gap-2"
             >
+              <Trash className="h-4 w-4" />
               Yes, clear all plans
             </AlertDialogAction>
           </AlertDialogFooter>
