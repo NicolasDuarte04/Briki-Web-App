@@ -15,9 +15,6 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 
-// Import helper functions for analytics tracking
-import { trackEvent } from '@/lib/analytics';
-
 // Define a type for the insurance plans we'll be displaying
 interface InsurancePlan {
   id: string | number;
@@ -75,7 +72,11 @@ export default function ComparePlansPage() {
         
         // Log an analytics event for page view
         try {
-          trackEvent('view_comparison', 'Plan Comparison', 'Comparison - Dedicated View', selectedPlans.length);
+          // Analytics event tracking would be implemented here
+          console.log('Analytics: view_comparison', { 
+            planCount: selectedPlans.length, 
+            categories: selectedPlans.map(p => p.category) 
+          });
         } catch (error) {
           console.error('Analytics error:', error);
         }
@@ -185,7 +186,8 @@ export default function ComparePlansPage() {
     
     // Log an analytics event for clearing plans
     try {
-      trackEvent('clear_comparison', 'Plan Comparison', 'Clear Plans');
+      // Analytics event tracking would be implemented here
+      console.log('Analytics: clear_comparison');
     } catch (error) {
       console.error('Analytics error:', error);
     }
@@ -208,7 +210,8 @@ export default function ComparePlansPage() {
     
     // Log an analytics event for removing a plan
     try {
-      trackEvent('remove_plan', 'Plan Comparison', 'Remove Plan');
+      // Analytics event tracking would be implemented here
+      console.log('Analytics: remove_plan', { id });
     } catch (error) {
       console.error('Analytics error:', error);
     }

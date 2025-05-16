@@ -24,6 +24,7 @@ import TermsPage from "@/pages/terms-page";
 import ProfilePage from "@/pages/profile-page";
 import SettingsPage from "@/pages/settings-page";
 import ApiSettingsPage from "@/pages/api-settings-page";
+import ComparePlansPage from "@/pages/compare-plans-page";
 
 // Import redirects from their respective files
 import { 
@@ -92,6 +93,7 @@ function Router() {
         <Route path="/insurance/auto" component={AutoInsurance} />
         <Route path="/insurance/pet" component={PetInsurance} />
         <Route path="/insurance/health" component={HealthInsurance} />
+        <Route path="/compare-plans" component={ComparePlansPage} />
         
         {/* Public-facing explore pages (for SEO and non-authenticated users) */}
         <Route path="/explore/travel" component={ExploreTravelInsurance} />
