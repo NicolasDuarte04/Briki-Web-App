@@ -131,7 +131,7 @@ export default function AuthPageEnhanced() {
   // Handle form submissions
   const onLoginSubmit: SubmitHandler<LoginFormValues> = (values) => {
     loginMutation.mutate({
-      identifier: values.username, // Using username as identifier for our local auth system
+      username: values.username,
       password: values.password,
     });
   };
@@ -141,7 +141,10 @@ export default function AuthPageEnhanced() {
       username: values.username,
       password: values.password,
       email: values.email,
-      name: values.username, // Using username as name for simplicity
+      firstName: values.username, // Using username as firstName for simplicity
+      lastName: "",
+      id: crypto.randomUUID(), // Generate a random UUID for the user ID
+      role: "user" // Default role
     });
   };
   
@@ -366,13 +369,15 @@ export default function AuthPageEnhanced() {
                   <motion.button 
                     whileHover={{ scale: 1.02, y: -2 }} 
                     whileTap={{ scale: 0.98 }}
-                    className="flex h-12 items-center justify-center gap-2 rounded-xl bg-white/80 text-sm font-medium text-foreground shadow-sm backdrop-blur-sm transition hover:bg-white/90 border border-white/40"
+                    className="flex h-12 items-center justify-center gap-2 rounded-xl bg-white/80 text-sm font-medium text-foreground/50 shadow-sm backdrop-blur-sm transition hover:bg-white/90 border border-white/40"
                     type="button"
+                    disabled={true}
                   >
-                    <svg className="w-5 h-5 text-[#1877F2]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
+                    <svg className="w-5 h-5 text-[#1877F2]/50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
                       <path fill="currentColor" d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z" />
                     </svg>
                     <span>Facebook</span>
+                    <span className="absolute top-0 right-0 text-xs bg-black/40 text-white px-1 rounded-sm -mr-1 -mt-1">Coming soon</span>
                   </motion.button>
                 </div>
               </TabsContent>
