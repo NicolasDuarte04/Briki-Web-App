@@ -112,8 +112,9 @@ export const useCompareStore = create<CompareState>()(
       
       // Get unique categories that have selected plans
       getSelectedCategories: () => {
-        const categories = get().selectedPlans.map(p => p.category);
-        return [...new Set(categories)] as InsuranceCategory[];
+        const categoriesSet = new Set<InsuranceCategory>();
+        get().selectedPlans.forEach(p => categoriesSet.add(p.category));
+        return Array.from(categoriesSet);
       },
       
       // Check if we have at least two plans selected for comparison
