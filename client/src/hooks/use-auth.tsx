@@ -372,20 +372,61 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  // Provide a default context if none exists to prevent errors
+  // Check if we're in a context
   if (!context) {
     console.warn("Auth context not found, using default values");
+    
+    // Create authentication mutations
+    const loginMutation = useMutation({
+      mutationFn: async (credentials: { identifier: string; password: string }) => {
+        const response = await apiRequest("POST", "/api/auth/login", credentials);
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || "Login failed");
+        }
+        return response.json();
+      }
+    });
+
+    const registerMutation = useMutation({
+      mutationFn: async (userData: { 
+        username: string; 
+        email: string; 
+        password: string;
+        firstName?: string;
+        lastName?: string;
+      }) => {
+        const response = await apiRequest("POST", "/api/auth/register", userData);
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || "Registration failed");
+        }
+        return response.json();
+      }
+    });
+
+    const logoutMutation = useMutation({
+      mutationFn: async () => {
+        const response = await apiRequest("POST", "/api/auth/logout");
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || "Logout failed");
+        }
+        return response.json();
+      }
+    });
+    
     return {
       user: null,
       isLoading: false,
       error: null,
       isAuthenticated: false,
-      // Add stub implementations for required functions
-      loginMutation: {} as any,
-      logoutMutation: {} as any,
-      registerMutation: {} as any,
+      loginMutation,
+      registerMutation,
+      logoutMutation,
       refetchUser: async () => ({ user: null })
     };
   }
+  
   return context;
 }
