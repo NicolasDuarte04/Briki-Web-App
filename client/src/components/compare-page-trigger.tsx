@@ -22,7 +22,7 @@ export function ComparePageTrigger() {
   return (
     <div className="fixed bottom-6 right-6 z-50">
       <Button 
-        onClick={() => navigate('/compare-plans-direct.html')}
+        onClick={() => window.location.href = '/briki-compare.html'}
         size="lg" 
         className="shadow-md flex items-center gap-2"
       >
