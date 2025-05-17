@@ -3,8 +3,8 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { useAuth, AuthProvider } from "./auth-context";
-import { ProtectedRoute } from "@/lib/protected-route";
+import { useAuth, AuthProvider } from "@/contexts/AuthContext";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { LanguageProvider } from "@/components/language-selector";
 import { PageTransition } from "@/components/ui/transition-effect";
 import { RecentlyViewedProvider } from "@/contexts/recently-viewed-context";
@@ -14,8 +14,7 @@ import { useNavigation } from "@/lib/navigation";
 
 import NotFound from "@/pages/not-found";
 import HomePageNew from "@/pages/home-page-new";
-import AuthPageEnhanced from "@/pages/auth-page-enhanced";
-import AuthPageReplit from "@/pages/auth-page-replit";
+import AuthPage from "@/pages/auth";
 import TripInfoPage from "@/pages/trip-info-page";
 import InsuranceCategoriesPage from "@/pages/insurance-categories-page";
 import CheckoutPage from "@/pages/checkout-page";
@@ -77,10 +76,10 @@ function Router() {
         <Route path="/" component={LandingPage} />
         <Route path="/countdown" component={CountdownPageNew} />
         <Route path="/home" component={HomePageNew} />
-        <Route path="/auth" component={AuthPageReplit} />
+        <Route path="/auth" component={AuthPage} />
         <Route path="/categories" component={InsuranceCategoriesPage} />
-        <ProtectedRoute path="/trip-info" component={TripInfoPage} />
-        <ProtectedRoute path="/checkout/:planId" component={CheckoutPage} />
+        <Route path="/trip-info" component={TripInfoPage} />
+        <Route path="/checkout/:planId" component={CheckoutPage} />
         <Route path="/weather-risk" component={WeatherRiskPage} />
         {/* Legacy routes - redirected to new paths */}
         <Route path="/auto-insurance" component={AutoInsuranceRedirect} />
@@ -107,9 +106,9 @@ function Router() {
         <Route path="/learn-more" component={LearnMorePage} />
         <Route path="/terms" component={TermsPage} />
         <Route path="/ai-assistant" component={AIAssistantDemo} />
-        <ProtectedRoute path="/profile" component={ProfilePage} />
-        <ProtectedRoute path="/settings" component={SettingsPage} />
-        <ProtectedRoute path="/api-settings" component={ApiSettingsPage} />
+        <Route path="/profile" component={ProfilePage} />
+        <Route path="/settings" component={SettingsPage} />
+        <Route path="/api-settings" component={ApiSettingsPage} />
         
         {/* Company/Partner Routes */}
         <Route path="/company" component={CompanyPage} />
@@ -117,10 +116,10 @@ function Router() {
         <Route path="/company-login" component={CompanyLoginPage} />
         <Route path="/company-register" component={CompanyRegisterPage} />
         <Route path="/contact-sales" component={ContactSalesPage} />
-        <ProtectedRoute path="/company-dashboard" component={CompanyDashboardPage} />
-        <ProtectedRoute path="/company-dashboard/upload" component={CompanyQuoteUploadPage} />
-        <ProtectedRoute path="/company-dashboard/preview" component={CompanyPreviewPage} />
-        <ProtectedRoute path="/company-dashboard/request-pilot" component={CompanyRequestPilotPage} />
+        <Route path="/company-dashboard" component={CompanyDashboardPage} />
+        <Route path="/company-dashboard/upload" component={CompanyQuoteUploadPage} />
+        <Route path="/company-dashboard/preview" component={CompanyPreviewPage} />
+        <Route path="/company-dashboard/request-pilot" component={CompanyRequestPilotPage} />
         
         <Route component={NotFound} />
       </Switch>
@@ -186,18 +185,13 @@ function AppContent() {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <LanguageProvider>
-          <RecentlyViewedProvider>
-            <TooltipProvider>
-              <Toaster />
-              <AppContent />
-            </TooltipProvider>
-          </RecentlyViewedProvider>
-        </LanguageProvider>
-      </AuthProvider>
-    </QueryClientProvider>
+    <LanguageProvider>
+      <RecentlyViewedProvider>
+        <TooltipProvider>
+          <AppContent />
+        </TooltipProvider>
+      </RecentlyViewedProvider>
+    </LanguageProvider>
   );
 }
 
