@@ -48,6 +48,10 @@ import TravelInsurance from "@/pages/insurance/travel";
 import AutoInsurance from "@/pages/insurance/auto";
 import PetInsurance from "@/pages/insurance/pet";
 import HealthInsurance from "@/pages/insurance/health";
+
+// Quote pages
+import GetQuotePage from "@/pages/get-quote";
+import QuoteConfirmationPage from "@/pages/quote-confirmation";
 import InsuranceQuote from "@/pages/insurance/[category]/quote";
 
 // Explore pages (public-facing SEO pages without app layout)
@@ -104,6 +108,8 @@ function Router() {
         
         {/* Quote pages for each insurance category */}
         <Route path="/insurance/:category/quote" component={InsuranceQuote} />
+        <Route path="/get-quote" component={GetQuotePage} />
+        <Route path="/quote-confirmation" component={QuoteConfirmationPage} />
         <Route path="/learn-more" component={LearnMorePage} />
         <Route path="/terms" component={TermsPage} />
         <Route path="/ai-assistant" component={AIAssistantDemo} />

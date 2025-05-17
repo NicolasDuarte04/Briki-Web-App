@@ -70,9 +70,10 @@ export default function QuoteForm() {
         title: "Quote Submitted",
         description: `Your quote request has been submitted successfully. Reference: ${data.quoteReference}`,
       });
-      navigate("/quote-confirmation", { 
-        state: { quoteReference: data.quoteReference }
-      });
+      
+      // Store the reference in history state before navigation
+      window.history.pushState({ quoteReference: data.quoteReference }, "");
+      setLocation("/quote-confirmation");
     },
     onError: (error) => {
       toast({
