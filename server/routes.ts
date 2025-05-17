@@ -34,8 +34,8 @@ const tripSchema = z.object({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Setup authentication routes
-  setupAuth(app);
+  // Setup Replit authentication
+  await setupAuth(app);
 
   // Initialize database with test data
   try {

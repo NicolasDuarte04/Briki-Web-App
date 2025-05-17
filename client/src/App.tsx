@@ -15,6 +15,7 @@ import { useNavigation } from "@/lib/navigation";
 import NotFound from "@/pages/not-found";
 import HomePageNew from "@/pages/home-page-new";
 import AuthPageEnhanced from "@/pages/auth-page-enhanced";
+import AuthPageReplit from "@/pages/auth-page-replit";
 import TripInfoPage from "@/pages/trip-info-page";
 import InsuranceCategoriesPage from "@/pages/insurance-categories-page";
 import CheckoutPage from "@/pages/checkout-page";
@@ -76,7 +77,7 @@ function Router() {
         <Route path="/" component={LandingPage} />
         <Route path="/countdown" component={CountdownPageNew} />
         <Route path="/home" component={HomePageNew} />
-        <Route path="/auth" component={AuthPageEnhanced} />
+        <Route path="/auth" component={AuthPageReplit} />
         <Route path="/categories" component={InsuranceCategoriesPage} />
         <ProtectedRoute path="/trip-info" component={TripInfoPage} />
         <ProtectedRoute path="/checkout/:planId" component={CheckoutPage} />
