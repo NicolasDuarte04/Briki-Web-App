@@ -3,7 +3,7 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth, AuthProvider } from "./auth-provider";
 import { ProtectedRoute } from "@/lib/protected-route";
 import { LanguageProvider } from "@/components/language-selector";
 import { PageTransition } from "@/components/ui/transition-effect";
@@ -25,7 +25,7 @@ import TermsPage from "@/pages/terms-page";
 import ProfilePage from "@/pages/profile-page";
 import SettingsPage from "@/pages/settings-page";
 import ApiSettingsPage from "@/pages/api-settings-page";
-import ComparePlansPage from "@/pages/compare-plans-page-fixed";
+import ComparePlansPage from "./pages/compare-plans-debug";
 
 // Import redirects from their respective files
 import { 
@@ -187,14 +187,16 @@ function AppContent() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <LanguageProvider>
-        <RecentlyViewedProvider>
-          <TooltipProvider>
-            <Toaster />
-            <AppContent />
-          </TooltipProvider>
-        </RecentlyViewedProvider>
-      </LanguageProvider>
+      <AuthProvider>
+        <LanguageProvider>
+          <RecentlyViewedProvider>
+            <TooltipProvider>
+              <Toaster />
+              <AppContent />
+            </TooltipProvider>
+          </RecentlyViewedProvider>
+        </LanguageProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
