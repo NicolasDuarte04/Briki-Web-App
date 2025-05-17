@@ -3,10 +3,12 @@ import { useLocation } from "wouter";
 import { MainLayout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle, ArrowLeft, DownloadCloud, Send } from "lucide-react";
+import { CheckCircle, ArrowLeft, DownloadCloud, Send, Info } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { InsurancePlan } from "@/store/compare-store";
+import { generatePlanInsights, PlanInsight } from "@/utils/ai-insights";
+import { PlanInsightTag } from "@/components/plans/PlanInsightTag";
 
 export default function QuoteSummary() {
   const [, navigate] = useLocation();
@@ -16,6 +18,7 @@ export default function QuoteSummary() {
   const [category, setCategory] = useState<string>("travel");
   const [submissionComplete, setSubmissionComplete] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [insights, setInsights] = useState<PlanInsight[]>([]);
   
   useEffect(() => {
     // Scroll to top when component mounts
@@ -56,8 +59,54 @@ export default function QuoteSummary() {
       };
       
       setPlan(mockPlan);
+      
+      // Generate mock comparison plans to enable AI insights
+      const mockComparisonPlans: InsurancePlan[] = [
+        mockPlan,
+        {
+          id: "economy-plan",
+          name: "Economy Plan",
+          category: category,
+          provider: "Budget Insurance",
+          price: mockPlan.price * 0.7,
+          features: mockPlan.features.slice(0, Math.max(1, mockPlan.features.length - 2)),
+          description: "Basic coverage for essential needs only.",
+          coverage: {
+            medical: "$50,000",
+            emergency: "$25,000",
+            baggage: "$1,000",
+            cancellation: "75% of trip cost"
+          }
+        },
+        {
+          id: "premium-plan",
+          name: "Premium Gold Plan",
+          category: category,
+          provider: "Premium Protection Co.",
+          price: mockPlan.price * 1.8,
+          features: [
+            ...mockPlan.features,
+            "Premium 24/7 Concierge",
+            "Luxury Transportation Upgrade",
+            "VIP Medical Services"
+          ],
+          description: "The highest level of coverage and service for discerning travelers.",
+          coverage: {
+            medical: "$250,000",
+            emergency: "$100,000",
+            baggage: "$5,000",
+            cancellation: "125% of trip cost",
+            delay: "$2,000",
+            evacuation: "Unlimited"
+          }
+        }
+      ];
+      
+      // Generate AI insights for this plan
+      const planInsights = generatePlanInsights(mockPlan, mockComparisonPlans);
+      setInsights(planInsights);
     }
-  }, [location]);
+  }, [location, category]);
   
   const handleGoBack = () => {
     navigate(`/insurance/${category}/quote?planId=${plan?.id}`);
@@ -146,6 +195,20 @@ export default function QuoteSummary() {
                   <CardDescription>
                     Provided by {plan.provider || "Insurance Provider"} • {plan.category.charAt(0).toUpperCase() + plan.category.slice(1)} Insurance
                   </CardDescription>
+                  
+                  {/* Display AI insights for this plan */}
+                  {insights.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {insights.map((insight, index) => (
+                        <PlanInsightTag 
+                          key={index} 
+                          tag={insight.tag} 
+                          reason={insight.reason} 
+                          showTooltip={true} 
+                        />
+                      ))}
+                    </div>
+                  )}
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
