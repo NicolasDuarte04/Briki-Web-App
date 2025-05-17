@@ -1,4 +1,4 @@
-import { InsuranceCategory } from "./PlanCard";
+import { InsuranceCategory } from "@shared/schema";
 
 // Interface for insurance plans
 export interface MockInsurancePlan {
