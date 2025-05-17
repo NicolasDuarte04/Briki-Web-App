@@ -52,6 +52,9 @@ import HealthInsurance from "@/pages/insurance/health";
 // Quote pages
 import GetQuotePage from "@/pages/get-quote";
 import QuoteConfirmationPage from "@/pages/quote-confirmation";
+
+// Comparison pages
+import ComparePlansDemo from "@/pages/compare-plans-demo";
 import InsuranceQuote from "@/pages/insurance/[category]/quote";
 
 // Explore pages (public-facing SEO pages without app layout)
