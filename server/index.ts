@@ -23,7 +23,17 @@ app.use("/api/login", (req, res, next) => {
   next();
 });
 
-app.use("/api/register", (req, res, next) => {
+app.use("/api/callback", (req, res, next) => {
+  res.header('Access-Control-Allow-Credentials', 'true');
+  next();
+});
+
+app.use("/api/logout", (req, res, next) => {
+  res.header('Access-Control-Allow-Credentials', 'true');
+  next();
+});
+
+app.use("/api/auth/user", (req, res, next) => {
   res.header('Access-Control-Allow-Credentials', 'true');
   next();
 });

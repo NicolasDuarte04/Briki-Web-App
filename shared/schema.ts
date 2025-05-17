@@ -28,7 +28,7 @@ export const users = pgTable("users", {
 
 export const trips = pgTable("trips", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").references(() => users.id),
+  userId: text("user_id").references(() => users.id),
   destination: text("destination").notNull(),
   countryOfOrigin: text("country_of_origin").notNull(), // This will be used instead of tripType
   departureDate: text("departure_date").notNull(),
@@ -60,7 +60,7 @@ export const insurancePlans = pgTable("insurance_plans", {
 
 export const orders = pgTable("orders", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").references(() => users.id),
+  userId: text("user_id").references(() => users.id),
   tripId: integer("trip_id").references(() => trips.id),
   planId: integer("plan_id").references(() => insurancePlans.id),
   totalAmount: integer("total_amount").notNull(),
@@ -71,12 +71,24 @@ export const orders = pgTable("orders", {
 
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
+  id: true,
   username: true,
-  password: true,
-  name: true,
   email: true,
+  firstName: true,
+  lastName: true,
+  profileImageUrl: true,
   role: true,
   companyProfile: true,
+});
+
+export const upsertUserSchema = createInsertSchema(users).pick({
+  id: true,
+  username: true,
+  email: true,
+  firstName: true,
+  lastName: true,
+  profileImageUrl: true,
+  role: true,
 });
 
 export const insertTripSchema = createInsertSchema(trips).pick({
@@ -104,6 +116,7 @@ export const insertOrderSchema = createInsertSchema(orders).pick({
 
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
+export type UpsertUser = z.infer<typeof upsertUserSchema>;
 export type User = typeof users.$inferSelect;
 
 // Include countryOfOrigin instead of tripType in the schema

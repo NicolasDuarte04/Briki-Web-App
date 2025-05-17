@@ -1,9 +1,9 @@
 import { 
-  User, InsertUser, 
+  User, InsertUser, UpsertUser,
   Trip, InsertTrip, 
   InsurancePlan, InsertInsurancePlan,
   Order, InsertOrder,
-  users, trips, insurancePlans, orders
+  users, trips, insurancePlans, orders, sessions
 } from "@shared/schema";
 import session from "express-session";
 import createMemoryStore from "memorystore";
@@ -16,13 +16,14 @@ const MemoryStore = createMemoryStore(session);
 
 export interface IStorage {
   // User methods
-  getUser(id: number | null | undefined): Promise<User | undefined>;
+  getUser(id: string | null | undefined): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  upsertUser(user: UpsertUser): Promise<User>;
   
   // Trip methods
   getTrip(id: number): Promise<Trip | undefined>;
-  getTripsByUserId(userId: number): Promise<Trip[]>;
+  getTripsByUserId(userId: string): Promise<Trip[]>;
   createTrip(trip: InsertTrip): Promise<Trip>;
   
   // Insurance plan methods
@@ -32,7 +33,7 @@ export interface IStorage {
   
   // Order methods
   getOrder(id: number): Promise<Order | undefined>;
-  getOrdersByUserId(userId: number): Promise<Order[]>;
+  getOrdersByUserId(userId: string): Promise<Order[]>;
   createOrder(order: InsertOrder): Promise<Order>;
 
   // Session store
@@ -61,7 +62,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // User methods
-  async getUser(id: number | null | undefined): Promise<User | undefined> {
+  async getUser(id: string | null | undefined): Promise<User | undefined> {
     if (id === null || id === undefined) {
       return undefined;
     }
@@ -79,13 +80,28 @@ export class DatabaseStorage implements IStorage {
     return results[0];
   }
   
+  async upsertUser(userData: UpsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(userData)
+      .onConflictDoUpdate({
+        target: users.id,
+        set: {
+          ...userData,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return user;
+  }
+  
   // Trip methods
   async getTrip(id: number): Promise<Trip | undefined> {
     const results = await db.select().from(trips).where(eq(trips.id, id));
     return results[0];
   }
   
-  async getTripsByUserId(userId: number): Promise<Trip[]> {
+  async getTripsByUserId(userId: string): Promise<Trip[]> {
     return await db.select().from(trips)
       .where(eq(trips.userId, userId))
       .orderBy(desc(trips.createdAt));
@@ -182,7 +198,7 @@ export class DatabaseStorage implements IStorage {
     return results[0];
   }
   
-  async getOrdersByUserId(userId: number): Promise<Order[]> {
+  async getOrdersByUserId(userId: string): Promise<Order[]> {
     return await db.select().from(orders)
       .where(eq(orders.userId, userId))
       .orderBy(desc(orders.createdAt));
@@ -196,27 +212,44 @@ export class DatabaseStorage implements IStorage {
   // Seed test data including users and insurance plans
   async seedDataIfNeeded(): Promise<void> {
     try {
-      // First check and seed test user if needed
-      const testUser = await this.getUserByUsername("demo");
-      if (!testUser) {
-        // Import the hashedPassword function from auth.ts
-        const { scrypt, randomBytes } = await import('crypto');
-        const { promisify } = await import('util');
-        const scryptAsync = promisify(scrypt);
+      // First check if users table exists
+      try {
+        // Use a raw query to check if the table exists to avoid schema errors
+        const usersTableQuery = await db.execute(`
+          SELECT EXISTS (
+            SELECT FROM information_schema.tables 
+            WHERE table_schema = 'public' 
+            AND table_name = 'users'
+          );
+        `);
         
-        const hashPassword = async (password: string) => {
-          const salt = randomBytes(16).toString("hex");
-          const buf = (await scryptAsync(password, salt, 64)) as Buffer;
-          return `${buf.toString("hex")}.${salt}`;
-        };
+        if (!usersTableQuery.rows[0]?.exists) {
+          console.log('Users table does not exist yet, skipping seed');
+          return;
+        }
+      } catch (error) {
+        console.error('Error checking if users table exists:', error);
+        return;
+      }
+      
+      // Check if the test user exists using a direct query to avoid schema issues
+      const userExistsQuery = await db.execute(`
+        SELECT COUNT(*) as count FROM users WHERE username = 'demo';
+      `);
+      
+      const userExists = userExistsQuery.rows[0]?.count 
+        ? parseInt(userExistsQuery.rows[0].count as string) > 0
+        : false;
+      
+      // Create test user if it doesn't exist
+      if (!userExists) {
+        console.log('Creating test user: demo');
         
-        console.log('Creating test user: demo / test123');
-        await this.createUser({
-          username: "demo",
-          password: await hashPassword("test123"),
-          email: "demo@example.com",
-          name: "Demo User"
-        });
+        await db.execute(`
+          INSERT INTO users (id, username, email, role, "firstName", "lastName")
+          VALUES ('demo123', 'demo', 'demo@example.com', 'user', 'Demo', 'User');
+        `);
+        
         console.log('Test user created successfully');
       }
       

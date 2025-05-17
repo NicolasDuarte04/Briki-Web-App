@@ -1,6 +1,6 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
-import { setupAuth, requireAuth } from "./auth";
+import { setupAuth, isAuthenticated } from "./replitAuth";
 import { storage } from "./storage";
 import Stripe from "stripe";
 import { users, trips, insurancePlans, orders } from "@shared/schema";
@@ -73,7 +73,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Trip Endpoints
-  app.post("/api/trips", requireAuth, async (req: AuthenticatedRequest, res) => {
+  app.post("/api/trips", isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
       // Validate the request body
       const validationResult = tripSchema.safeParse(req.body);
@@ -89,13 +89,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get validated data
       const tripData = validationResult.data;
       
+      // Get user ID from Replit Auth session
+      const userId = req.user.claims.sub;
+      
       // Create the trip record
       const trip = await storage.createTrip({
         ...tripData,
-        userId: req.user.id,
+        userId,
       });
       
-      console.log("POST /api/trips - Created trip for user:", req.user.id);
+      console.log("POST /api/trips - Created trip for user:", userId);
       res.status(201).json(trip);
     } catch (error: any) {
       console.error("POST /api/trips - Error creating trip:", error);
@@ -103,10 +106,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/trips", requireAuth, async (req: AuthenticatedRequest, res) => {
+  app.get("/api/trips", isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
+      // Get user ID from Replit Auth session
+      const userId = req.user.claims.sub;
+      
       // Get trips for the authenticated user
-      const trips = await storage.getTripsByUserId(req.user.id);
+      const trips = await storage.getTripsByUserId(userId);
       res.json(trips);
     } catch (error: any) {
       console.error("GET /api/trips - Error fetching trips:", error);
