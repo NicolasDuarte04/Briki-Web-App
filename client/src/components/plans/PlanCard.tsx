@@ -50,9 +50,49 @@ export function PlanCard({
 }: PlanCardProps) {
   const [, navigate] = useLocation();
   const [internalIsSelected, setInternalIsSelected] = useState(false);
+  const [insights, setInsights] = useState<PlanInsight[]>([]);
   
   // Use external selection state if provided, otherwise use internal state
   const isSelected = externalIsSelected !== undefined ? externalIsSelected : internalIsSelected;
+  
+  // Generate AI insights for this plan
+  useEffect(() => {
+    // Create a plan object compatible with our AI insights system
+    const plan: InsurancePlan = {
+      id: id.toString(),
+      name: title,
+      category: category,
+      provider: provider,
+      price: price,
+      description: description || "",
+      features: features || []
+    };
+    
+    // Mock other plans for comparison (in a real app, these would come from an API or context)
+    const mockPlans: InsurancePlan[] = [
+      plan,
+      {
+        id: "budget-plan",
+        name: "Budget Plan",
+        category: category,
+        provider: "Economy Insurance",
+        price: price * 0.7,
+        features: features.slice(0, Math.max(1, features.length - 2))
+      },
+      {
+        id: "premium-plan",
+        name: "Premium Plan",
+        category: category,
+        provider: "Premium Insurance",
+        price: price * 1.5,
+        features: [...features, "24/7 Priority Support", "Premium Coverage"]
+      }
+    ];
+    
+    // Generate insights
+    const generatedInsights = generatePlanInsights(plan, mockPlans);
+    setInsights(generatedInsights);
+  }, [id, title, provider, price, features, category, description]);
 
   // Format price as currency
   const formatPrice = (price: number) => {
@@ -107,6 +147,20 @@ export function PlanCard({
             </Badge>
           )}
         </div>
+        
+        {/* Display AI-generated insights if available */}
+        {insights.length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-3">
+            {insights.map((insight, index) => (
+              <PlanInsightTag 
+                key={index} 
+                tag={insight.tag} 
+                reason={insight.reason} 
+                showTooltip={true} 
+              />
+            ))}
+          </div>
+        )}
       </CardHeader>
       
       <CardContent className="pb-4">
