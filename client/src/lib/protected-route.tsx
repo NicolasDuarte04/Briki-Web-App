@@ -1,4 +1,4 @@
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/useAuth";
 import { Loader2 } from "lucide-react";
 import { Redirect, Route } from "wouter";
 import { useState, useEffect } from "react";
@@ -11,7 +11,7 @@ export function ProtectedRoute({
   path: string;
   component: () => React.JSX.Element | null;
 }) {
-  const { user, isLoading, refetchUser } = useAuth();
+  const { user, isLoading, isAuthenticated, refetchUser } = useAuth();
   const { navigate } = useNavigation();
   const [isVerifying, setIsVerifying] = useState(false);
   const [verificationAttempts, setVerificationAttempts] = useState(0);
@@ -21,8 +21,8 @@ export function ProtectedRoute({
     
     const verifyAuth = async () => {
       // No need to verify if we already have the user
-      if (user) {
-        console.log("Protected route: User already authenticated:", user.username);
+      if (isAuthenticated) {
+        console.log("Protected route: User already authenticated");
         return;
       }
       
@@ -33,13 +33,13 @@ export function ProtectedRoute({
       }
       
       // Only attempt to verify if not already in progress and not loading
-      if (!isVerifying && !isLoading && !user) {
+      if (!isVerifying && !isLoading && !isAuthenticated) {
         try {
           setIsVerifying(true);
           console.log("Protected route: Verifying authentication...");
           
           const result = await refetchUser();
-          console.log("Auth verification result:", result?.data ? `User found: ${result.data.username}` : "No user");
+          console.log("Auth verification result:", result?.data ? "User authenticated" : "No user");
           
           setVerificationAttempts(prev => prev + 1);
         } catch (error) {
