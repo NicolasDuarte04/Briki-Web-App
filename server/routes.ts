@@ -1,6 +1,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+import { setupAuth } from "./auth";
+import { isAuthenticated } from "./auth/local-auth";
 import { storage } from "./storage";
 import Stripe from "stripe";
 import { users, trips, insurancePlans, orders } from "@shared/schema";
