@@ -234,6 +234,114 @@ export class DatabaseStorage implements IStorage {
       throw error;
     }
   }
+
+  // Quote operations
+  async createQuote(quoteData: InsertQuote): Promise<Quote> {
+    try {
+      // Generate a unique reference number for this quote
+      const quoteReference = this.generateQuoteReference();
+      
+      // Set expiration date (30 days from now by default)
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 30);
+      
+      // Insert the quote with the generated reference
+      const [quote] = await db
+        .insert(quotes)
+        .values({
+          ...quoteData,
+          quoteReference,
+          status: "pending",
+          notificationSent: false,
+          expiresAt
+        })
+        .returning();
+      
+      return quote;
+    } catch (error) {
+      console.error("Error creating quote:", error);
+      throw error;
+    }
+  }
+
+  async getQuoteById(id: number): Promise<Quote | undefined> {
+    try {
+      const [quote] = await db
+        .select()
+        .from(quotes)
+        .where(eq(quotes.id, id));
+      
+      return quote;
+    } catch (error) {
+      console.error("Error getting quote by ID:", error);
+      return undefined;
+    }
+  }
+
+  async getQuoteByReference(reference: string): Promise<Quote | undefined> {
+    try {
+      const [quote] = await db
+        .select()
+        .from(quotes)
+        .where(eq(quotes.quoteReference, reference));
+      
+      return quote;
+    } catch (error) {
+      console.error("Error getting quote by reference:", error);
+      return undefined;
+    }
+  }
+
+  async getUserQuotes(userId: string): Promise<Quote[]> {
+    try {
+      const userQuotes = await db
+        .select()
+        .from(quotes)
+        .where(eq(quotes.userId, userId))
+        .orderBy(quotes.createdAt);
+      
+      return userQuotes;
+    } catch (error) {
+      console.error("Error getting user quotes:", error);
+      return [];
+    }
+  }
+
+  async updateQuoteStatus(id: number, status: string): Promise<Quote> {
+    try {
+      const [updatedQuote] = await db
+        .update(quotes)
+        .set({ 
+          status,
+          updatedAt: new Date()
+        })
+        .where(eq(quotes.id, id))
+        .returning();
+      
+      return updatedQuote;
+    } catch (error) {
+      console.error("Error updating quote status:", error);
+      throw error;
+    }
+  }
+
+  async markQuoteNotificationSent(id: number): Promise<Quote> {
+    try {
+      const [updatedQuote] = await db
+        .update(quotes)
+        .set({ 
+          notificationSent: true,
+          updatedAt: new Date()
+        })
+        .where(eq(quotes.id, id))
+        .returning();
+      
+      return updatedQuote;
+    } catch (error) {
+      console.error("Error marking quote notification sent:", error);
+      throw error;
+    }
+  }
 }
 
 // Export a singleton instance of the storage
