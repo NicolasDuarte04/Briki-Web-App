@@ -40,6 +40,8 @@ interface InsurancePlan {
 }
 
 export default function ComparePlansPage() {
+  console.log("ComparePlansPage mounting..."); // Debug log to confirm component mount
+  
   const { selectedPlans, clearPlans, removePlan } = useCompareStore();
   const [, navigate] = useLocation();
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
@@ -47,6 +49,7 @@ export default function ComparePlansPage() {
   const [bestValues, setBestValues] = useState<Record<string, number | string>>({});
   const [fetchedPlans, setFetchedPlans] = useState<InsurancePlan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false); // Track error state
   const { toast } = useToast();
   
   // Function to fetch plan details based on the selectedPlans
@@ -131,6 +134,7 @@ export default function ComparePlansPage() {
         
       } catch (error) {
         console.error('Error fetching plan data:', error);
+        setHasError(true);
         toast({
           title: "Error fetching plan data",
           description: "There was a problem loading the selected plans. Please try again.",
@@ -330,44 +334,73 @@ export default function ComparePlansPage() {
     };
   });
   
-  return (
-    <MainLayout>
-      <div className="container py-8 max-w-7xl">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
+  // Add a simple test div at the top level for debugging
+  // This acts as a canary - if this renders but the rest doesn't, we know where the issue is
+  console.log("ComparePlansPage rendering with", { 
+    selectedPlansCount: selectedPlans.length,
+    isLoading,
+    hasError,
+    fetchedPlansCount: fetchedPlans.length
+  });
+
+  // Try-catch pattern for the entire component rendering to prevent blank screens
+  try {
+    return (
+      <MainLayout>
+        {/* TEST DIV - remove after debugging */}
+        <div id="compare-debug" className="bg-yellow-100 p-2 text-xs">
+          Debug: Plans page is rendering. Selected plans: {selectedPlans.length}
+        </div>
+        
+        <div className="container py-8 max-w-7xl">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleExitWithConfirmation}
+                className="flex items-center gap-1"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back to Plans
+              </Button>
+              
+              <h1 className="text-2xl font-bold flex items-center gap-2">
+                <FileBarChart className="h-6 w-6 text-primary" />
+                Comparing {selectedPlans.length} {selectedPlans.length === 1 ? 'Plan' : 'Plans'}
+              </h1>
+            </div>
+            
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={handleExitWithConfirmation}
-              className="flex items-center gap-1"
+              onClick={handleClearWithConfirmation}
+              className="flex items-center gap-1 text-red-600 border-red-200 hover:bg-red-50"
             >
-              <ArrowLeft className="h-4 w-4" />
-              Back to Plans
+              <Trash className="h-4 w-4" />
+              Clear All
             </Button>
-            
-            <h1 className="text-2xl font-bold flex items-center gap-2">
-              <FileBarChart className="h-6 w-6 text-primary" />
-              Comparing {selectedPlans.length} {selectedPlans.length === 1 ? 'Plan' : 'Plans'}
-            </h1>
           </div>
           
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={handleClearWithConfirmation}
-            className="flex items-center gap-1 text-red-600 border-red-200 hover:bg-red-50"
-          >
-            <Trash className="h-4 w-4" />
-            Clear All
-          </Button>
-        </div>
-        
-        {/* Plan warning for too many plans */}
-        {renderPlanWarning()}
-        
-        {/* Loading state */}
-        {isLoading ? (
+          {/* Display error message if there's an error */}
+          {hasError && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="h-5 w-5 text-red-500 mt-0.5" />
+                <div>
+                  <h3 className="font-medium text-red-800">Error Loading Plans</h3>
+                  <p className="text-red-700">There was a problem loading your selected plans. Please try again or go back to select new plans.</p>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {/* Plan warning for too many plans */}
+          {!hasError && renderPlanWarning()}
+          
+          {/* Loading state */}
+          {isLoading ? (
           <div className="flex flex-col items-center justify-center py-12">
             <div className="animate-spin w-12 h-12 border-4 border-primary border-t-transparent rounded-full mb-4"></div>
             <p className="text-lg text-gray-600">Loading plans for comparison...</p>
@@ -568,4 +601,36 @@ export default function ComparePlansPage() {
       </AlertDialog>
     </MainLayout>
   );
+  } catch (error) {
+    console.error("Critical error rendering comparison page:", error);
+    // Simple fallback UI in case of render errors
+    return (
+      <MainLayout>
+        <div className="container py-8">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-xl mx-auto">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="h-6 w-6 text-red-500 mt-0.5 flex-shrink-0" />
+              <div>
+                <h3 className="font-medium text-red-800 text-lg mb-2">Unable to Display Comparison</h3>
+                <p className="text-red-700 mb-4">We encountered an error while trying to display your plan comparison. This might happen if there's an issue with loading the plans data.</p>
+                <div className="flex gap-3 mt-4">
+                  <Button onClick={() => navigate('/insurance/travel')} className="flex items-center gap-1">
+                    <ArrowLeft className="h-4 w-4" />
+                    Back to Plans
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => window.location.reload()}
+                    className="flex items-center gap-1"
+                  >
+                    Try Again
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </MainLayout>
+    );
+  }
 }
