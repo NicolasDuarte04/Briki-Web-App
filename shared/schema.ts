@@ -222,10 +222,112 @@ export const formatFieldValue = (value: any, field: string): string => {
   return String(value);
 };
 
+// Quote table for storing user quote submissions
+export const quotes = pgTable("quotes", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").references(() => users.id),
+  category: varchar("category").notNull(),
+  country: varchar("country").notNull(),
+  email: varchar("email").notNull(),
+  firstName: varchar("first_name").notNull(),
+  lastName: varchar("last_name").notNull(),
+  startDate: date("start_date").notNull(),
+  endDate: date("end_date").notNull(),
+  travelersCount: integer("travelers_count").notNull(),
+  quoteDetails: jsonb("quote_details"),
+  quoteReference: varchar("quote_reference").notNull(),
+  totalPrice: real("total_price"),
+  statusCode: varchar("status_code"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  expiresAt: timestamp("expires_at")
+});
+
+// Trip table for storing user trips
+export const trips = pgTable("trips", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").references(() => users.id),
+  destination: varchar("destination").notNull(),
+  startDate: date("start_date").notNull(),
+  endDate: date("end_date").notNull(),
+  travelersCount: integer("travelers_count").notNull(),
+  status: varchar("status").default("planning"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+// Insurance plans table for storing available plans
+export const insurancePlans = pgTable("insurance_plans", {
+  id: serial("id").primaryKey(),
+  planId: varchar("plan_id").notNull().unique(),
+  name: varchar("name").notNull(),
+  provider: varchar("provider").notNull(),
+  category: varchar("category").notNull(),
+  basePrice: real("base_price").notNull(),
+  coverageAmount: real("coverage_amount").notNull(),
+  description: text("description"),
+  rating: varchar("rating"),
+  reviews: integer("reviews"),
+  country: varchar("country"),
+  badge: varchar("badge"),
+  planDetails: jsonb("plan_details"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+// Orders table for tracking insurance purchases
+export const orders = pgTable("orders", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").references(() => users.id),
+  planId: varchar("plan_id").references(() => insurancePlans.planId),
+  quoteId: integer("quote_id").references(() => quotes.id),
+  orderReference: varchar("order_reference").notNull(),
+  status: varchar("status").default("pending"),
+  totalAmount: real("total_amount").notNull(),
+  paymentMethod: varchar("payment_method"),
+  paymentId: varchar("payment_id"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
 // Create insert schemas 
 export const insertUserSchema = createInsertSchema(users);
+export const insertQuoteSchema = createInsertSchema(quotes, {
+  id: undefined,
+  createdAt: undefined,
+  updatedAt: undefined
+});
+export const insertTripSchema = createInsertSchema(trips, {
+  id: undefined,
+  createdAt: undefined,
+  updatedAt: undefined
+});
+export const insertInsurancePlanSchema = createInsertSchema(insurancePlans, {
+  id: undefined,
+  createdAt: undefined,
+  updatedAt: undefined
+});
+export const insertOrderSchema = createInsertSchema(orders, {
+  id: undefined,
+  createdAt: undefined,
+  updatedAt: undefined
+});
+
+// Export types for CRUD operations
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
+
+export type InsertQuote = z.infer<typeof insertQuoteSchema>;
+export type Quote = typeof quotes.$inferSelect;
+
+export type InsertTrip = z.infer<typeof insertTripSchema>;
+export type Trip = typeof trips.$inferSelect;
+
+export type InsertInsurancePlan = z.infer<typeof insertInsurancePlanSchema>;
+export type InsurancePlan = typeof insurancePlans.$inferSelect;
+
+export type InsertOrder = z.infer<typeof insertOrderSchema>;
+export type Order = typeof orders.$inferSelect;
 
 // Types for sessions
 export type Session = typeof sessions.$inferSelect;
