@@ -71,6 +71,31 @@ export const orders = pgTable("orders", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Quote requests table for tracking insurance quote submissions
+export const quotes = pgTable("quotes", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").references(() => users.id),
+  planId: text("plan_id").notNull(), // String ID to accommodate external plan IDs
+  category: text("category").notNull().$type<InsuranceCategory>(),
+  firstName: text("first_name").notNull(),
+  lastName: text("last_name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone"),
+  dateOfBirth: text("date_of_birth"),
+  address: text("address"),
+  city: text("city"),
+  state: text("state"),
+  zipCode: text("zip_code"),
+  country: text("country").notNull(),
+  additionalInfo: jsonb("additional_info"), // Category-specific fields as JSON
+  quoteReference: text("quote_reference").notNull().unique(), // Unique reference number
+  status: text("status").notNull().default("pending"), // pending, processed, completed
+  notificationSent: boolean("notification_sent").default(false),
+  expiresAt: timestamp("expires_at"), // Quote validity period
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   id: true,
@@ -137,6 +162,25 @@ export const insertOrderSchema = createInsertSchema(orders).pick({
   status: true,
   paymentIntentId: true,
 });
+
+// Quote submission schema for validation
+export const insertQuoteSchema = createInsertSchema(quotes)
+  .omit({ 
+    id: true, 
+    createdAt: true, 
+    updatedAt: true, 
+    quoteReference: true,
+    status: true,
+    notificationSent: true
+  })
+  .extend({
+    // Add validations for core fields
+    firstName: z.string().min(1, "First name is required"),
+    lastName: z.string().min(1, "Last name is required"),
+    email: z.string().email("Please enter a valid email address"),
+    phone: z.string().optional(),
+    additionalInfo: z.record(z.any()).optional()
+  });
 
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
