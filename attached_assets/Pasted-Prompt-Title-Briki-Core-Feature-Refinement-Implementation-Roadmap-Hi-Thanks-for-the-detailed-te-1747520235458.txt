@@ -1,0 +1,67 @@
+Prompt Title: Briki Core Feature Refinement – Implementation Roadmap
+
+Hi! Thanks for the detailed technical audit. Based on your findings, we’d like to move into the refinement and implementation phase to improve Briki’s core systems. Please review the following prioritized tasks and confirm:
+
+1. Cross-Category Plan Comparison
+Goal: Improve UX clarity and data standardization for multi-category comparisons  
+Tasks:
+- [ ] Standardize key comparison metrics across plan types (e.g., coverage limit, deductible, exclusions)  
+- [ ] Visually distinguish plans from different categories (badges, background tint, or section dividers)  
+Can you suggest the best approach to unify schema logic across categories?
+
+2. AI-Driven Plan Insights
+Goal: Move from static badge display to dynamic scoring logic  
+Tasks:
+- [ ] Implement a scoring system (weighted logic for factors like price, coverage, etc.)  
+- [ ] Support optional user preferences (e.g., favor cheaper or more comprehensive plans)  
+- [ ] Prepare for future A/B testing (flag system or variant logic)  
+How feasible is it to adapt our current schema to support score-based recommendations?
+
+3. Persistent State Sync
+Goal: Improve session consistency across browser tabs/windows  
+Tasks:
+- [ ] Implement tab-to-tab state sync (e.g., using `storage` event listener or broadcast channel)  
+Can you confirm if Zustand’s middleware supports this natively, or should we implement a custom sync?
+
+4. Quote Flow Completion
+Goal: Deliver a seamless quote submission and confirmation experience  
+Tasks:
+- [ ] Build post-quote confirmation view  
+- [ ] Trigger basic confirmation email (can be placeholder for now)  
+- [ ] Stub out integration point for external quote providers  
+Can you share a proposed flow and confirm what backend endpoints already exist?
+
+5. Analytics Integration
+Goal: Start capturing meaningful user behavior for product validation  
+Tasks:
+- [ ] Integrate `gtag` or PostHog  
+- [ ] Track the following events:
+  - Google login success  
+  - Start plan comparison  
+  - Badge (recommendation) click  
+  - Quote submission  
+Do you prefer to implement this via middleware or directly within components?
+
+6. Role-Based Access Control
+Goal: Lay the foundation for brokers/partners/admins  
+Tasks:
+- [ ] Extend auth logic with role-based user metadata  
+- [ ] Protect routes or views based on user role  
+Would you recommend storing roles in the auth token or using DB lookups on load?
+
+7. Modular Comparison Engine
+Goal: Prepare the engine for licensing and external embedding  
+Tasks:
+- [ ] Abstract comparison logic into standalone module  
+- [ ] Decouple UI from logic via adapter or headless pattern  
+Can you outline what dependencies would need to be lifted to extract this cleanly?
+
+8. External API Integration Readiness
+Goal: Enable live data integrations in the future  
+Tasks:
+- [ ] Build an API adapter layer (normalize provider inputs to internal schema)  
+- [ ] Implement basic caching + error handling  
+- [ ] Prepare hooks/services to consume real-time quote data  
+Do you think we should start with mock APIs now to test flow before real providers?
+
+Let us know your availability and how you’d prioritize these based on development time, risk, and immediate value. Feel free to break these into phases if needed. Thanks again!
