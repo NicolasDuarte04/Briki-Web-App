@@ -73,7 +73,7 @@ export default function AuthPageReplit() {
   
   // Auth checks and redirects
   useEffect(() => {
-    if (user) {
+    if (isAuthenticated) {
       toast({
         title: "Already logged in",
         description: "You are already logged in to your account.",
@@ -82,7 +82,7 @@ export default function AuthPageReplit() {
         navigate('/home');
       }, 500);
     }
-  }, [user, navigate, toast]);
+  }, [isAuthenticated, navigate, toast]);
 
   return (
     <AnimatedBackground variant="auth" className="flex min-h-screen items-center justify-center px-4 py-0">
