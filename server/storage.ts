@@ -18,8 +18,11 @@ export interface IStorage {
   // User methods
   getUser(id: string | null | undefined): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
+  getUserByGoogleId(googleId: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   upsertUser(user: UpsertUser): Promise<User>;
+  updateUser(id: string, userData: Partial<UpsertUser>): Promise<User>;
   
   // Trip methods
   getTrip(id: number): Promise<Trip | undefined>;
@@ -74,6 +77,18 @@ export class DatabaseStorage implements IStorage {
     const results = await db.select().from(users).where(eq(users.username, username));
     return results[0];
   }
+  
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    if (!email) return undefined;
+    const results = await db.select().from(users).where(eq(users.email, email));
+    return results[0];
+  }
+  
+  async getUserByGoogleId(googleId: string): Promise<User | undefined> {
+    if (!googleId) return undefined;
+    const results = await db.select().from(users).where(eq(users.googleId, googleId));
+    return results[0];
+  }
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const results = await db.insert(users).values(insertUser).returning();
@@ -91,6 +106,18 @@ export class DatabaseStorage implements IStorage {
           updatedAt: new Date(),
         },
       })
+      .returning();
+    return user;
+  }
+  
+  async updateUser(id: string, userData: Partial<UpsertUser>): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({
+        ...userData,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, id))
       .returning();
     return user;
   }
@@ -256,9 +283,11 @@ export class DatabaseStorage implements IStorage {
               id TEXT PRIMARY KEY,
               username TEXT NOT NULL UNIQUE,
               email TEXT UNIQUE,
+              password TEXT,
               "firstName" TEXT,
               "lastName" TEXT,
               "profileImageUrl" TEXT,
+              "googleId" TEXT UNIQUE,
               role TEXT DEFAULT 'user',
               "companyProfile" JSONB,
               "createdAt" TIMESTAMP DEFAULT NOW(),
