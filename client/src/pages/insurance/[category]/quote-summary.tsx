@@ -1,14 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useLocation } from "wouter";
 import { MainLayout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle, ArrowLeft, DownloadCloud, Send, Info } from "lucide-react";
+import { CheckCircle, ArrowLeft, DownloadCloud, Send, Info, Printer } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { InsurancePlan } from "@/store/compare-store";
 import { generatePlanInsights, PlanInsight } from "@/utils/ai-insights";
 import { PlanInsightTag } from "@/components/plans/PlanInsightTag";
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 export default function QuoteSummary() {
   const [, navigate] = useLocation();
@@ -19,6 +21,8 @@ export default function QuoteSummary() {
   const [submissionComplete, setSubmissionComplete] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [insights, setInsights] = useState<PlanInsight[]>([]);
+  const [isPdfGenerating, setIsPdfGenerating] = useState(false);
+  const summaryCardRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
     // Scroll to top when component mounts
@@ -127,11 +131,90 @@ export default function QuoteSummary() {
     }, 1500);
   };
   
-  const handleDownloadQuote = () => {
-    toast({
-      title: "Quote downloaded",
-      description: "Your quote details have been saved as a PDF.",
-    });
+  const handleDownloadQuote = async () => {
+    if (!plan || !summaryCardRef.current) return;
+    
+    try {
+      setIsPdfGenerating(true);
+      
+      // Generate PDF from the summary card
+      const canvas = await html2canvas(summaryCardRef.current, {
+        scale: 2, // Better resolution
+        logging: false,
+        useCORS: true,
+        allowTaint: true,
+      });
+      
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+      });
+      
+      // Calculate dimensions to fit the image properly on the PDF
+      const imgWidth = 210 - 40; // A4 width minus margins
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      // Add Briki header
+      pdf.setFontSize(22);
+      pdf.setTextColor(41, 98, 255); // Primary blue color
+      pdf.text('Briki Insurance', 20, 20);
+      
+      // Add quote reference number
+      const referenceNumber = `BRK-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
+      pdf.setFontSize(10);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text(`Reference: ${referenceNumber}`, 20, 30);
+      pdf.text(`Date: ${new Date().toLocaleDateString()}`, 20, 35);
+      
+      // Add image of the card
+      pdf.addImage(imgData, 'PNG', 20, 45, imgWidth, imgHeight);
+      
+      // Add footer
+      const pageHeight = pdf.internal.pageSize.height;
+      pdf.setFontSize(8);
+      pdf.setTextColor(120, 120, 120);
+      pdf.text('This quote is valid for 30 days from the issue date. Terms and conditions apply.', 20, pageHeight - 10);
+      
+      // Category-specific disclaimer based on insurance type
+      let disclaimer = '';
+      switch(category) {
+        case 'travel':
+          disclaimer = 'Travel insurance requires verification of travel dates and destination prior to activation.';
+          break;
+        case 'auto':
+          disclaimer = 'Auto insurance requires vehicle inspection and documentation verification.';
+          break;
+        case 'health':
+          disclaimer = 'Health insurance may require medical history disclosure and examination.';
+          break;
+        case 'pet':
+          disclaimer = 'Pet insurance requires verification of pet age and health status.';
+          break;
+        default:
+          disclaimer = 'Insurance coverage is subject to underwriting and approval.';
+      }
+      
+      pdf.text(disclaimer, 20, pageHeight - 15);
+      
+      // Save the PDF
+      pdf.save(`Briki_${category}_insurance_quote_${referenceNumber}.pdf`);
+      
+      toast({
+        title: "Quote downloaded",
+        description: "Your quote details have been saved as a PDF.",
+      });
+    } catch (error) {
+      console.error('PDF generation error:', error);
+      toast({
+        title: "Download failed",
+        description: "There was an error generating your PDF. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsPdfGenerating(false);
+    }
   };
   
   const handleReturnHome = () => {
@@ -189,12 +272,21 @@ export default function QuoteSummary() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.1 }}
             >
-              <Card className="mb-6">
-                <CardHeader>
-                  <CardTitle>{plan.name}</CardTitle>
-                  <CardDescription>
-                    Provided by {plan.provider || "Insurance Provider"} • {plan.category.charAt(0).toUpperCase() + plan.category.slice(1)} Insurance
-                  </CardDescription>
+              <Card className="mb-6" ref={summaryCardRef}>
+                <CardHeader className="border-b bg-primary/5">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <CardTitle>{plan.name}</CardTitle>
+                      <CardDescription>
+                        Provided by {plan.provider || "Insurance Provider"} • {plan.category.charAt(0).toUpperCase() + plan.category.slice(1)} Insurance
+                      </CardDescription>
+                    </div>
+                    <div className="flex flex-col items-end text-right">
+                      <span className="text-sm text-muted-foreground">Quote ID</span>
+                      <span className="font-medium">BRK-{Math.floor(Math.random() * 10000).toString().padStart(4, '0')}</span>
+                      <span className="text-xs text-muted-foreground">{new Date().toLocaleDateString()}</span>
+                    </div>
+                  </div>
                   
                   {/* Display AI insights for this plan */}
                   {insights.length > 0 && (
@@ -210,15 +302,13 @@ export default function QuoteSummary() {
                     </div>
                   )}
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <h3 className="font-medium mb-2">Plan Description</h3>
-                    <p className="text-muted-foreground">{plan.description}</p>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <CardContent className="space-y-4 pt-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <h3 className="font-medium mb-2">Key Features</h3>
+                      <h3 className="font-medium mb-2 text-primary">Plan Description</h3>
+                      <p className="text-muted-foreground">{plan.description}</p>
+                      
+                      <h3 className="font-medium mb-2 mt-6 text-primary">Key Features</h3>
                       <ul className="space-y-1">
                         {plan.features ? (
                           plan.features.map((feature, index) => (
@@ -234,33 +324,121 @@ export default function QuoteSummary() {
                     </div>
                     
                     <div>
-                      <h3 className="font-medium mb-2">Coverage Details</h3>
-                      {plan.coverage ? (
-                        <div className="space-y-1 text-sm">
-                          {Object.entries(plan.coverage).map(([key, value]) => (
-                            <div key={key} className="flex justify-between">
-                              <span className="capitalize">{key}:</span>
-                              <span className="font-medium">{value}</span>
+                      <h3 className="font-medium mb-3 text-primary">Coverage Details</h3>
+                      <div className="space-y-3 bg-slate-50 p-4 rounded-md">
+                        {plan.coverage ? (
+                          Object.entries(plan.coverage).map(([key, value], index) => (
+                            <div key={index} className="flex justify-between border-b pb-2">
+                              <span className="capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}:</span>
+                              <span className="font-semibold">{value}</span>
                             </div>
-                          ))}
+                          ))
+                        ) : (
+                          <p className="text-muted-foreground">Coverage details not available</p>
+                        )}
+                      </div>
+                      
+                      {/* Category-specific variables */}
+                      {category === 'travel' && (
+                        <div className="mt-4 bg-primary/5 p-4 rounded-md">
+                          <h4 className="font-medium mb-2">Travel-Specific Coverage</h4>
+                          <div className="space-y-2 text-sm">
+                            <div className="flex justify-between">
+                              <span>Trip Cancellation:</span>
+                              <span className="font-medium">Up to 100% of trip cost</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>Adventure Sports Coverage:</span>
+                              <span className="font-medium">Included</span>
+                            </div>
+                          </div>
                         </div>
-                      ) : (
-                        <p className="text-muted-foreground">Coverage details not available</p>
+                      )}
+                      
+                      {category === 'auto' && (
+                        <div className="mt-4 bg-primary/5 p-4 rounded-md">
+                          <h4 className="font-medium mb-2">Auto-Specific Coverage</h4>
+                          <div className="space-y-2 text-sm">
+                            <div className="flex justify-between">
+                              <span>Collision Deductible:</span>
+                              <span className="font-medium">$500</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>Roadside Assistance:</span>
+                              <span className="font-medium">Included</span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {category === 'health' && (
+                        <div className="mt-4 bg-primary/5 p-4 rounded-md">
+                          <h4 className="font-medium mb-2">Health-Specific Coverage</h4>
+                          <div className="space-y-2 text-sm">
+                            <div className="flex justify-between">
+                              <span>Annual Deductible:</span>
+                              <span className="font-medium">$1,000</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>Telemedicine:</span>
+                              <span className="font-medium">Included</span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {category === 'pet' && (
+                        <div className="mt-4 bg-primary/5 p-4 rounded-md">
+                          <h4 className="font-medium mb-2">Pet-Specific Coverage</h4>
+                          <div className="space-y-2 text-sm">
+                            <div className="flex justify-between">
+                              <span>Exam Fees:</span>
+                              <span className="font-medium">Covered</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>Wellness Add-on:</span>
+                              <span className="font-medium">Available</span>
+                            </div>
+                          </div>
+                        </div>
                       )}
                     </div>
                   </div>
-                  
-                  <div className="pt-4">
+
+                  <div className="bg-primary/10 p-4 rounded-lg mt-6">
                     <div className="flex justify-between items-center">
-                      <span className="text-lg font-semibold">Total Premium:</span>
-                      <span className="text-xl font-bold text-primary">${plan.price}</span>
+                      <span className="text-lg">Monthly Premium</span>
+                      <span className="text-2xl font-bold">${plan.price.toFixed(2)}</span>
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">
-                      Per month, billed annually. Taxes may apply.
+                      Per month, billed annually. Taxes may apply in your region.
                     </p>
                   </div>
                 </CardContent>
-                <CardFooter className="flex justify-end">
+                <CardFooter className="flex justify-between bg-slate-50 border-t">
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline"
+                      size="sm"
+                      onClick={() => window.print()}
+                      className="gap-1"
+                      title="Print quote details"
+                    >
+                      <Printer className="h-4 w-4" />
+                      Print
+                    </Button>
+                    <Button 
+                      variant="outline"
+                      size="sm"
+                      onClick={handleDownloadQuote}
+                      disabled={isPdfGenerating}
+                      className="gap-1"
+                      title="Download quote as PDF"
+                    >
+                      <DownloadCloud className="h-4 w-4" />
+                      {isPdfGenerating ? 'Generating...' : 'Download PDF'}
+                    </Button>
+                  </div>
                   <Button 
                     onClick={handleSubmitQuote} 
                     disabled={isSubmitting}
