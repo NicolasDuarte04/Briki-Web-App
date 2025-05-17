@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Briki Insurance - Plan Comparison</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background-color: #f9fafb;
+    }
+    .gradient-bg {
+      background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%);
+    }
+    .plan-card {
+      transition: all 0.2s ease;
+    }
+    .plan-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    .badge {
+      background-color: rgba(14, 165, 233, 0.1);
+      color: #0ea5e9;
+    }
+    .loading {
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: .5;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="gradient-bg text-white p-6">
+    <div class="container mx-auto">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+        <div>
+          <h1 class="text-3xl font-bold mb-1">Briki Insurance</h1>
+          <p class="text-blue-100">Plan Comparison Tool</p>
+        </div>
+        <a href="javascript:history.back()" class="mt-4 md:mt-0 inline-flex items-center px-4 py-2 text-sm bg-white text-blue-600 font-medium rounded-md hover:bg-blue-50 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Back to Insurance
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container mx-auto py-8 px-4">
+    <div id="loadingState" class="loading flex flex-col items-center justify-center py-16">
+      <svg class="animate-spin h-12 w-12 text-blue-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      <p class="text-gray-600">Loading your selected plans...</p>
+    </div>
+
+    <div id="contentArea" class="hidden">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+        <div>
+          <h2 class="text-2xl font-bold text-gray-800">Comparing <span id="planCount">0</span> Plans</h2>
+          <p class="text-gray-600" id="planCategories">Loading categories...</p>
+        </div>
+        <button id="clearButton" class="mt-4 md:mt-0 inline-flex items-center px-4 py-2 text-sm bg-red-50 text-red-600 border border-red-200 font-medium rounded-md hover:bg-red-100 transition-colors hidden">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+          Clear All Plans
+        </button>
+      </div>
+
+      <div id="plansGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+      <div id="emptyState" class="hidden bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
+        <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </svg>
+        <h3 class="text-xl font-semibold text-gray-800 mb-2">No Plans Selected</h3>
+        <p class="text-gray-600 mb-6 max-w-md mx-auto">Select insurance plans from our catalog to compare their features, prices, and benefits side by side.</p>
+        <a href="javascript:history.back()" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors">
+          Browse Insurance Plans
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const loadingState = document.getElementById('loadingState');
+      const contentArea = document.getElementById('contentArea');
+      const planCount = document.getElementById('planCount');
+      const planCategories = document.getElementById('planCategories');
+      const plansGrid = document.getElementById('plansGrid');
+      const emptyState = document.getElementById('emptyState');
+      const clearButton = document.getElementById('clearButton');
+      
+      // ComparisonManager handles all operations
+      const ComparisonManager = {
+        storageKey: 'briki-compare-plans',
+        plans: [],
+        
+        // Initialize the manager
+        init: function() {
+          this.loadPlans();
+          
+          // Set up clear button
+          clearButton.addEventListener('click', () => {
+            if (confirm('Are you sure you want to clear all selected plans?')) {
+              this.clearPlans();
+            }
+          });
+        },
+        
+        // Load plans from localStorage
+        loadPlans: function() {
+          try {
+            const data = localStorage.getItem(this.storageKey);
+            if (data) {
+              const parsed = JSON.parse(data);
+              this.plans = parsed.state && parsed.state.selectedPlans ? parsed.state.selectedPlans : [];
+            } else {
+              this.plans = [];
+            }
+          } catch (error) {
+            console.error('Error loading plans:', error);
+            this.plans = [];
+          }
+          
+          // Show content area and hide loading
+          loadingState.classList.add('hidden');
+          contentArea.classList.remove('hidden');
+          
+          this.updateUI();
+        },
+        
+        // Clear all selected plans
+        clearPlans: function() {
+          try {
+            const data = localStorage.getItem(this.storageKey);
+            if (data) {
+              const parsed = JSON.parse(data);
+              if (parsed.state) {
+                parsed.state.selectedPlans = [];
+                localStorage.setItem(this.storageKey, JSON.stringify(parsed));
+              }
+            }
+            
+            this.plans = [];
+            this.updateUI();
+          } catch (error) {
+            console.error('Error clearing plans:', error);
+          }
+        },
+        
+        // Get unique categories
+        getCategories: function() {
+          const categories = [...new Set(this.plans.map(plan => plan.category))];
+          return categories.length > 0 ? categories : ['No categories'];
+        },
+        
+        // Format currency
+        formatCurrency: function(amount) {
+          if (amount === undefined || amount === null) return 'Not specified';
+          
+          return new Intl.NumberFormat('es-CO', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 0
+          }).format(amount);
+        },
+        
+        // Update the UI
+        updateUI: function() {
+          // Update plan count
+          planCount.textContent = this.plans.length;
+          
+          // Update categories
+          const categories = this.getCategories();
+          planCategories.textContent = categories.join(', ');
+          
+          // Toggle clear button
+          clearButton.classList.toggle('hidden', this.plans.length === 0);
+          
+          // Show/hide components based on plan count
+          if (this.plans.length > 0) {
+            plansGrid.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+            this.renderPlans();
+          } else {
+            plansGrid.classList.add('hidden');
+            emptyState.classList.remove('hidden');
+          }
+        },
+        
+        // Render plans
+        renderPlans: function() {
+          plansGrid.innerHTML = '';
+          
+          this.plans.forEach(plan => {
+            // Features list
+            let featuresHtml = '';
+            if (plan.features && plan.features.length > 0) {
+              featuresHtml = `
+                <div class="mt-4">
+                  <h4 class="text-sm font-medium text-gray-500 mb-2">Key Features</h4>
+                  <ul class="space-y-1">
+                    ${plan.features.map(feature => `
+                      <li class="flex items-start">
+                        <svg class="h-5 w-5 text-green-500 flex-shrink-0 mr-1.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                        </svg>
+                        <span class="text-sm text-gray-600">${feature}</span>
+                      </li>
+                    `).join('')}
+                  </ul>
+                </div>
+              `;
+            }
+            
+            // Create plan card
+            const card = document.createElement('div');
+            card.className = 'plan-card bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden';
+            card.innerHTML = `
+              <div class="p-5 border-b border-gray-200">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <h3 class="text-lg font-semibold text-gray-800">${plan.name || plan.title || 'Plan ' + plan.id}</h3>
+                    <p class="text-sm text-gray-500">${plan.provider || 'Unknown provider'}</p>
+                  </div>
+                  <span class="badge text-xs font-medium px-2.5 py-0.5 rounded-full">${plan.category || 'Unknown'}</span>
+                </div>
+              </div>
+              <div class="p-5">
+                <div class="space-y-3">
+                  <div>
+                    <p class="text-2xl font-bold text-gray-800">${this.formatCurrency(plan.price)}</p>
+                    ${plan.description ? `<p class="text-sm text-gray-600 mt-1">${plan.description}</p>` : ''}
+                  </div>
+                  ${featuresHtml}
+                </div>
+              </div>
+              <div class="px-5 py-4 bg-gray-50 border-t border-gray-200 text-right">
+                <button class="inline-flex items-center px-3 py-1.5 text-sm bg-white text-gray-700 border border-gray-300 font-medium rounded-md hover:bg-gray-50 transition-colors remove-btn">
+                  Remove
+                </button>
+              </div>
+            `;
+            
+            // Add event listener for remove
+            const removeBtn = card.querySelector('.remove-btn');
+            removeBtn.addEventListener('click', () => {
+              // For simplicity, we just clear all plans
+              this.clearPlans();
+            });
+            
+            plansGrid.appendChild(card);
+          });
+        }
+      };
+      
+      // Initialize the comparison manager
+      ComparisonManager.init();
+    });
+  </script>
+</body>
+</html>

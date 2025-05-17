@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Briki - Plan Comparison Tool</title>
+  <style>
+    :root {
+      --blue-50: #eff6ff;
+      --blue-100: #dbeafe;
+      --blue-500: #3b82f6;
+      --blue-600: #2563eb;
+      --blue-700: #1d4ed8;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+      --red-50: #fef2f2;
+      --red-500: #ef4444;
+      --red-600: #dc2626;
+      --green-500: #22c55e;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+    
+    body {
+      background-color: var(--gray-50);
+      color: var(--gray-900);
+      line-height: 1.5;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+    
+    .header {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 2rem;
+    }
+    
+    @media (min-width: 768px) {
+      .header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-start;
+      }
+    }
+    
+    .title {
+      margin-bottom: 1rem;
+    }
+    
+    h1 {
+      font-size: 1.875rem;
+      font-weight: 800;
+      color: var(--gray-900);
+      margin-top: 0.5rem;
+    }
+    
+    .subtitle {
+      color: var(--gray-500);
+      margin-top: 0.25rem;
+    }
+    
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 0.375rem;
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      line-height: 1.25rem;
+      cursor: pointer;
+      transition: all 150ms ease-in-out;
+      text-decoration: none;
+    }
+    
+    .btn-outline {
+      background-color: transparent;
+      border: 1px solid var(--gray-300);
+      color: var(--gray-700);
+    }
+    
+    .btn-outline:hover {
+      background-color: var(--gray-100);
+      border-color: var(--gray-400);
+    }
+    
+    .btn-primary {
+      background-color: var(--blue-600);
+      border: 1px solid var(--blue-600);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background-color: var(--blue-700);
+      border-color: var(--blue-700);
+    }
+    
+    .btn-danger {
+      background-color: var(--red-50);
+      border: 1px solid var(--red-50);
+      color: var(--red-600);
+    }
+    
+    .btn-danger:hover {
+      background-color: var(--red-500);
+      border-color: var(--red-500);
+      color: white;
+    }
+    
+    .btn svg {
+      margin-right: 0.5rem;
+      width: 1rem;
+      height: 1rem;
+    }
+    
+    .back-button {
+      margin-bottom: 1rem;
+    }
+    
+    .status-card {
+      background-color: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+      margin-bottom: 2rem;
+      overflow: hidden;
+    }
+    
+    .card-header {
+      padding: 1.25rem;
+      background-color: white;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    
+    .card-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--gray-900);
+    }
+    
+    .card-subtitle {
+      font-size: 0.875rem;
+      color: var(--gray-500);
+      margin-top: 0.25rem;
+    }
+    
+    .card-content {
+      padding: 1.25rem;
+    }
+    
+    .status-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+    
+    @media (min-width: 640px) {
+      .status-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    .status-item {
+      background-color: var(--gray-50);
+      border-radius: 0.5rem;
+      padding: 1rem;
+    }
+    
+    .status-label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--gray-500);
+      margin-bottom: 0.5rem;
+    }
+    
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.25rem 0.75rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      border-radius: 9999px;
+      background-color: var(--blue-100);
+      color: var(--blue-700);
+      margin-right: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .plans-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+    
+    @media (min-width: 640px) {
+      .plans-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (min-width: 1024px) {
+      .plans-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    
+    .plan-card {
+      background-color: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+      overflow: hidden;
+    }
+    
+    .plan-header {
+      padding: 1.25rem;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    
+    .plan-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--gray-900);
+    }
+    
+    .plan-meta {
+      font-size: 0.875rem;
+      color: var(--gray-500);
+      margin-top: 0.25rem;
+    }
+    
+    .plan-content {
+      padding: 1.25rem;
+    }
+    
+    .feature-list {
+      margin-top: 1rem;
+      list-style-type: none;
+    }
+    
+    .feature-item {
+      display: flex;
+      margin-bottom: 0.5rem;
+      font-size: 0.875rem;
+    }
+    
+    .feature-icon {
+      color: var(--green-500);
+      margin-right: 0.5rem;
+      flex-shrink: 0;
+    }
+    
+    .data-row {
+      margin-bottom: 0.75rem;
+    }
+    
+    .data-label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--gray-500);
+      margin-bottom: 0.25rem;
+    }
+    
+    .data-value {
+      font-size: 0.875rem;
+      color: var(--gray-900);
+    }
+    
+    .plan-footer {
+      padding: 1.25rem;
+      border-top: 1px solid var(--gray-200);
+      display: flex;
+      justify-content: flex-end;
+    }
+    
+    .empty-state {
+      text-align: center;
+      background-color: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+      padding: 3rem 2rem;
+    }
+    
+    .empty-icon {
+      color: var(--gray-400);
+      margin-bottom: 1rem;
+    }
+    
+    .empty-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--gray-900);
+      margin-bottom: 0.5rem;
+    }
+    
+    .empty-message {
+      color: var(--gray-500);
+      margin-bottom: 1.5rem;
+    }
+    
+    .loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 400px;
+    }
+    
+    .spinner {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 50%;
+      border: 0.25rem solid var(--blue-100);
+      border-top-color: var(--blue-600);
+      animation: spin 1s linear infinite;
+      margin-bottom: 1rem;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div>
+        <a href="/insurance/travel" class="btn btn-outline back-button">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+          </svg>
+          Back to Insurance Plans
+        </a>
+        <div class="title">
+          <h1>Plan Comparison Tool</h1>
+          <p class="subtitle">Compare multiple insurance plans side by side</p>
+        </div>
+      </div>
+      
+      <button id="clearButton" class="btn btn-danger" style="display: none;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+        </svg>
+        Clear All Plans
+      </button>
+    </div>
+    
+    <div class="loading" id="loadingState">
+      <div class="spinner"></div>
+      <p>Loading comparison data...</p>
+    </div>
+    
+    <div id="contentArea" style="display: none;">
+      <div class="status-card">
+        <div class="card-header">
+          <h2 class="card-title">Comparison Status</h2>
+          <p class="card-subtitle">Details about currently selected plans</p>
+        </div>
+        <div class="card-content">
+          <div class="status-grid">
+            <div class="status-item">
+              <div class="status-label">Selected Plans</div>
+              <div class="status-value">
+                <span class="badge" id="planCount">0</span>
+                <span>plans selected</span>
+              </div>
+            </div>
+            
+            <div class="status-item">
+              <div class="status-label">Categories</div>
+              <div id="categoriesArea" class="status-value">
+                <span style="color: var(--gray-500);">No plans selected</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="plans-grid" id="plansGrid" style="display: none;"></div>
+      
+      <div class="empty-state" id="emptyState" style="display: none;">
+        <svg class="empty-icon" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
+        </svg>
+        <h3 class="empty-title">No Plans Selected</h3>
+        <p class="empty-message">Select some insurance plans to compare their features and coverage.</p>
+        <a href="/insurance/travel" class="btn btn-primary">
+          Browse Insurance Plans
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Helper for formatting currency
+    function formatCurrency(amount) {
+      if (amount === undefined || amount === null) return 'Not specified';
+      
+      return new Intl.NumberFormat('es-CO', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 0
+      }).format(amount);
+    }
+    
+    // ComparisonManager handles all operations related to plan comparison
+    class ComparisonManager {
+      constructor() {
+        this.localStorageKey = 'briki-compare-plans';
+        this.plans = [];
+        this.initialized = false;
+        
+        // UI elements
+        this.loadingElement = document.getElementById('loadingState');
+        this.contentElement = document.getElementById('contentArea');
+        this.plansGridElement = document.getElementById('plansGrid');
+        this.emptyStateElement = document.getElementById('emptyState');
+        this.planCountElement = document.getElementById('planCount');
+        this.categoriesElement = document.getElementById('categoriesArea');
+        this.clearButtonElement = document.getElementById('clearButton');
+        
+        // Setup event listeners
+        this.clearButtonElement.addEventListener('click', () => this.clearPlans());
+        
+        // Initialize
+        this.loadPlans();
+      }
+      
+      // Load plans from localStorage
+      loadPlans() {
+        try {
+          const data = localStorage.getItem(this.localStorageKey);
+          if (data) {
+            const parsed = JSON.parse(data);
+            this.plans = parsed.state && parsed.state.selectedPlans ? parsed.state.selectedPlans : [];
+          } else {
+            this.plans = [];
+          }
+          
+          // Complete initialization and update UI
+          this.initialized = true;
+          this.updateUI();
+        } catch (error) {
+          console.error('Error loading plans:', error);
+          this.plans = [];
+          this.initialized = true;
+          this.updateUI();
+        }
+      }
+      
+      // Clear all selected plans
+      clearPlans() {
+        if (confirm('Are you sure you want to clear all selected plans?')) {
+          try {
+            const data = localStorage.getItem(this.localStorageKey);
+            if (data) {
+              const parsed = JSON.parse(data);
+              if (parsed.state) {
+                parsed.state.selectedPlans = [];
+                localStorage.setItem(this.localStorageKey, JSON.stringify(parsed));
+              }
+            }
+            
+            this.plans = [];
+            this.updateUI();
+          } catch (error) {
+            console.error('Error clearing plans:', error);
+          }
+        }
+      }
+      
+      // Get unique categories from selected plans
+      getCategories() {
+        return [...new Set(this.plans.map(plan => plan.category))];
+      }
+      
+      // Update the UI based on current state
+      updateUI() {
+        // Hide loading state
+        this.loadingElement.style.display = 'none';
+        this.contentElement.style.display = 'block';
+        
+        // Update plan count
+        this.planCountElement.textContent = this.plans.length;
+        
+        // Update categories
+        const categories = this.getCategories();
+        if (categories.length > 0) {
+          this.categoriesElement.innerHTML = categories.map(
+            category => `<span class="badge">${category}</span>`
+          ).join('');
+        } else {
+          this.categoriesElement.innerHTML = '<span style="color: var(--gray-500);">No plans selected</span>';
+        }
+        
+        // Update clear button visibility
+        this.clearButtonElement.style.display = this.plans.length > 0 ? 'flex' : 'none';
+        
+        // Update main content area
+        if (this.plans.length > 0) {
+          this.plansGridElement.style.display = 'grid';
+          this.emptyStateElement.style.display = 'none';
+          this.renderPlans();
+        } else {
+          this.plansGridElement.style.display = 'none';
+          this.emptyStateElement.style.display = 'block';
+        }
+      }
+      
+      // Render plan cards
+      renderPlans() {
+        this.plansGridElement.innerHTML = '';
+        
+        this.plans.forEach(plan => {
+          // Create features HTML if available
+          let featuresHtml = '';
+          if (plan.features && plan.features.length > 0) {
+            featuresHtml = `
+              <div class="data-row">
+                <div class="data-label">Key Features</div>
+                <ul class="feature-list">
+                  ${plan.features.map(feature => `
+                    <li class="feature-item">
+                      <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                      </svg>
+                      <span>${feature}</span>
+                    </li>
+                  `).join('')}
+                </ul>
+              </div>
+            `;
+          }
+          
+          const planCard = document.createElement('div');
+          planCard.className = 'plan-card';
+          planCard.innerHTML = `
+            <div class="plan-header">
+              <h3 class="plan-title">${plan.name || plan.title || 'Plan ' + plan.id}</h3>
+              <div class="plan-meta">
+                Category: ${plan.category || 'Unknown'} • ID: ${plan.id}
+              </div>
+            </div>
+            <div class="plan-content">
+              <div class="data-row">
+                <div class="data-label">Provider</div>
+                <div class="data-value">${plan.provider || 'Not specified'}</div>
+              </div>
+              <div class="data-row">
+                <div class="data-label">Price</div>
+                <div class="data-value">${formatCurrency(plan.price)}</div>
+              </div>
+              ${plan.description ? `
+              <div class="data-row">
+                <div class="data-label">Description</div>
+                <div class="data-value">${plan.description}</div>
+              </div>
+              ` : ''}
+              ${featuresHtml}
+            </div>
+            <div class="plan-footer">
+              <button class="btn btn-outline remove-plan" data-id="${plan.id}">
+                Remove
+              </button>
+            </div>
+          `;
+          
+          // Add event listener to remove button
+          const removeButton = planCard.querySelector('.remove-plan');
+          removeButton.addEventListener('click', () => {
+            this.clearPlans(); // For simplicity, just clear all plans
+          });
+          
+          this.plansGridElement.appendChild(planCard);
+        });
+      }
+    }
+    
+    // Initialize the ComparisonManager when the DOM is loaded
+    document.addEventListener('DOMContentLoaded', () => {
+      new ComparisonManager();
+    });
+  </script>
+</body>
+</html>
