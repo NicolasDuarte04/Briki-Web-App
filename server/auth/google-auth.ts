@@ -11,9 +11,13 @@ export async function configureGoogleAuth() {
     return;
   }
 
-  const callbackURL = process.env.NODE_ENV === "production"
-    ? `${process.env.PUBLIC_URL}/api/auth/google/callback`
-    : "http://localhost:5000/api/auth/google/callback";
+  // Use app domain for production or localhost for development
+  const domain = process.env.NODE_ENV === "production"
+    ? process.env.PUBLIC_URL || "https://briki.replit.app"
+    : "http://localhost:5000";
+    
+  // Construct proper callback URL
+  const callbackURL = `${domain}/api/auth/google/callback`;
 
   passport.use(
     new GoogleStrategy(
@@ -29,6 +33,13 @@ export async function configureGoogleAuth() {
           let user = await storage.getUserByGoogleId(profile.id);
           
           if (user) {
+            // Update user profile with latest Google info
+            user = await storage.updateUser({
+              id: user.id,
+              profileImageUrl: profile.photos && profile.photos.length > 0 ? profile.photos[0].value : user.profileImageUrl,
+              username: user.username
+            });
+            
             return done(null, user);
           }
           
@@ -39,7 +50,12 @@ export async function configureGoogleAuth() {
             
             if (user) {
               // Link Google ID to existing account
-              user = await storage.updateUser(user.id, { googleId: profile.id });
+              user = await storage.updateUser({
+                id: user.id,
+                googleId: profile.id, 
+                username: user.username,
+                profileImageUrl: profile.photos && profile.photos.length > 0 ? profile.photos[0].value : user.profileImageUrl
+              });
               return done(null, user);
             }
           }
@@ -56,7 +72,14 @@ export async function configureGoogleAuth() {
             : null;
             
           // Generate a username based on display name or email
-          let username = profile.displayName?.replace(/\s+/g, '').toLowerCase() || email?.split('@')[0] || '';
+          let username = '';
+          if (profile.displayName) {
+            username = profile.displayName.replace(/\s+/g, '').toLowerCase();
+          } else if (email) {
+            username = email.split('@')[0];
+          } else {
+            username = `user${Math.floor(Math.random() * 10000)}`;
+          }
           
           // Ensure username is unique by appending random string if needed
           const existingUser = await storage.getUserByUsername(username);
@@ -79,6 +102,7 @@ export async function configureGoogleAuth() {
           
           return done(null, newUser);
         } catch (error) {
+          console.error("Google authentication error:", error);
           return done(error as Error);
         }
       }
@@ -87,14 +111,35 @@ export async function configureGoogleAuth() {
 }
 
 export function googleAuthRedirect(req: Request, res: Response, next: NextFunction) {
+  // Store the returnTo URL if provided in query
+  if (req.query.returnTo) {
+    req.session.returnTo = req.query.returnTo as string;
+  }
+  
   passport.authenticate("google", {
     scope: ["profile", "email"],
+    prompt: "select_account" // Always show account selection screen
   })(req, res, next);
 }
 
 export function googleAuthCallback(req: Request, res: Response, next: NextFunction) {
   passport.authenticate("google", {
-    failureRedirect: "/login",
-    successRedirect: "/",
+    failureRedirect: "/auth",
+  }, (err, user) => {
+    if (err || !user) {
+      return res.redirect('/auth?error=google_auth_failed');
+    }
+    
+    req.login(user, (loginErr) => {
+      if (loginErr) {
+        console.error("Login error after Google auth:", loginErr);
+        return res.redirect('/auth?error=login_failed');
+      }
+      
+      // Successful authentication, redirect to the return URL or default dashboard
+      const returnTo = req.session.returnTo || '/dashboard';
+      delete req.session.returnTo;
+      return res.redirect(returnTo);
+    });
   })(req, res, next);
 }
