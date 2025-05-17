@@ -1,23 +1,23 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { InsuranceCategory } from '@shared/schema';
+import { 
+  InsuranceCategory, 
+  BasePlanFields,
+  TravelPlanFields,
+  AutoPlanFields, 
+  PetPlanFields,
+  HealthPlanFields
+} from '@shared/schema';
 
-// Enhanced type for insurance plans with added properties for real data
-export interface InsurancePlan {
-  id: string;
-  name: string;
-  category: InsuranceCategory;
-  description?: string;
-  price?: number;
-  provider?: string;
-  features?: string[];
-  coverage?: Record<string, any>;
-  country?: string;
-  coverageHighlights?: string;
-  priceRange?: string;
-  rating?: string;
-  badge?: string;
-}
+// Define comprehensive plan type for all categories
+export type InsurancePlan = BasePlanFields & {
+  categoryDetails?: {
+    travel?: TravelPlanFields;
+    auto?: AutoPlanFields;
+    pet?: PetPlanFields;
+    health?: HealthPlanFields;
+  };
+};
 
 // Define the store state type with enhanced functionality
 interface CompareState {
