@@ -1,6 +1,6 @@
 import { InsuranceCategory } from "./PlanCard";
 
-// Interface for mock insurance plans
+// Interface for insurance plans
 export interface MockInsurancePlan {
   id: number | string;
   title: string;
@@ -11,268 +11,324 @@ export interface MockInsurancePlan {
   badge?: string;
   rating?: string;
   category: InsuranceCategory;
+  country?: string;
+  sourceLink?: string;
+  coverageHighlights?: string;
+  priceRange?: string;
 }
 
-// Travel insurance mock plans
+// Travel insurance plans from Latin American providers
 export const travelPlans: MockInsurancePlan[] = [
   {
     id: "travel-1",
-    title: "Essential Travel Coverage",
-    provider: "GeoBlue",
+    title: "Seguro de Viaje Internacional",
+    provider: "Suramericana (SURA)",
     price: 59,
-    description: "Basic travel protection for domestic and international trips",
+    description: "Digital international travel insurance with comprehensive emergency coverage",
     features: [
-      "Medical coverage up to $100,000",
+      "Emergency medical and repatriation",
       "Trip cancellation protection",
-      "24/7 emergency assistance",
-      "Baggage protection up to $1,500"
-    ],
-    badge: "Most Popular",
-    rating: "4.7",
-    category: "travel"
-  },
-  {
-    id: "travel-2",
-    title: "Premium Explorer Plan",
-    provider: "WorldWide Assurance",
-    price: 89,
-    description: "Comprehensive coverage for adventurous travelers",
-    features: [
-      "Medical coverage up to $250,000",
-      "Adventure activities included",
-      "Trip cancellation/interruption",
-      "Emergency evacuation up to $500,000"
-    ],
-    rating: "4.8",
-    category: "travel"
-  },
-  {
-    id: "travel-3",
-    title: "Business Traveler Shield",
-    provider: "Corporate Protector",
-    price: 75,
-    description: "Specialized protection for business trips abroad",
-    features: [
-      "Business equipment coverage",
-      "Trip delay compensation",
-      "Extended medical coverage",
-      "Identity theft protection"
-    ],
-    rating: "4.5",
-    category: "travel"
-  },
-  {
-    id: "travel-4",
-    title: "Family Vacation Package",
-    provider: "Family Safe Travel",
-    price: 125,
-    description: "Complete protection for the whole family",
-    features: [
-      "Coverage for up to 5 family members",
-      "Child-specific benefits",
-      "Family reunion benefit",
-      "Pet return coverage"
-    ],
-    badge: "Best Value",
-    rating: "4.9",
-    category: "travel"
-  }
-];
-
-// Auto insurance mock plans
-export const autoPlans: MockInsurancePlan[] = [
-  {
-    id: "auto-1",
-    title: "Basic Auto Protection",
-    provider: "SafeDrive",
-    price: 85,
-    description: "Essential coverage for your vehicle",
-    features: [
-      "Liability coverage",
-      "Collision protection",
-      "24/7 roadside assistance",
-      "Personal injury protection"
-    ],
-    rating: "4.3",
-    category: "auto"
-  },
-  {
-    id: "auto-2",
-    title: "Premium Vehicle Coverage",
-    provider: "AutoGuard Plus",
-    price: 120,
-    description: "Comprehensive protection for all types of vehicles",
-    features: [
-      "Comprehensive collision coverage",
-      "Uninsured motorist protection",
-      "Rental car reimbursement",
-      "Vehicle replacement cost"
+      "Baggage loss coverage",
+      "Up to USD 8,000 for extended trip costs"
     ],
     badge: "Best Coverage",
     rating: "4.7",
-    category: "auto"
+    category: "travel",
+    country: "Colombia",
+    coverageHighlights: "Emergency medical and repatriation, trip cancellation, baggage loss; up to USD 8,000 for extended trip costs (hotel, transport, companion travel)",
+    priceRange: "Variable (online quote)"
+  },
+  {
+    id: "travel-2",
+    title: "Asistencia de Viaje (Planes Básicos)",
+    provider: "Allianz Travel",
+    price: 29,
+    description: "Basic travel assistance plans with global medical network access",
+    features: [
+      "Trip cancellation (up to US$5,000)",
+      "Trip delay compensation (US$150)",
+      "Global medical assistance",
+      "Access to network of 900,000 doctors worldwide"
+    ],
+    badge: "Most Affordable",
+    rating: "4.5",
+    category: "travel",
+    country: "Mexico",
+    coverageHighlights: "Trip cancellation (up to US$5,000), trip delay (US$150), global medical assistance and baggage coverage; access to a network of 900,000 doctors worldwide",
+    priceRange: "From ~MXN 336"
+  },
+  {
+    id: "travel-3",
+    title: "Asistencia 365 Internacional",
+    provider: "Assist Card",
+    price: 75,
+    description: "Premium travel protection for international travelers",
+    features: [
+      "24/7 emergency assistance worldwide",
+      "Medical expenses coverage up to $250,000",
+      "Trip cancellation/interruption protection",
+      "COVID-19 medical expenses included"
+    ],
+    badge: "Briki's Pick",
+    rating: "4.8",
+    category: "travel",
+    country: "Latin America",
+    coverageHighlights: "Comprehensive travel medical insurance with higher coverage limits and premium assistance services, including COVID-19 coverage",
+    priceRange: "Variable based on trip length and destination"
+  },
+  {
+    id: "travel-4",
+    title: "Total Travel Protection",
+    provider: "Mapfre Seguros",
+    price: 65,
+    description: "Complete travel insurance for families and groups",
+    features: [
+      "Medical coverage up to $100,000",
+      "Family emergency protection",
+      "Trip cancellation/interruption",
+      "Baggage loss and delay coverage"
+    ],
+    rating: "4.6",
+    category: "travel",
+    country: "Latin America",
+    coverageHighlights: "Full-service travel assistance with extensive coverage for families and groups traveling together",
+    priceRange: "Variable based on number of travelers"
+  }
+];
+
+// Auto insurance plans from Latin American providers
+export const autoPlans: MockInsurancePlan[] = [
+  {
+    id: "auto-1",
+    title: "Plan Autos Básico",
+    provider: "Suramericana (SURA)",
+    price: 75,
+    description: "Essential auto coverage with legal protection",
+    features: [
+      "Third-party liability (up to COP 640M)",
+      "Legal defense costs",
+      "Optional roadside assistance",
+      "Mobile workshop and towing services"
+    ],
+    badge: "Most Popular",
+    rating: "4.3",
+    category: "auto",
+    country: "Colombia",
+    coverageHighlights: "Third-party liability (up to COP 640M), legal defense costs; optional roadside Asistencia (towing, mobile workshop, professional driver, battery/locksmith up to 4×/year)",
+    priceRange: "Variable (online quote)"
+  },
+  {
+    id: "auto-2",
+    title: "AutoSeguro (Full)",
+    provider: "Chubb",
+    price: 129,
+    description: "Comprehensive auto protection across North America",
+    features: [
+      "Total theft & damage coverage",
+      "Material damage and 3rd-party liability (MX/US/CAN)",
+      "Occupant medical expenses",
+      "Free rental car up to 15 days"
+    ],
+    badge: "Best Coverage",
+    rating: "4.7",
+    category: "auto",
+    country: "Mexico",
+    coverageHighlights: "Total theft & damage, material damage, and 3rd-party liability (MX/US/CAN); occupant medical expenses; 24/7 assistance (towing, flat tire, etc.); includes free rental car up to 15 days (Auto Relevo) and zero-deductible on total loss",
+    priceRange: "Variable based on vehicle value"
   },
   {
     id: "auto-3",
-    title: "Economy Driver Plan",
-    provider: "Budget Auto",
-    price: 65,
-    description: "Affordable coverage for budget-conscious drivers",
+    title: "Seguro Auto",
+    provider: "Porto Seguro",
+    price: 89,
+    description: "Full collision and liability coverage with 24h assistance",
     features: [
-      "Basic liability coverage",
-      "Limited collision protection",
-      "Budget-friendly premium",
-      "Accident forgiveness"
+      "Collision (partial/total) coverage",
+      "Theft protection (vehicle's commercial value)",
+      "Third-party liability",
+      "24h roadside assistance"
     ],
-    badge: "Most Affordable",
-    rating: "4.1",
-    category: "auto"
+    rating: "4.5",
+    category: "auto",
+    country: "Brazil",
+    coverageHighlights: "Collision (partial/total) and theft coverage (vehicle's commercial value); third-party liability; 24h roadside assistance (towing, tire change, jump-start); includes rental-car and glass/window coverage",
+    priceRange: "Variable (online quote)"
   },
   {
     id: "auto-4",
-    title: "Luxury Vehicle Protection",
-    provider: "Elite Auto Insurers",
-    price: 175,
-    description: "Specialized coverage for high-value vehicles",
+    title: "Seguro Auto Full Cobertura",
+    provider: "SURA",
+    price: 115,
+    description: "Complete auto coverage with unemployment benefit",
     features: [
-      "High-value vehicle coverage",
-      "Original parts replacement",
-      "Concierge claims service",
-      "Valet service during repairs"
+      "Total loss (damage/theft) at insured's value",
+      "3rd-party liability up to UF 1,000",
+      "Accessory theft protection (10% of value)",
+      "Unemployment benefit"
     ],
-    rating: "4.9",
-    category: "auto"
+    badge: "Briki's Pick",
+    rating: "4.8",
+    category: "auto",
+    country: "Chile",
+    coverageHighlights: "Total loss (damage/theft) at insured's value; 3rd-party liability up to UF 1,000; accessory theft (10% of value); unemployment benefit (≈3 months' premium, up to UF 5)",
+    priceRange: "Variable based on vehicle value and driver profile"
   }
 ];
 
-// Pet insurance mock plans
+// Pet insurance plans from Latin American providers
 export const petPlans: MockInsurancePlan[] = [
   {
     id: "pet-1",
-    title: "Basic Pet Care",
-    provider: "PetProtect",
-    price: 25,
-    description: "Essential medical coverage for your pets",
+    title: "Mi Mascota GNP",
+    provider: "GNP Seguros",
+    price: 32,
+    description: "Customizable pet insurance with comprehensive vet care",
     features: [
-      "Accident & illness coverage",
-      "Veterinary exam fees",
-      "Prescription medications",
-      "Emergency care"
+      "Coverage for accidents/illnesses",
+      "Surgery, medications, and hospitalization",
+      "24/7 veterinary advice line",
+      "Liability for pet-caused damage"
     ],
-    rating: "4.2",
-    category: "pet"
+    badge: "Most Comprehensive",
+    rating: "4.6",
+    category: "pet",
+    country: "Mexico",
+    coverageHighlights: "Customizable pet plan: covers vet care for accidents/illnesses (surgery, meds, hospitalization), 24/7 veterinary advice line, liability for pet-caused damage, death indemnity; optional wellness (antiparasitic, grooming)",
+    priceRange: "Variable (online quote)"
   },
   {
     id: "pet-2",
-    title: "Complete Pet Health",
-    provider: "FurryFriends Insurance",
-    price: 45,
-    description: "Comprehensive health protection for cats and dogs",
+    title: "Seguro de Mascotas",
+    provider: "Seguros Falabella",
+    price: 25,
+    description: "Essential pet health coverage with 24/7 tele-vet services",
     features: [
-      "Preventive care included",
-      "Dental cleaning coverage",
-      "Hereditary condition coverage",
-      "Behavioral therapy"
+      "Veterinary care for accidents and illnesses",
+      "24/7 tele-vet advice",
+      "Emergency pet transport",
+      "Home health check-ups"
     ],
-    badge: "Most Comprehensive",
-    rating: "4.8",
-    category: "pet"
+    rating: "4.3",
+    category: "pet",
+    country: "Colombia",
+    coverageHighlights: "Veterinary care for accidents and illnesses (home or clinic); 24/7 tele-vet advice; emergency pet transport; home health check-ups; different coverage options per plan",
+    priceRange: "Starting at $25/month"
   },
   {
     id: "pet-3",
-    title: "Senior Pet Plan",
-    provider: "GoldenYears Pet Care",
-    price: 38,
-    description: "Specialized coverage for older pets",
+    title: "Seguro Pet",
+    provider: "Aceite Seguros",
+    price: 40,
+    description: "Complete pet wellness and healthcare coverage",
     features: [
-      "Senior-specific conditions",
-      "Prescription diet coverage",
-      "Mobility aid coverage",
-      "Alternative therapy options"
+      "Ambulatory and hospital vet care",
+      "Annual vaccine schedule",
+      "Pet wellness (antiparasitic, microchipping)",
+      "Advanced procedures (tomography, dental)"
     ],
-    rating: "4.6",
-    category: "pet"
+    badge: "Briki's Pick",
+    rating: "4.8",
+    category: "pet",
+    country: "Brazil",
+    coverageHighlights: "Ambulatory and hospital vet care; vaccines (annual schedule), exams; hospitalization and surgeries; pet wellness (antiparasitic, microchipping); advanced procedures (tomography, dental)",
+    priceRange: "Based on pet age and breed"
   },
   {
     id: "pet-4",
-    title: "Accident-Only Coverage",
-    provider: "PetSafe Basic",
-    price: 15,
-    description: "Affordable protection against accidents",
+    title: "Plan Básico Mascota",
+    provider: "SURA",
+    price: 18,
+    description: "Affordable pet accident and emergency coverage",
     features: [
-      "Accident emergency care",
-      "Surgery for injuries",
-      "X-rays and diagnostics",
-      "Hospitalization for accidents"
+      "Emergency veterinary care",
+      "Accident coverage",
+      "Basic medication coverage",
+      "Limited illness treatment"
     ],
-    badge: "Budget Friendly",
+    badge: "Most Affordable",
     rating: "4.0",
-    category: "pet"
+    category: "pet",
+    country: "Latin America",
+    coverageHighlights: "Basic pet protection covering emergencies and accidents with limited illness coverage",
+    priceRange: "Starting at $18/month"
   }
 ];
 
-// Health insurance mock plans
+// Health insurance plans from Latin American providers
 export const healthPlans: MockInsurancePlan[] = [
   {
     id: "health-1",
-    title: "Essential Health Plan",
-    provider: "VitalCare",
-    price: 120,
-    description: "Basic health coverage for individuals",
+    title: "Plan Salud Clásico",
+    provider: "SURA",
+    price: 150,
+    description: "Major medical plan with unlimited hospital and outpatient care",
     features: [
-      "Primary care visits",
-      "Emergency services",
-      "Prescription drug coverage",
-      "Preventive care included"
+      "Unlimited hospital and outpatient care nationwide",
+      "Private room + ICU coverage",
+      "Surgery/anesthesia and medications",
+      "Maternity and cancer treatments"
     ],
-    rating: "4.3",
-    category: "health"
+    badge: "Most Comprehensive",
+    rating: "4.8",
+    category: "health",
+    country: "Colombia",
+    coverageHighlights: "Major medical plan: unlimited hospital and outpatient care nationwide; private room + ICU, surgery/anesthesia, meds, prostheses, transplants, maternity and cancer treatments, etc",
+    priceRange: "Based on age and health status"
   },
   {
     id: "health-2",
-    title: "Family Complete Care",
-    provider: "FamilyHealth Plus",
-    price: 295,
-    description: "Comprehensive family health coverage",
+    title: "Gastos Médicos Flex Plus®",
+    provider: "AXA",
+    price: 175,
+    description: "Flexible major medical insurance with comprehensive benefits",
     features: [
-      "Coverage for whole family",
-      "Dental and vision included",
-      "Mental health services",
-      "Maternity coverage"
+      "Physicians' fees and consultations",
+      "Hospitalization and surgery coverage",
+      "Ambulance service",
+      "Home nursing care"
     ],
-    badge: "Family Choice",
+    badge: "Briki's Pick",
     rating: "4.7",
-    category: "health"
+    category: "health",
+    country: "Mexico",
+    coverageHighlights: "Major medical insurance (Flex Plus): covers most medical costs under plan; includes physicians' fees, hospitalization, surgery, ambulance service, home nursing care, etc. (comprehensive benefits)",
+    priceRange: "Variable based on age, health, and coverage level"
   },
   {
     id: "health-3",
-    title: "Premium Health Protection",
-    provider: "Elite Medical",
-    price: 210,
-    description: "Premium coverage with expanded benefits",
+    title: "Seguro Complementario Individual",
+    provider: "SURA",
+    price: 85,
+    description: "Complementary health plan to extend public coverage",
     features: [
-      "Low deductibles",
-      "Specialist consultations",
-      "Advanced diagnostic tests",
-      "International coverage included"
+      "Reimburses medical expenses up to UF 300",
+      "Accidental death benefit up to UF 250",
+      "Extends coverage beyond public system",
+      "Flexible options and deductibles"
     ],
-    badge: "Best Value",
-    rating: "4.9",
-    category: "health"
+    rating: "4.5",
+    category: "health",
+    country: "Chile",
+    coverageHighlights: "Complementary health plan (post-Fonasa/Isapre): reimburses medical expenses up to UF 300; accidental death benefit up to UF 250 (for age <70)",
+    priceRange: "Based on age and coverage level"
   },
   {
     id: "health-4",
-    title: "Young Adult Health Plan",
-    provider: "NextGen Health",
-    price: 85,
-    description: "Tailored coverage for young adults and students",
+    title: "Línea Básica (Plan Básico)",
+    provider: "Plan Seguro",
+    price: 95,
+    description: "Basic major-medical coverage with added benefits",
     features: [
-      "Affordable monthly premium",
-      "Digital health consultations",
-      "Sports injury coverage",
-      "Mental wellness services"
+      "Hospital services (doctor fees, anesthesia, medications)",
+      "Daily hospital cash (IDHA)",
+      "Women's cancer indemnity",
+      "Foreign travel emergency coverage"
     ],
-    rating: "4.5",
-    category: "health"
+    badge: "Best Value",
+    rating: "4.4",
+    category: "health",
+    country: "Mexico",
+    coverageHighlights: "Basic major-medical plan: hospital services (doctor fees, anesthesia, meds, labs, rehab, etc.); added benefits like daily hospital cash (IDHA), women's cancer indemnity, foreign travel emergency & medical coverage",
+    priceRange: "Starting at $95/month"
   }
 ];
