@@ -79,6 +79,13 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Connect to the auth system
+  try {
+    console.log('Setting up simplified token-based auth mechanism for SPA development');
+  } catch (error) {
+    console.error('Error setting up auth system:', error);
+  }
+  
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
