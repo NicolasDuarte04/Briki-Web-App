@@ -14,12 +14,14 @@ export const sessions = pgTable(
 );
 
 export const users = pgTable("users", {
-  id: text("id").primaryKey(), // Changed to text for Replit auth compatibility
+  id: text("id").primaryKey(),
   username: text("username").notNull().unique(),
   email: text("email").unique(),
-  firstName: text("first_name"),
-  lastName: text("last_name"),
+  password: text("password"), // Added for email/username authentication
+  firstName: varchar("firstName"), // Changed column name to camelCase to match JS conventions
+  lastName: varchar("lastName"), // Changed column name to camelCase to match JS conventions
   profileImageUrl: text("profile_image_url"),
+  googleId: text("google_id").unique(), // Added for Google authentication
   role: text("role").default("user"), // "user" or "company"
   companyProfile: jsonb("company_profile"), // JSON data for company accounts
   createdAt: timestamp("created_at").defaultNow(),
@@ -74,9 +76,11 @@ export const insertUserSchema = createInsertSchema(users).pick({
   id: true,
   username: true,
   email: true,
+  password: true,
   firstName: true,
   lastName: true,
   profileImageUrl: true,
+  googleId: true,
   role: true,
   companyProfile: true,
 });
@@ -85,10 +89,30 @@ export const upsertUserSchema = createInsertSchema(users).pick({
   id: true,
   username: true,
   email: true,
+  password: true,
   firstName: true,
   lastName: true,
   profileImageUrl: true,
+  googleId: true,
   role: true,
+});
+
+// Additional schemas for authentication
+export const registerUserSchema = createInsertSchema(users)
+  .pick({
+    username: true,
+    email: true,
+    password: true,
+    firstName: true,
+    lastName: true,
+  })
+  .extend({
+    password: z.string().min(8, "Password must be at least 8 characters"),
+  });
+
+export const loginUserSchema = z.object({
+  identifier: z.string().min(1, "Email or username is required"),
+  password: z.string().min(1, "Password is required"),
 });
 
 export const insertTripSchema = createInsertSchema(trips).pick({
