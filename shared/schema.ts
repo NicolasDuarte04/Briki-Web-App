@@ -197,4 +197,7 @@ export type InsurancePlan = typeof insurancePlans.$inferSelect;
 export type InsertOrder = z.infer<typeof insertOrderSchema>;
 export type Order = typeof orders.$inferSelect;
 
+export type InsertQuote = z.infer<typeof insertQuoteSchema>;
+export type Quote = typeof quotes.$inferSelect;
+
 // Insurance category types are defined above

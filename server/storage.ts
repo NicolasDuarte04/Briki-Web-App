@@ -1,6 +1,13 @@
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
+import { nanoid } from 'nanoid';
+import { 
+  quotes, 
+  InsertQuote, 
+  Quote, 
+  InsuranceCategory
+} from "@shared/schema";
 
 // Extended user input schema for auth functionality
 export const userAuthSchema = z.object({
@@ -56,10 +63,25 @@ export interface IStorage {
   getUserByGoogleId(googleId: string): Promise<User | undefined>;
   createUser(user: UserAuth): Promise<User>;
   updateUser(id: string, updates: UserUpdate): Promise<User>;
+  
+  // Quote operations
+  createQuote(quoteData: InsertQuote): Promise<Quote>;
+  getQuoteById(id: number): Promise<Quote | undefined>;
+  getQuoteByReference(reference: string): Promise<Quote | undefined>;
+  getUserQuotes(userId: string): Promise<Quote[]>;
+  updateQuoteStatus(id: number, status: string): Promise<Quote>;
+  markQuoteNotificationSent(id: number): Promise<Quote>;
 }
 
 // Implementation for PostgreSQL database
 export class DatabaseStorage implements IStorage {
+  // Helper function to generate unique quote reference
+  private generateQuoteReference(): string {
+    // Format: BRK-{random 8 char alphanumeric}-{timestamp}
+    const randomPart = nanoid(8).toUpperCase();
+    const timestamp = Date.now().toString().slice(-6);
+    return `BRK-${randomPart}-${timestamp}`;
+  }
   async getUser(id: string): Promise<User | undefined> {
     try {
       const result = await db.query.raw(`
