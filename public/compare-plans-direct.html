@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Briki - Plan Comparison Tool</title>
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <style>
+    :root {
+      --primary: #0ea5e9;
+      --primary-dark: #0284c7;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-700: #374151;
+      --gray-900: #111827;
+      --red-50: #fee2e2;
+      --red-100: #fecaca;
+      --red-700: #b91c1c;
+      --amber-50: #fffbeb;
+      --amber-100: #fef3c7;
+    }
+    
+    /* Basic reset and styling */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+    
+    body {
+      background-color: var(--gray-50);
+      color: var(--gray-900);
+      line-height: 1.5;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    
+    h1 {
+      font-size: 1.875rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .icon {
+      width: 1.5rem;
+      height: 1.5rem;
+      color: var(--primary);
+    }
+    
+    .btn {
+      background-color: var(--gray-100);
+      border: 1px solid var(--gray-200);
+      color: var(--gray-700);
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+    
+    .btn:hover {
+      background-color: var(--gray-200);
+    }
+    
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+    
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+      border-color: var(--primary-dark);
+    }
+    
+    .btn-danger {
+      background-color: var(--red-50);
+      color: var(--red-700);
+      border-color: var(--red-100);
+    }
+    
+    .btn-danger:hover {
+      background-color: var(--red-100);
+    }
+    
+    .card {
+      background-color: white;
+      border-radius: 0.5rem;
+      border: 1px solid var(--gray-200);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      margin-bottom: 1.5rem;
+    }
+    
+    .card-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    
+    .card-description {
+      color: var(--gray-500);
+      font-size: 0.875rem;
+    }
+    
+    .card-content {
+      padding: 1.5rem;
+    }
+    
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1rem;
+    }
+    
+    .status-box {
+      background-color: var(--gray-100);
+      padding: 1rem;
+      border-radius: 0.5rem;
+    }
+    
+    .status-box h3 {
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      background-color: var(--gray-200);
+      color: var(--gray-700);
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      margin-right: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .plans-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+    
+    .plan-card {
+      background-color: white;
+      border-radius: 0.5rem;
+      border: 1px solid var(--gray-200);
+      overflow: hidden;
+    }
+    
+    .plan-header {
+      padding: 1.25rem;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    
+    .plan-content {
+      padding: 1.25rem;
+    }
+    
+    .plan-footer {
+      padding: 1.25rem;
+      border-top: 1px solid var(--gray-200);
+      display: flex;
+      justify-content: flex-end;
+    }
+    
+    .empty-state {
+      background-color: var(--gray-100);
+      padding: 3rem;
+      border-radius: 0.5rem;
+      text-align: center;
+    }
+    
+    .empty-state h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+    
+    .empty-state p {
+      color: var(--gray-500);
+      margin-bottom: 1.5rem;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      header button {
+        margin-top: 1rem;
+      }
+      
+      .status-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <a href="/insurance/travel" class="btn">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Back to Insurance Plans
+        </a>
+        <h1 style="margin-top: 1rem;">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+            <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>
+          </svg>
+          Plan Comparison Tool
+        </h1>
+        <p style="color: var(--gray-500); margin-top: 0.25rem;">
+          Compare different insurance plans side by side
+        </p>
+      </div>
+      
+      <button class="btn btn-danger" id="clearBtn">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6"/>
+        </svg>
+        Clear All Plans
+      </button>
+    </header>
+    
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Comparison Status</div>
+        <div class="card-description">Details about currently selected plans</div>
+      </div>
+      <div class="card-content">
+        <div class="status-grid">
+          <div class="status-box">
+            <h3>Selected Plans</h3>
+            <p>
+              <span class="badge" id="planCount">0</span>
+              <span>plans selected</span>
+            </p>
+          </div>
+          
+          <div class="status-box">
+            <h3>Plan IDs</h3>
+            <div id="planIds">
+              <p style="color: var(--gray-500);">No plans selected</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div id="plansList" class="plans-grid" style="display: none;">
+      <!-- Plan cards will be inserted here by JavaScript -->
+    </div>
+    
+    <div id="emptyState" class="empty-state">
+      <h2>No Plans Selected for Comparison</h2>
+      <p>Select some insurance plans to compare their features and coverage.</p>
+      <a href="/insurance/travel" class="btn btn-primary">
+        Browse Insurance Plans
+      </a>
+    </div>
+  </div>
+
+  <script>
+    // Simple storage to read from localStorage
+    class ComparisonStorage {
+      constructor() {
+        this.localStorageKey = 'briki-compare-plans';
+      }
+      
+      getPlans() {
+        try {
+          const data = localStorage.getItem(this.localStorageKey);
+          if (!data) return [];
+          
+          const parsed = JSON.parse(data);
+          return parsed.state && parsed.state.selectedPlans ? parsed.state.selectedPlans : [];
+        } catch (error) {
+          console.error('Error reading plans from localStorage:', error);
+          return [];
+        }
+      }
+      
+      clearPlans() {
+        try {
+          const data = localStorage.getItem(this.localStorageKey);
+          if (!data) return;
+          
+          const parsed = JSON.parse(data);
+          if (parsed.state) {
+            parsed.state.selectedPlans = [];
+            localStorage.setItem(this.localStorageKey, JSON.stringify(parsed));
+          }
+        } catch (error) {
+          console.error('Error clearing plans:', error);
+        }
+      }
+    }
+    
+    // Initialize the app
+    document.addEventListener('DOMContentLoaded', () => {
+      const storage = new ComparisonStorage();
+      const plans = storage.getPlans();
+      
+      updateUI(plans, storage);
+    });
+    
+    // Update the UI based on selected plans
+    function updateUI(plans, storage) {
+      const planCount = document.getElementById('planCount');
+      const planIds = document.getElementById('planIds');
+      const plansList = document.getElementById('plansList');
+      const emptyState = document.getElementById('emptyState');
+      const clearBtn = document.getElementById('clearBtn');
+      
+      // Update plan count
+      planCount.textContent = plans.length;
+      
+      // Update plan IDs
+      if (plans.length > 0) {
+        planIds.innerHTML = '';
+        plans.forEach(plan => {
+          const badge = document.createElement('span');
+          badge.className = 'badge';
+          badge.textContent = plan.id;
+          planIds.appendChild(badge);
+        });
+      } else {
+        planIds.innerHTML = '<p style="color: var(--gray-500);">No plans selected</p>';
+      }
+      
+      // Show/hide elements based on selected plans
+      if (plans.length > 0) {
+        plansList.style.display = 'grid';
+        emptyState.style.display = 'none';
+        renderPlanCards(plans, storage);
+      } else {
+        plansList.style.display = 'none';
+        emptyState.style.display = 'block';
+      }
+      
+      // Set up clear button
+      clearBtn.addEventListener('click', () => {
+        if (confirm('Are you sure you want to clear all selected plans?')) {
+          storage.clearPlans();
+          updateUI([], storage);
+        }
+      });
+    }
+    
+    // Render plan cards
+    function renderPlanCards(plans, storage) {
+      const plansList = document.getElementById('plansList');
+      plansList.innerHTML = '';
+      
+      plans.forEach(plan => {
+        const card = document.createElement('div');
+        card.className = 'plan-card';
+        
+        const header = document.createElement('div');
+        header.className = 'plan-header';
+        header.innerHTML = `
+          <div class="card-title">${plan.name || 'Plan ' + plan.id}</div>
+          <div class="card-description">
+            Category: ${plan.category || 'Unknown'} • ID: ${plan.id}
+          </div>
+        `;
+        
+        const content = document.createElement('div');
+        content.className = 'plan-content';
+        
+        // Create features list if available
+        let featuresHtml = '';
+        if (plan.features && plan.features.length > 0) {
+          featuresHtml = `
+            <h4 style="font-weight: 600; margin-bottom: 0.5rem;">Features</h4>
+            <ul style="list-style-type: none; padding-left: 0;">
+              ${plan.features.map(feature => `
+                <li style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.25rem;">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary); flex-shrink: 0;">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                  <span>${feature}</span>
+                </li>
+              `).join('')}
+            </ul>
+          `;
+        }
+        
+        // Add provider and price details
+        content.innerHTML = `
+          <div style="margin-bottom: 1rem;">
+            <p><strong>Provider:</strong> ${plan.provider || 'Not specified'}</p>
+            <p><strong>Price:</strong> ${formatPrice(plan.price) || 'Not specified'}</p>
+            ${plan.description ? `<p style="margin-top: 0.5rem;">${plan.description}</p>` : ''}
+          </div>
+          ${featuresHtml}
+        `;
+        
+        const footer = document.createElement('div');
+        footer.className = 'plan-footer';
+        
+        const removeButton = document.createElement('button');
+        removeButton.className = 'btn';
+        removeButton.textContent = 'Remove';
+        removeButton.onclick = () => {
+          // For simplicity, we're just clearing all plans
+          // In a real implementation, this would only remove the specific plan
+          storage.clearPlans();
+          updateUI([], storage);
+        };
+        
+        footer.appendChild(removeButton);
+        
+        card.appendChild(header);
+        card.appendChild(content);
+        card.appendChild(footer);
+        
+        plansList.appendChild(card);
+      });
+    }
+    
+    // Format price as currency
+    function formatPrice(price) {
+      if (!price && price !== 0) return null;
+      
+      return new Intl.NumberFormat('es-CO', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 0
+      }).format(price);
+    }
+  </script>
+</body>
+</html>
