@@ -1,8 +1,7 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { apiRequest } from '@/lib/queryClient';
+import { createContext, useState, useEffect, ReactNode } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
-// Define the User type based on our database schema
+// Define the User type
 export interface User {
   id: string;
   username: string;
@@ -13,8 +12,8 @@ export interface User {
   role?: string;
 }
 
-// Define the AuthContext props and state
-interface AuthContextType {
+// Auth context type definition
+export interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
@@ -28,35 +27,34 @@ interface AuthContextType {
   loginWithGoogle: (returnTo?: string) => void;
 }
 
-// Create the context with default values
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  isLoading: true,
-  isAuthenticated: false,
-  login: async () => false,
-  logout: async () => {},
-  register: async () => false,
-  loginWithGoogle: () => {},
-});
+// Creating the context with a default value
+export const AuthContext = createContext<AuthContextType | null>(null);
 
-// Auth Provider component
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
+interface Props {
+  children: ReactNode;
+}
+
+export function AuthProvider({ children }: Props) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
-  // Load user on mount
+  // Load user on mount and handle persistent sessions
   useEffect(() => {
-    const loadUser = async () => {
+    const fetchUser = async () => {
       try {
         setIsLoading(true);
-        const response = await apiRequest('GET', '/api/auth/user');
+        const response = await fetch('/api/auth/user', {
+          credentials: 'include'
+        });
         
         if (response.ok) {
           const userData = await response.json();
           setUser(userData);
         } else {
+          // Clear user data if not authenticated
           setUser(null);
+          // We don't show error toast on initial load as it's expected for non-logged-in users
         }
       } catch (error) {
         console.error('Error loading user:', error);
@@ -66,7 +64,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     };
     
-    loadUser();
+    fetchUser();
   }, []);
 
   // Login function
@@ -74,24 +72,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       setIsLoading(true);
       
-      const response = await apiRequest('POST', '/api/auth/login', {
-        username,
-        password,
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+        credentials: 'include',
       });
       
       if (response.ok) {
-        const { user: userData } = await response.json();
-        setUser(userData);
+        const userData = await response.json();
+        setUser(userData.user);
         toast({
           title: 'Login successful',
-          description: `Welcome back, ${userData.firstName || userData.username}!`,
+          description: `Welcome back, ${userData.user.firstName || userData.user.username}!`,
         });
         return true;
       } else {
         const error = await response.json();
         toast({
           title: 'Login failed',
-          description: error.message || 'Invalid credentials. Please try again.',
+          description: error.message || 'Invalid credentials',
           variant: 'destructive',
         });
         return false;
@@ -118,21 +120,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       setIsLoading(true);
       
-      const response = await apiRequest('POST', '/api/auth/register', userData);
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+        credentials: 'include',
+      });
       
       if (response.ok) {
-        const { user: newUser } = await response.json();
-        setUser(newUser);
+        const data = await response.json();
+        setUser(data.user);
         toast({
           title: 'Registration successful',
-          description: `Welcome to Briki, ${newUser.firstName || newUser.username}!`,
+          description: `Welcome to Briki, ${data.user.firstName || data.user.username}!`,
         });
         return true;
       } else {
         const error = await response.json();
         toast({
           title: 'Registration failed',
-          description: error.message || 'Could not create account. Please try again.',
+          description: error.message || 'Could not create account',
           variant: 'destructive',
         });
         return false;
@@ -155,19 +164,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       setIsLoading(true);
       
-      const response = await apiRequest('GET', '/api/auth/logout');
+      const response = await fetch('/api/auth/logout', {
+        method: 'GET',
+        credentials: 'include',
+      });
       
       if (response.ok) {
         setUser(null);
         toast({
           title: 'Logged out',
-          description: 'You have been logged out successfully.',
+          description: 'You have been successfully logged out.',
         });
       } else {
         const error = await response.json();
         toast({
           title: 'Logout failed',
-          description: error.message || 'Could not log out. Please try again.',
+          description: error.message || 'Could not log out',
           variant: 'destructive',
         });
       }
@@ -183,28 +195,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // Login with Google
+  // Google login function
   const loginWithGoogle = (returnTo?: string) => {
-    const baseUrl = '/api/auth/google';
+    // Store returnTo URL in localStorage if provided
+    if (returnTo) {
+      localStorage.setItem('authReturnTo', returnTo);
+    }
     
-    // Add returnTo URL if provided
-    const url = returnTo 
-      ? `${baseUrl}?returnTo=${encodeURIComponent(returnTo)}`
-      : baseUrl;
-    
-    // Redirect to Google login
-    window.location.href = url;
+    // Redirect to Google OAuth endpoint
+    window.location.href = '/api/auth/google';
   };
-
-  // Determine authentication status
-  const isAuthenticated = !!user;
 
   return (
     <AuthContext.Provider
       value={{
         user,
         isLoading,
-        isAuthenticated,
+        isAuthenticated: !!user,
         login,
         logout,
         register,
@@ -214,15 +221,4 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       {children}
     </AuthContext.Provider>
   );
-};
-
-// Hook to use the auth context
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  
-  return context;
-};
+}

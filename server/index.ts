@@ -2,6 +2,10 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import cors from "cors";
+import passport from "passport";
+import { configureSession } from "./auth/session";
+import { configureGoogleAuth } from "./auth/google-auth";
+import authRoutes from "./routes/auth";
 
 const app = express();
 
@@ -17,27 +21,55 @@ app.use(cors({
   exposedHeaders: ['Set-Cookie']
 }));
 
-// Add explicit Access-Control-Allow-Credentials for auth endpoints
-app.use("/api/login", (req, res, next) => {
-  res.header('Access-Control-Allow-Credentials', 'true');
-  next();
+// Setup session management before routes
+let sessionConfig;
+try {
+  sessionConfig = configureSession();
+  app.use(sessionConfig);
+  console.log("Using PostgreSQL session store for auth sessions");
+} catch (error) {
+  console.warn("Unable to configure PostgreSQL session, using memory session store for auth sessions");
+  const session = require('express-session');
+  const MemoryStore = require('memorystore')(session);
+  
+  // Fallback to memory store
+  app.use(session({
+    cookie: { maxAge: 86400000 }, // 24 hours
+    store: new MemoryStore({
+      checkPeriod: 86400000 // Prune expired entries every 24h
+    }),
+    resave: false,
+    saveUninitialized: false,
+    secret: process.env.SESSION_SECRET || 'briki-dev-secret'
+  }));
+}
+
+// Initialize passport for authentication
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Configure passport serialization
+passport.serializeUser((user: any, done) => {
+  done(null, user.id);
 });
 
-app.use("/api/callback", (req, res, next) => {
-  res.header('Access-Control-Allow-Credentials', 'true');
-  next();
+passport.deserializeUser(async (id: string, done) => {
+  try {
+    // Use the storage module to fetch user by ID
+    const { storage } = require('./storage');
+    const user = await storage.getUser(id);
+    done(null, user || null);
+  } catch (err) {
+    done(err, null);
+  }
 });
 
-app.use("/api/logout", (req, res, next) => {
-  res.header('Access-Control-Allow-Credentials', 'true');
-  next();
+// Setup Google OAuth if credentials are available
+configureGoogleAuth().catch(err => {
+  console.error("Failed to configure Google Auth:", err);
 });
 
-app.use("/api/auth/user", (req, res, next) => {
-  res.header('Access-Control-Allow-Credentials', 'true');
-  next();
-});
-
+// Standard middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -48,6 +80,7 @@ app.use((req, res, next) => {
   next();
 });
 
+// Log API requests
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
@@ -78,14 +111,10 @@ app.use((req, res, next) => {
   next();
 });
 
+// Mount auth routes
+app.use('/api/auth', authRoutes);
+
 (async () => {
-  // Connect to the auth system
-  try {
-    console.log('Setting up simplified token-based auth mechanism for SPA development');
-  } catch (error) {
-    console.error('Error setting up auth system:', error);
-  }
-  
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {

@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { isAuthenticated } from "./auth/local-auth";
 import { storage } from "./storage";
+import { pool } from "./db"; // Add the pool import here
 import Stripe from "stripe";
 import { users, trips, insurancePlans, orders } from "@shared/schema";
 import { z } from "zod";
@@ -44,9 +45,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Mount Google Auth routes
   app.use('/api/auth', googleAuthRoutes);
 
-  // Initialize database with test data
+  // Initialize database
   try {
-    await storage.seedDataIfNeeded();
+    // Check if database is accessible
+    await pool.query('SELECT 1');
     console.log("Database initialization completed");
   } catch (error) {
     console.error("Error during database initialization:", error);

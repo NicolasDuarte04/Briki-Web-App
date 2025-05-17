@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/hooks/use-auth";
 import GoogleLoginButton from "./GoogleLoginButton";
 
 // Login form schema
@@ -33,7 +33,10 @@ export default function AuthForm() {
   const [activeTab, setActiveTab] = useState<"login" | "signup">("login");
   
   // Authentication context
-  const { login, register, isLoading } = useAuth();
+  const auth = useAuth();
+  const { isLoading } = auth;
+  const login = auth.login;
+  const registerUser = auth.register;
   const { toast } = useToast();
 
   // Form for login
@@ -57,24 +60,40 @@ export default function AuthForm() {
 
   // Handle login submit
   const onLoginSubmit = async (data: LoginFormValues) => {
-    const success = await login(data.username, data.password);
-    
-    if (!success) {
-      loginForm.setError("password", {
-        type: "manual",
-        message: "Invalid credentials",
+    try {
+      const success = await login(data.username, data.password);
+      
+      if (!success) {
+        loginForm.setError("password", {
+          type: "manual",
+          message: "Invalid credentials",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Login failed",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
       });
     }
   };
 
   // Handle registration submit
   const onRegisterSubmit = async (data: RegistrationFormValues) => {
-    const success = await register(data);
-    
-    if (!success) {
+    try {
+      const success = await registerUser(data);
+      
+      if (!success) {
+        toast({
+          title: "Registration failed",
+          description: "This username or email might already be in use.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
       toast({
         title: "Registration failed",
-        description: "This username or email might already be in use.",
+        description: "An unexpected error occurred. Please try again.",
         variant: "destructive",
       });
     }
@@ -86,7 +105,7 @@ export default function AuthForm() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="bg-white dark:bg-gray-800 rounded-lg shadow-xl overflow-hidden"
+        className="bg-white dark:bg-gray-900 rounded-lg shadow-xl overflow-hidden border border-gray-200 dark:border-gray-800"
       >
         <Tabs 
           defaultValue="login" 
@@ -94,9 +113,9 @@ export default function AuthForm() {
           onValueChange={(value) => setActiveTab(value as "login" | "signup")}
           className="w-full"
         >
-          <TabsList className="grid grid-cols-2 w-full">
-            <TabsTrigger value="login" className="py-3">Log In</TabsTrigger>
-            <TabsTrigger value="signup" className="py-3">Sign Up</TabsTrigger>
+          <TabsList className="grid grid-cols-2 w-full rounded-none">
+            <TabsTrigger value="login" className="py-3 rounded-none text-base font-medium">Log In</TabsTrigger>
+            <TabsTrigger value="signup" className="py-3 rounded-none text-base font-medium">Sign Up</TabsTrigger>
           </TabsList>
           
           {/* Login Tab */}
@@ -111,7 +130,7 @@ export default function AuthForm() {
               
               <div className="relative my-6">
                 <Separator />
-                <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 px-2 text-sm text-gray-500">
+                <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-900 px-2 text-sm text-gray-500">
                   or continue with
                 </span>
               </div>
@@ -148,7 +167,7 @@ export default function AuthForm() {
                   
                   <Button 
                     type="submit" 
-                    className="w-full" 
+                    className="w-full bg-gradient-to-r from-[#003087] to-[#33BFFF] hover:opacity-90 transition-opacity"
                     disabled={isLoading}
                   >
                     {isLoading ? "Logging in..." : "Log In"}
@@ -170,7 +189,7 @@ export default function AuthForm() {
               
               <div className="relative my-6">
                 <Separator />
-                <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 px-2 text-sm text-gray-500">
+                <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-900 px-2 text-sm text-gray-500">
                   or sign up with
                 </span>
               </div>
@@ -221,7 +240,7 @@ export default function AuthForm() {
                   
                   <Button 
                     type="submit" 
-                    className="w-full" 
+                    className="w-full bg-gradient-to-r from-[#003087] to-[#33BFFF] hover:opacity-90 transition-opacity"
                     disabled={isLoading}
                   >
                     {isLoading ? "Creating account..." : "Sign Up"}

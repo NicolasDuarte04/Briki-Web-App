@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { GoogleLoginButton } from '@/components/auth/GoogleLoginButton';
+import GoogleLoginButton from '@/components/auth/GoogleLoginButton';
 import { GlassCard } from '@/components/auth/GlassCard';
 import { useAuth } from '@/hooks/use-auth';
 import { MainLayout } from '@/components/layout';
