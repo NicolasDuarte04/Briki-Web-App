@@ -1,25 +1,36 @@
 import session from 'express-session';
-import { v4 as uuidv4 } from 'uuid';
 import { NextFunction, Request, Response } from 'express';
+import connectPgSimple from 'connect-pg-simple';
+import { pool } from '../db';
 
 // Define the session configuration
 export function configureSession() {
-  // Ensure we have a session secret
   if (!process.env.SESSION_SECRET) {
-    console.warn('No SESSION_SECRET provided. Using a generated secret (not recommended for production)');
+    console.warn('No SESSION_SECRET provided. Using a default secret (not recommended for production)');
   }
   
-  const sessionSecret = process.env.SESSION_SECRET || uuidv4();
+  const sessionSecret = process.env.SESSION_SECRET || 'briki-secure-session-secret';
+  const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
+  
+  // Use PostgreSQL for session storage (more reliable than memory store)
+  const PgStore = connectPgSimple(session);
+  const sessionStore = new PgStore({
+    pool,
+    tableName: 'sessions',
+    createTableIfMissing: true,
+    ttl: sessionTtl / 1000, // Convert from ms to seconds
+  });
   
   // Session configuration with secure cookies in production
   return session({
     secret: sessionSecret,
     resave: false,
     saveUninitialized: false,
+    store: sessionStore,
     cookie: {
       secure: process.env.NODE_ENV === 'production',
       httpOnly: true,
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: sessionTtl,
       sameSite: 'lax'
     }
   });
@@ -36,9 +47,8 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
     return res.status(401).json({ message: 'Authentication required' });
   }
   
-  // Store the requested URL for redirecting after login
-  req.session.returnTo = req.originalUrl;
-  res.redirect('/auth');
+  // For non-API routes, redirect to login
+  res.redirect('/auth?redirectTo=' + encodeURIComponent(req.originalUrl));
 }
 
 // Helper to get safe user data (no sensitive info)

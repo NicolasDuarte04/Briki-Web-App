@@ -19,6 +19,8 @@ export async function configureGoogleAuth() {
   // Construct proper callback URL
   const callbackURL = `${domain}/api/auth/google/callback`;
 
+  console.log("Configuring Google OAuth with callback URL:", callbackURL);
+
   passport.use(
     new GoogleStrategy(
       {
@@ -33,11 +35,11 @@ export async function configureGoogleAuth() {
           let user = await storage.getUserByGoogleId(profile.id);
           
           if (user) {
-            // Update user profile with latest Google info
-            user = await storage.updateUser({
-              id: user.id,
-              profileImageUrl: profile.photos && profile.photos.length > 0 ? profile.photos[0].value : user.profileImageUrl,
-              username: user.username
+            // Update existing user with latest Google info
+            user = await storage.updateUser(user.id, {
+              profileImageUrl: profile.photos?.[0]?.value || user.profileImageUrl,
+              firstName: profile.name?.givenName || user.firstName,
+              lastName: profile.name?.familyName || user.lastName,
             });
             
             return done(null, user);
@@ -50,11 +52,11 @@ export async function configureGoogleAuth() {
             
             if (user) {
               // Link Google ID to existing account
-              user = await storage.updateUser({
-                id: user.id,
-                googleId: profile.id, 
-                username: user.username,
-                profileImageUrl: profile.photos && profile.photos.length > 0 ? profile.photos[0].value : user.profileImageUrl
+              user = await storage.updateUser(user.id, {
+                googleId: profile.id,
+                profileImageUrl: profile.photos?.[0]?.value || user.profileImageUrl,
+                firstName: profile.name?.givenName || user.firstName,
+                lastName: profile.name?.familyName || user.lastName,
               });
               return done(null, user);
             }
@@ -103,7 +105,7 @@ export async function configureGoogleAuth() {
           return done(null, newUser);
         } catch (error) {
           console.error("Google authentication error:", error);
-          return done(error as Error);
+          return done(error, null);
         }
       }
     )
@@ -111,7 +113,7 @@ export async function configureGoogleAuth() {
 }
 
 export function googleAuthRedirect(req: Request, res: Response, next: NextFunction) {
-  // Store the returnTo URL if provided in query
+  // Store the returnTo URL if provided in query params
   if (req.query.returnTo) {
     req.session.returnTo = req.query.returnTo as string;
   }
@@ -124,9 +126,10 @@ export function googleAuthRedirect(req: Request, res: Response, next: NextFuncti
 
 export function googleAuthCallback(req: Request, res: Response, next: NextFunction) {
   passport.authenticate("google", {
-    failureRedirect: "/auth",
-  }, (err, user) => {
+    failureRedirect: "/auth?error=google_auth_failed",
+  }, (err: Error, user: any) => {
     if (err || !user) {
+      console.error("Google authentication callback error:", err);
       return res.redirect('/auth?error=google_auth_failed');
     }
     
@@ -137,8 +140,14 @@ export function googleAuthCallback(req: Request, res: Response, next: NextFuncti
       }
       
       // Successful authentication, redirect to the return URL or default dashboard
-      const returnTo = req.session.returnTo || '/dashboard';
+      const returnTo = req.session.returnTo || '/';
       delete req.session.returnTo;
+      
+      // Redirect based on user role
+      if (user.role === 'company') {
+        return res.redirect('/company-dashboard');
+      }
+      
       return res.redirect(returnTo);
     });
   })(req, res, next);
