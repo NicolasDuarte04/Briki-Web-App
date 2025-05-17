@@ -16,8 +16,8 @@ export async function configureGoogleAuth() {
     ? process.env.PUBLIC_URL || "https://briki.replit.app"
     : "http://localhost:5000";
     
-  // Construct proper callback URL
-  const callbackURL = `${domain}/api/auth/google/callback`;
+  // Construct proper callback URL to match Google's expected format
+  const callbackURL = `${domain}/api/auth/callback/google`;
 
   console.log("Configuring Google OAuth with callback URL:", callbackURL);
 
