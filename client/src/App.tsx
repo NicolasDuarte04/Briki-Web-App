@@ -185,13 +185,18 @@ function AppContent() {
 
 function App() {
   return (
-    <LanguageProvider>
-      <RecentlyViewedProvider>
-        <TooltipProvider>
-          <AppContent />
-        </TooltipProvider>
-      </RecentlyViewedProvider>
-    </LanguageProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <LanguageProvider>
+          <RecentlyViewedProvider>
+            <TooltipProvider>
+              <Toaster />
+              <AppContent />
+            </TooltipProvider>
+          </RecentlyViewedProvider>
+        </LanguageProvider>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }
 
