@@ -214,7 +214,31 @@ export class DatabaseStorage implements IStorage {
     try {
       // First check if users table exists
       try {
-        // Use a raw query to check if the table exists to avoid schema errors
+        // Check for sessions table first (part of Replit Auth)
+        const sessionsTableQuery = await db.execute(`
+          SELECT EXISTS (
+            SELECT FROM information_schema.tables 
+            WHERE table_schema = 'public' 
+            AND table_name = 'sessions'
+          );
+        `);
+        
+        if (!sessionsTableQuery.rows[0]?.exists) {
+          console.log('Sessions table does not exist yet, creating it...');
+          
+          await db.execute(`
+            CREATE TABLE IF NOT EXISTS sessions (
+              sid VARCHAR(255) PRIMARY KEY,
+              sess JSONB NOT NULL,
+              expire TIMESTAMP NOT NULL
+            );
+            CREATE INDEX IF NOT EXISTS IDX_session_expire ON sessions (expire);
+          `);
+          
+          console.log('Sessions table created successfully');
+        }
+        
+        // Check if users table exists
         const usersTableQuery = await db.execute(`
           SELECT EXISTS (
             SELECT FROM information_schema.tables 
@@ -224,11 +248,29 @@ export class DatabaseStorage implements IStorage {
         `);
         
         if (!usersTableQuery.rows[0]?.exists) {
-          console.log('Users table does not exist yet, skipping seed');
-          return;
+          console.log('Users table does not exist yet, creating it...');
+          
+          // Create a users table matching our schema
+          await db.execute(`
+            CREATE TABLE IF NOT EXISTS users (
+              id TEXT PRIMARY KEY,
+              username TEXT NOT NULL UNIQUE,
+              email TEXT UNIQUE,
+              "firstName" TEXT,
+              "lastName" TEXT,
+              "profileImageUrl" TEXT,
+              role TEXT DEFAULT 'user',
+              "companyProfile" JSONB,
+              "createdAt" TIMESTAMP DEFAULT NOW(),
+              "updatedAt" TIMESTAMP DEFAULT NOW()
+            );
+          `);
+          
+          console.log('Users table created successfully');
         }
+        
       } catch (error) {
-        console.error('Error checking if users table exists:', error);
+        console.error('Error checking or creating tables:', error);
         return;
       }
       
@@ -246,8 +288,8 @@ export class DatabaseStorage implements IStorage {
         console.log('Creating test user: demo');
         
         await db.execute(`
-          INSERT INTO users (id, username, email, role, "firstName", "lastName")
-          VALUES ('demo123', 'demo', 'demo@example.com', 'user', 'Demo', 'User');
+          INSERT INTO users (id, username, email, role, "firstName", "lastName", "profileImageUrl")
+          VALUES ('demo123', 'demo', 'demo@example.com', 'user', 'Demo', 'User', 'https://replit.com/public/images/mark.png');
         `);
         
         console.log('Test user created successfully');
