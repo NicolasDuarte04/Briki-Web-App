@@ -430,8 +430,8 @@ export default function ComparePlansPage() {
               {/* Overview Tab */}
               <TabsContent value="overview" className="border-none p-0">
                 <h2 className="text-lg font-medium mb-3">Plan Overview Comparison</h2>
-                <ScrollArea className="w-full rounded-md" orientation="horizontal">
-                  <div className="flex gap-4 pb-4 min-w-max">
+                <ScrollArea className="w-full rounded-md">
+                  <div className="flex gap-4 pb-4 min-w-max overflow-x-auto">
                     {/* First column labels */}
                     <div className="w-64 flex-shrink-0">
                       <div className="h-60 bg-muted/20 rounded-t-lg"></div>
@@ -553,8 +553,8 @@ export default function ComparePlansPage() {
               {/* Features Tab */}
               <TabsContent value="features" className="border-none p-0">
                 <h2 className="text-lg font-medium mb-3">Plan Features Comparison</h2>
-                <ScrollArea className="w-full rounded-md" orientation="horizontal">
-                  <div className="flex gap-4 pb-4 min-w-max">
+                <ScrollArea className="w-full rounded-md">
+                  <div className="flex gap-4 pb-4 min-w-max overflow-x-auto">
                     {/* First column - feature names */}
                     <div className="w-64 flex-shrink-0">
                       <div className="h-20 bg-muted/20 rounded-t-lg flex items-center justify-center">
