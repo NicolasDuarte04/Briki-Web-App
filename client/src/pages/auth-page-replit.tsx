@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useAuth } from "@/hooks/use-auth-replit";
+import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 
@@ -62,7 +62,14 @@ const FloatingElements = () => (
 );
 
 export default function AuthPageReplit() {
-  const { user, login, isLoading } = useAuth();
+  // For temporary compatibility while transitioning to Replit auth
+  const auth = useAuth();
+  const user = auth.user;
+  const isLoading = auth.isLoading;
+  // Direct login with Replit auth
+  const login = () => {
+    window.location.href = "/api/login";
+  };
   const [, navigate] = useLocation();
   const { toast } = useToast();
   
