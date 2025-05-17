@@ -1,27 +1,39 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { InsuranceCategory } from '@shared/schema';
 
-// Simple type for insurance plans
+// Enhanced type for insurance plans with added properties for real data
 export interface InsurancePlan {
   id: string;
   name: string;
-  category: string;
+  category: InsuranceCategory;
   description?: string;
   price?: number;
   provider?: string;
   features?: string[];
   coverage?: Record<string, any>;
+  country?: string;
+  coverageHighlights?: string;
+  priceRange?: string;
+  rating?: string;
+  badge?: string;
 }
 
-// Define the store state type
+// Define the store state type with enhanced functionality
 interface CompareState {
   selectedPlans: InsurancePlan[];
   maxPlans: number;
+  maxPlansPerCategory: number;
   addPlan: (plan: InsurancePlan) => void;
   removePlan: (planId: string) => void;
   clearPlans: () => void;
+  clearCategory: (category: InsuranceCategory) => void;
   isPlanSelected: (planId: string) => boolean;
   canAddMorePlans: () => boolean;
+  canAddPlanToCategory: (category: InsuranceCategory) => boolean;
+  getSelectedPlansByCategory: (category: InsuranceCategory) => InsurancePlan[];
+  getSelectedCategories: () => InsuranceCategory[];
+  getComparisonReady: () => boolean;
 }
 
 // Create the Zustand store with localStorage persistence
@@ -29,15 +41,23 @@ export const useCompareStore = create<CompareState>()(
   persist(
     (set, get) => ({
       selectedPlans: [],
-      maxPlans: 4, // Maximum number of plans that can be compared at once
-
+      maxPlans: 8, // Maximum number of plans that can be compared at once
+      maxPlansPerCategory: 4, // Maximum plans per single category
+      
       // Add a plan to comparison
       addPlan: (plan) => {
-        const { selectedPlans, maxPlans } = get();
+        const { selectedPlans, maxPlans, maxPlansPerCategory } = get();
         
         // Check if we've reached the maximum number of plans
         if (selectedPlans.length >= maxPlans) {
           console.warn(`Maximum of ${maxPlans} plans can be compared at once`);
+          return;
+        }
+        
+        // Check if we've reached the maximum number of plans for this category
+        const plansInCategory = selectedPlans.filter(p => p.category === plan.category);
+        if (plansInCategory.length >= maxPlansPerCategory) {
+          console.warn(`Maximum of ${maxPlansPerCategory} plans per category can be compared at once`);
           return;
         }
         
@@ -61,6 +81,12 @@ export const useCompareStore = create<CompareState>()(
         set({ selectedPlans: [] });
       },
       
+      // Clear all plans from a specific category
+      clearCategory: (category) => {
+        const { selectedPlans } = get();
+        set({ selectedPlans: selectedPlans.filter(p => p.category !== category) });
+      },
+      
       // Check if a plan is already selected
       isPlanSelected: (planId) => {
         return get().selectedPlans.some(p => p.id === planId);
@@ -70,12 +96,39 @@ export const useCompareStore = create<CompareState>()(
       canAddMorePlans: () => {
         const { selectedPlans, maxPlans } = get();
         return selectedPlans.length < maxPlans;
+      },
+      
+      // Check if more plans can be added to a specific category
+      canAddPlanToCategory: (category) => {
+        const { selectedPlans, maxPlansPerCategory } = get();
+        const plansInCategory = selectedPlans.filter(p => p.category === category);
+        return plansInCategory.length < maxPlansPerCategory;
+      },
+      
+      // Get selected plans filtered by category
+      getSelectedPlansByCategory: (category) => {
+        return get().selectedPlans.filter(p => p.category === category);
+      },
+      
+      // Get unique categories that have selected plans
+      getSelectedCategories: () => {
+        const categories = get().selectedPlans.map(p => p.category);
+        return [...new Set(categories)] as InsuranceCategory[];
+      },
+      
+      // Check if we have at least two plans selected for comparison
+      getComparisonReady: () => {
+        return get().selectedPlans.length >= 2;
       }
     }),
     {
       name: 'briki-compare-plans',
-      // Only persist the selectedPlans array
-      partialize: (state) => ({ selectedPlans: state.selectedPlans }),
+      // Store the full state in localStorage
+      partialize: (state) => ({ 
+        selectedPlans: state.selectedPlans
+      }),
+      // Version information for migrations if schema changes
+      version: 1,
     }
   )
 );
