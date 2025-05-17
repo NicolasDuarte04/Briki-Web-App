@@ -137,5 +137,7 @@ router.get('/logout', (req: Request, res: Response) => {
 // Google OAuth routes
 router.get('/google', googleAuthRedirect);
 router.get('/google/callback', googleAuthCallback);
+// Add support for alternate callback format that Google might use
+router.get('/callback/google', googleAuthCallback);
 
 export default router;
