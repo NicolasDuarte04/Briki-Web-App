@@ -54,10 +54,10 @@ export default function InsuranceQuote() {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate form submission
+    // Simulate form submission and redirect to quote summary
     setTimeout(() => {
       setIsSubmitting(false);
-      navigate(`/insurance/${category}`);
+      navigate(`/insurance/${category}/quote-summary?planId=${planId}`);
     }, 1500);
   };
 
