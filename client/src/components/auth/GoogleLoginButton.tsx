@@ -1,36 +1,41 @@
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { FcGoogle } from 'react-icons/fc';
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
+import { FcGoogle } from "react-icons/fc";
+import { useLocation } from "wouter";
 
 interface GoogleLoginButtonProps {
-  text?: string;
+  mode: "login" | "signup";
+  fullWidth?: boolean;
   className?: string;
-  onClick?: () => void;
 }
 
-export function GoogleLoginButton({ 
-  text = "Continue with Google", 
-  className = "",
-  onClick 
+export default function GoogleLoginButton({ 
+  mode, 
+  fullWidth = true,
+  className = "" 
 }: GoogleLoginButtonProps) {
+  const { loginWithGoogle } = useAuth();
+  const [location] = useLocation();
   
   const handleGoogleLogin = () => {
-    // Redirect to the server's Google authentication endpoint
-    window.location.href = "/api/auth/google";
-    
-    // If onClick is provided, call it as well
-    if (onClick) onClick();
+    // Use current location as return URL if not on auth page
+    const returnTo = location.startsWith('/auth') ? undefined : location;
+    loginWithGoogle(returnTo);
   };
   
+  // Text based on mode (login or signup)
+  const buttonText = mode === "login" 
+    ? "Continue with Google" 
+    : "Sign up with Google";
+
   return (
     <Button 
-      type="button" 
-      onClick={handleGoogleLogin} 
-      variant="outline" 
-      className={`w-full relative backdrop-blur-sm bg-white/10 hover:bg-white/20 border border-white/20 ${className}`}
+      variant="outline"
+      onClick={handleGoogleLogin}
+      className={`flex items-center gap-2 bg-white hover:bg-gray-100 text-gray-800 border border-gray-300 ${fullWidth ? 'w-full' : ''} ${className}`}
     >
-      <FcGoogle className="w-5 h-5 absolute left-3" />
-      <span className="mx-auto">{text}</span>
+      <FcGoogle className="h-5 w-5" />
+      <span>{buttonText}</span>
     </Button>
   );
 }
