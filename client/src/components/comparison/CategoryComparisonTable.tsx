@@ -81,7 +81,9 @@ const CategoryComparisonTable = ({
   
   // Get all categories present in the plans
   const categories = useMemo(() => {
-    return [...new Set(plans.map(p => p.category))] as InsuranceCategory[];
+    const categoriesSet = new Set<InsuranceCategory>();
+    plans.forEach(p => categoriesSet.add(p.category));
+    return Array.from(categoriesSet);
   }, [plans]);
   
   // Get all field keys for each category
@@ -127,18 +129,16 @@ const CategoryComparisonTable = ({
     }
     
     // Category-specific fields are in categoryDetails
-    if (plan.categoryDetails && plan.categoryDetails[plan.category]) {
-      const categoryDetails = plan.categoryDetails[plan.category];
-      
+    if (plan.categoryDetails) {
       switch (plan.category) {
         case 'travel':
-          return categoryDetails.travel?.[field as keyof TravelPlanFields];
+          return plan.categoryDetails.travel?.[field as keyof TravelPlanFields];
         case 'auto':
-          return categoryDetails.auto?.[field as keyof AutoPlanFields];
+          return plan.categoryDetails.auto?.[field as keyof AutoPlanFields];
         case 'pet':
-          return categoryDetails.pet?.[field as keyof PetPlanFields];
+          return plan.categoryDetails.pet?.[field as keyof PetPlanFields];
         case 'health':
-          return categoryDetails.health?.[field as keyof HealthPlanFields];
+          return plan.categoryDetails.health?.[field as keyof HealthPlanFields];
         default:
           return undefined;
       }

@@ -1,20 +1,39 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useCompareStore } from "@/store/compare-store";
 import CategoryComparisonTable from "@/components/comparison/CategoryComparisonTable";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Trash2, ArrowLeft } from "lucide-react";
+import { Trash2, ArrowLeft, PlusCircle } from "lucide-react";
 import { Link } from "wouter";
+import { sampleInsurancePlans } from "@/data/sample-insurance-plans";
 
 export default function ComparePlansDemo() {
   const { 
     selectedPlans, 
+    addPlan,
     clearPlans, 
     removePlan, 
     getSelectedCategories,
-    getComparisonReady 
+    getComparisonReady,
+    isPlanSelected
   } = useCompareStore();
+  
+  // Auto-populate the comparison tool with sample plans if none are selected
+  useEffect(() => {
+    if (selectedPlans.length === 0) {
+      // Add one plan from each category to demonstrate cross-category comparison
+      const travelPlan = sampleInsurancePlans.find(p => p.category === 'travel');
+      const autoPlan = sampleInsurancePlans.find(p => p.category === 'auto');
+      const petPlan = sampleInsurancePlans.find(p => p.category === 'pet');
+      const healthPlan = sampleInsurancePlans.find(p => p.category === 'health');
+      
+      if (travelPlan) addPlan(travelPlan);
+      if (autoPlan) addPlan(autoPlan);
+      if (petPlan) addPlan(petPlan);
+      if (healthPlan) addPlan(healthPlan);
+    }
+  }, []);
   
   const categories = getSelectedCategories();
   const isComparisonReady = getComparisonReady();
