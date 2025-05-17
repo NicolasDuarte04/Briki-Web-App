@@ -35,15 +35,17 @@ const tripSchema = z.object({
   travelers: z.number().int().positive(),
 });
 
-// Import Google Auth routes
+// Import routes
 import googleAuthRoutes from './routes/google-auth';
+import quotesRoutes from './routes/quotes';
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup Replit authentication
   await setupAuth(app);
   
-  // Mount Google Auth routes
+  // Mount API routes
   app.use('/api/auth', googleAuthRoutes);
+  app.use('/api/quotes', quotesRoutes);
 
   // Initialize database
   try {

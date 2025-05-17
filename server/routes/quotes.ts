@@ -2,7 +2,7 @@ import express from 'express';
 import { z } from 'zod';
 import { insertQuoteSchema } from '@shared/schema';
 import { storage } from '../storage';
-import { isAuthenticated } from '../middleware/auth';
+import { isAuthenticated } from '../auth/local-auth';
 
 const router = express.Router();
 
