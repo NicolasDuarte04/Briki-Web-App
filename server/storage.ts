@@ -121,17 +121,19 @@ export class DatabaseStorage implements IStorage {
   // we need to search in the company_profile JSON field where we store it
   async getUserByGoogleId(googleId: string): Promise<User | undefined> {
     try {
-      // Using SQL to query for googleProfileId in the company_profile JSON
-      const result = await db.query.raw(`
+      // Using a simple query with the Pool directly for JSON field querying
+      const result = await db.execute(sql`
         SELECT * FROM users 
-        WHERE company_profile->>'googleProfileId' = $1 
+        WHERE company_profile->>'googleProfileId' = ${googleId}
         LIMIT 1
-      `, [googleId]);
+      `);
       
-      if (result && result.length > 0) {
-        return result[0] as User;
+      // Check if we got any rows back
+      if (result && result.rows && result.rows.length > 0) {
+        return result.rows[0] as User;
       }
       
+      console.log(`No user found with Google ID: ${googleId}`);
       return undefined;
     } catch (error) {
       console.error("Error getting user by Google ID:", error);
@@ -165,8 +167,8 @@ export class DatabaseStorage implements IStorage {
           username: username,
           password: userData.password,
           role: userData.role || 'user',
-          name: 'New User', // Default name for users
-          company_profile: {} // Empty JSON object for company profile
+          name: userData.name || 'New User', // Use provided name or default
+          company_profile: userData.company_profile || {} // Use provided company_profile or empty object
         })
         .returning();
       

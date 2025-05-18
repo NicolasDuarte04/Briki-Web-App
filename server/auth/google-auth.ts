@@ -42,7 +42,7 @@ export async function configureGoogleAuth() {
               ? `${profile.name.givenName || ''} ${profile.name.familyName || ''}`.trim() 
               : user.name;
               
-            user = await storage.updateUser(user.id, {
+            user = await storage.updateUser(String(user.id), {
               name: name || user.name,
               // No profileImageUrl in the database schema
             });
@@ -62,7 +62,7 @@ export async function configureGoogleAuth() {
                 ? `${profile.name.givenName || ''} ${profile.name.familyName || ''}`.trim() 
                 : user.name;
               
-              user = await storage.updateUser(user.id, {
+              user = await storage.updateUser(String(user.id), {
                 // No googleId in the database schema
                 name: name || user.name,
                 // Store Google connection in a property in company_profile
@@ -107,10 +107,15 @@ export async function configureGoogleAuth() {
             ? `${firstName} ${lastName}`.trim() 
             : firstName || lastName || username;
             
+          // Must ensure email is not null before creating user since it's required in the schema
+          if (!email) {
+            return done(new Error("Email is required but not provided by Google"), false);
+          }
+
           const newUser = await storage.createUser({
             // id is auto-generated in the DB as a number
             username,
-            email,
+            email, // Now guaranteed to be non-null
             password: null, // No password for Google auth
             name, // Using combined name field
             role: "user",
