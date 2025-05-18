@@ -249,7 +249,7 @@ const QuoteDetailDialog = ({
                   <div className="text-sm text-muted-foreground mt-1">
                     {Object.entries(quote.quoteDetails as Record<string, any>).map(([key, value]) => (
                       <div key={key} className="flex justify-between py-1 border-b">
-                        <span>{key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</span>
+                        <span>{key.replace(/([A-Z])/g, ' $1').replace(/^./, (str: string) => str.toUpperCase())}</span>
                         <span>{typeof value === 'boolean' ? (value ? 'Yes' : 'No') : String(value)}</span>
                       </div>
                     ))}
@@ -647,7 +647,7 @@ export default function QuoteHistoryPage() {
                     <div className="text-sm">
                       <div className="flex justify-between mb-1">
                         <span className="text-muted-foreground">Created:</span>
-                        <span>{format(new Date(quote.createdAt), 'PP')}</span>
+                        <span>{quote.createdAt ? format(new Date(quote.createdAt), 'PP') : 'N/A'}</span>
                       </div>
                       <div className="flex justify-between mb-1">
                         <span className="text-muted-foreground">Destination:</span>
@@ -655,7 +655,10 @@ export default function QuoteHistoryPage() {
                       </div>
                       <div className="flex justify-between mb-1">
                         <span className="text-muted-foreground">Travel dates:</span>
-                        <span>{format(new Date(quote.startDate), 'PP')} - {format(new Date(quote.endDate), 'PP')}</span>
+                        <span>
+                          {quote.startDate ? format(new Date(quote.startDate), 'PP') : 'N/A'} - {' '}
+                          {quote.endDate ? format(new Date(quote.endDate), 'PP') : 'N/A'}
+                        </span>
                       </div>
                       <div className="flex justify-between mb-1">
                         <span className="text-muted-foreground">Travelers:</span>
