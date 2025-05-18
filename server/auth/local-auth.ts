@@ -113,13 +113,17 @@ export async function registerUser(req: Request, res: Response) {
     
     console.log("Creating user with email:", email);
     
-    // Only use fields that exist in the actual database
+    // Create user with our updated schema fields
     const user = await storage.createUser({
       email,
       password: hashedPassword,
       name: name || username, // Use provided name or default to email username
+      username,
       role: "user",
-      // Required field but leave as empty object
+      firstName: name || null, // Store name as firstName for consistency
+      lastName: null,
+      profileImageUrl: null,
+      // Keep track of registration method
       company_profile: {
         registeredWith: "email"
       }
