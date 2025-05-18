@@ -22,7 +22,7 @@ const loginSchema = z.object({
   rememberMe: z.boolean().optional().default(false)
 });
 
-// Registration form schema with strong validation
+// Registration form schema with strong validation and enhanced profile fields
 const registrationSchema = z
   .object({
     email: z.string().email("Please enter a valid email address"),
@@ -33,6 +33,8 @@ const registrationSchema = z
       .regex(/[a-z]/, "Password must contain at least one lowercase letter")
       .regex(/[0-9]/, "Password must contain at least one number"),
     confirmPassword: z.string().min(1, "Please confirm your password"),
+    firstName: z.string().optional(),
+    lastName: z.string().optional(),
     name: z.string().optional(),
     acceptTerms: z.boolean().refine(val => val === true, {
       message: "You must accept the terms and conditions"
@@ -145,7 +147,9 @@ export default function UnifiedAuthForm() {
         email: data.email,
         password: data.password,
         confirmPassword: data.confirmPassword,
-        name: data.name
+        firstName: data.firstName,
+        lastName: data.lastName,
+        name: data.firstName && data.lastName ? `${data.firstName} ${data.lastName}` : data.name
       });
       
       if (success) {
@@ -494,6 +498,46 @@ export default function UnifiedAuthForm() {
 
                 <Form {...registerForm}>
                   <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-5">
+                    {/* First Name Field */}
+                    <FormField
+                      control={registerForm.control}
+                      name="firstName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-700 dark:text-gray-300">First Name</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="text"
+                              placeholder="First Name"
+                              className="auth-input"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Last Name Field */}
+                    <FormField
+                      control={registerForm.control}
+                      name="lastName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-700 dark:text-gray-300">Last Name</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="text"
+                              placeholder="Last Name"
+                              className="auth-input"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
                     {/* Email Field */}
                     <FormField
                       control={registerForm.control}
