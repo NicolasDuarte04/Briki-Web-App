@@ -94,9 +94,9 @@ export async function registerUser(req: Request, res: Response) {
       // Check if this email was used with a social login
       // Use type assertion for company_profile
       const companyProfile = existingUser.company_profile as Record<string, any> | null | undefined;
-      const isSocialUser = companyProfile && companyProfile.registeredWith === 'google';
+      const hasSocialLogin = companyProfile && companyProfile.registeredWith === 'google';
       
-      if (isSocialUser) {
+      if (hasSocialLogin) {
         return res.status(400).json({
           message: "This email is registered with Google. Please use Google Sign In"
         });
