@@ -134,7 +134,7 @@ export default function AuthForm() {
         
         toast({
           title: "Registration failed",
-          description: "This username or email might already be in use.",
+          description: "This email might already be in use.",
           variant: "destructive",
         });
       }

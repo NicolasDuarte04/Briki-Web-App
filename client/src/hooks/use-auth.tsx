@@ -179,9 +179,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginData) => {
-      console.log("Login attempt for:", credentials.username);
+      console.log("Login attempt for:", credentials.email);
       trackEvent('login_attempt', 'authentication', 'credentials', undefined, {
-        username: credentials.username,
+        email: credentials.email,
         role: credentials.role || 'user'
       });
       try {
@@ -352,7 +352,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Track successful registration with user ID for analytics
       trackEvent('signup_complete', 'authentication', 'form', undefined, {
         user_id: data.user.id,
-        username: data.user.username,
+        email: data.user.email,
         role: data.user.role
       });
       
@@ -386,7 +386,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       toast({
         title: "Registration successful",
-        description: `Welcome to Briki, ${data.user.username}!`,
+        description: `Welcome to Briki!`,
       });
     },
     onError: (error: Error) => {
