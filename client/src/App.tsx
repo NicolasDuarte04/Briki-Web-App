@@ -18,7 +18,8 @@ import { initGA, trackEvent, EventCategory } from "@/lib/analytics";
 
 import NotFound from "@/pages/not-found";
 import HomePageNew from "@/pages/home-page-new";
-import AuthPage from "@/pages/auth/AuthPage";
+// Import our new unified authentication screen
+import AuthPage from "@/pages/AuthPage";
 import TripInfoPage from "@/pages/trip-info-page";
 import InsuranceCategoriesPage from "@/pages/insurance-categories-page";
 import CheckoutPage from "@/pages/checkout-page";
