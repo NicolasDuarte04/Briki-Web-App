@@ -1,15 +1,14 @@
 import { createContext, useState, useEffect, ReactNode } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
-// Define the User type
+// Define the User type aligned with our database structure
 export interface User {
-  id: string;
-  username: string;
-  email?: string | null;
-  firstName?: string | null;
-  lastName?: string | null;
-  profileImageUrl?: string | null;
-  role?: string;
+  id: string | number; // Support both string (for OAuth) and number (for DB)
+  username?: string | null;
+  email: string;
+  name?: string | null;
+  role?: string | null;
+  profileImageUrl?: string | null; // Extracted from company_profile in API response
 }
 
 // Auth context type definition
@@ -17,12 +16,13 @@ export interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  login: (username: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
   register: (userData: {
-    username: string;
     email: string;
     password: string;
+    confirmPassword: string;
+    name?: string;
   }) => Promise<boolean>;
   loginWithGoogle: (returnTo?: string) => void;
 }
@@ -72,7 +72,7 @@ export function AuthProvider({ children }: Props) {
   }, []);
 
   // Login function
-  const login = async (username: string, password: string): Promise<boolean> => {
+  const login = async (email: string, password: string): Promise<boolean> => {
     try {
       setIsLoading(true);
       
@@ -81,7 +81,7 @@ export function AuthProvider({ children }: Props) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ email, password }),
         credentials: 'include',
       });
       
@@ -90,7 +90,7 @@ export function AuthProvider({ children }: Props) {
         setUser(userData.user);
         toast({
           title: 'Login successful',
-          description: `Welcome back, ${userData.user.firstName || userData.user.username}!`,
+          description: `Welcome back, ${userData.user.name || userData.user.username || 'user'}!`,
         });
         return true;
       } else {
@@ -117,9 +117,10 @@ export function AuthProvider({ children }: Props) {
 
   // Register function
   const register = async (userData: {
-    username: string;
     email: string;
     password: string;
+    confirmPassword: string;
+    name?: string;
   }): Promise<boolean> => {
     try {
       setIsLoading(true);
@@ -138,7 +139,7 @@ export function AuthProvider({ children }: Props) {
         setUser(data.user);
         toast({
           title: 'Registration successful',
-          description: `Welcome to Briki, ${data.user.firstName || data.user.username}!`,
+          description: `Welcome to Briki, ${data.user.name || data.user.username || 'user'}!`,
         });
         return true;
       } else {
