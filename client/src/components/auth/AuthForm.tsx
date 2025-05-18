@@ -24,7 +24,6 @@ const loginSchema = z.object({
 
 // Registration form schema with stronger validation
 const registrationSchema = z.object({
-  username: z.string().min(3, "Username must be at least 3 characters"),
   email: z.string().email("Please enter a valid email"),
   password: z
     .string()
@@ -76,7 +75,6 @@ export default function AuthForm() {
   const registerForm = useForm<RegistrationFormValues>({
     resolver: zodResolver(registrationSchema),
     defaultValues: {
-      username: "",
       email: "",
       password: "",
       acceptTerms: false,
@@ -123,7 +121,6 @@ export default function AuthForm() {
       trackEvent("signup_attempt", "authentication", "form_signup");
       
       const success = await registerUser({
-        username: data.username,
         email: data.email,
         password: data.password,
       });
@@ -212,13 +209,14 @@ export default function AuthForm() {
                 <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
                   <FormField
                     control={loginForm.control}
-                    name="username"
+                    name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-700 dark:text-gray-300">Username</FormLabel>
+                        <FormLabel className="text-gray-700 dark:text-gray-300">Email</FormLabel>
                         <FormControl>
                           <Input 
-                            placeholder="Enter your username" 
+                            type="email"
+                            placeholder="your@email.com" 
                             className="auth-input"
                             {...field} 
                           />
