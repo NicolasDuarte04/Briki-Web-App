@@ -53,19 +53,33 @@ if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
         return done(null, updatedUser);
       } else {
         // Create new user from Google profile
-        // Generate a username and name from email
+        // Generate a username from email if needed
         const username = email.split('@')[0];
-        const name = displayName || username;
+        
+        // Extract first and last name from displayName if available
+        let firstName, lastName;
+        if (displayName && displayName.includes(' ')) {
+          const nameParts = displayName.split(' ');
+          firstName = nameParts[0];
+          lastName = nameParts.slice(1).join(' ');
+        } else {
+          firstName = displayName || username;
+          lastName = null;
+        }
         
         const newUser = await storage.createUser({
           email: email,
           username: username,
-          name: name,
+          // Set both name and firstName/lastName for compatibility
+          name: displayName || username,
+          firstName: firstName,
+          lastName: lastName,
+          // Get profile image directly from Google
+          profileImageUrl: photos?.[0]?.value,
           role: "user", // Default role
-          // Store Google profile info in company_profile field (JSON)
+          // Store Google auth info in company_profile field
           company_profile: {
             googleId: id,
-            profileImageUrl: photos?.[0]?.value,
             registeredWith: "google"
           },
           // Add null password since it's required by the schema but not used with Google auth

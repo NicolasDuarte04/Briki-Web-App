@@ -209,28 +209,28 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  // Updated to match interface with two parameters
+  // Updated to match interface with two parameters and handle string IDs properly
   async updateUser(idParam: any, updates?: UserUpdate): Promise<User> {
     try {
       // Support both update patterns: updateUser(id, updates) and updateUser({id, ...updates})
-      let id: number;
+      let id: string;
       let updateData: any = {};
       
       // Check if first parameter is an object containing id and updates
       if (typeof idParam === 'object' && idParam !== null) {
-        // Extract id from the object
-        id = typeof idParam.id === 'number' ? idParam.id : parseInt(idParam.id, 10);
+        // Extract id from the object and ensure it's a string
+        id = String(idParam.id);
         
         // Copy all other properties as updates
         updateData = {...idParam};
         delete updateData.id; // Remove id from updates object
       } else {
         // Traditional approach: separate id and updates parameters
-        id = typeof idParam === 'number' ? idParam : parseInt(idParam, 10);
+        id = String(idParam);
         updateData = updates || {};
       }
       
-      if (isNaN(id)) {
+      if (!id) {
         throw new Error(`Invalid user ID: ${idParam}`);
       }
       
