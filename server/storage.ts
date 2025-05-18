@@ -12,14 +12,14 @@ import {
 // Extended user input schema for auth functionality
 export const userAuthSchema = z.object({
   id: z.string(),
-  username: z.string().min(3),
-  email: z.string().email().nullable(),
+  email: z.string().email(),
   password: z.string().nullable(), // Nullable for social auth
   firstName: z.string().nullable().optional(),
   lastName: z.string().nullable().optional(),
   profileImageUrl: z.string().nullable().optional(),
   googleId: z.string().nullable().optional(),
   role: z.enum(["user", "admin", "company"]).default("user"),
+  username: z.string().optional(), // Make username optional for backward compatibility
 });
 
 // Define user schema for database
