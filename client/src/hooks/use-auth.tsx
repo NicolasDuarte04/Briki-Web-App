@@ -590,8 +590,14 @@ export function useAuth(): AuthContextType {
       }
     };
 
-    const register = async (data: { email: string; password: string }): Promise<boolean> => {
+    const register = async (data: { email: string; password: string; confirmPassword?: string }): Promise<boolean> => {
       try {
+        // Validate password confirmation if provided
+        if (data.confirmPassword && data.password !== data.confirmPassword) {
+          console.error("Passwords do not match");
+          return false;
+        }
+        
         trackEvent('signup_attempt_fallback_helper', 'authentication', 'form');
         await registerMutation.mutateAsync({
           id: crypto.randomUUID(),
