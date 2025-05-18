@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
-import AuthForm from "@/components/auth/AuthForm";
+import AuthForm from "@/components/auth/FixedAuthForm";
 import { useToast } from "@/hooks/use-toast";
 
 export default function AuthPage() {
