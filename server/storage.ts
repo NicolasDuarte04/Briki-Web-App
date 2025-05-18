@@ -1,8 +1,9 @@
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, and, asc, desc, sql } from "drizzle-orm";
 import { z } from "zod";
 import { nanoid } from 'nanoid';
 import { 
+  users,
   quotes, 
   InsertQuote, 
   Quote, 
@@ -22,25 +23,12 @@ export const userAuthSchema = z.object({
   username: z.string().optional(), // Make username optional for backward compatibility
 });
 
-// Define user schema for database
-export const users = {
-  id: { name: "id", type: "text" },
-  username: { name: "username", type: "text" },
-  email: { name: "email", type: "text" },
-  password: { name: "password", type: "text" },
-  firstName: { name: "first_name", type: "text" },
-  lastName: { name: "last_name", type: "text" },
-  profileImageUrl: { name: "profile_image_url", type: "text" },
-  googleId: { name: "google_id", type: "text" },
-  role: { name: "role", type: "text" },
-  createdAt: { name: "created_at", type: "timestamp" },
-  updatedAt: { name: "updated_at", type: "timestamp" }
-};
+// We're using the users schema from shared/schema.ts instead of defining it here
 
 export type User = {
   id: string;
-  username: string;
-  email: string | null;
+  username?: string;
+  email: string;
   password: string | null;
   firstName: string | null;
   lastName: string | null;
@@ -96,11 +84,8 @@ export class DatabaseStorage implements IStorage {
   }
   async getUser(id: string): Promise<User | undefined> {
     try {
-      const result = await db.query.raw(`
-        SELECT * FROM users WHERE id = $1 LIMIT 1
-      `, [id]);
-      
-      return result.rows[0] as User || undefined;
+      const [user] = await db.select().from(users).where(eq(users.id, id)).limit(1);
+      return user;
     } catch (error) {
       console.error("Error getting user by ID:", error);
       return undefined;
@@ -109,11 +94,8 @@ export class DatabaseStorage implements IStorage {
 
   async getUserByUsername(username: string): Promise<User | undefined> {
     try {
-      const result = await db.query.raw(`
-        SELECT * FROM users WHERE username = $1 LIMIT 1
-      `, [username]);
-      
-      return result.rows[0] as User || undefined;
+      const [user] = await db.select().from(users).where(eq(users.username, username)).limit(1);
+      return user;
     } catch (error) {
       console.error("Error getting user by username:", error);
       return undefined;

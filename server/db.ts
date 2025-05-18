@@ -11,5 +11,31 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-export const db = drizzle({ client: pool, schema });
+// Use a singleton pattern to ensure we only create one database connection
+let _pool: Pool | null = null;
+let _db: ReturnType<typeof drizzle> | null = null;
+
+// Get the pool instance (create only once)
+export const getPool = () => {
+  if (!_pool) {
+    _pool = new Pool({ 
+      connectionString: process.env.DATABASE_URL,
+      max: 3, // Reduce max connections to avoid overwhelming the database
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 5000
+    });
+  }
+  return _pool;
+};
+
+// Get the db instance (create only once)
+export const getDb = () => {
+  if (!_db) {
+    _db = drizzle({ client: getPool(), schema });
+  }
+  return _db;
+};
+
+// Backward compatibility exports
+export const pool = getPool();
+export const db = getDb();

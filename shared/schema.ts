@@ -291,7 +291,14 @@ export const orders = pgTable("orders", {
 });
 
 // Create insert schemas 
-export const insertUserSchema = createInsertSchema(users);
+export const insertUserSchema = createInsertSchema(users).extend({
+  // Make username optional since we now use email as primary identifier
+  username: z.string().optional(),
+  // Keep email required  
+  email: z.string().email("Please enter a valid email"),
+  // Add validation for password
+  password: z.string().min(8, "Password must be at least 8 characters")
+});
 export const insertQuoteSchema = createInsertSchema(quotes, {
   id: undefined,
   createdAt: undefined,

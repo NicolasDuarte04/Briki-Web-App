@@ -123,7 +123,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
         
         const userData = await res.json();
-        console.log("User authenticated:", userData.username);
+        console.log("User authenticated:", userData.email);
         return userData;
       } catch (err) {
         console.error("Error fetching user:", err);
@@ -149,11 +149,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const register = async (data: { email: string; password: string }): Promise<boolean> => {
+  const register = async (data: { email: string; password: string; confirmPassword?: string }): Promise<boolean> => {
     try {
+      // Verify passwords match if confirmPassword is provided
+      if (data.confirmPassword && data.password !== data.confirmPassword) {
+        toast({
+          title: "Password mismatch",
+          description: "The passwords you entered don't match. Please try again.",
+          variant: "destructive",
+        });
+        return false;
+      }
+      
       trackEvent('signup_attempt', 'authentication', 'form_signup');
+      // Generate username from email (matching server-side logic)
+      const localPart = data.email.split('@')[0];
+      const username = localPart.replace(/[^a-zA-Z0-9]/g, '') || 'user';
+      
       const result = await registerMutation.mutateAsync({
         id: crypto.randomUUID(),
+        username, // Include username derived from email
         email: data.email,
         password: data.password,
         role: "user",
@@ -290,9 +305,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const registerMutation = useMutation({
     mutationFn: async (credentials: InsertUser) => {
-      console.log("Registration attempt for:", credentials.username);
+      console.log("Registration attempt for:", credentials.email);
       trackEvent('signup_attempt', 'authentication', 'form', undefined, {
-        username: credentials.username
+        email: credentials.email
       });
       
       try {
