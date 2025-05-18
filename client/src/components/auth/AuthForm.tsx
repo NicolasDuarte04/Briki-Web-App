@@ -31,10 +31,14 @@ const registrationSchema = z.object({
     .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
     .regex(/[a-z]/, "Password must contain at least one lowercase letter")
     .regex(/[0-9]/, "Password must contain at least one number"),
+  confirmPassword: z.string(),
   acceptTerms: z.boolean()
     .refine(val => val === true, {
       message: "You must accept the terms and conditions",
     }),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -77,6 +81,7 @@ export default function AuthForm() {
     defaultValues: {
       email: "",
       password: "",
+      confirmPassword: "",
       acceptTerms: false,
     },
     mode: "onChange",
@@ -120,9 +125,11 @@ export default function AuthForm() {
       // Track registration attempt
       trackEvent("signup_attempt", "authentication", "form_signup");
       
+      // Password validation happens in the register function
       const success = await registerUser({
         email: data.email,
         password: data.password,
+        confirmPassword: data.confirmPassword
       });
       
       if (success) {
@@ -134,7 +141,7 @@ export default function AuthForm() {
         
         toast({
           title: "Registration failed",
-          description: "This email might already be in use.",
+          description: "This email address might already be in use or there was an issue with your password.",
           variant: "destructive",
         });
       }
@@ -389,6 +396,34 @@ export default function AuthForm() {
                             </ul>
                           </div>
                         )}
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={registerForm.control}
+                    name="confirmPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-700 dark:text-gray-300">Confirm Password</FormLabel>
+                        <div className="relative">
+                          <FormControl>
+                            <Input 
+                              type={showPassword ? "text" : "password"} 
+                              placeholder="Confirm your password" 
+                              className="auth-input pr-10"
+                              {...field} 
+                            />
+                          </FormControl>
+                          <button
+                            type="button"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                            onClick={togglePasswordVisibility}
+                          >
+                            {showPassword ? <EyeOffIcon size={18} /> : <EyeIcon size={18} />}
+                          </button>
+                        </div>
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
