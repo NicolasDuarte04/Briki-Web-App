@@ -199,41 +199,142 @@ export default function AuthForm() {
           {/* Login Tab */}
           <TabsContent value="login" className="p-6 sm:p-8">
             <div className="space-y-5">
-              <div className="text-center mb-6">
-                <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#003087] to-[#33BFFF]">
-                  Welcome Back
-                </h2>
-                <p className="text-gray-600 dark:text-gray-400 mt-1">
-                  Sign in to continue your journey
-                </p>
-              </div>
-              
-              <GoogleLoginButton mode="login" />
-              
-              <div className="relative my-6">
-                <Separator />
-                <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-900 px-2 text-sm text-gray-500">
-                  or continue with
-                </span>
-              </div>
-              
-              <Form {...loginForm}>
-                <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
-                  <FormField
+              {showForgotPassword ? (
+                <>
+                  <div className="text-center mb-6">
+                    <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#003087] to-[#33BFFF]">
+                      Reset Password
+                    </h2>
+                    <p className="text-gray-600 dark:text-gray-400 mt-1">
+                      Enter your email to receive a reset link
+                    </p>
+                  </div>
+                  
+                  {!resetRequestSent ? (
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          Email
+                        </label>
+                        <Input
+                          type="email"
+                          value={resetEmail}
+                          onChange={(e) => setResetEmail(e.target.value)}
+                          placeholder="your@email.com"
+                          className="auth-input"
+                        />
+                      </div>
+                      
+                      <div className="space-y-2 pt-2">
+                        <Button
+                          type="button"
+                          onClick={() => {
+                            // Handle password reset
+                            if (!resetEmail || !resetEmail.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+                              toast({
+                                title: "Invalid email",
+                                description: "Please enter a valid email address.",
+                                variant: "destructive",
+                              });
+                              return;
+                            }
+                            
+                            // Track password reset attempt
+                            trackEvent("password_reset_request", "authentication", "forgot_password");
+                            
+                            // Here we would normally call an API endpoint to send a reset email
+                            // For now, we'll simulate success
+                            setResetRequestSent(true);
+                            toast({
+                              title: "Reset link sent",
+                              description: "If an account exists with that email, a password reset link has been sent.",
+                            });
+                          }}
+                          className="w-full bg-gradient-to-r from-[#003087] to-[#33BFFF] hover:opacity-90 transition-all h-11 shadow-md hover:shadow-lg"
+                        >
+                          Send Reset Link
+                        </Button>
+                        
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => setShowForgotPassword(false)}
+                          className="w-full mt-2 border-gray-300 dark:border-gray-700 shadow-sm hover:shadow-md"
+                        >
+                          Back to Login
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-4 text-center">
+                      <div className="py-6">
+                        <div className="mx-auto w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mb-4">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-600">
+                            <path d="M20 6L9 17l-5-5"/>
+                          </svg>
+                        </div>
+                        <p className="text-gray-700 dark:text-gray-300">
+                          We've sent an email to <span className="font-semibold">{resetEmail}</span> with instructions to reset your password.
+                        </p>
+                        <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">
+                          Please check your inbox and follow the provided link.
+                        </p>
+                      </div>
+                      
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => {
+                          setShowForgotPassword(false);
+                          setResetRequestSent(false);
+                        }}
+                        className="shadow-sm hover:shadow-md"
+                      >
+                        Back to Login
+                      </Button>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  <div className="text-center mb-6">
+                    <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#003087] to-[#33BFFF]">
+                      Welcome Back
+                    </h2>
+                    <p className="text-gray-600 dark:text-gray-400 mt-1">
+                      Sign in to continue your journey
+                    </p>
+                  </div>
+                  
+                  <GoogleLoginButton mode="login" />
+                  
+                  <div className="relative my-6">
+                    <Separator />
+                    <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-900 px-2 text-sm text-gray-500">
+                      or continue with
+                    </span>
+                  </div>
+                  
+                  <Form {...loginForm}>
+                    <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
+                      <FormField
                     control={loginForm.control}
                     name="email"
-                    render={({ field }) => (
+                    render={({ field, fieldState }) => (
                       <FormItem>
                         <FormLabel className="text-gray-700 dark:text-gray-300">Email</FormLabel>
                         <FormControl>
                           <Input 
                             type="email"
                             placeholder="your@email.com" 
-                            className="auth-input"
+                            className={`auth-input ${fieldState.isDirty && !fieldState.invalid ? 'border-green-500 ring-green-100' : ''}`}
                             {...field} 
                           />
                         </FormControl>
                         <FormMessage />
+                        {fieldState.isDirty && !fieldState.invalid && (
+                          <FormSuccess>Valid email format</FormSuccess>
+                        )}
                       </FormItem>
                     )}
                   />
