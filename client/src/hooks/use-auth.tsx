@@ -33,6 +33,7 @@ type AuthContextType = {
     lastName?: string;
   }) => Promise<boolean>;
   logout: () => Promise<void>;
+  requestPasswordReset: (email: string) => Promise<boolean>;
 };
 
 type LoginData = {
@@ -203,6 +204,51 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await logoutMutation.mutateAsync();
     } catch (error) {
       console.error("Logout failed in logout helper:", error);
+    }
+  };
+  
+  // Password reset function
+  const requestPasswordReset = async (email: string): Promise<boolean> => {
+    try {
+      trackEvent('password_reset_attempt', 'authentication', 'form');
+      
+      // Call the password reset endpoint
+      const response = await fetch("/api/reset-password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-cache"
+        },
+        body: JSON.stringify({ email })
+      });
+      
+      // Process the response
+      if (response.ok) {
+        trackEvent('password_reset_success', 'authentication', 'form');
+        toast({
+          title: "Password reset email sent",
+          description: "If an account exists with that email, we've sent instructions to reset your password.",
+        });
+        return true;
+      } else {
+        const errorData = await response.json();
+        trackEvent('password_reset_error', 'authentication', 'form');
+        toast({
+          title: "Password reset request failed",
+          description: errorData.message || "Failed to request password reset. Please try again later.",
+          variant: "destructive",
+        });
+        return false;
+      }
+    } catch (error) {
+      console.error("Password reset error:", error);
+      trackEvent('password_reset_error', 'authentication', 'form');
+      toast({
+        title: "Password reset request failed",
+        description: "An unexpected error occurred. Please try again later.",
+        variant: "destructive",
+      });
+      return false;
     }
   };
 

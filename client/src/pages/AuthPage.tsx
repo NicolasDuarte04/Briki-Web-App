@@ -5,7 +5,6 @@ import { ArrowLeft } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { trackEvent } from "@/lib/analytics";
 import UnifiedAuthScreen from "@/components/auth/UnifiedAuthScreen";
-import { AnimatedBackground, FloatingElements } from "@/components/ui/animated-background";
 
 export default function AuthPage() {
   const [, navigate] = useLocation();
@@ -26,14 +25,13 @@ export default function AuthPage() {
   }, [params?.tab]);
   
   return (
-    <AnimatedBackground variant="auth" className="flex min-h-screen items-center justify-center px-4 py-0">
+    <div className="flex min-h-screen items-center justify-center px-4 py-0 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-900 dark:to-gray-800">
       {/* Gradient overlay for depth */}
       <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 to-cyan-500/5 backdrop-blur-[80px] opacity-30"></div>
-      <FloatingElements />
       
       {/* Back to home button */}
       <motion.button 
-        className="absolute top-6 left-6 flex items-center gap-2 text-white/80 hover:text-white transition-colors"
+        className="absolute top-6 left-6 flex items-center gap-2 text-gray-700 hover:text-gray-900 transition-colors"
         onClick={() => navigate('/')}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -56,7 +54,7 @@ export default function AuthPage() {
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tighter bg-gradient-to-r from-[#4C6EFF] to-[#5F9FFF] bg-clip-text text-transparent drop-shadow-md">
             Briki
           </h1>
-          <p className="text-lg text-white/90 font-medium drop-shadow-md mt-2">
+          <p className="text-lg text-gray-700 font-medium mt-2">
             Your AI-powered insurance companion
           </p>
         </motion.div>
@@ -70,6 +68,6 @@ export default function AuthPage() {
           <UnifiedAuthScreen initialTab={params?.tab as "login" | "signup" || "login"} />
         </motion.div>
       </div>
-    </AnimatedBackground>
+    </div>
   );
 }
