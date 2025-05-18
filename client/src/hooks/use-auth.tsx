@@ -58,7 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!isLoading && user) {
       trackEvent('user_authenticated', 'authentication', 'session_start', undefined, {
         user_id: user.id,
-        username: user.username,
+        email: user.email,
         auth_method: 'token'
       });
     }
@@ -66,7 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   
   // Centralized role-based redirection function
   const handleRoleBasedRedirection = (userData: SelectUser) => {
-    console.log("Handling role-based redirection for user:", userData.username);
+    console.log("Handling role-based redirection for user:", userData.email);
     console.log("User role:", userData.role);
     
     if (userData.role === "company") {
@@ -241,7 +241,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Track successful login with user ID for analytics
       trackEvent('login_complete', 'authentication', 'credentials', undefined, {
         user_id: data.user.id,
-        username: data.user.username,
+        email: data.user.email,
         role: data.user.role
       });
       
@@ -275,7 +275,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       toast({
         title: "Login successful",
-        description: `Welcome back, ${data.user.username}!`,
+        description: `Welcome back!`,
       });
     },
     onError: (error: Error) => {
@@ -564,10 +564,10 @@ export function useAuth(): AuthContextType {
       }
     });
     
-    const login = async (username: string, password: string): Promise<boolean> => {
+    const login = async (email: string, password: string): Promise<boolean> => {
       try {
         trackEvent('login_attempt_fallback_helper', 'authentication', 'credentials');
-        await loginMutation.mutateAsync({ username, password });
+        await loginMutation.mutateAsync({ email, password });
         return true;
       } catch (error) {
         console.error("Login failed in fallback login helper:", error);
@@ -575,12 +575,11 @@ export function useAuth(): AuthContextType {
       }
     };
 
-    const register = async (data: { username: string; email: string; password: string }): Promise<boolean> => {
+    const register = async (data: { email: string; password: string }): Promise<boolean> => {
       try {
         trackEvent('signup_attempt_fallback_helper', 'authentication', 'form');
         await registerMutation.mutateAsync({
           id: crypto.randomUUID(),
-          username: data.username,
           email: data.email,
           password: data.password,
           role: "user",
