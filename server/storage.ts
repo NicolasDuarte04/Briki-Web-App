@@ -200,30 +200,48 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async updateUser(id: string, updates: UserUpdate): Promise<User> {
+  // Updated to match interface with two parameters
+  async updateUser(idParam: any, updates?: UserUpdate): Promise<User> {
     try {
-      // Convert string ID to number (since our DB uses numeric IDs)
-      const userId = parseInt(id, 10);
+      // Support both update patterns: updateUser(id, updates) and updateUser({id, ...updates})
+      let id: number;
+      let updateData: any = {};
       
-      if (isNaN(userId)) {
-        throw new Error(`Invalid user ID: ${id}`);
+      // Check if first parameter is an object containing id and updates
+      if (typeof idParam === 'object' && idParam !== null) {
+        // Extract id from the object
+        id = typeof idParam.id === 'number' ? idParam.id : parseInt(idParam.id, 10);
+        
+        // Copy all other properties as updates
+        updateData = {...idParam};
+        delete updateData.id; // Remove id from updates object
+      } else {
+        // Traditional approach: separate id and updates parameters
+        id = typeof idParam === 'number' ? idParam : parseInt(idParam, 10);
+        updateData = updates || {};
+      }
+      
+      if (isNaN(id)) {
+        throw new Error(`Invalid user ID: ${idParam}`);
       }
       
       // Using Drizzle ORM for the update - only include fields that exist in the actual DB
       const updateValues: any = {};
       
       // Build the update object with only fields that exist in our actual database
-      if (updates.username !== undefined) updateValues.username = updates.username;
-      if (updates.email !== undefined) updateValues.email = updates.email;
-      if (updates.password !== undefined) updateValues.password = updates.password;
-      if (updates.name !== undefined) updateValues.name = updates.name;
-      if (updates.role !== undefined) updateValues.role = updates.role;
+      if (updateData.username !== undefined) updateValues.username = updateData.username;
+      if (updateData.email !== undefined) updateValues.email = updateData.email;
+      if (updateData.password !== undefined) updateValues.password = updateData.password;
+      if (updateData.name !== undefined) updateValues.name = updateData.name;
+      if (updateData.role !== undefined) updateValues.role = updateData.role;
       
       // Special handling for company_profile to merge with existing data
-      if (updates.company_profile !== undefined) {
+      if (updateData.company_profile !== undefined) {
+        console.log("Updating company_profile with:", updateData.company_profile);
+        
         // First get the current user to properly merge profiles
         const result = await db.execute(sql`
-          SELECT company_profile FROM users WHERE id = ${userId} LIMIT 1
+          SELECT company_profile FROM users WHERE id = ${id} LIMIT 1
         `);
         
         let existingProfile = {};
@@ -235,19 +253,24 @@ export class DatabaseStorage implements IStorage {
         // Merge the existing profile with new updates
         updateValues.company_profile = {
           ...existingProfile,
-          ...updates.company_profile
+          ...updateData.company_profile
         };
         
-        console.log("Updated company_profile:", updateValues.company_profile);
+        console.log("Merged company_profile:", updateValues.company_profile);
       }
       
-      // Always update updatedAt
-      updateValues.updatedAt = new Date();
+      if (Object.keys(updateValues).length === 0) {
+        console.log("No updates provided for user", id);
+        const user = await this.getUser(id.toString());
+        return user as User;
+      }
+      
+      console.log(`Updating user ${id} with:`, updateValues);
       
       const [user] = await db
         .update(users)
         .set(updateValues)
-        .where(eq(users.id, userId))
+        .where(eq(users.id, id))
         .returning();
       
       return user;
