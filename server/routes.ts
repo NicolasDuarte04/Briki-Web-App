@@ -47,13 +47,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use('/api/auth', googleAuthRoutes);
   app.use('/api/quotes', quotesRoutes);
 
-  // Initialize database
+  // Initialize database - using a more resilient approach
   try {
-    // Check if database is accessible
-    await pool.query('SELECT 1');
-    console.log("Database initialization completed");
+    // Use a simple query to test database connection with timeout
+    const dbCheckPromise = pool.query('SELECT 1');
+    
+    // Set a timeout to avoid hanging if the connection is problematic
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Database connection timeout')), 3000);
+    });
+    
+    // Race the database query against the timeout
+    await Promise.race([dbCheckPromise, timeoutPromise]);
+    console.log("Database connection verified successfully");
   } catch (error) {
-    console.error("Error during database initialization:", error);
+    console.error("Database connection check failed:", error);
+    // Continue app startup even if database check fails - the app will attempt
+    // to reconnect on actual database operations
   }
 
   // Health check endpoint
