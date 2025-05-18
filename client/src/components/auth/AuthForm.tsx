@@ -17,7 +17,7 @@ import { Loader2, EyeIcon, EyeOffIcon } from "lucide-react";
 
 // Login form schema
 const loginSchema = z.object({
-  username: z.string().min(1, "Username is required"),
+  email: z.string().email("Please enter a valid email address"),
   password: z.string().min(1, "Password is required"),
   rememberMe: z.boolean().optional(),
 });
@@ -66,7 +66,7 @@ export default function AuthForm() {
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      username: "",
+      email: "",
       password: "",
       rememberMe: false,
     },
@@ -90,7 +90,7 @@ export default function AuthForm() {
       // Track login attempt
       trackEvent("login_attempt", "authentication", "form_login");
       
-      const success = await login(data.username, data.password);
+      const success = await login(data.email, data.password);
       
       if (success) {
         // Track successful login
