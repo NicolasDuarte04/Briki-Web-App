@@ -51,13 +51,17 @@ export function AuthProvider({ children }: Props) {
         if (response.ok) {
           const userData = await response.json();
           setUser(userData);
-        } else {
-          // Clear user data if not authenticated
+        } else if (response.status === 302 || response.status === 401) {
+          // Handle redirects or unauthorized status gracefully - user is not logged in
           setUser(null);
-          // We don't show error toast on initial load as it's expected for non-logged-in users
+          // Don't show error toast for expected auth states
+        } else {
+          console.warn(`Auth check returned unexpected status: ${response.status}`);
+          setUser(null);
         }
       } catch (error) {
-        console.error('Error loading user:', error);
+        // Only log error if it's not a normal redirect/auth flow
+        console.log('Auth check status:', error);
         setUser(null);
       } finally {
         setIsLoading(false);

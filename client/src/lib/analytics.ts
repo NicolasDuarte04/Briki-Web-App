@@ -1,67 +1,81 @@
-/**
- * Analytics utility for tracking events in the Briki app
- * This module provides simple functions for tracking user interactions
- * and can be expanded to support multiple analytics providers
- */
-
-/**
- * Track a specific event with flexible properties
- * 
- * @param eventName The name of the event to track
- * @param properties Optional properties/dimensions to include with the event
- */
-export const trackEvent = (
-  eventName: string,
-  properties?: Record<string, string | number | boolean> | string | null
-) => {
-  try {
-    // Support for older implementation signature
-    let eventProps: Record<string, any> = {};
-    
-    if (typeof properties === 'string') {
-      // Legacy format: Second param was category
-      eventProps = { 
-        event_category: properties
-      };
-    } else if (properties && typeof properties === 'object') {
-      // New format: Pass properties as an object
-      eventProps = properties;
-    }
-    
-    // Check if gtag is available (Google Analytics)
-    if (typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('event', eventName, eventProps);
-      console.log('[Analytics] Event tracked:', { eventName, properties: eventProps });
-    } else {
-      // If no analytics provider is available, log to console in development
-      if (process.env.NODE_ENV === 'development') {
-        console.log('[Analytics] Event (dev):', { eventName, properties: eventProps });
-      }
-    }
-  } catch (error) {
-    console.error('[Analytics] Error tracking event:', error);
+// Define the gtag function globally
+declare global {
+  interface Window {
+    dataLayer: any[];
+    gtag: (...args: any[]) => void;
   }
+}
+
+// Initialize Google Analytics
+export const initGA = () => {
+  const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID;
+
+  if (!measurementId) {
+    console.warn('Missing required Google Analytics key: VITE_GA_MEASUREMENT_ID');
+    return;
+  }
+
+  // Add Google Analytics script to the head
+  const script1 = document.createElement('script');
+  script1.async = true;
+  script1.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
+  document.head.appendChild(script1);
+
+  // Initialize gtag
+  const script2 = document.createElement('script');
+  script2.innerHTML = `
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', '${measurementId}');
+  `;
+  document.head.appendChild(script2);
+  
+  console.log('Google Analytics initialized with ID:', measurementId);
 };
 
-// Track a page view
+// Track page views - useful for single-page applications
 export const trackPageView = (url: string) => {
-  try {
-    // Check if gtag is available (Google Analytics)
-    if (typeof window !== 'undefined' && (window as any).gtag) {
-      const gaId = (window as any).GA_MEASUREMENT_ID;
-      if (gaId) {
-        (window as any).gtag('config', gaId, {
-          page_path: url,
-        });
-        console.log('[Analytics] Page view tracked:', url);
-      }
-    } else {
-      // If no analytics provider is available, log to console in development
-      if (process.env.NODE_ENV === 'development') {
-        console.log('[Analytics] Page view (dev):', url);
-      }
-    }
-  } catch (error) {
-    console.error('[Analytics] Error tracking page view:', error);
-  }
+  if (typeof window === 'undefined' || !window.gtag) return;
+  
+  const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID;
+  if (!measurementId) return;
+  
+  window.gtag('config', measurementId, {
+    page_path: url
+  });
+  
+  console.log('Page view tracked:', url);
+};
+
+// Track event categories
+export enum EventCategory {
+  USER = 'user',
+  ENGAGEMENT = 'engagement',
+  CONVERSION = 'conversion',
+  INSURANCE = 'insurance',
+  NAVIGATION = 'navigation',
+  QUOTE = 'quote',
+  ERROR = 'error'
+}
+
+// Track events with optional parameters
+export const trackEvent = (
+  action: string, 
+  category: EventCategory | string, 
+  label?: string, 
+  value?: number,
+  additionalParams?: Record<string, any>
+) => {
+  if (typeof window === 'undefined' || !window.gtag) return;
+  
+  const eventParams = {
+    event_category: category,
+    event_label: label,
+    value: value,
+    ...additionalParams
+  };
+  
+  window.gtag('event', action, eventParams);
+  console.log('Event tracked:', { action, category, label, value, ...additionalParams });
 };

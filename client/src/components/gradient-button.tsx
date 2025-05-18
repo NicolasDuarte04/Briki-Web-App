@@ -10,6 +10,9 @@ interface GradientButtonProps extends React.ButtonHTMLAttributes<HTMLButtonEleme
   icon?: ReactNode;
   loading?: boolean;
   loadingText?: string;
+  gradientFrom?: string;
+  gradientTo?: string;
+  iconPosition?: "left" | "right";
 }
 
 const GradientButton = ({
@@ -20,6 +23,9 @@ const GradientButton = ({
   icon,
   loading = false,
   loadingText,
+  gradientFrom,
+  gradientTo,
+  iconPosition = "left",
   ...props
 }: GradientButtonProps) => {
   // Size classes
@@ -28,19 +34,30 @@ const GradientButton = ({
     md: "text-sm px-4 py-2",
     lg: "text-base px-6 py-3",
   };
+  
+  // Custom gradient if provided
+  const customGradient = gradientFrom && gradientTo 
+    ? `bg-gradient-to-r from-[${gradientFrom}] to-[${gradientTo}]`
+    : "";
 
   // Variant classes
   const variantClasses = {
     primary: 
-      "bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 " +
-      "text-white shadow-md hover:shadow-lg border border-blue-400/50 hover:border-blue-600/50",
+      customGradient || ("bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 " +
+      "text-white shadow-md hover:shadow-lg border border-blue-400/50 hover:border-blue-600/50"),
     secondary: 
-      "bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 " +
-      "text-white shadow-md hover:shadow-lg border border-purple-400/50 hover:border-purple-600/50",
+      customGradient || ("bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 " +
+      "text-white shadow-md hover:shadow-lg border border-purple-400/50 hover:border-purple-600/50"),
     outline: 
       "bg-gradient-to-r from-transparent to-transparent hover:from-blue-50/10 hover:to-blue-100/10 " +
       "text-blue-500 border border-blue-400 hover:text-blue-600 hover:border-blue-500",
   };
+
+  // Filter out custom props before passing to DOM element
+  const domProps = {...props};
+  delete (domProps as any).gradientFrom;
+  delete (domProps as any).gradientTo;
+  delete (domProps as any).iconPosition;
 
   return (
     <button
@@ -52,8 +69,8 @@ const GradientButton = ({
         variantClasses[variant],
         className
       )}
-      disabled={loading || props.disabled}
-      {...props}
+      disabled={loading || domProps.disabled}
+      {...domProps}
     >
       {loading ? (
         <>
@@ -62,8 +79,9 @@ const GradientButton = ({
         </>
       ) : (
         <>
-          {icon && <span className="mr-2">{icon}</span>}
+          {icon && iconPosition === "left" && <span className="mr-2">{icon}</span>}
           {children}
+          {icon && iconPosition === "right" && <span className="ml-2">{icon}</span>}
         </>
       )}
     </button>
