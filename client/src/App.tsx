@@ -12,6 +12,9 @@ import { RecentlyViewedProvider } from "@/contexts/recently-viewed-context";
 import { AIAssistantProvider, AuthenticatedLayout, MainLayout } from "@/components/layout";
 import { LoginNotification } from "@/components/login-notification";
 import { useNavigation } from "@/lib/navigation";
+import { useAnalytics } from "@/hooks/use-analytics";
+import { useEffect } from "react";
+import { initGA, trackEvent, EventCategory } from "@/lib/analytics";
 
 import NotFound from "@/pages/not-found";
 import HomePageNew from "@/pages/home-page-new";
@@ -77,6 +80,17 @@ import ContactSalesPage from "@/pages/contact-sales-page";
 
 function Router() {
   const { location } = useNavigation();
+  
+  // Track page views with Google Analytics
+  useAnalytics();
+  
+  // Log landing page view for primary page
+  useEffect(() => {
+    if (location === '/') {
+      console.log('Landing page viewed');
+      trackEvent('page_view', EventCategory.NAVIGATION, 'landing_page');
+    }
+  }, [location]);
   
   return (
     <PageTransition>
@@ -195,6 +209,15 @@ function AppContent() {
 }
 
 function App() {
+  // Initialize Google Analytics on app mount
+  useEffect(() => {
+    if (import.meta.env.VITE_GA_MEASUREMENT_ID) {
+      initGA();
+    } else {
+      console.warn('Google Analytics Measurement ID not provided');
+    }
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
