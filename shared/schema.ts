@@ -4,13 +4,17 @@ import { z } from "zod";
 
 // Database tables for user management
 export const users = pgTable("users", {
-  id: integer("id").primaryKey(), // Integer ID per schema check
-  name: text("name"), // Name as a text field instead of firstName/lastName
+  id: varchar("id").primaryKey(), // String ID to support both number and OAuth string IDs
+  name: text("name"), // Name as a text field
   username: text("username"),
   email: text("email").unique().notNull(),
   password: text("password"),
   role: varchar("role").default("user"),
+  profileImageUrl: text("profile_image_url"),
+  firstName: text("first_name"),
+  lastName: text("last_name"),
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
   company_profile: jsonb("company_profile")
 });
 
