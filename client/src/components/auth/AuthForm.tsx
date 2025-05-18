@@ -22,24 +22,25 @@ const loginSchema = z.object({
   rememberMe: z.boolean().optional(),
 });
 
-// Registration form schema with stronger validation
-const registrationSchema = z.object({
-  email: z.string().email("Please enter a valid email"),
-  password: z
-    .string()
-    .min(8, "Password must be at least 8 characters")
-    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-    .regex(/[a-z]/, "Password must contain at least one lowercase letter")
-    .regex(/[0-9]/, "Password must contain at least one number"),
-  confirmPassword: z.string(),
-  acceptTerms: z.boolean()
-    .refine(val => val === true, {
+// Registration form schema with stronger validation and password confirmation
+const registrationSchema = z
+  .object({
+    email: z.string().email("Please enter a valid email"),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+      .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+      .regex(/[0-9]/, "Password must contain at least one number"),
+    confirmPassword: z.string().min(1, "Please confirm your password"),
+    acceptTerms: z.boolean().default(false).refine((val) => val === true, {
       message: "You must accept the terms and conditions",
-    }),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords do not match",
-  path: ["confirmPassword"],
-});
+    })
+  })
+  .refine(data => data.password === data.confirmPassword, {
+    message: "Passwords must match",
+    path: ["confirmPassword"]
+  });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 type RegistrationFormValues = z.infer<typeof registrationSchema>;
