@@ -67,7 +67,7 @@ router.post('/login', async (req: Request, res: Response) => {
 // User registration
 router.post('/register', async (req: Request, res: Response) => {
   try {
-    const { email, password, confirmPassword } = req.body;
+    const { email, password, confirmPassword, firstName, lastName } = req.body;
     
     if (!email || !password) {
       return res.status(400).json({ 
@@ -118,12 +118,23 @@ router.post('/register', async (req: Request, res: Response) => {
     // Generate username from email (for backward compatibility)
     const username = email.split('@')[0];
     
-    // Create new user with email as primary identifier and auto-generated username
+    // Create display name from first and last name if available
+    let name = null;
+    if (firstName && lastName) {
+      name = `${firstName} ${lastName}`;
+    } else if (firstName) {
+      name = firstName;
+    }
+    
+    // Create new user with email as primary identifier and enhanced profile fields
     const newUser = await storage.createUser({
       id: uuidv4(),
       email,
       username, // Auto-generated from email
       password: hashedPassword,
+      firstName, // New profile field
+      lastName,  // New profile field
+      name,      // Generated from firstName/lastName if available
       role: "user", // Default role
     });
     
