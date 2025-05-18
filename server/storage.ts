@@ -145,17 +145,18 @@ export class DatabaseStorage implements IStorage {
         username = 'user';
       }
       
+      console.log("Attempting to create user with email:", userData.email);
+      
       // Use proper Drizzle ORM insert syntax matching the actual DB schema
+      // Only using fields that exist in the database
       const [user] = await db
         .insert(users)
         .values({
-          // Note: We use email as the primary unique identifier
           email: userData.email,
           username: username,
           password: userData.password,
           role: userData.role || 'user',
           name: 'New User', // Default name for users
-          // createdAt is handled by defaultNow()
           company_profile: {} // Empty JSON object for company profile
         })
         .returning();
