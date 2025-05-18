@@ -1,0 +1,76 @@
+Yes, go ahead and create the migration to add the missing columns to the database so we can fix the schema mismatch. Once that’s done, proceed with the following instructions to **rebuild the authentication system UI and logic from scratch**.
+
+---
+
+## PHASE 1: Fix Schema Mismatch
+
+1. Run a migration to add the following missing columns to the users table:
+   - `first_name` (string, optional)
+   - `last_name` (string, optional)
+   - `profile_image_url` (string, optional)
+
+2. Confirm that all fields in shared/schema.ts match the actual PostgreSQL schema after migration.
+
+3. Eliminate any use of `db.query.raw` or `db.execute(sql)` in the user registration flow. Use Drizzle ORM insert syntax instead.
+
+4. Verify that the `createUser()` function in `server/storage.ts` works correctly with the new schema and does not throw any errors for missing columns.
+
+---
+
+## PHASE 2: Rebuild the Authentication UI
+
+### Overview:
+We want to fully **remove** the current login/register components and **rebuild** a modern, clean UI inspired by our **Briki landing page aesthetic**.
+
+### Requirements:
+
+#### 1. Replace Legacy Files:
+- Delete or archive:
+  - `AuthForm.tsx`
+  - `FixedAuthForm.tsx`
+- Replace usage across the app with the new UI component only
+
+#### 2. New Auth Component Structure:
+- Single unified component: `UnifiedAuthScreen.tsx`
+- Includes two tabs: `Log In` and `Sign Up`
+- Uses proper styling (from landing page):
+  - Rounded borders, proper spacing
+  - Modern font, color palette, and hover states
+  - Fully responsive and mobile-ready
+
+#### 3. Log In Tab:
+- Fields:
+  - `email`
+  - `password`
+- Include:
+  - “Continue with Google” button
+  - “Forgot Password?” link (can be inactive for now)
+
+#### 4. Sign Up Tab:
+- Fields:
+  - `first name` (optional)
+  - `last name` (optional)
+  - `email` (required)
+  - `password`
+  - `confirm password`
+- Include:
+  - “Continue with Google” button
+- Password must match validation (Zod + backend)
+- Visual indicators (green checkmarks for correct fields, red for errors)
+
+#### 5. Functionality:
+- All form submissions should go to the correct endpoints:
+  - `/api/auth/register`
+  - `/api/auth/login`
+- Use the correct auth logic with token storage and redirection
+- Ensure Google auth also populates fields like name and profile image correctly
+
+---
+
+## PHASE 3: Final Validation
+- Ensure both login and register work in dev and production
+- Remove any unused routes or endpoints related to the legacy auth system
+- Add visual polish (shadow, spacing, button states) matching landing page style
+- Ensure role-based redirection (e.g., if user is `company`, go to `/company-dashboard`, else `/home`)
+
+Let me know when PHASE 1 is complete so we can validate the schema before you continue to UI.
