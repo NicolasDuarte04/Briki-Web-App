@@ -18,7 +18,7 @@ import { initGA, trackEvent, EventCategory } from "@/lib/analytics";
 
 import NotFound from "@/pages/not-found";
 import HomePageNew from "@/pages/home-page-new";
-import Dashboard from "@/pages/dashboard";
+import Dashboard from "@/pages/dashboard-enhanced";
 // Import our new unified authentication screen
 import AuthPage from "@/pages/AuthPage";
 import TripInfoPage from "@/pages/trip-info-page";
