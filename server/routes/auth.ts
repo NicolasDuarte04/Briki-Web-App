@@ -19,17 +19,17 @@ router.get('/user', requireAuth, async (req: Request, res: Response) => {
   }
 });
 
-// Local login with username/password
+// Local login with email/password
 router.post('/login', async (req: Request, res: Response) => {
   try {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
     
-    if (!username || !password) {
-      return res.status(400).json({ message: 'Username and password are required' });
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email and password are required' });
     }
     
-    // Find user by username
-    const user = await storage.getUserByUsername(username);
+    // Find user by email
+    const user = await storage.getUserByEmail(email);
     
     if (!user) {
       return res.status(401).json({ message: 'Invalid credentials' });
