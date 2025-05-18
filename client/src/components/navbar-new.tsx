@@ -29,7 +29,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 export default function NavbarNew() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const { user, isLoading, logoutMutation, isAuthenticated } = useAuth();
+  const { user, isLoading, isAuthenticated, logout } = useAuth();
   const { t } = useLanguage();
   const { toggleAssistant } = useAIAssistantUI();
   
@@ -51,16 +51,16 @@ export default function NavbarNew() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
   
-  const handleLogout = () => {
-    logoutMutation.mutate();
+  const handleLogout = async () => {
+    await logout();
   };
 
   // Get user initials for avatar
   const getUserInitials = () => {
     if (!user) return "U";
     
-    if (user.name) {
-      return user.name[0].toUpperCase();
+    if (user.firstName) {
+      return user.firstName[0].toUpperCase();
     }
     
     return user.username[0].toUpperCase();
@@ -267,13 +267,8 @@ export default function NavbarNew() {
                     <DropdownMenuItem 
                       className="cursor-pointer hover:bg-destructive/10 focus:bg-destructive/10"
                       onClick={handleLogout}
-                      disabled={logoutMutation.isPending}
                     >
-                      {logoutMutation.isPending ? (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin text-destructive/70" />
-                      ) : (
-                        <LogOut className="mr-2 h-4 w-4 text-destructive/70" />
-                      )}
+                      <LogOut className="mr-2 h-4 w-4 text-destructive/70" />
                       <span className="text-destructive/80">Sign out</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
