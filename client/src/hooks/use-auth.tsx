@@ -155,7 +155,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const register = async (data: { email: string; password: string; confirmPassword?: string; name?: string }): Promise<boolean> => {
+  const register = async (data: { 
+    email: string; 
+    password: string; 
+    confirmPassword?: string; 
+    firstName?: string;
+    lastName?: string;
+    name?: string 
+  }): Promise<boolean> => {
     try {
       // Verify passwords match if confirmPassword is provided
       if (data.confirmPassword && data.password !== data.confirmPassword) {
@@ -169,13 +176,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       trackEvent('signup_attempt', 'authentication', 'form_signup');
       
-      // Now we send email, password, and optional name - no more username field
+      // Now we send email, password, and profile fields
       const result = await registerMutation.mutateAsync({
         // We don't need to generate a UUID here - the DB will assign an ID
         email: data.email,
         password: data.password,
-        // Use name if provided or leave it for the server to generate from email
-        name: data.name,
+        // Include first and last name if provided
+        firstName: data.firstName,
+        lastName: data.lastName,
+        // Use name if provided or leave it for the server to generate
+        name: data.name || (data.firstName && data.lastName ? `${data.firstName} ${data.lastName}` : undefined),
         // Only provide fields that exist in the actual database schema
         role: "user",
         company_profile: { registeredWith: "email" },
