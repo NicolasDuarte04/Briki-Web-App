@@ -97,7 +97,8 @@ export async function registerUser(req: Request, res: Response) {
     }
     
     // Check if this email was used with a social login
-    const socialUser = existingUser?.company_profile?.googleId;
+    // Access googleId through the correct path in company_profile
+    const socialUser = existingUser?.company_profile?.registeredWith === 'google';
     if (socialUser) {
       return res.status(400).json({
         message: "This email is registered with Google. Please use Google Sign In"

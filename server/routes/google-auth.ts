@@ -67,7 +67,9 @@ if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
             googleId: id,
             profileImageUrl: photos?.[0]?.value,
             registeredWith: "google"
-          }
+          },
+          // Add null password since it's required by the schema but not used with Google auth
+          password: null
         });
         
         return done(null, newUser);
@@ -85,12 +87,22 @@ passport.serializeUser((user, done) => {
 });
 
 // Deserialize user from the session
-passport.deserializeUser(async (id, done) => {
+passport.deserializeUser(async (id: string, done) => {
   try {
+    // Make sure we're parsing IDs correctly - our database uses numeric IDs
+    if (!id) {
+      return done(new Error('Invalid user ID'), null);
+    }
+    
     const user = await storage.getUser(id);
-    done(null, user);
+    if (!user) {
+      return done(new Error('User not found'), null);
+    }
+    
+    return done(null, user);
   } catch (error) {
-    done(error, null);
+    console.error('Error deserializing user:', error);
+    return done(error, null);
   }
 });
 
@@ -102,17 +114,43 @@ router.get('/google', passport.authenticate('google', {
 
 router.get('/google/callback', 
   passport.authenticate('google', { 
-    failureRedirect: '/auth/login',
-    successRedirect: '/dashboard',
-  })
+    failureRedirect: '/auth',
+    failureMessage: true
+  }), 
+  (req, res) => {
+    // Handle successful authentication
+    console.log('Google authentication successful, redirecting to home');
+    
+    // Get user role to determine where to redirect
+    const user = req.user as any;
+    const role = user?.role;
+    
+    // Redirect based on user role
+    if (role === 'company') {
+      res.redirect('/company-dashboard');
+    } else {
+      res.redirect('/home');
+    }
+  }
 );
 
 // Get current user information
 router.get('/user', (req, res) => {
   if (req.isAuthenticated()) {
-    // Only return safe user fields
-    const { id, username, email, firstName, lastName, profileImageUrl, role } = req.user;
-    res.json({ id, username, email, firstName, lastName, profileImageUrl, role });
+    // Only return safe user fields - using the actual fields in our database schema
+    const { id, username, email, name, role, company_profile } = req.user;
+    
+    // Extract profile image URL from company_profile if it exists
+    const profileImageUrl = company_profile?.profileImageUrl || null;
+    
+    res.json({ 
+      id, 
+      username, 
+      email, 
+      name,
+      role,
+      profileImageUrl
+    });
   } else {
     res.status(401).json({ message: 'Not authenticated' });
   }
