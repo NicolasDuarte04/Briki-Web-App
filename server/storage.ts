@@ -106,11 +106,13 @@ export class DatabaseStorage implements IStorage {
     if (!email) return undefined;
     
     try {
-      const result = await db.query.raw(`
-        SELECT * FROM users WHERE email = $1 LIMIT 1
-      `, [email]);
+      const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.email, email))
+        .limit(1);
       
-      return result.rows[0] as User || undefined;
+      return user;
     } catch (error) {
       console.error("Error getting user by email:", error);
       return undefined;
@@ -119,11 +121,13 @@ export class DatabaseStorage implements IStorage {
 
   async getUserByGoogleId(googleId: string): Promise<User | undefined> {
     try {
-      const result = await db.query.raw(`
-        SELECT * FROM users WHERE google_id = $1 LIMIT 1
-      `, [googleId]);
+      const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.googleId, googleId))
+        .limit(1);
       
-      return result.rows[0] as User || undefined;
+      return user;
     } catch (error) {
       console.error("Error getting user by Google ID:", error);
       return undefined;
@@ -132,9 +136,6 @@ export class DatabaseStorage implements IStorage {
 
   async createUser(userData: UserAuth): Promise<User> {
     try {
-      // Set current timestamp for created_at and updated_at
-      const now = new Date();
-      
       // Generate a username from email if not provided
       let username = userData.username;
       if (!username && userData.email) {
@@ -148,29 +149,32 @@ export class DatabaseStorage implements IStorage {
         username = 'user';
       }
       
-      const result = await db.query.raw(`
-        INSERT INTO users 
-        (id, username, email, password, first_name, last_name, profile_image_url, google_id, role, created_at, updated_at)
-        VALUES
-        ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-        RETURNING *
-      `, [
-        userData.id, 
-        username, 
-        userData.email, 
-        userData.password,
-        userData.firstName || null,
-        userData.lastName || null,
-        userData.profileImageUrl || null,
-        userData.googleId || null,
-        userData.role || 'user',
-        now,
-        now
-      ]);
+      // Use proper Drizzle ORM insert syntax
+      const [user] = await db
+        .insert(users)
+        .values({
+          id: userData.id,
+          username: username,
+          email: userData.email,
+          password: userData.password,
+          firstName: userData.firstName || null,
+          lastName: userData.lastName || null,
+          profileImageUrl: userData.profileImageUrl || null,
+          googleId: userData.googleId || null,
+          role: userData.role || 'user',
+          // createdAt and updatedAt will be handled by defaultNow()
+        })
+        .returning();
       
-      return result.rows[0] as User;
+      console.log("User created successfully:", { id: user.id, email: user.email });
+      return user;
     } catch (error) {
       console.error("Error creating user:", error);
+      // Log more detailed error information for debugging
+      if (error instanceof Error) {
+        console.error("Error message:", error.message);
+        console.error("Error stack:", error.stack);
+      }
       throw error;
     }
   }

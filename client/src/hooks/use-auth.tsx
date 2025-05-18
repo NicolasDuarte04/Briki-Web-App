@@ -168,7 +168,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       const result = await registerMutation.mutateAsync({
         id: crypto.randomUUID(),
-        username, // Include username derived from email
+        // Username is now optional - we let the server generate it
         email: data.email,
         password: data.password,
         role: "user",
