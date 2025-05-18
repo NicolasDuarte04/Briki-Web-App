@@ -26,17 +26,14 @@ export const userAuthSchema = z.object({
 // We're using the users schema from shared/schema.ts instead of defining it here
 
 export type User = {
-  id: string;
+  id: number;
   username?: string;
   email: string;
-  password: string | null;
-  firstName: string | null;
-  lastName: string | null;
-  profileImageUrl: string | null;
-  googleId: string | null;
-  role: "user" | "admin" | "company";
-  createdAt: Date;
-  updatedAt: Date;
+  password?: string;
+  name?: string;
+  role?: string;
+  createdAt?: Date;
+  company_profile?: any;
 };
 
 export type UserAuth = z.infer<typeof userAuthSchema>;
@@ -106,28 +103,27 @@ export class DatabaseStorage implements IStorage {
     if (!email) return undefined;
     
     try {
+      // Select only fields that exist in the actual database
       const [user] = await db
         .select()
         .from(users)
         .where(eq(users.email, email))
         .limit(1);
       
-      return user;
+      return user || undefined;
     } catch (error) {
       console.error("Error getting user by email:", error);
       return undefined;
     }
   }
 
+  // Currently we don't have a googleId field in our database
+  // but keeping this function as a stub for when we implement it
   async getUserByGoogleId(googleId: string): Promise<User | undefined> {
     try {
-      const [user] = await db
-        .select()
-        .from(users)
-        .where(eq(users.googleId, googleId))
-        .limit(1);
-      
-      return user;
+      // We'll need to update this when we add the googleId field to the schema
+      console.log("Note: getUserByGoogleId is stubbed as googleId is not in the DB schema");
+      return undefined;
     } catch (error) {
       console.error("Error getting user by Google ID:", error);
       return undefined;
@@ -149,22 +145,18 @@ export class DatabaseStorage implements IStorage {
         username = 'user';
       }
       
-      // Use proper Drizzle ORM insert syntax - only using fields that exist in the DB
+      // Use proper Drizzle ORM insert syntax matching the actual DB schema
       const [user] = await db
         .insert(users)
         .values({
-          // id is an integer in the DB according to schema check
-          // username as text
-          username: username,
-          // email as text
+          // Note: We use email as the primary unique identifier
           email: userData.email,
-          // password as text
+          username: username,
           password: userData.password,
-          // role as varchar
           role: userData.role || 'user',
-          // Name field (combined first/last name)
-          name: userData.firstName ? (userData.lastName ? `${userData.firstName} ${userData.lastName}` : userData.firstName) : 'User',
-          // created_at will be handled by defaultNow()
+          name: 'New User', // Default name for users
+          // createdAt is handled by defaultNow()
+          company_profile: {} // Empty JSON object for company profile
         })
         .returning();
       

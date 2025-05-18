@@ -4,17 +4,14 @@ import { z } from "zod";
 
 // Database tables for user management
 export const users = pgTable("users", {
-  id: varchar("id").primaryKey().notNull(),
-  username: varchar("username"),
-  email: varchar("email").unique().notNull(),
-  password: varchar("password"),
-  firstName: varchar("first_name"),
-  lastName: varchar("last_name"),
-  profileImageUrl: varchar("profile_image_url"),
-  googleId: varchar("google_id").unique(),
+  id: integer("id").primaryKey(), // Integer ID per schema check
+  name: text("name"), // Name as a text field instead of firstName/lastName
+  username: text("username"),
+  email: text("email").unique().notNull(),
+  password: text("password"),
   role: varchar("role").default("user"),
   createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  company_profile: jsonb("company_profile")
 });
 
 // Database table for session management
@@ -297,7 +294,13 @@ export const insertUserSchema = createInsertSchema(users).extend({
   // Keep email required  
   email: z.string().email("Please enter a valid email"),
   // Add validation for password
-  password: z.string().min(8, "Password must be at least 8 characters")
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  // Make id optional since it's auto-generated
+  id: z.number().optional(),
+  // Make name optional
+  name: z.string().optional(),
+  // Make company_profile optional
+  company_profile: z.any().optional()
 });
 export const insertQuoteSchema = createInsertSchema(quotes, {
   id: undefined,
@@ -322,7 +325,16 @@ export const insertOrderSchema = createInsertSchema(orders, {
 
 // Export types for CRUD operations
 export type InsertUser = z.infer<typeof insertUserSchema>;
-export type User = typeof users.$inferSelect;
+export type User = {
+  id: number;
+  username?: string;
+  email: string;
+  password?: string;
+  name?: string;
+  role?: string;
+  createdAt?: Date;
+  company_profile?: any;
+};
 
 export type InsertQuote = z.infer<typeof insertQuoteSchema>;
 export type Quote = typeof quotes.$inferSelect;
