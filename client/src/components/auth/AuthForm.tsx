@@ -325,23 +325,7 @@ export default function AuthForm() {
               
               <Form {...registerForm}>
                 <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-4">
-                  <FormField
-                    control={registerForm.control}
-                    name="username"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-gray-700 dark:text-gray-300">Username</FormLabel>
-                        <FormControl>
-                          <Input 
-                            placeholder="Choose a username" 
-                            className="auth-input"
-                            {...field} 
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  {/* Username field removed - using email as primary identifier */}
                   
                   <FormField
                     control={registerForm.control}
