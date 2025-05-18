@@ -149,20 +149,22 @@ export class DatabaseStorage implements IStorage {
         username = 'user';
       }
       
-      // Use proper Drizzle ORM insert syntax
+      // Use proper Drizzle ORM insert syntax - only using fields that exist in the DB
       const [user] = await db
         .insert(users)
         .values({
-          id: userData.id,
+          // id is an integer in the DB according to schema check
+          // username as text
           username: username,
+          // email as text
           email: userData.email,
+          // password as text
           password: userData.password,
-          firstName: userData.firstName || null,
-          lastName: userData.lastName || null,
-          profileImageUrl: userData.profileImageUrl || null,
-          googleId: userData.googleId || null,
+          // role as varchar
           role: userData.role || 'user',
-          // createdAt and updatedAt will be handled by defaultNow()
+          // Name field (combined first/last name)
+          name: userData.firstName ? (userData.lastName ? `${userData.firstName} ${userData.lastName}` : userData.firstName) : 'User',
+          // created_at will be handled by defaultNow()
         })
         .returning();
       
@@ -231,15 +233,29 @@ export class DatabaseStorage implements IStorage {
       setValues.push(`updated_at = $${paramCounter++}`);
       queryParams.push(new Date());
       
-      // Execute the update query
-      const result = await db.query.raw(`
-        UPDATE users
-        SET ${setValues.join(', ')}
-        WHERE id = $1
-        RETURNING *
-      `, queryParams);
+      // Using Drizzle ORM for the update
+      const updateValues: any = {};
       
-      return result.rows[0] as User;
+      // Build the update object dynamically
+      if (updates.username !== undefined) updateValues.username = updates.username;
+      if (updates.email !== undefined) updateValues.email = updates.email;
+      if (updates.password !== undefined) updateValues.password = updates.password;
+      if (updates.firstName !== undefined) updateValues.firstName = updates.firstName;
+      if (updates.lastName !== undefined) updateValues.lastName = updates.lastName;
+      if (updates.profileImageUrl !== undefined) updateValues.profileImageUrl = updates.profileImageUrl;
+      if (updates.googleId !== undefined) updateValues.googleId = updates.googleId;
+      if (updates.role !== undefined) updateValues.role = updates.role;
+      
+      // Always update updatedAt
+      updateValues.updatedAt = new Date();
+      
+      const [user] = await db
+        .update(users)
+        .set(updateValues)
+        .where(eq(users.id, id))
+        .returning();
+      
+      return user;
     } catch (error) {
       console.error("Error updating user:", error);
       throw error;
