@@ -5,8 +5,8 @@ import { z } from "zod";
 // Database tables for user management
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().notNull(),
-  username: varchar("username").notNull(),
-  email: varchar("email").unique(),
+  username: varchar("username"),
+  email: varchar("email").unique().notNull(),
   password: varchar("password"),
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
