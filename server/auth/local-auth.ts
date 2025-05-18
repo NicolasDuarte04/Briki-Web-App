@@ -71,16 +71,19 @@ export async function registerUser(req: Request, res: Response) {
     // Create new user - generate a username from email if needed
     const username = email.split('@')[0]; // Simple username from email
     
+    // Only use fields that exist in the actual database
     const user = await storage.createUser({
-      id: uuidv4(),
+      // Note: id is now a number and auto-incremented by the database
       username,
       email,
       password: hashedPassword,
-      firstName: firstName || null,
-      lastName: lastName || null,
-      profileImageUrl: null,
-      googleId: null,
+      // Combine firstName and lastName into name if they exist
+      name: firstName && lastName ? `${firstName} ${lastName}` : 
+            firstName ? firstName : 
+            lastName ? lastName : 'New User',
       role: "user",
+      // Add empty company_profile as it exists in the DB
+      company_profile: {}
     });
 
     // Log user in after registration
@@ -88,13 +91,12 @@ export async function registerUser(req: Request, res: Response) {
       if (err) {
         return res.status(500).json({ message: "Error during login after registration" });
       }
+      // Return only fields that exist in our actual database schema
       return res.status(201).json({ user: { 
         id: user.id,
         username: user.username,
         email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        profileImageUrl: user.profileImageUrl,
+        name: user.name,
         role: user.role,
       }});
     });
@@ -119,13 +121,12 @@ export function loginUser(req: Request, res: Response, next: NextFunction) {
         return next(err);
       }
       
+      // Return only fields that exist in our actual database schema
       return res.status(200).json({ user: {
         id: user.id,
         username: user.username,
         email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        profileImageUrl: user.profileImageUrl,
+        name: user.name,
         role: user.role,
       }});
     });
