@@ -81,8 +81,23 @@ export class DatabaseStorage implements IStorage {
   }
   async getUser(id: string): Promise<User | undefined> {
     try {
-      const [user] = await db.select().from(users).where(eq(users.id, id)).limit(1);
-      return user;
+      // Convert string id to number since database uses integer ids
+      const numericId = parseInt(id, 10);
+      if (isNaN(numericId)) {
+        console.error("Invalid user ID format:", id);
+        return undefined;
+      }
+      
+      // Use SQL template for explicit type conversion
+      const result = await db.execute(sql`
+        SELECT * FROM users WHERE id = ${numericId} LIMIT 1
+      `);
+      
+      if (!result || !result.rows || result.rows.length === 0) {
+        return undefined;
+      }
+      
+      return result.rows[0] as User;
     } catch (error) {
       console.error("Error getting user by ID:", error);
       return undefined;
