@@ -68,8 +68,9 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import PageHeader from "@/components/page-header";
-import EmptyState from "@/components/empty-state";
+// Using components we created directly in this project
+import PageHeader from "../components/page-header";
+import EmptyState from "../components/empty-state";
 
 // Quote status badge component
 const StatusBadge = ({ status }: { status: string }) => {
@@ -538,7 +539,7 @@ export default function QuoteHistoryPage() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          {format(new Date(quote.createdAt), 'PP')}
+                          {quote.createdAt ? format(new Date(quote.createdAt), 'PP') : 'N/A'}
                         </TableCell>
                         <TableCell>{quote.country}</TableCell>
                         <TableCell>${quote.totalPrice?.toFixed(2) || "0.00"}</TableCell>

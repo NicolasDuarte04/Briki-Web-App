@@ -128,6 +128,7 @@ function Router() {
         <Route path="/insurance/:category/quote" component={InsuranceQuote} />
         <Route path="/get-quote" component={GetQuotePage} />
         <Route path="/quote-confirmation" component={QuoteConfirmationPage} />
+        <Route path="/quote-history" component={QuoteHistoryPage} />
         <Route path="/compare-plans-demo" component={ComparePlansDemo} />
         <Route path="/learn-more" component={LearnMorePage} />
         <Route path="/terms" component={TermsPage} />
