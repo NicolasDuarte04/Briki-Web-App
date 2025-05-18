@@ -24,12 +24,14 @@ type AuthContextType = {
   logoutMutation: UseMutationResult<null, Error, void>;
   registerMutation: UseMutationResult<TokenResponse, Error, InsertUser>;
   refetchUser: () => Promise<any>;
-  login: (username: string, password: string) => Promise<boolean>;
-  register: (data: { username: string; email: string; password: string }) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<boolean>;
+  register: (data: { email: string; password: string }) => Promise<boolean>;
   logout: () => Promise<void>;
 };
 
-type LoginData = Pick<InsertUser, "username" | "password"> & {
+type LoginData = {
+  email: string;
+  password: string;
   role?: string; // Add optional role parameter for company login
 };
 
@@ -136,10 +138,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     enabled: true
   });
 
-  const login = async (username: string, password: string): Promise<boolean> => {
+  const login = async (email: string, password: string): Promise<boolean> => {
     try {
       trackEvent('login_attempt', 'authentication', 'form_login', undefined, { method: 'credentials' });
-      const result = await loginMutation.mutateAsync({ username, password });
+      const result = await loginMutation.mutateAsync({ email, password });
       return !!result;
     } catch (error) {
       console.error("Login failed in login helper:", error);
@@ -147,12 +149,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const register = async (data: { username: string; email: string; password: string }): Promise<boolean> => {
+  const register = async (data: { email: string; password: string }): Promise<boolean> => {
     try {
       trackEvent('signup_attempt', 'authentication', 'form_signup');
       const result = await registerMutation.mutateAsync({
         id: crypto.randomUUID(),
-        username: data.username,
         email: data.email,
         password: data.password,
         role: "user",
