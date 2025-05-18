@@ -48,8 +48,8 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
       return res.status(401).json({ message: 'Invalid token' });
     }
     
-    // Retrieve the user
-    const user = await storage.getUser(userId);
+    // Retrieve the user (convert to string to match our schema)
+    const user = await storage.getUser(String(userId));
     if (!user) {
       console.log('Auth middleware - User not found for token');
       return res.status(401).json({ message: 'User not found' });
