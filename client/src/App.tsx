@@ -28,7 +28,7 @@ import TermsPage from "@/pages/terms-page";
 import ProfilePage from "@/pages/profile-page";
 import SettingsPage from "@/pages/settings-page";
 import ApiSettingsPage from "@/pages/api-settings-page";
-import ComparePlansPage from "./pages/compare-plans-debug";
+import ComparePlansPage from "@/pages/compare-plans";  // Updated to use the main compare plans component
 
 // Import redirects from their respective files
 import { 
