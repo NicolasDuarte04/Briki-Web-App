@@ -6,22 +6,19 @@ import { storage } from "../storage";
 import { v4 as uuidv4 } from "uuid";
 
 export async function configureLocalAuth() {
-  // Local Strategy for username/password authentication
+  // Local Strategy for email-based authentication only
   passport.use(
     new LocalStrategy(
       {
-        usernameField: "identifier", // email or username
+        usernameField: "email", // Only use email as identifier
         passwordField: "password",
       },
-      async (identifier, password, done) => {
+      async (email, password, done) => {
         try {
-          // Check if the identifier is an email or username
-          const isEmail = identifier.includes("@");
+          console.log("Attempting login with email:", email);
           
-          // Find user by email or username
-          const user = isEmail 
-            ? await storage.getUserByEmail(identifier)
-            : await storage.getUserByUsername(identifier);
+          // Find user by email only - removing username-based authentication
+          const user = await storage.getUserByEmail(email);
 
           if (!user) {
             return done(null, false, { message: "Invalid credentials" });
@@ -49,11 +46,37 @@ export async function configureLocalAuth() {
 
 export async function registerUser(req: Request, res: Response) {
   try {
-    const { email, password, firstName, lastName } = req.body;
+    const { email, password, confirmPassword, name } = req.body;
 
-    // Email is now required, we'll use it as the main identifier
+    // Email is required as the main identifier
     if (!email) {
       return res.status(400).json({ message: "Email is required" });
+    }
+    
+    // Password validation
+    if (!password) {
+      return res.status(400).json({ message: "Password is required" });
+    }
+    
+    // Check password length
+    if (password.length < 8) {
+      return res.status(400).json({ message: "Password must be at least 8 characters" });
+    }
+    
+    // Check password complexity
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    
+    if (!hasUpperCase || !hasLowerCase || !hasNumber) {
+      return res.status(400).json({ 
+        message: "Password must include at least one uppercase letter, one lowercase letter, and one number" 
+      });
+    }
+    
+    // Confirm passwords match
+    if (confirmPassword && password !== confirmPassword) {
+      return res.status(400).json({ message: "Passwords do not match" });
     }
 
     // Check if user with this email already exists
@@ -68,21 +91,19 @@ export async function registerUser(req: Request, res: Response) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create new user - generate a username from email if needed
-    const username = email.split('@')[0]; // Simple username from email
+    // Create a username from email for backward compatibility
+    const username = email.split('@')[0]; 
+    
+    console.log("Creating user with email:", email);
     
     // Only use fields that exist in the actual database
     const user = await storage.createUser({
-      // Note: id is now a number and auto-incremented by the database
-      username,
+      // Note: id is auto-generated in the DB
+      username, // Keep for backward compatibility
       email,
       password: hashedPassword,
-      // Combine firstName and lastName into name if they exist
-      name: firstName && lastName ? `${firstName} ${lastName}` : 
-            firstName ? firstName : 
-            lastName ? lastName : 'New User',
+      name: name || email.split('@')[0], // Use provided name or default to email username
       role: "user",
-      // Add empty company_profile as it exists in the DB
       company_profile: {}
     });
 
