@@ -36,34 +36,38 @@ if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
       
       if (existingUser) {
         // Update existing user with latest Google profile information
+        // Merge Google profile info into existing company_profile
+        const currentProfile = existingUser.company_profile || {};
+        const updatedProfile = {
+          ...currentProfile,
+          googleId: id,
+          profileImageUrl: photos?.[0]?.value,
+          registeredWith: "google"
+        };
+        
         const updatedUser = await storage.updateUser({
           id: existingUser.id,
-          username: existingUser.username,
-          googleId: id,
-          profileImageUrl: photos?.[0]?.value || existingUser.profileImageUrl,
+          company_profile: updatedProfile
         });
         
         return done(null, updatedUser);
       } else {
         // Create new user from Google profile
-        // Split display name into first name and last name if possible
-        const nameParts = displayName.split(' ');
-        const firstName = nameParts[0] || '';
-        const lastName = nameParts.slice(1).join(' ') || '';
+        // Generate a username and name from email
         const username = email.split('@')[0];
-        
-        // Generate a unique ID for the new user
-        const userId = uuidv4();
+        const name = displayName || username;
         
         const newUser = await storage.createUser({
-          id: userId,
-          username: username,
-          googleId: id,
           email: email,
-          firstName: firstName,
-          lastName: lastName,
-          profileImageUrl: photos?.[0]?.value,
+          username: username,
+          name: name,
           role: "user", // Default role
+          // Store Google profile info in company_profile field (JSON)
+          company_profile: {
+            googleId: id,
+            profileImageUrl: photos?.[0]?.value,
+            registeredWith: "google"
+          }
         });
         
         return done(null, newUser);
