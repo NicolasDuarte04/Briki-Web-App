@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/use-auth";
-import { Loader2, Bell, Menu, User, Settings, LogOut, Bot, SparklesIcon, ChevronDown } from "lucide-react";
+import { Loader2, Bell, Menu, User, Settings, LogOut, Bot, SparklesIcon, ChevronDown, FileText } from "lucide-react";
 import { useLanguage, LanguageSelector } from "@/components/language-selector";
 import { AIAssistantButton, useAIAssistantUI } from "@/components/layout";
 import GlassCard from "@/components/glass-card";
@@ -241,6 +241,13 @@ export default function NavbarNew() {
                     >
                       <User className="mr-2 h-4 w-4 text-primary/70" />
                       <span>Profile</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      className="cursor-pointer hover:bg-primary/5 focus:bg-primary/5" 
+                      onClick={() => navigate("/quote-history")}
+                    >
+                      <FileText className="mr-2 h-4 w-4 text-primary/70" />
+                      <span>Quote History</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem 
                       className="cursor-pointer hover:bg-primary/5 focus:bg-primary/5" 

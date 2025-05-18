@@ -55,6 +55,7 @@ import HealthInsurance from "@/pages/insurance/health";
 // Quote pages
 import GetQuotePage from "@/pages/get-quote";
 import QuoteConfirmationPage from "@/pages/quote-confirmation";
+import QuoteHistoryPage from "@/pages/quote-history";
 
 // Comparison pages
 import ComparePlansDemo from "@/pages/compare-plans-demo";
