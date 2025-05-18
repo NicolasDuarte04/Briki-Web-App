@@ -99,6 +99,12 @@ export class DatabaseStorage implements IStorage {
   async getUserByUsername(username: string): Promise<User | undefined> {
     try {
       const [user] = await db.select().from(users).where(eq(users.username, username)).limit(1);
+      
+      if (user) {
+        // Ensure the ID is handled as a string for consistency
+        user.id = String(user.id);
+      }
+      
       return user;
     } catch (error) {
       console.error("Error getting user by username:", error);
@@ -110,12 +116,17 @@ export class DatabaseStorage implements IStorage {
     if (!email) return undefined;
     
     try {
-      // Select only fields that exist in the actual database
+      // Query the database for the user with this email
       const [user] = await db
         .select()
         .from(users)
         .where(eq(users.email, email))
         .limit(1);
+      
+      if (user) {
+        // Ensure the ID is handled as a string for consistency
+        user.id = String(user.id);
+      }
       
       return user || undefined;
     } catch (error) {
