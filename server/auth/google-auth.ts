@@ -13,7 +13,7 @@ export async function configureGoogleAuth() {
 
   // Use app domain for production or localhost for development
   const domain = process.env.NODE_ENV === "production"
-    ? process.env.PUBLIC_URL || "https://brikiapp"
+    ? process.env.PUBLIC_URL || "https://brikiapp.com"
     : "http://localhost:5000";
     
   // Construct proper callback URL to match Google's expected format
