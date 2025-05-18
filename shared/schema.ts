@@ -296,15 +296,21 @@ export const orders = pgTable("orders", {
 // Create insert schemas 
 export const insertUserSchema = createInsertSchema(users).extend({
   // Make username optional since we now use email as primary identifier
-  username: z.string().optional(),
+  username: z.string().optional().nullable(),
   // Keep email required  
   email: z.string().email("Please enter a valid email"),
   // Add validation for password
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  password: z.string().min(8, "Password must be at least 8 characters").nullable(),
   // Make id optional since it's auto-generated
-  id: z.number().optional(),
+  id: z.string().optional(),
   // Make name optional
-  name: z.string().optional(),
+  name: z.string().optional().nullable(),
+  // Make role optional with default
+  role: z.string().optional().nullable().default("user"),
+  // Add profile fields
+  firstName: z.string().optional().nullable(),
+  lastName: z.string().optional().nullable(),
+  profileImageUrl: z.string().optional().nullable(),
   // Make company_profile optional
   company_profile: z.any().optional()
 });
