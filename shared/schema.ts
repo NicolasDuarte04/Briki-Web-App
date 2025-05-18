@@ -333,17 +333,8 @@ export const insertOrderSchema = createInsertSchema(orders, {
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 
-// Define a custom User type structure that matches DB fields precisely
-export type CustomUser = {
-  id: number;
-  username?: string | null;
-  email: string;
-  password?: string | null;
-  name?: string | null;
-  role?: string | null;
-  createdAt?: Date | null;
-  company_profile?: any;
-};
+// Legacy CustomUser type has been deprecated
+// Use the User type from db schema instead which is more complete
 
 export type InsertQuote = z.infer<typeof insertQuoteSchema>;
 export type Quote = typeof quotes.$inferSelect;
