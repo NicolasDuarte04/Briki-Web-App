@@ -457,13 +457,8 @@ export default function NavbarNew() {
                                 handleLogout();
                                 setIsOpen(false);
                               }}
-                              disabled={logoutMutation.isPending}
                             >
-                              {logoutMutation.isPending ? (
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              ) : (
-                                <LogOut className="mr-2 h-4 w-4" />
-                              )}
+                              <LogOut className="mr-2 h-4 w-4" />
                               Sign out
                             </Button>
                           </motion.div>
