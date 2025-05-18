@@ -67,11 +67,18 @@ router.post('/login', async (req: Request, res: Response) => {
 // User registration
 router.post('/register', async (req: Request, res: Response) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, confirmPassword } = req.body;
     
     if (!email || !password) {
       return res.status(400).json({ 
         message: 'Email and password are required' 
+      });
+    }
+    
+    // Validate password confirmation
+    if (password !== confirmPassword) {
+      return res.status(400).json({ 
+        message: 'Passwords do not match' 
       });
     }
     
@@ -81,13 +88,41 @@ router.post('/register', async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Email already in use' });
     }
     
+    // Password strength validation (enforce requirements on server-side too)
+    const passwordRegex = {
+      minLength: /.{8,}/,
+      hasUppercase: /[A-Z]/,
+      hasLowercase: /[a-z]/,
+      hasNumber: /[0-9]/
+    };
+    
+    if (!passwordRegex.minLength.test(password)) {
+      return res.status(400).json({ message: 'Password must be at least 8 characters long' });
+    }
+    
+    if (!passwordRegex.hasUppercase.test(password)) {
+      return res.status(400).json({ message: 'Password must contain at least one uppercase letter' });
+    }
+    
+    if (!passwordRegex.hasLowercase.test(password)) {
+      return res.status(400).json({ message: 'Password must contain at least one lowercase letter' });
+    }
+    
+    if (!passwordRegex.hasNumber.test(password)) {
+      return res.status(400).json({ message: 'Password must contain at least one number' });
+    }
+    
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
     
-    // Create new user (username will be generated from email in storage.createUser)
+    // Generate username from email (for backward compatibility)
+    const username = email.split('@')[0];
+    
+    // Create new user with email as primary identifier and auto-generated username
     const newUser = await storage.createUser({
       id: uuidv4(),
       email,
+      username, // Auto-generated from email
       password: hashedPassword,
       role: "user", // Default role
     });

@@ -11,31 +11,55 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-// Use a singleton pattern to ensure we only create one database connection
-let _pool: Pool | null = null;
-let _db: ReturnType<typeof drizzle> | null = null;
+// Create a global singleton for database connections
+let _dbInstance: {
+  pool: Pool;
+  db: ReturnType<typeof drizzle>;
+} | null = null;
 
-// Get the pool instance (create only once)
-export const getPool = () => {
-  if (!_pool) {
-    _pool = new Pool({ 
+// Initialize database connection (called once during app startup)
+export const initializeDb = () => {
+  if (!_dbInstance) {
+    console.log('Initializing database connection pool...');
+    
+    const pool = new Pool({ 
       connectionString: process.env.DATABASE_URL,
-      max: 3, // Reduce max connections to avoid overwhelming the database
-      idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 5000
+      max: 2, // Limit concurrent connections
+      idleTimeoutMillis: 30000, // Close idle connections after 30 seconds
+      connectionTimeoutMillis: 5000, // Connection timeout after 5 seconds
+      allowExitOnIdle: true // Allow pool to cleanup on idle
     });
+    
+    // Test pool connection once to catch early errors
+    pool.on('error', (err) => {
+      console.error('Unexpected database pool error:', err);
+    });
+    
+    const db = drizzle({ client: pool, schema });
+    
+    _dbInstance = { pool, db };
   }
-  return _pool;
+  
+  return _dbInstance;
 };
 
-// Get the db instance (create only once)
-export const getDb = () => {
-  if (!_db) {
-    _db = drizzle({ client: getPool(), schema });
+// Get existing database instance or initialize
+export const getDatabaseInstance = () => {
+  if (!_dbInstance) {
+    return initializeDb();
   }
-  return _db;
+  return _dbInstance;
 };
 
-// Backward compatibility exports
-export const pool = getPool();
-export const db = getDb();
+// Simplified exports for backward compatibility
+export const pool = getDatabaseInstance().pool;
+export const db = getDatabaseInstance().db;
+
+// Function to properly close database connections
+export const closeDatabase = async () => {
+  if (_dbInstance) {
+    await _dbInstance.pool.end();
+    _dbInstance = null;
+    console.log('Database connections closed');
+  }
+};
