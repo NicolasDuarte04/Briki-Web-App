@@ -346,10 +346,19 @@ export default function QuoteHistoryPage() {
     enabled: isAuthenticated,
   });
 
-  // Track page view
+  // Track page view and other analytics events
   React.useEffect(() => {
     if (isAuthenticated) {
-      trackEvent('view_quote_history', 'quotes', 'page_view');
+      // Track page view with more detailed category and label
+      trackEvent('view_quote_history', 'account_section', 'quote_management');
+      
+      // Report to Google Analytics for enhanced tracking
+      if (typeof window !== 'undefined' && window.gtag) {
+        window.gtag('event', 'screen_view', {
+          app_name: 'Briki',
+          screen_name: 'Quote History'
+        });
+      }
     }
   }, [isAuthenticated]);
 
