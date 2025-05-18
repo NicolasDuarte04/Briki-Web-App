@@ -1,0 +1,33 @@
+We’re now ready to rebuild the entire main screen of the Briki app. Please read the following instructions carefully and treat this as a new, clean implementation of the post-login interface:
+
+1. **Navigation Bar (Top Taskbar)**
+   - Use the exact same top bar style and layout that appears in the Briki landing page.
+   - This includes the typography, spacing, colors, and the Briki logo version (the one that appears on the landing page, not the alternate login version).
+   - Ensure the logo doesn’t change as users navigate across the app — it must remain consistent.
+
+2. **Main Dashboard UI (After Login)**
+   - Use the same font, gradients, spacing, and general aesthetic used in the landing page design.
+   - Make sure the home screen feels modern, clean, and intuitive — not overloaded with elements.
+   - The layout should feel like a natural extension of the landing page, not a separate design system.
+
+3. **Functional Elements Required**
+   - A welcome message at the top (personalized if possible: “Welcome back, [firstName]”).
+   - Quick access cards or links to:
+     - Compare Insurance Plans
+     - Get a Quote
+     - Track My Quotes
+     - Saved Plans / Favorites
+   - Show one featured recommendation (optional, placeholder now).
+   - Include a footer similar in style to the landing page.
+
+4. **Technical and Cleanup Notes**
+   - Before building, confirm and remove unused or legacy UI components and routes.
+   - Confirm that the new dashboard will be located at `/home` for authenticated users.
+   - Ensure the layout uses `AuthenticatedLayout.tsx` for proper route guarding and navigation.
+   - Confirm there are no conflicting styles, duplicated headers, or mixed layout providers.
+
+5. **Consistency**
+   - Double-check that the entire app (landing, login, main menu, comparison, quote flow) uses the same Briki branding elements (logo version, font, colors).
+   - Pay attention to mobile responsiveness — no overlapping or broken layouts.
+
+Once you confirm these design parameters, proceed to rebuild the main dashboard. Let us know if you need new design assets or visual references — otherwise, you can use the current landing page as your design source.

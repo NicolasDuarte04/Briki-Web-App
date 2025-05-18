@@ -18,6 +18,7 @@ import { initGA, trackEvent, EventCategory } from "@/lib/analytics";
 
 import NotFound from "@/pages/not-found";
 import HomePageNew from "@/pages/home-page-new";
+import Dashboard from "@/pages/dashboard";
 // Import our new unified authentication screen
 import AuthPage from "@/pages/AuthPage";
 import TripInfoPage from "@/pages/trip-info-page";
@@ -99,7 +100,7 @@ function Router() {
       <Switch>
         <Route path="/" component={LandingPage} />
         <Route path="/countdown" component={CountdownPageNew} />
-        <Route path="/home" component={HomePageNew} />
+        <Route path="/home" component={Dashboard} />
         <Route path="/auth" component={AuthPage} />
         <Route path="/categories" component={InsuranceCategoriesPage} />
         <Route path="/trip-info" component={TripInfoPage} />
