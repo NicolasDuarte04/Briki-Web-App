@@ -82,6 +82,18 @@ export class DatabaseStorage implements IStorage {
     const timestamp = Date.now().toString().slice(-6);
     return `BRK-${randomPart}-${timestamp}`;
   }
+  
+  // Utility function to generate a username from email
+  private generateUsernameFromEmail(email: string): string {
+    if (!email) return 'user';
+    
+    // Take part before the @ symbol
+    const localPart = email.split('@')[0];
+    // Remove special characters and spaces
+    const sanitized = localPart.replace(/[^a-zA-Z0-9]/g, '');
+    // Ensure it's not empty
+    return sanitized || 'user';
+  }
   async getUser(id: string): Promise<User | undefined> {
     try {
       const result = await db.query.raw(`
@@ -141,6 +153,19 @@ export class DatabaseStorage implements IStorage {
       // Set current timestamp for created_at and updated_at
       const now = new Date();
       
+      // Generate a username from email if not provided
+      let username = userData.username;
+      if (!username && userData.email) {
+        // Take part before the @ symbol
+        const localPart = userData.email.split('@')[0];
+        // Remove special characters and spaces
+        username = localPart.replace(/[^a-zA-Z0-9]/g, '');
+        // Ensure it's not empty
+        if (!username) username = 'user';
+      } else if (!username) {
+        username = 'user';
+      }
+      
       const result = await db.query.raw(`
         INSERT INTO users 
         (id, username, email, password, first_name, last_name, profile_image_url, google_id, role, created_at, updated_at)
@@ -149,7 +174,7 @@ export class DatabaseStorage implements IStorage {
         RETURNING *
       `, [
         userData.id, 
-        userData.username, 
+        username, 
         userData.email, 
         userData.password,
         userData.firstName || null,
