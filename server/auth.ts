@@ -14,8 +14,8 @@ const scryptAsync = promisify(scrypt);
 
 // Set a simple token-based authentication approach for SPA
 // This is a simplified approach for development purposes
-export const userSessions = new Map<string, number>(); // token -> userId
-export const tokensByUserId = new Map<number, string>(); // userId -> token
+export const userSessions = new Map<string, string>(); // token -> userId (string for both DB and OAuth)
+export const tokensByUserId = new Map<string, string>(); // userId -> token
 
 async function hashPassword(password: string) {
   const salt = randomBytes(16).toString("hex");
@@ -23,7 +23,9 @@ async function hashPassword(password: string) {
   return `${buf.toString("hex")}.${salt}`;
 }
 
-async function comparePasswords(supplied: string, stored: string) {
+async function comparePasswords(supplied: string, stored: string | null) {
+  if (!stored) return false;
+  
   const [hashed, salt] = stored.split(".");
   const hashedBuf = Buffer.from(hashed, "hex");
   const suppliedBuf = (await scryptAsync(supplied, salt, 64)) as Buffer;
@@ -123,10 +125,10 @@ export function setupAuth(app: Express) {
       });
       console.log('POST /api/register - User created successfully, ID:', user.id);
 
-      // Generate a token for the user
+      // Generate a token for the user (ensuring ID is handled as string)
       const token = generateToken();
-      userSessions.set(token, user.id);
-      tokensByUserId.set(user.id, token);
+      userSessions.set(token, String(user.id));
+      tokensByUserId.set(String(user.id), token);
       
       console.log('POST /api/register - Generated authentication token for user');
       
@@ -163,12 +165,12 @@ export function setupAuth(app: Express) {
       
       console.log('POST /api/login - Authentication successful for user:', email);
       
-      // Create a new token or use existing
-      let token = tokensByUserId.get(user.id);
+      // Create a new token or use existing (ensuring ID is handled as string)
+      let token = tokensByUserId.get(String(user.id));
       if (!token) {
         token = generateToken();
-        userSessions.set(token, user.id);
-        tokensByUserId.set(user.id, token);
+        userSessions.set(token, String(user.id));
+        tokensByUserId.set(String(user.id), token);
         console.log('POST /api/login - Generated new token for user');
       } else {
         console.log('POST /api/login - Using existing token for user');

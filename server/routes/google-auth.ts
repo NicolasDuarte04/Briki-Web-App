@@ -138,10 +138,17 @@ router.get('/google/callback',
 router.get('/user', (req, res) => {
   if (req.isAuthenticated()) {
     // Only return safe user fields - using the actual fields in our database schema
-    const { id, username, email, name, role, company_profile } = req.user;
-    
-    // Extract profile image URL from company_profile if it exists
-    const profileImageUrl = company_profile?.profileImageUrl || null;
+    const { 
+      id, 
+      username, 
+      email, 
+      name, 
+      role, 
+      company_profile,
+      profileImageUrl,
+      firstName,
+      lastName 
+    } = req.user;
     
     res.json({ 
       id, 
