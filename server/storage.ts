@@ -8,24 +8,25 @@ import {
   InsertQuote, 
   Quote, 
   InsuranceCategory,
-  CustomUser
+  User as SchemaUser
 } from "@shared/schema";
 
-// Extended user input schema for auth functionality - matching actual DB schema
+// Updated user input schema to match our enhanced DB schema
 export const userAuthSchema = z.object({
-  // id is number in the actual DB and auto-generated
-  id: z.number().optional(),
+  id: z.string().optional(), // String ID to support both DB and OAuth IDs
   email: z.string().email(),
   password: z.string().nullable(), // Nullable for social auth
   name: z.string().nullable().optional(),
-  role: z.string().default("user"),
-  username: z.string().nullable().optional(), // Make username optional for backward compatibility
-  company_profile: z.any().optional(),
-  // No firstName, lastName, profileImageUrl, or googleId in actual DB
+  username: z.string().nullable().optional(),
+  role: z.string().nullable().optional().default("user"),
+  profileImageUrl: z.string().nullable().optional(),
+  firstName: z.string().nullable().optional(),
+  lastName: z.string().nullable().optional(),
+  company_profile: z.any().optional()
 });
 
-// We're using the CustomUser type from shared/schema.ts to match DB fields precisely
-export type User = CustomUser;
+// Use the User type from our database schema
+export type User = SchemaUser;
 
 export type UserAuth = z.infer<typeof userAuthSchema>;
 export type UserUpdate = Partial<Omit<UserAuth, "id">>;
