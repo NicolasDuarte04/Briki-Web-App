@@ -1,0 +1,52 @@
+Hey, I’d like to conduct a full diagnosis of the current authentication implementation. We’re experiencing both UI inconsistencies and functional failures across login and registration.
+
+Please go through the checklist below to help us identify and resolve all issues:
+
+⸻
+
+1. UI Consistency Checks
+	•	Why is the Login and Sign Up card box not visually consistent in size and alignment?
+	•	Please check if different padding/margin or width values are being used across these two components.
+	•	Are they using the same shared component base or different layout containers?
+	•	Make sure spacing, font weight, and vertical alignment match between both forms.
+
+2. Auth Flow Debugging
+
+We are still seeing:
+	•	“Registration failed” even when using valid, fabricated email addresses.
+	•	Login fails even for accounts that were just created via Google login.
+
+Please verify and answer:
+	•	Is the database properly connected and accepting write/read operations from the frontend?
+	•	Can you confirm whether users created via Google login are being inserted properly into the users table?
+	•	Are registration attempts failing silently because of an insert issue or model conflict?
+	•	Are backend try/catch blocks masking the real error? Can we log the raw error to console or store it?
+
+3. Registration Form Validation
+	•	Can you confirm that email + password + confirm password are now the only required fields?
+	•	Is confirmPassword properly validated both client- and server-side?
+	•	Are all constraints for email uniqueness, password strength, and agreement to ToS being checked correctly?
+
+4. Backend Schema Alignment
+	•	Is the current schema treating username as optional in both Drizzle ORM and the database layer?
+	•	Is the createUser() function now using the Drizzle .insert() method, or is any raw SQL/legacy logic still active?
+
+5. Visual Enhancements Needed
+	•	Can we add subtle shadow/elevation to the form card?
+	•	Can we add green success indicators or checkmarks next to validated fields?
+	•	Can we unify the button heights, spacing, and hover styles across Login and Sign Up?
+
+6. Deployment Validation
+	•	Is the behavior consistent across:
+	•	https://brikiapp.com
+	•	localhost:5000
+	•	*.replit.dev staging links?
+	•	Do we have any environment variable mismatches or deployment caching issues?
+
+⸻
+
+Goal
+
+We want a stable, clean, and visually aligned login/signup experience that works flawlessly across environments and device sizes. Please diagnose and fix all the above, and confirm once each is complete so we can retest it live.
+
+Thanks!
