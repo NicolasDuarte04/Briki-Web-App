@@ -203,7 +203,7 @@ const QuoteDetailDialog = ({
                 <div>
                   <p className="text-sm font-medium">Created</p>
                   <p className="text-sm text-muted-foreground">
-                    {format(new Date(quote.createdAt), 'PPP')}
+                    {quote.createdAt ? format(new Date(quote.createdAt), 'PPP') : 'N/A'}
                   </p>
                 </div>
                 <div>
@@ -228,10 +228,10 @@ const QuoteDetailDialog = ({
                 <p className="text-sm font-medium">Trip Information</p>
                 <div className="grid grid-cols-2 gap-2 mt-1">
                   <p className="text-sm text-muted-foreground">
-                    <span className="font-medium">From:</span> {format(new Date(quote.startDate), 'PP')}
+                    <span className="font-medium">From:</span> {quote.startDate ? format(new Date(quote.startDate), 'PP') : 'N/A'}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    <span className="font-medium">To:</span> {format(new Date(quote.endDate), 'PP')}
+                    <span className="font-medium">To:</span> {quote.endDate ? format(new Date(quote.endDate), 'PP') : 'N/A'}
                   </p>
                   <p className="text-sm text-muted-foreground">
                     <span className="font-medium">Destination:</span> {quote.country}
@@ -242,14 +242,14 @@ const QuoteDetailDialog = ({
                 </div>
               </div>
 
-              {quote.quoteDetails && (
+              {quote.quoteDetails && typeof quote.quoteDetails === 'object' && (
                 <div>
                   <p className="text-sm font-medium">Selected Coverage</p>
                   <div className="text-sm text-muted-foreground mt-1">
-                    {Object.entries(quote.quoteDetails).map(([key, value]) => (
+                    {Object.entries(quote.quoteDetails as Record<string, any>).map(([key, value]) => (
                       <div key={key} className="flex justify-between py-1 border-b">
                         <span>{key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</span>
-                        <span>{typeof value === 'boolean' ? (value ? 'Yes' : 'No') : value}</span>
+                        <span>{typeof value === 'boolean' ? (value ? 'Yes' : 'No') : String(value)}</span>
                       </div>
                     ))}
                   </div>
@@ -389,9 +389,9 @@ export default function QuoteHistoryPage() {
 
   // Filter quotes based on search and filters
   const filteredQuotes = React.useMemo(() => {
-    if (!quotes) return [];
+    if (!quotes || !Array.isArray(quotes)) return [];
     
-    return quotes.filter(quote => {
+    return quotes.filter((quote: Quote) => {
       // Status filter
       if (statusFilter !== "all" && quote.statusCode !== statusFilter) {
         return false;
@@ -620,7 +620,7 @@ export default function QuoteHistoryPage() {
                     Clear Filters
                   </Button>
                 ) : (
-                  <Button as={Link} href="/trip-info">Get a Quote</Button>
+                  <Link href="/trip-info"><Button>Get a Quote</Button></Link>
                 )
               }
             />
