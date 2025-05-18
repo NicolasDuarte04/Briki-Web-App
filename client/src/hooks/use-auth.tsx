@@ -149,7 +149,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const register = async (data: { email: string; password: string; confirmPassword?: string }): Promise<boolean> => {
+  const register = async (data: { email: string; password: string; confirmPassword?: string; name?: string }): Promise<boolean> => {
     try {
       // Verify passwords match if confirmPassword is provided
       if (data.confirmPassword && data.password !== data.confirmPassword) {
@@ -162,19 +162,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       
       trackEvent('signup_attempt', 'authentication', 'form_signup');
-      // Generate username from email (matching server-side logic)
-      const localPart = data.email.split('@')[0];
-      const username = localPart.replace(/[^a-zA-Z0-9]/g, '') || 'user';
       
+      // Now we send email, password, and optional name - no more username field
       const result = await registerMutation.mutateAsync({
-        id: crypto.randomUUID(),
-        // Username is now optional - we let the server generate it
+        // We don't need to generate a UUID here - the DB will assign an ID
         email: data.email,
         password: data.password,
+        // Use name if provided or leave it for the server to generate from email
+        name: data.name,
+        // Only provide fields that exist in the actual database schema
         role: "user",
-        firstName: null,
-        lastName: null,
-        profileImageUrl: null,
+        company_profile: { registeredWith: "email" },
       });
       return !!result;
     } catch (error) {
