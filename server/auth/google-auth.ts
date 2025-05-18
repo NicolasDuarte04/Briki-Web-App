@@ -76,9 +76,10 @@ export async function configureGoogleAuth() {
           }
           
           // Create new user if no existing account found
-          const email = profile.emails && profile.emails.length > 0 
+          // Make sure email is a string type since null will cause type errors
+          const email = (profile.emails && profile.emails.length > 0 && profile.emails[0].value)
             ? profile.emails[0].value 
-            : null;
+            : '';
             
           const firstName = profile.name?.givenName || null;
           const lastName = profile.name?.familyName || null;
@@ -129,7 +130,7 @@ export async function configureGoogleAuth() {
           return done(null, newUser);
         } catch (error) {
           console.error("Google authentication error:", error);
-          return done(error, null);
+          return done(error as Error, false);
         }
       }
     )
@@ -151,7 +152,7 @@ export function googleAuthRedirect(req: Request, res: Response, next: NextFuncti
 export function googleAuthCallback(req: Request, res: Response, next: NextFunction) {
   passport.authenticate("google", {
     failureRedirect: "/auth?error=google_auth_failed",
-  }, (err: Error, user: any) => {
+  }, (err: Error, user: Express.User | false | null | undefined) => {
     if (err || !user) {
       console.error("Google authentication callback error:", err);
       return res.redirect('/auth?error=google_auth_failed');
