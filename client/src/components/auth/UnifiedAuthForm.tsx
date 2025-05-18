@@ -116,10 +116,7 @@ export default function UnifiedAuthForm() {
       
       if (success) {
         trackEvent("login_success", "authentication", "form_login");
-        toast({
-          title: "Login successful",
-          description: "Welcome back to Briki!",
-        });
+        // Toast is handled in the auth context
       } else {
         trackEvent("login_failure", "authentication", "form_login");
         

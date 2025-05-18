@@ -1,15 +1,8 @@
 import { useContext } from 'react';
-import { AuthContext, type User } from '@/contexts/AuthContext';
+import { AuthContext, type User, type AuthContextType } from '@/contexts/AuthContext';
 
-interface UseAuthReturn {
-  user: User | null;
-  isLoading: boolean;
-  isAuthenticated: boolean;
-  login: (username: string, password: string) => Promise<boolean>;
-  register: (userData: { username: string; email: string; password: string }) => Promise<boolean>;
-  logout: () => Promise<void>;
-  loginWithGoogle: (returnTo?: string) => void;
-}
+// Interface matches the AuthContextType
+interface UseAuthReturn extends AuthContextType {}
 
 export function useAuth(): UseAuthReturn {
   const context = useContext(AuthContext);
