@@ -218,7 +218,28 @@ export class DatabaseStorage implements IStorage {
       if (updates.password !== undefined) updateValues.password = updates.password;
       if (updates.name !== undefined) updateValues.name = updates.name;
       if (updates.role !== undefined) updateValues.role = updates.role;
-      if (updates.company_profile !== undefined) updateValues.company_profile = updates.company_profile;
+      
+      // Special handling for company_profile to merge with existing data
+      if (updates.company_profile !== undefined) {
+        // First get the current user to properly merge profiles
+        const result = await db.execute(sql`
+          SELECT company_profile FROM users WHERE id = ${userId} LIMIT 1
+        `);
+        
+        let existingProfile = {};
+        if (result?.rows?.[0]?.company_profile) {
+          existingProfile = result.rows[0].company_profile;
+          console.log("Retrieved existing company_profile:", existingProfile);
+        }
+        
+        // Merge the existing profile with new updates
+        updateValues.company_profile = {
+          ...existingProfile,
+          ...updates.company_profile
+        };
+        
+        console.log("Updated company_profile:", updateValues.company_profile);
+      }
       
       // Always update updatedAt
       updateValues.updatedAt = new Date();
