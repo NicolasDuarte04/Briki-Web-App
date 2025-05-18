@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormSuccess } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -49,6 +49,10 @@ export default function AuthForm() {
   // State for active tab
   const [activeTab, setActiveTab] = useState<"login" | "signup">("login");
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetRequestSent, setResetRequestSent] = useState(false);
   
   // Authentication context
   const auth = useAuth();
@@ -284,8 +288,9 @@ export default function AuthForm() {
                       className="p-0 h-auto text-sm text-primary hover:text-primary/80"
                       onClick={() => {
                         trackEvent("forgot_password_click", "authentication", "login_form");
-                        // Implementation for forgot password
+                        setShowForgotPassword(true);
                       }}
+                      type="button"
                     >
                       Forgot password?
                     </Button>
