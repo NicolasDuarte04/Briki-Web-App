@@ -135,6 +135,38 @@ const QuoteDetailDialog = ({
     queryKey: ['/api/quotes', quoteId],
     enabled: isOpen && quoteId !== null,
   });
+  
+  // Helper function to safely render coverage details
+  const renderCoverageDetails = () => {
+    if (!quote || !quote.quoteDetails) return null;
+    
+    try {
+      const details = typeof quote.quoteDetails === 'object' ? 
+        quote.quoteDetails as Record<string, any> : 
+        JSON.parse(String(quote.quoteDetails));
+        
+      return (
+        <div>
+          <p className="text-sm font-medium">Selected Coverage</p>
+          <div className="text-sm text-muted-foreground mt-1">
+            {Object.entries(details).map(([key, value]) => (
+              <div key={key} className="flex justify-between py-1 border-b">
+                <span>{key.replace(/([A-Z])/g, ' $1').replace(/^./, (str: string) => str.toUpperCase())}</span>
+                <span>{typeof value === 'boolean' ? (value ? 'Yes' : 'No') : String(value)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    } catch (e) {
+      console.error('Error parsing quote details:', e);
+      return (
+        <div className="text-sm text-muted-foreground">
+          <p>Coverage details unavailable</p>
+        </div>
+      );
+    }
+  };
 
   // Handle quote download
   const handleDownload = async () => {
@@ -243,19 +275,7 @@ const QuoteDetailDialog = ({
                 </div>
               </div>
 
-              {quote.quoteDetails && typeof quote.quoteDetails === 'object' && (
-                <div>
-                  <p className="text-sm font-medium">Selected Coverage</p>
-                  <div className="text-sm text-muted-foreground mt-1">
-                    {Object.entries(quote.quoteDetails as Record<string, any>).map(([key, value]) => (
-                      <div key={key} className="flex justify-between py-1 border-b">
-                        <span>{key.replace(/([A-Z])/g, ' $1').replace(/^./, (str: string) => str.toUpperCase())}</span>
-                        <span>{typeof value === 'boolean' ? (value ? 'Yes' : 'No') : String(value)}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+              {renderCoverageDetails()}
 
               <div className="bg-primary/10 p-4 rounded-lg">
                 <div className="flex justify-between items-center">
