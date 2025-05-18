@@ -156,7 +156,9 @@ router.get('/user', (req, res) => {
       email, 
       name,
       role,
-      profileImageUrl
+      profileImageUrl,
+      firstName,
+      lastName
     });
   } else {
     res.status(401).json({ message: 'Not authenticated' });

@@ -165,16 +165,18 @@ export class DatabaseStorage implements IStorage {
       
       console.log("Attempting to create user with email:", userData.email);
       
-      // Use proper Drizzle ORM insert syntax matching the actual DB schema
-      // Only using fields that exist in the database
+      // Use proper Drizzle ORM insert syntax matching our updated schema
       const [user] = await db
         .insert(users)
         .values({
           email: userData.email,
-          username: username,
+          username: userData.username || username,
           password: userData.password,
           role: userData.role || 'user',
-          name: userData.name || 'New User', // Use provided name or default
+          name: userData.name || username, // Use provided name or default
+          firstName: userData.firstName || null,
+          lastName: userData.lastName || null,
+          profileImageUrl: userData.profileImageUrl || null,
           company_profile: userData.company_profile || {} // Use provided company_profile or empty object
         })
         .returning();
@@ -259,10 +261,11 @@ export class DatabaseStorage implements IStorage {
       
       console.log(`Updating user ${id} with:`, updateValues);
       
+      // Convert ID to string to match our schema
       const [user] = await db
         .update(users)
         .set(updateValues)
-        .where(eq(users.id, id))
+        .where(eq(users.id, String(id)))
         .returning();
       
       return user;
