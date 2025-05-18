@@ -78,31 +78,48 @@ export function setupAuth(app: Express) {
   console.log('Setting up simplified token-based auth mechanism for SPA development');
 
   app.post("/api/register", async (req, res) => {
-    console.log('POST /api/register - Registration attempt for username:', req.body.username);
+    console.log('POST /api/register - Registration attempt for email:', req.body.email);
     
     try {
-      // Validate required fields
-      if (!req.body.username || !req.body.password) {
+      // Validate required fields for email-based authentication
+      if (!req.body.email || !req.body.password) {
         console.log('POST /api/register - Missing required fields');
-        return res.status(400).json({ message: "Username and password are required" });
+        return res.status(400).json({ message: "Email and password are required" });
       }
       
-      const existingUser = await storage.getUserByUsername(req.body.username);
+      // Email validation
+      if (!req.body.email.includes('@') || !req.body.email.includes('.')) {
+        return res.status(400).json({ message: "Please enter a valid email address" });
+      }
+      
+      // Password validation
+      if (req.body.password.length < 8) {
+        return res.status(400).json({ message: "Password must be at least 8 characters" });
+      }
+      
+      // Check for existing user by email
+      const existingUser = await storage.getUserByEmail(req.body.email);
       if (existingUser) {
-        console.log('POST /api/register - Username already exists:', req.body.username);
-        return res.status(400).json({ message: "Username already exists" });
+        console.log('POST /api/register - Email already exists:', req.body.email);
+        return res.status(400).json({ message: "Email already in use" });
       }
 
-      console.log('POST /api/register - Creating new user:', req.body.username);
+      console.log('POST /api/register - Creating new user with email:', req.body.email);
       
       // If registering from company pages, set role to "company"
       const role = req.body.role || (req.body.isCompany ? "company" : "user");
       console.log(`POST /api/register - User role: ${role}`);
+      
+      // Generate a username from email for backward compatibility
+      const username = req.body.username || req.body.email.split('@')[0];
 
       const user = await storage.createUser({
-        ...req.body,
+        email: req.body.email,
+        username: username,
+        name: req.body.name || username,
         role,
         password: await hashPassword(req.body.password),
+        company_profile: req.body.company_profile || { registeredWith: "email" }
       });
       console.log('POST /api/register - User created successfully, ID:', user.id);
 
