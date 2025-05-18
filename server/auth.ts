@@ -125,26 +125,26 @@ export function setupAuth(app: Express) {
   });
 
   app.post("/api/login", async (req, res) => {
-    console.log('POST /api/login - Login attempt for username:', req.body.username);
+    console.log('POST /api/login - Login attempt for email:', req.body.email);
     
     try {
-      const { username, password } = req.body;
+      const { email, password } = req.body;
       
       // Check if user exists
-      const user = await storage.getUserByUsername(username);
+      const user = await storage.getUserByEmail(email);
       if (!user) {
-        console.log('POST /api/login - User not found:', username);
-        return res.status(401).json({ message: "Invalid username or password" });
+        console.log('POST /api/login - User not found:', email);
+        return res.status(401).json({ message: "Invalid email or password" });
       }
       
       // Verify password
       const passwordValid = await comparePasswords(password, user.password);
       if (!passwordValid) {
-        console.log('POST /api/login - Invalid password for user:', username);
-        return res.status(401).json({ message: "Invalid username or password" });
+        console.log('POST /api/login - Invalid password for user:', email);
+        return res.status(401).json({ message: "Invalid email or password" });
       }
       
-      console.log('POST /api/login - Authentication successful for user:', username);
+      console.log('POST /api/login - Authentication successful for user:', email);
       
       // Create a new token or use existing
       let token = tokensByUserId.get(user.id);
