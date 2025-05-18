@@ -49,25 +49,28 @@ export async function configureLocalAuth() {
 
 export async function registerUser(req: Request, res: Response) {
   try {
-    const { username, email, password, firstName, lastName } = req.body;
+    const { email, password, firstName, lastName } = req.body;
 
-    // Check if user with this email or username already exists
-    const existingUser = email 
-      ? await storage.getUserByEmail(email)
-      : await storage.getUserByUsername(username);
+    // Email is now required, we'll use it as the main identifier
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    // Check if user with this email already exists
+    const existingUser = await storage.getUserByEmail(email);
 
     if (existingUser) {
       return res.status(400).json({ 
-        message: email 
-          ? "Email already in use" 
-          : "Username already taken" 
+        message: "Email already in use" 
       });
     }
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create new user
+    // Create new user - generate a username from email if needed
+    const username = email.split('@')[0]; // Simple username from email
+    
     const user = await storage.createUser({
       id: uuidv4(),
       username,
