@@ -32,9 +32,10 @@ const registrationSchema = z.object({
     .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
     .regex(/[a-z]/, "Password must contain at least one lowercase letter")
     .regex(/[0-9]/, "Password must contain at least one number"),
-  acceptTerms: z.literal(true, {
-    errorMap: () => ({ message: "You must accept the terms and conditions" }),
-  }),
+  acceptTerms: z.boolean()
+    .refine(val => val === true, {
+      message: "You must accept the terms and conditions",
+    }),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -80,6 +81,7 @@ export default function AuthForm() {
       password: "",
       acceptTerms: false,
     },
+    mode: "onChange",
   });
 
   // Handle login submit
