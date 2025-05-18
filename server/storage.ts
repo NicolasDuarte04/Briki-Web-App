@@ -10,17 +10,17 @@ import {
   InsuranceCategory
 } from "@shared/schema";
 
-// Extended user input schema for auth functionality
+// Extended user input schema for auth functionality - matching actual DB schema
 export const userAuthSchema = z.object({
-  id: z.string(),
+  // id is number in the actual DB and auto-generated
+  id: z.number().optional(),
   email: z.string().email(),
   password: z.string().nullable(), // Nullable for social auth
-  firstName: z.string().nullable().optional(),
-  lastName: z.string().nullable().optional(),
-  profileImageUrl: z.string().nullable().optional(),
-  googleId: z.string().nullable().optional(),
-  role: z.enum(["user", "admin", "company"]).default("user"),
+  name: z.string().nullable().optional(),
+  role: z.string().default("user"),
   username: z.string().optional(), // Make username optional for backward compatibility
+  company_profile: z.any().optional(),
+  // No firstName, lastName, profileImageUrl, or googleId in actual DB
 });
 
 // We're using the users schema from shared/schema.ts instead of defining it here
@@ -117,12 +117,21 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  // Currently we don't have a googleId field in our database
-  // but keeping this function as a stub for when we implement it
+  // Since we don't have a dedicated googleId column in the database,
+  // we need to search in the company_profile JSON field where we store it
   async getUserByGoogleId(googleId: string): Promise<User | undefined> {
     try {
-      // We'll need to update this when we add the googleId field to the schema
-      console.log("Note: getUserByGoogleId is stubbed as googleId is not in the DB schema");
+      // Using SQL to query for googleProfileId in the company_profile JSON
+      const result = await db.query.raw(`
+        SELECT * FROM users 
+        WHERE company_profile->>'googleProfileId' = $1 
+        LIMIT 1
+      `, [googleId]);
+      
+      if (result && result.length > 0) {
+        return result[0] as User;
+      }
+      
       return undefined;
     } catch (error) {
       console.error("Error getting user by Google ID:", error);
@@ -176,68 +185,23 @@ export class DatabaseStorage implements IStorage {
 
   async updateUser(id: string, updates: UserUpdate): Promise<User> {
     try {
-      // Prepare the SET part of the SQL query dynamically
-      const setValues: string[] = [];
-      const queryParams: any[] = [id]; // First param is the ID
-      let paramCounter = 2; // Start from 2 since ID is $1
+      // Convert string ID to number (since our DB uses numeric IDs)
+      const userId = parseInt(id, 10);
       
-      // Add each update field
-      if (updates.username !== undefined) {
-        setValues.push(`username = $${paramCounter++}`);
-        queryParams.push(updates.username);
+      if (isNaN(userId)) {
+        throw new Error(`Invalid user ID: ${id}`);
       }
       
-      if (updates.email !== undefined) {
-        setValues.push(`email = $${paramCounter++}`);
-        queryParams.push(updates.email);
-      }
-      
-      if (updates.password !== undefined) {
-        setValues.push(`password = $${paramCounter++}`);
-        queryParams.push(updates.password);
-      }
-      
-      if (updates.firstName !== undefined) {
-        setValues.push(`first_name = $${paramCounter++}`);
-        queryParams.push(updates.firstName);
-      }
-      
-      if (updates.lastName !== undefined) {
-        setValues.push(`last_name = $${paramCounter++}`);
-        queryParams.push(updates.lastName);
-      }
-      
-      if (updates.profileImageUrl !== undefined) {
-        setValues.push(`profile_image_url = $${paramCounter++}`);
-        queryParams.push(updates.profileImageUrl);
-      }
-      
-      if (updates.googleId !== undefined) {
-        setValues.push(`google_id = $${paramCounter++}`);
-        queryParams.push(updates.googleId);
-      }
-      
-      if (updates.role !== undefined) {
-        setValues.push(`role = $${paramCounter++}`);
-        queryParams.push(updates.role);
-      }
-      
-      // Always update the updated_at timestamp
-      setValues.push(`updated_at = $${paramCounter++}`);
-      queryParams.push(new Date());
-      
-      // Using Drizzle ORM for the update
+      // Using Drizzle ORM for the update - only include fields that exist in the actual DB
       const updateValues: any = {};
       
-      // Build the update object dynamically
+      // Build the update object with only fields that exist in our actual database
       if (updates.username !== undefined) updateValues.username = updates.username;
       if (updates.email !== undefined) updateValues.email = updates.email;
       if (updates.password !== undefined) updateValues.password = updates.password;
-      if (updates.firstName !== undefined) updateValues.firstName = updates.firstName;
-      if (updates.lastName !== undefined) updateValues.lastName = updates.lastName;
-      if (updates.profileImageUrl !== undefined) updateValues.profileImageUrl = updates.profileImageUrl;
-      if (updates.googleId !== undefined) updateValues.googleId = updates.googleId;
+      if (updates.name !== undefined) updateValues.name = updates.name;
       if (updates.role !== undefined) updateValues.role = updates.role;
+      if (updates.company_profile !== undefined) updateValues.company_profile = updates.company_profile;
       
       // Always update updatedAt
       updateValues.updatedAt = new Date();
@@ -245,7 +209,7 @@ export class DatabaseStorage implements IStorage {
       const [user] = await db
         .update(users)
         .set(updateValues)
-        .where(eq(users.id, id))
+        .where(eq(users.id, userId))
         .returning();
       
       return user;

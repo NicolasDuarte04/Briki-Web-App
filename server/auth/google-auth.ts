@@ -37,10 +37,14 @@ export async function configureGoogleAuth() {
           
           if (user) {
             // Update existing user with latest Google info
+            // Combine firstName and lastName into name field since that's what exists in DB
+            const name = profile.name 
+              ? `${profile.name.givenName || ''} ${profile.name.familyName || ''}`.trim() 
+              : user.name;
+              
             user = await storage.updateUser(user.id, {
-              profileImageUrl: profile.photos?.[0]?.value || user.profileImageUrl,
-              firstName: profile.name?.givenName || user.firstName,
-              lastName: profile.name?.familyName || user.lastName,
+              name: name || user.name,
+              // No profileImageUrl in the database schema
             });
             
             return done(null, user);
@@ -52,12 +56,20 @@ export async function configureGoogleAuth() {
             user = await storage.getUserByEmail(email);
             
             if (user) {
-              // Link Google ID to existing account
+              // Link Google profile to existing account
+              // Combine firstName and lastName into name field since that's what exists in DB
+              const name = profile.name 
+                ? `${profile.name.givenName || ''} ${profile.name.familyName || ''}`.trim() 
+                : user.name;
+              
               user = await storage.updateUser(user.id, {
-                googleId: profile.id,
-                profileImageUrl: profile.photos?.[0]?.value || user.profileImageUrl,
-                firstName: profile.name?.givenName || user.firstName,
-                lastName: profile.name?.familyName || user.lastName,
+                // No googleId in the database schema
+                name: name || user.name,
+                // Store Google connection in a property in company_profile
+                company_profile: {
+                  ...user.company_profile,
+                  googleProfileId: profile.id
+                }
               });
               return done(null, user);
             }
@@ -90,17 +102,23 @@ export async function configureGoogleAuth() {
             username = `${username}${Math.floor(Math.random() * 10000)}`;
           }
           
-          // Create new user with Google info
+          // Create new user with Google info - using only fields in actual DB
+          const name = firstName && lastName 
+            ? `${firstName} ${lastName}`.trim() 
+            : firstName || lastName || username;
+            
           const newUser = await storage.createUser({
-            id: uuidv4(),
+            // id is auto-generated in the DB as a number
             username,
             email,
             password: null, // No password for Google auth
-            firstName,
-            lastName,
-            profileImageUrl,
-            googleId: profile.id,
+            name, // Using combined name field
             role: "user",
+            // Store Google profile info in company_profile JSON field
+            company_profile: {
+              googleProfileId: profile.id,
+              googleProfileImageUrl: profileImageUrl
+            }
           });
           
           return done(null, newUser);
