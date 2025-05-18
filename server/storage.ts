@@ -243,6 +243,10 @@ export class DatabaseStorage implements IStorage {
       if (updateData.password !== undefined) updateValues.password = updateData.password;
       if (updateData.name !== undefined) updateValues.name = updateData.name;
       if (updateData.role !== undefined) updateValues.role = updateData.role;
+      // Handle profile fields
+      if (updateData.firstName !== undefined) updateValues.firstName = updateData.firstName;
+      if (updateData.lastName !== undefined) updateValues.lastName = updateData.lastName;
+      if (updateData.profileImageUrl !== undefined) updateValues.profileImageUrl = updateData.profileImageUrl;
       
       // Special handling for company_profile to merge with existing data
       if (updateData.company_profile !== undefined) {
@@ -276,12 +280,20 @@ export class DatabaseStorage implements IStorage {
       
       console.log(`Updating user ${id} with:`, updateValues);
       
-      // Convert ID to string to match our schema
+      // Add updatedAt timestamp
+      updateValues.updatedAt = new Date();
+      
+      // Update the user in the database
       const [user] = await db
         .update(users)
         .set(updateValues)
-        .where(eq(users.id, String(id)))
+        .where(eq(users.id, id))
         .returning();
+      
+      // Ensure ID is consistently treated as a string
+      if (user) {
+        user.id = String(user.id);
+      }
       
       return user;
     } catch (error) {
