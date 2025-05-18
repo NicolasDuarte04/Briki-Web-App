@@ -52,7 +52,7 @@ interface UnifiedAuthScreenProps {
   initialTab?: "login" | "signup";
 }
 
-export function UnifiedAuthScreen({ initialTab = "login" }: UnifiedAuthScreenProps) {
+export default function UnifiedAuthScreen({ initialTab = "login" }: UnifiedAuthScreenProps) {
   // State management
   const [activeTab, setActiveTab] = useState<string>(initialTab);
   const [showPassword, setShowPassword] = useState(false);

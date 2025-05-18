@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { trackEvent } from "@/lib/analytics";
-import { UnifiedAuthScreen } from "@/components/auth/UnifiedAuthScreen";
+import UnifiedAuthScreen from "@/components/auth/UnifiedAuthScreen";
 import { AnimatedBackground, FloatingElements } from "@/components/ui/animated-background";
 
 export default function AuthPage() {
