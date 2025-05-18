@@ -17,6 +17,7 @@ export async function configureGoogleAuth() {
     : "http://localhost:5000";
     
   // Construct proper callback URL to match Google's expected format
+  // Making sure this exactly matches what's configured in Google Developer Console
   const callbackURL = `${domain}/api/auth/callback/google`;
 
   console.log("Configuring Google OAuth with callback URL:", callbackURL);
