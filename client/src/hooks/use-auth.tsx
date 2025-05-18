@@ -566,7 +566,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         refetchUser: refetch,
         login,
         register,
-        logout
+        logout,
+        requestPasswordReset
       }}
     >
       {children}
@@ -695,7 +696,16 @@ export function useAuth(): AuthContextType {
       login,
       register,
       logout,
-      refetchUser: async () => ({ user: null })
+      refetchUser: async () => ({ user: null }),
+      requestPasswordReset: async (email: string) => {
+        trackEvent('password_reset_attempt_fallback', 'authentication', 'form');
+        toast({
+          title: "Password reset unavailable",
+          description: "This feature is not available while offline. Please try again later.",
+          variant: "destructive",
+        });
+        return false;
+      }
     };
   }
   
