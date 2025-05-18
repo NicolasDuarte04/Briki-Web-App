@@ -235,6 +235,8 @@ export const quotes = pgTable("quotes", {
   quoteReference: varchar("quote_reference").notNull(),
   totalPrice: real("total_price"),
   statusCode: varchar("status_code"),
+  status: varchar("status"), // Added status field
+  notificationSent: boolean("notification_sent").default(false), // Added notification field
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
   expiresAt: timestamp("expires_at")
@@ -325,14 +327,17 @@ export const insertOrderSchema = createInsertSchema(orders, {
 
 // Export types for CRUD operations
 export type InsertUser = z.infer<typeof insertUserSchema>;
-export type User = {
+export type User = typeof users.$inferSelect;
+
+// Define a custom User type structure that matches DB fields precisely
+export type CustomUser = {
   id: number;
-  username?: string;
+  username?: string | null;
   email: string;
-  password?: string;
-  name?: string;
-  role?: string;
-  createdAt?: Date;
+  password?: string | null;
+  name?: string | null;
+  role?: string | null;
+  createdAt?: Date | null;
   company_profile?: any;
 };
 
