@@ -17,7 +17,11 @@ export async function configureLocalAuth() {
         try {
           console.log("Attempting login with email:", email);
           
-          // Find user by email only - removing username-based authentication
+          if (!email) {
+            return done(null, false, { message: "Email is required" });
+          }
+          
+          // Find user by email only
           const user = await storage.getUserByEmail(email);
 
           if (!user) {
@@ -48,9 +52,13 @@ export async function registerUser(req: Request, res: Response) {
   try {
     const { email, password, confirmPassword, name } = req.body;
 
-    // Email is required as the main identifier
+    // Email validation
     if (!email) {
       return res.status(400).json({ message: "Email is required" });
+    }
+    
+    if (!email.includes('@') || !email.includes('.')) {
+      return res.status(400).json({ message: "Please enter a valid email address" });
     }
     
     // Password validation
@@ -87,24 +95,33 @@ export async function registerUser(req: Request, res: Response) {
         message: "Email already in use" 
       });
     }
+    
+    // Check if this email was used with a social login
+    const socialUser = existingUser?.company_profile?.googleId;
+    if (socialUser) {
+      return res.status(400).json({
+        message: "This email is registered with Google. Please use Google Sign In"
+      });
+    }
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create a username from email for backward compatibility
-    const username = email.split('@')[0]; 
+    const username = email.split('@')[0];
     
     console.log("Creating user with email:", email);
     
     // Only use fields that exist in the actual database
     const user = await storage.createUser({
-      // Note: id is auto-generated in the DB
-      username, // Keep for backward compatibility
       email,
       password: hashedPassword,
-      name: name || email.split('@')[0], // Use provided name or default to email username
+      name: name || username, // Use provided name or default to email username
       role: "user",
-      company_profile: {}
+      // Required field but leave as empty object
+      company_profile: {
+        registeredWith: "email"
+      }
     });
 
     // Log user in after registration
