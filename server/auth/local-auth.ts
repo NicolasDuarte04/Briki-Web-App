@@ -97,8 +97,9 @@ export async function registerUser(req: Request, res: Response) {
     }
     
     // Check if this email was used with a social login
-    // Access googleId through the correct path in company_profile
-    const socialUser = existingUser?.company_profile?.registeredWith === 'google';
+    // Handle company_profile safely (it may be undefined)
+    const companyProfile = existingUser?.company_profile as Record<string, any> | undefined;
+    const socialUser = companyProfile?.registeredWith === 'google';
     if (socialUser) {
       return res.status(400).json({
         message: "This email is registered with Google. Please use Google Sign In"
@@ -150,7 +151,7 @@ export async function registerUser(req: Request, res: Response) {
 }
 
 export function loginUser(req: Request, res: Response, next: NextFunction) {
-  passport.authenticate("local", (err, user, info) => {
+  passport.authenticate("local", (err: Error | null, user: any, info: { message?: string } = {}) => {
     if (err) {
       return next(err);
     }

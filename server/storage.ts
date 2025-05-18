@@ -165,10 +165,14 @@ export class DatabaseStorage implements IStorage {
       
       console.log("Attempting to create user with email:", userData.email);
       
+      // Generate a user ID if not provided (string-based for compatibility with OAuth)
+      const userId = userData.id || `user_${Date.now().toString()}`;
+      
       // Use proper Drizzle ORM insert syntax matching our updated schema
       const [user] = await db
         .insert(users)
         .values({
+          id: userId,
           email: userData.email,
           username: userData.username || username,
           password: userData.password,
