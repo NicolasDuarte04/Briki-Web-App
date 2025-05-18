@@ -25,7 +25,7 @@ type AuthContextType = {
   registerMutation: UseMutationResult<TokenResponse, Error, InsertUser>;
   refetchUser: () => Promise<any>;
   login: (email: string, password: string) => Promise<boolean>;
-  register: (data: { email: string; password: string }) => Promise<boolean>;
+  register: (data: { email: string; password: string; confirmPassword?: string }) => Promise<boolean>;
   logout: () => Promise<void>;
 };
 
