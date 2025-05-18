@@ -67,18 +67,12 @@ router.post('/login', async (req: Request, res: Response) => {
 // User registration
 router.post('/register', async (req: Request, res: Response) => {
   try {
-    const { username, email, password } = req.body;
+    const { email, password } = req.body;
     
-    if (!username || !email || !password) {
+    if (!email || !password) {
       return res.status(400).json({ 
-        message: 'Username, email, and password are required' 
+        message: 'Email and password are required' 
       });
-    }
-    
-    // Check if username already exists
-    const existingUsername = await storage.getUserByUsername(username);
-    if (existingUsername) {
-      return res.status(400).json({ message: 'Username already in use' });
     }
     
     // Check if email already exists
@@ -90,10 +84,9 @@ router.post('/register', async (req: Request, res: Response) => {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
     
-    // Create new user
+    // Create new user (username will be generated from email in storage.createUser)
     const newUser = await storage.createUser({
       id: uuidv4(),
-      username,
       email,
       password: hashedPassword,
       role: "user", // Default role
