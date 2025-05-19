@@ -1,6 +1,32 @@
 import { trackEvent, EventCategory } from './analytics';
 import { v4 as uuidv4 } from 'uuid';
 
+// Internal helper function to track all assistant events
+const _trackAssistantEvent = (
+  eventType: AssistantEventType,
+  metadata: Record<string, any> = {}
+): void => {
+  try {
+    // Update the EventCategory for consistency
+    const category = EventCategory.INSURANCE; // Using existing category
+    
+    trackEvent(
+      eventType,
+      category,
+      null,
+      undefined,
+      {
+        sessionId: getAssistantSessionId(),
+        timestamp: new Date().toISOString(),
+        ...metadata
+      }
+    );
+  } catch (error) {
+    console.error('Error tracking assistant event:', error);
+    // Don't throw - analytics should never block the app
+  }
+};
+
 // Define specific event types for the AI Assistant
 export enum AssistantEventType {
   // User interaction events
@@ -11,6 +37,7 @@ export enum AssistantEventType {
   // Assistant response events
   ASSISTANT_MESSAGE_SENT = 'assistant_message_sent',
   ASSISTANT_ACTION_TRIGGERED = 'assistant_action_triggered',
+  ASSISTANT_ERROR = 'assistant_error',
   
   // Feature usage events
   QUOTE_FLOW_LAUNCHED = 'quote_flow_launched_by_ai',
@@ -20,7 +47,10 @@ export enum AssistantEventType {
   
   // Session lifecycle events
   SESSION_STARTED = 'assistant_session_started',
-  SESSION_ENDED = 'assistant_session_ended'
+  SESSION_ENDED = 'assistant_session_ended',
+  
+  // Feedback events
+  USER_FEEDBACK_GIVEN = 'user_feedback_given'
 }
 
 // Storage key for the session ID

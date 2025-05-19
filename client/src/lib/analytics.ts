@@ -1,3 +1,5 @@
+// No duplicate enum needed as there's one below
+
 // Define the gtag function globally
 declare global {
   interface Window {
