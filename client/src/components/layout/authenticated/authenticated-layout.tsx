@@ -14,14 +14,10 @@ interface AuthenticatedLayoutProps {
 export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
   const { location } = useNavigation();
   
-  // List of public pages where we don't want to show the authenticated navbar
-  const publicPages = ['/', '/features', '/pricing', '/ask-briki', '/blog', '/forum', '/careers', '/auth'];
-  const isPublicPage = publicPages.some(path => location === path || location.startsWith(`${path}/`));
-  
   return (
     <>
-      {/* Don't show navbar on public pages (they use PublicLayout) */}
-      {!isPublicPage && <NavbarNew />}
+      {/* Don't show navbar on auth page */}
+      {location !== '/auth' && <NavbarNew />}
       <FloatingAssistantButton />
       {children}
     </>
