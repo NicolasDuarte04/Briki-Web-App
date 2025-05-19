@@ -214,27 +214,30 @@ export default function UnifiedAuthScreen({ initialTab = "login" }: UnifiedAuthS
   );
   
   return (
-    <div className="w-full max-w-md mx-auto bg-white dark:bg-gray-900 rounded-xl shadow-xl overflow-hidden">
+    <div className="w-full max-w-md mx-auto bg-white dark:bg-gray-900 rounded-xl shadow-xl overflow-hidden border border-gray-100 dark:border-gray-800">
       <div className="p-6 sm:p-8">
+        <div className="flex justify-center mb-6">
+          <h2 className="text-2xl font-bold tracking-tighter bg-gradient-to-r from-indigo-600 to-blue-500 bg-clip-text text-transparent">Briki</h2>
+        </div>
         <Tabs defaultValue={activeTab} onValueChange={handleTabChange} className="w-full">
           {!forgotPasswordMode ? (
             <>
-              <TabsList className="grid grid-cols-2 w-full mb-6">
-                <TabsTrigger value="login" className="auth-tab rounded-l-md">Log In</TabsTrigger>
-                <TabsTrigger value="signup" className="auth-tab rounded-r-md">Sign Up</TabsTrigger>
+              <TabsList className="grid grid-cols-2 w-full mb-6 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
+                <TabsTrigger value="login" className="font-medium rounded-md text-gray-800 dark:text-white data-[state=active]:bg-white data-[state=active]:shadow-sm dark:data-[state=active]:bg-gray-700">Log In</TabsTrigger>
+                <TabsTrigger value="signup" className="font-medium rounded-md text-gray-800 dark:text-white data-[state=active]:bg-white data-[state=active]:shadow-sm dark:data-[state=active]:bg-gray-700">Sign Up</TabsTrigger>
               </TabsList>
               
               {/* Login Tab */}
               <TabsContent value="login" className="mt-0">
                 <form onSubmit={loginForm.handleSubmit(handleLoginSubmit)} className="space-y-5">
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="email" className="text-gray-800 dark:text-gray-200 font-medium">Email</Label>
                     <Input
                       id="email"
                       type="email"
                       placeholder="your.email@example.com"
                       autoComplete="email"
-                      className="auth-input"
+                      className="rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 shadow-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 h-11"
                       {...loginForm.register("email")}
                     />
                     {loginForm.formState.errors.email && (
@@ -244,11 +247,11 @@ export default function UnifiedAuthScreen({ initialTab = "login" }: UnifiedAuthS
                   
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <Label htmlFor="password">Password</Label>
+                      <Label htmlFor="password" className="text-gray-800 dark:text-gray-200 font-medium">Password</Label>
                       <button
                         type="button"
                         onClick={() => setForgotPasswordMode(true)}
-                        className="text-xs text-blue-600 hover:text-blue-800 hover:underline"
+                        className="text-xs text-blue-600 hover:text-blue-800 hover:underline font-medium"
                       >
                         Forgot password?
                       </button>
@@ -259,7 +262,7 @@ export default function UnifiedAuthScreen({ initialTab = "login" }: UnifiedAuthS
                         type={showPassword ? "text" : "password"}
                         placeholder="••••••••"
                         autoComplete="current-password"
-                        className="auth-input pr-10"
+                        className="rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 shadow-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 h-11 pr-10"
                         {...loginForm.register("password")}
                       />
                       <button
@@ -444,26 +447,31 @@ export default function UnifiedAuthScreen({ initialTab = "login" }: UnifiedAuthS
                   <div className="flex items-start space-x-2">
                     <Checkbox
                       id="acceptTerms"
-                      {...registerForm.register("acceptTerms")}
+                      checked={registerForm.watch("acceptTerms")}
+                      onCheckedChange={(checked) => {
+                        registerForm.setValue("acceptTerms", checked === true);
+                      }}
                       className="mt-1"
                     />
-                    <div>
-                      <label
-                        htmlFor="acceptTerms"
-                        className="text-sm font-medium leading-none"
-                      >
-                        I accept the 
-                      </label>
-                      <a 
-                        href="/terms" 
-                        className="text-sm font-medium text-blue-600 hover:underline ml-1"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Terms & Conditions
-                      </a>
+                    <div className="flex flex-col space-y-1">
+                      <div className="flex flex-wrap items-center">
+                        <label
+                          htmlFor="acceptTerms"
+                          className="text-sm font-medium text-gray-800 dark:text-gray-200 leading-none"
+                        >
+                          I accept the 
+                        </label>
+                        <a 
+                          href="/terms" 
+                          className="text-sm font-medium text-blue-600 hover:underline ml-1"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Terms & Conditions
+                        </a>
+                      </div>
                       {registerForm.formState.errors.acceptTerms && (
-                        <p className="text-sm text-red-500">{registerForm.formState.errors.acceptTerms.message}</p>
+                        <p className="text-sm text-red-500 mt-1">{registerForm.formState.errors.acceptTerms.message}</p>
                       )}
                     </div>
                   </div>
