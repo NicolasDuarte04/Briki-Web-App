@@ -1,120 +1,83 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { AlertTriangle, CheckCircle, RefreshCw } from 'lucide-react';
 import { Spinner } from '@/components/ui/spinner';
-import { apiGet } from '@/lib/api';
-import { trackError } from '@/lib/analytics';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { checkAPIStatus } from '@/services/ai-service';
+import { AlertCircle, CheckCircle2 } from 'lucide-react';
 
 interface ApiStatusCheckProps {
-  onStatusChange: (isAvailable: boolean) => void;
+  onStatusChange?: (isAvailable: boolean) => void;
 }
 
 export function ApiStatusCheck({ onStatusChange }: ApiStatusCheckProps) {
-  const [status, setStatus] = useState<'loading' | 'available' | 'unavailable'>('loading');
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [isChecking, setIsChecking] = useState(false);
+  const [isChecking, setIsChecking] = useState<boolean>(true);
+  const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
+  const [retryCount, setRetryCount] = useState<number>(0);
 
-  const checkApiStatus = async () => {
-    try {
+  // Check API status when component mounts or when retry is triggered
+  useEffect(() => {
+    const checkStatus = async () => {
       setIsChecking(true);
-      setStatus('loading');
-      
-      // Check OpenAI API status via our backend health endpoint
-      const result = await apiGet('/api/ai/health');
-      
-      if (result && result.status === 'ok') {
-        setStatus('available');
-        setErrorMessage(null);
-        onStatusChange(true);
-      } else {
-        setStatus('unavailable');
-        setErrorMessage(result?.message || 'The AI service is currently unavailable.');
-        onStatusChange(false);
-        trackError(`AI API unavailable: ${result?.message || 'Unknown error'}`);
+      try {
+        const status = await checkAPIStatus();
+        setIsAvailable(status);
+        onStatusChange?.(status);
+      } catch (error) {
+        console.error('Error checking API status:', error);
+        setIsAvailable(false);
+        onStatusChange?.(false);
+      } finally {
+        setIsChecking(false);
       }
-    } catch (error) {
-      setStatus('unavailable');
-      const errorMsg = error instanceof Error ? error.message : 'Unknown error occurred';
-      setErrorMessage(errorMsg);
-      onStatusChange(false);
-      trackError(`AI API check error: ${errorMsg}`);
-    } finally {
-      setIsChecking(false);
-    }
+    };
+
+    checkStatus();
+  }, [onStatusChange, retryCount]);
+
+  // Handle retry button click
+  const handleRetry = () => {
+    setRetryCount((prev) => prev + 1);
   };
 
-  useEffect(() => {
-    checkApiStatus();
-    // Check every 5 minutes
-    const interval = setInterval(checkApiStatus, 5 * 60 * 1000);
-    return () => clearInterval(interval);
-  }, []);
+  if (isChecking) {
+    return (
+      <div className="flex items-center space-x-2 p-2 rounded-md bg-gray-50">
+        <Spinner size="sm" className="text-blue-600" />
+        <span className="text-sm text-gray-600">Checking assistant availability...</span>
+      </div>
+    );
+  }
 
-  return (
-    <Card className="mb-4 border-0 shadow-md bg-white dark:bg-slate-900">
-      <CardContent className="p-4">
-        {status === 'loading' || isChecking ? (
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Spinner size="sm" />
-              <span className="text-sm text-slate-600 dark:text-slate-300">
-                Checking AI service availability...
-              </span>
-            </div>
-          </div>
-        ) : status === 'available' ? (
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-5 w-5 text-green-500" />
-              <span className="text-sm text-slate-600 dark:text-slate-300">
-                AI service is available and ready to use
-              </span>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={checkApiStatus}
-              disabled={isChecking}
-              className="h-8 px-2"
-            >
-              <RefreshCw className="h-4 w-4" />
-            </Button>
-          </div>
-        ) : (
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5 text-amber-500" />
-                <span className="text-sm font-medium text-amber-700 dark:text-amber-500">
-                  AI service is currently unavailable
-                </span>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={checkApiStatus}
-                disabled={isChecking}
-                className="h-8 px-2"
-              >
-                <RefreshCw className="h-4 w-4" />
-              </Button>
-            </div>
-            {errorMessage && (
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                {errorMessage}
-              </p>
-            )}
-            <style>
-              {`
-              .api-error-gradient {
-                background: linear-gradient(135deg, #fef3c7 0%, #fef3c7 50%, #fecaca 100%);
-              }
-              `}
-            </style>
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  );
+  if (isAvailable === false) {
+    return (
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>AI Assistant Unavailable</AlertTitle>
+        <AlertDescription>
+          <p className="mb-2">
+            The AI Assistant is currently unavailable. Please try again later or contact support if this issue persists.
+          </p>
+          <button
+            onClick={handleRetry}
+            className="text-sm underline hover:text-gray-800 focus:outline-none"
+          >
+            Retry connection
+          </button>
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
+  if (isAvailable === true) {
+    return (
+      <Alert variant="default" className="bg-green-50 border-green-200">
+        <CheckCircle2 className="h-4 w-4 text-green-600" />
+        <AlertTitle className="text-green-800">AI Assistant Available</AlertTitle>
+        <AlertDescription className="text-green-700">
+          The AI assistant is ready to help you with your insurance questions.
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
+  return null;
 }

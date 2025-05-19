@@ -1,297 +1,305 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { SendIcon, XIcon, ThumbsUp, ThumbsDown } from 'lucide-react';
-import { Spinner } from '@/components/ui/spinner';
-import { ApiStatusCheck } from './api-status-check';
-import { useToast } from '@/hooks/use-toast';
-import { Message, UserMemory } from '@/types/assistant';
-import { aiService } from '@/services/ai-service';
-import { useAssistantActions } from '@/hooks/use-assistant-actions';
-import { trackMessageSent, trackResponseReceived, trackFeedbackGiven } from '@/lib/assistant-analytics';
-import { cn } from '@/lib/utils';
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Card } from "@/components/ui/card";
+import { X, Send, Sparkles } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { v4 as uuidv4 } from "uuid";
+import { sendMessage, extractActionFromMessage } from "@/services/ai-service";
+import { 
+  Message, 
+  UserMemory, 
+  AssistantWidgetType,
+  RecommendPlanAction,
+  NavigateToPageAction,
+  ComparePlansAction,
+  ExplainTermAction
+} from "@/types/assistant";
+import { trackAssistantOpened, trackAssistantClosed, trackAssistantActionClicked } from "@/lib/assistant-analytics";
+import { useAssistantActions } from "@/hooks/use-assistant-actions";
 
 interface ChatInterfaceProps {
-  userMemory?: UserMemory;
-  isMinimized?: boolean;
-  onClose?: () => void;
-  onMinimize?: () => void;
+  isOpen: boolean;
+  onClose: () => void;
+  userMemory: UserMemory;
 }
 
-export function ChatInterface({
-  userMemory,
-  isMinimized = false,
-  onClose,
-  onMinimize,
-}: ChatInterfaceProps) {
+export function ChatInterface({ isOpen, onClose, userMemory }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [inputValue, setInputValue] = useState('');
-  const [isApiAvailable, setIsApiAvailable] = useState(true);
+  const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { toast } = useToast();
-  const { processAction } = useAssistantActions();
+  const { handleAction } = useAssistantActions();
 
-  // Add welcome message when the component mounts
+  // Initialize with welcome message
   useEffect(() => {
-    if (messages.length === 0) {
-      const welcomeMessage = aiService.generateMessage(
-        'assistant',
-        "Hello! I'm your Briki insurance assistant. How can I help you today?"
-      );
+    if (isOpen && messages.length === 0) {
+      // Track that the assistant was opened
+      trackAssistantOpened();
+      
+      // Add welcome message
+      const welcomeMessage: Message = {
+        id: uuidv4(),
+        sender: "assistant",
+        content: "Hello! I'm your Briki AI assistant. How can I help you with insurance today?",
+        timestamp: new Date().toISOString()
+      };
+      
       setMessages([welcomeMessage]);
     }
-  }, []);
+  }, [isOpen, messages.length]);
 
-  // Scroll to bottom of chat when messages change
+  // Scroll to bottom whenever messages change
   useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Handle sending a message
-  const handleSendMessage = async () => {
-    if (!inputValue.trim() || isLoading || !isApiAvailable) return;
+  // Clean up when closing
+  useEffect(() => {
+    if (!isOpen) {
+      // Track that the assistant was closed
+      trackAssistantClosed();
+    }
+  }, [isOpen]);
 
-    // Create user message
-    const userMessage = aiService.generateMessage('user', inputValue);
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
     
-    // Track the user message for analytics
-    trackMessageSent(inputValue.length, inputValue.endsWith('?'));
+    if (!inputValue.trim() || isLoading) return;
     
-    // Create loading message
-    const loadingMessage = aiService.generateMessage(
-      'assistant',
-      'Thinking...',
-      true
-    );
+    // Add user message
+    const userMessage: Message = {
+      id: uuidv4(),
+      sender: "user",
+      content: inputValue,
+      timestamp: new Date().toISOString()
+    };
     
-    // Update state
-    setMessages([...messages, userMessage, loadingMessage]);
-    setInputValue('');
+    // Add loading message
+    const loadingMessage: Message = {
+      id: uuidv4(),
+      sender: "assistant",
+      content: "Thinking...",
+      timestamp: new Date().toISOString(),
+      isLoading: true
+    };
+    
+    setMessages((prev) => [...prev, userMessage, loadingMessage]);
+    setInputValue("");
     setIsLoading(true);
     
-    // Get response from AI
     try {
-      const startTime = Date.now();
-      const response = await aiService.getAssistantResponse(
-        inputValue,
-        messages.filter(msg => !msg.isLoading), // Filter out any loading messages
-        userMemory
-      );
-      const responseTime = Date.now() - startTime;
+      // Send message to API
+      const response = await sendMessage(inputValue, userMemory);
       
-      // Track the response for analytics
-      trackResponseReceived(
-        response.text.length,
-        responseTime,
-        !!response.widgetData
-      );
+      // Process message and extract action if available
+      let widgetData: AssistantWidgetType | null = null;
+      
+      if (response.action) {
+        widgetData = response.action;
+      } else {
+        // Try to extract action from the message as a fallback
+        widgetData = extractActionFromMessage(response.message);
+      }
+      
+      // Create assistant message
+      const assistantMessage: Message = {
+        id: uuidv4(),
+        sender: "assistant",
+        content: response.message,
+        timestamp: new Date().toISOString(),
+        widgetData
+      };
       
       // Replace loading message with actual response
-      const assistantMessage = aiService.generateMessage(
-        'assistant',
-        response.text,
-        false,
-        false,
-        response.widgetData
-      );
-      
-      setMessages(prevMessages => 
-        prevMessages.map(msg => 
-          msg.id === loadingMessage.id ? assistantMessage : msg
-        )
+      setMessages((prev) => 
+        prev.map((msg) => (msg.isLoading ? assistantMessage : msg))
       );
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'An error occurred';
+      console.error("Error sending message to AI assistant:", error);
+      
+      // Create error message
+      const errorMessage: Message = {
+        id: uuidv4(),
+        sender: "assistant",
+        content: "Sorry, I encountered an error while processing your request. Please try again.",
+        timestamp: new Date().toISOString(),
+        error: true
+      };
       
       // Replace loading message with error message
-      const errorMsg = aiService.generateMessage(
-        'assistant',
-        `I'm having trouble connecting to my services right now. Please try again later. ${errorMessage}`,
-        false,
-        true
+      setMessages((prev) => 
+        prev.map((msg) => (msg.isLoading ? errorMessage : msg))
       );
-      
-      setMessages(prevMessages => 
-        prevMessages.map(msg => 
-          msg.id === loadingMessage.id ? errorMsg : msg
-        )
-      );
-      
-      toast({
-        title: 'Error',
-        description: 'There was a problem getting a response from the assistant.',
-        variant: 'destructive',
-      });
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Handle keyboard input (send on Enter, but allow Shift+Enter for new line)
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
-
-  // Handle giving feedback on a message
-  const handleFeedback = (messageId: string, isPositive: boolean) => {
-    // Implement feedback mechanism here
-    trackFeedbackGiven(isPositive, false);
+  // Handle action button clicks
+  const handleActionClick = (action: AssistantWidgetType) => {
+    // Track the action click
+    trackAssistantActionClicked(action.type, JSON.stringify(action).substring(0, 100));
     
-    toast({
-      title: 'Feedback Recorded',
-      description: `Thank you for your ${isPositive ? 'positive' : 'negative'} feedback.`,
-      variant: isPositive ? 'default' : 'destructive',
-    });
+    // Process the action
+    handleAction(action);
+    
+    // Close assistant after action (optional)
+    // onClose();
   };
 
   // Render message bubbles
-  const renderMessage = (message: Message) => {
-    const isUser = message.sender === 'user';
+  const renderMessageBubble = (message: Message) => {
+    const isUser = message.sender === "user";
     
     return (
-      <div
+      <div 
         key={message.id}
         className={cn(
-          'flex w-full mb-4',
-          isUser ? 'justify-end' : 'justify-start'
+          "flex w-full mb-4",
+          isUser ? "justify-end" : "justify-start"
         )}
       >
-        <div
+        <div 
           className={cn(
-            'max-w-[80%] rounded-lg p-3',
-            isUser
-              ? 'bg-gradient-to-r from-indigo-600 to-purple-500 text-white'
-              : message.error
-                ? 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200'
-                : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700'
+            "max-w-[80%] rounded-lg px-4 py-2",
+            isUser 
+              ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white" 
+              : "bg-gray-100 dark:bg-gray-800",
+            message.isLoading && "animate-pulse",
+            message.error && "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
           )}
         >
           {message.isLoading ? (
             <div className="flex items-center space-x-2">
-              <Spinner size="sm" />
-              <span>Thinking...</span>
+              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
+              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
+              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "600ms" }}></div>
             </div>
           ) : (
-            <>
-              <div className="whitespace-pre-wrap">{message.content}</div>
+            <div>
+              <p className="whitespace-pre-wrap">{message.content}</p>
               
-              {/* Show widget if available */}
-              {message.widgetData && (
-                <div className="mt-2 p-2 bg-slate-100 dark:bg-slate-700 rounded">
-                  {/* Widget content would go here */}
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
-                    {message.widgetData.type} widget
-                  </p>
-                </div>
-              )}
-              
-              {/* Show feedback buttons for assistant messages */}
-              {!isUser && !message.error && (
-                <div className="flex justify-end mt-2 gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 w-6 p-0 rounded-full hover:bg-green-100 dark:hover:bg-green-900"
-                    onClick={() => handleFeedback(message.id, true)}
-                  >
-                    <ThumbsUp className="h-3 w-3 text-green-600 dark:text-green-400" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 w-6 p-0 rounded-full hover:bg-red-100 dark:hover:bg-red-900"
-                    onClick={() => handleFeedback(message.id, false)}
-                  >
-                    <ThumbsDown className="h-3 w-3 text-red-600 dark:text-red-400" />
-                  </Button>
-                </div>
-              )}
-            </>
+              {/* Render action widget if available */}
+              {message.widgetData && renderActionWidget(message.widgetData)}
+            </div>
           )}
         </div>
       </div>
     );
   };
 
-  if (isMinimized) {
-    return null;
-  }
+  // Render action widget based on type
+  const renderActionWidget = (action: AssistantWidgetType) => {
+    switch (action.type) {
+      case "recommend_plan":
+        return renderRecommendPlanWidget(action);
+      case "navigate_to_page":
+        return renderNavigateWidget(action);
+      case "compare_plans":
+        return renderComparePlansWidget(action);
+      case "explain_term":
+        return renderExplainTermWidget(action);
+      default:
+        return null;
+    }
+  };
+
+  // Widget renderers for different action types
+  const renderRecommendPlanWidget = (action: RecommendPlanAction) => (
+    <div className="mt-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-md p-3">
+      <h4 className="font-semibold text-sm mb-2">Recommended Plan</h4>
+      <p className="text-xs mb-2">Category: {action.category}</p>
+      <p className="text-xs mb-3">Plan ID: {action.planId}</p>
+      <Button 
+        size="sm" 
+        className="w-full text-xs bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+        onClick={() => handleActionClick(action)}
+      >
+        View Plan Details
+      </Button>
+    </div>
+  );
+
+  const renderNavigateWidget = (action: NavigateToPageAction) => (
+    <div className="mt-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-md p-3">
+      <h4 className="font-semibold text-sm mb-2">Suggested Navigation</h4>
+      <p className="text-xs mb-3">Would you like to go to {action.label}?</p>
+      <Button 
+        size="sm" 
+        className="w-full text-xs bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+        onClick={() => handleActionClick(action)}
+      >
+        Go to {action.label}
+      </Button>
+    </div>
+  );
+
+  const renderComparePlansWidget = (action: ComparePlansAction) => (
+    <div className="mt-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-md p-3">
+      <h4 className="font-semibold text-sm mb-2">Compare Plans</h4>
+      <p className="text-xs mb-2">Category: {action.category}</p>
+      <p className="text-xs mb-3">Compare {action.planIds.length} plans</p>
+      <Button 
+        size="sm" 
+        className="w-full text-xs bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+        onClick={() => handleActionClick(action)}
+      >
+        Compare Plans
+      </Button>
+    </div>
+  );
+
+  const renderExplainTermWidget = (action: ExplainTermAction) => (
+    <div className="mt-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-md p-3">
+      <h4 className="font-semibold text-sm mb-2">Insurance Term: {action.term}</h4>
+      <p className="text-xs mb-2">{action.explanation}</p>
+    </div>
+  );
+
+  if (!isOpen) return null;
 
   return (
-    <Card className="w-full h-full max-h-[600px] flex flex-col overflow-hidden shadow-lg border-0">
-      {/* Header */}
-      <div className="flex justify-between items-center bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-3">
-        <h3 className="font-medium">Briki AI Assistant</h3>
-        <div className="flex gap-2">
-          {onMinimize && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-6 w-6 p-0 text-white hover:bg-indigo-700/50"
-              onClick={onMinimize}
-            >
-              <span className="sr-only">Minimize</span>
-              <span className="h-1 w-4 bg-white rounded-full block"></span>
-            </Button>
-          )}
-          {onClose && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-6 w-6 p-0 text-white hover:bg-indigo-700/50"
-              onClick={onClose}
-            >
-              <span className="sr-only">Close</span>
-              <XIcon className="h-4 w-4" />
-            </Button>
-          )}
+    <div className="fixed bottom-20 right-4 md:right-8 z-50 w-[95%] sm:w-[450px] max-h-[600px] flex flex-col shadow-2xl rounded-lg">
+      <Card className="flex flex-col h-[500px] border border-gray-200 dark:border-gray-800">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b">
+          <div className="flex items-center space-x-2">
+            <Sparkles className="h-5 w-5 text-blue-500" />
+            <h3 className="font-semibold">Briki AI Assistant</h3>
+          </div>
+          <Button variant="ghost" size="icon" onClick={onClose}>
+            <X className="h-4 w-4" />
+          </Button>
         </div>
-      </div>
-
-      {/* API Status Check */}
-      <ApiStatusCheck onStatusChange={setIsApiAvailable} />
-
-      {/* Messages */}
-      <CardContent className="flex-1 overflow-y-auto p-4">
-        <div className="space-y-4">
-          {messages.map(renderMessage)}
+        
+        {/* Messages */}
+        <div className="flex-1 p-4 overflow-y-auto">
+          {messages.map(renderMessageBubble)}
           <div ref={messagesEndRef} />
         </div>
-      </CardContent>
-
-      {/* Input Area */}
-      <div className="p-3 border-t border-slate-200 dark:border-slate-700">
-        {isApiAvailable ? (
-          <div className="flex gap-2">
-            <Textarea
-              placeholder="Type your message..."
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyDown={handleKeyDown}
-              className="min-h-[60px] resize-none"
-              disabled={isLoading}
-            />
-            <Button
-              className="shrink-0 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
-              onClick={handleSendMessage}
-              disabled={!inputValue.trim() || isLoading}
-            >
-              {isLoading ? <Spinner size="sm" /> : <SendIcon className="h-4 w-4" />}
-            </Button>
-          </div>
-        ) : (
-          <div className="text-center text-amber-600 dark:text-amber-500 p-2 bg-amber-50 dark:bg-amber-900/20 rounded">
-            The AI service is temporarily unavailable. Please try again later.
-          </div>
-        )}
-      </div>
+        
+        {/* Input */}
+        <form onSubmit={handleSendMessage} className="p-4 border-t">
+          <div className="flex space-x-2">
+          <Textarea
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            placeholder="Type your message..."
+            disabled={isLoading}
+            className="flex-1"
+          />
+          <Button 
+            type="submit" 
+            size="icon"
+            disabled={isLoading || !inputValue.trim()}
+            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+          >
+            <Send className="h-4 w-4" />
+          </Button>
+        </div>
+      </form>
     </Card>
+  </div>
   );
 }
