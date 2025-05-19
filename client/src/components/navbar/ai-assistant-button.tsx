@@ -1,66 +1,71 @@
-import { Bot } from 'lucide-react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
+import { MessageSquareIcon } from 'lucide-react';
 import { useAIAssistant } from '@/components/layout/ai-assistant-provider';
-import { cn } from '@/lib/utils';
-import { useLocation } from 'wouter';
 import { trackEvent, EventCategory } from '@/lib/analytics';
+import { cn } from '@/lib/utils';
 
 interface AIAssistantButtonProps {
-  variant?: 'default' | 'ghost' | 'outline';
-  size?: 'sm' | 'md' | 'lg';
+  variant?: 'default' | 'icon' | 'outline';
   className?: string;
 }
 
-export function AIAssistantButton({
-  variant = 'outline',
-  size = 'md',
-  className
+export function AIAssistantButton({ 
+  variant = 'default',
+  className = '',
 }: AIAssistantButtonProps) {
-  const { isAvailable, openAssistant } = useAIAssistant();
-  const [location] = useLocation();
-
-  // Only show the button on certain pages
-  // We don't need the assistant on the assistant page itself or certain utility pages
-  const shouldShowButton = () => {
-    const excludedPaths = [
-      '/assistant',
-      '/login',
-      '/signup',
-      '/forgot-password',
-      '/reset-password',
-    ];
-    
-    return isAvailable && !excludedPaths.some(path => location === path);
-  };
-
-  if (!shouldShowButton()) return null;
+  const { isOpen, openAssistant } = useAIAssistant();
 
   const handleClick = () => {
-    trackEvent('navbar_assistant_open', EventCategory.ENGAGEMENT, 'navbar_button');
+    // Track when the user clicks the assistant button in the navbar
+    trackEvent('assistant_navbar_button_clicked', EventCategory.ENGAGEMENT);
+    
+    // Open the assistant
     openAssistant();
   };
 
-  const sizeClasses = {
-    sm: 'h-8 px-2',
-    md: 'h-10 px-3',
-    lg: 'h-12 px-4',
-  };
+  // Render based on variant
+  if (variant === 'icon') {
+    return (
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={handleClick}
+        className={cn('p-0 h-9 w-9', className)}
+        aria-label="AI Assistant"
+      >
+        <MessageSquareIcon className="h-5 w-5" />
+      </Button>
+    );
+  }
 
+  if (variant === 'outline') {
+    return (
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={handleClick}
+        className={cn('gap-2', className)}
+      >
+        <MessageSquareIcon className="h-4 w-4" />
+        <span>Assistant</span>
+      </Button>
+    );
+  }
+
+  // Default variant
   return (
     <Button
-      variant={variant}
+      variant="default"
+      size="sm"
+      onClick={handleClick}
       className={cn(
-        "bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700",
-        "text-white border-0",
-        sizeClasses[size],
-        "transition-all duration-300 flex items-center gap-2",
+        'gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700',
         className
       )}
-      onClick={handleClick}
-      aria-label="Open AI Assistant"
     >
-      <Bot className="h-4 w-4" />
-      <span>Ask Assistant</span>
+      <MessageSquareIcon className="h-4 w-4" />
+      <span>Assistant</span>
     </Button>
   );
 }

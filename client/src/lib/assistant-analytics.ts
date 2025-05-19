@@ -35,7 +35,7 @@ export function trackResponseReceived(
   // Track response length in a separate event
   trackEvent(
     'assistant_response_length',
-    EventCategory.ANALYTICS,
+    EventCategory.PERFORMANCE,
     'characters',
     Math.min(Math.floor(responseLength / 50) * 50, 2000) // Bucket response lengths (0-50, 51-100, etc, capped at 2000)
   );
@@ -52,7 +52,7 @@ export function trackFeedbackGiven(
 ) {
   trackEvent(
     'assistant_feedback_given',
-    EventCategory.FEEDBACK,
+    EventCategory.ENGAGEMENT,
     isPositive ? 'positive' : 'negative',
     hasComment ? 1 : 0
   );
@@ -86,9 +86,7 @@ export function trackWidgetDisplayed(
   trackEvent(
     `assistant_widget_displayed`,
     EventCategory.ENGAGEMENT,
-    widgetType,
-    0,
-    { context: widgetContext }
+    widgetType
   );
 }
 
@@ -104,8 +102,6 @@ export function trackWidgetInteraction(
   trackEvent(
     `assistant_widget_interaction`,
     EventCategory.ENGAGEMENT,
-    widgetType,
-    0,
-    { interaction: interactionType }
+    `${widgetType}_${interactionType}`
   );
 }

@@ -1,46 +1,53 @@
-import { useLocation } from 'wouter';
-import { AIAction, NavigateToQuoteFlowAction, AddPlanToComparisonAction, ShowGlossaryTermAction } from '@/types/assistant';
-import { useToast } from '@/components/ui/use-toast';
-import { trackEvent, EventCategory } from '@/lib/analytics';
+import { useNavigate } from 'wouter';
+import { useToast } from '@/hooks/use-toast';
+import { trackAssistantAction } from '@/lib/assistant-analytics';
+import { 
+  AssistantAction, 
+  AssistantActionType,
+  NavigateToQuoteFlowAction,
+  AddPlanToComparisonAction,
+  ShowGlossaryTermAction
+} from '@/types/assistant';
+import { useComparisonStore } from '@/stores/comparison-store';
+import { useGlossaryStore } from '@/stores/glossary-store';
+import { InsuranceCategory } from '@/types/insurance';
 
 /**
  * Hook to handle actions from the AI Assistant
  */
 export function useAssistantActions() {
-  const [, navigate] = useLocation();
+  const navigate = useNavigate();
   const { toast } = useToast();
+  const { addPlanToComparison } = useComparisonStore();
+  const { showTerm } = useGlossaryStore();
 
   /**
    * Process an action from the AI
    * @param action The action to process
    * @returns A message about the result of the action, or null if no message should be shown
    */
-  const processAction = (action: AIAction | null): string | null => {
-    if (!action) return null;
+  const processAction = (action: AssistantAction): string => {
+    // Track the action in analytics
+    trackAssistantAction(action.type, action.category || 'general');
 
-    try {
-      switch (action.type) {
-        case 'navigate_to_quote_flow':
-          return handleNavigateToQuoteFlow(action as NavigateToQuoteFlowAction);
-        
-        case 'add_plan_to_comparison':
-          return handleAddPlanToComparison(action as AddPlanToComparisonAction);
-        
-        case 'show_glossary_term':
-          return handleShowGlossaryTerm(action as ShowGlossaryTermAction);
-        
-        default:
-          console.warn('Unknown action type:', action.type);
-          return null;
-      }
-    } catch (error) {
-      console.error('Error processing action:', error);
-      toast({
-        title: 'Error',
-        description: 'There was an error processing this action. Please try again.',
-        variant: 'destructive',
-      });
-      return null;
+    // Process the action based on type
+    switch (action.type) {
+      case AssistantActionType.NAVIGATE_TO_QUOTE_FLOW:
+        return handleNavigateToQuoteFlow(action as NavigateToQuoteFlowAction);
+      
+      case AssistantActionType.ADD_PLAN_TO_COMPARISON:
+        return handleAddPlanToComparison(action as AddPlanToComparisonAction);
+      
+      case AssistantActionType.SHOW_GLOSSARY_TERM:
+        return handleShowGlossaryTerm(action as ShowGlossaryTermAction);
+      
+      default:
+        toast({
+          title: 'Action Not Supported',
+          description: 'Sorry, this action is not supported yet.',
+          variant: 'destructive'
+        });
+        return 'I tried to perform an action, but it\'s not supported yet. Let me know if there\'s something else I can help with.';
     }
   };
 
@@ -48,17 +55,39 @@ export function useAssistantActions() {
    * Handle the navigate to quote flow action
    */
   const handleNavigateToQuoteFlow = (action: NavigateToQuoteFlowAction): string => {
-    const { category } = action;
+    const { category, prefillData } = action;
     
-    // Track the action
-    trackEvent('ai_navigate_to_quote_flow', EventCategory.CONVERSION, category);
+    // Store prefill data in sessionStorage if provided
+    if (prefillData) {
+      sessionStorage.setItem(`quote_prefill_${category}`, JSON.stringify(prefillData));
+    }
     
-    // Navigate to the quote flow
-    setTimeout(() => {
-      navigate(`/insurance/${category.toLowerCase()}/quote`);
-    }, 1000);
-    
-    return `I'll redirect you to the ${category} insurance quote flow in a moment.`;
+    // Navigate to the appropriate quote page based on category
+    switch (category) {
+      case InsuranceCategory.TRAVEL:
+        navigate('/insurance/travel/quote');
+        return 'I\'ve opened the travel insurance quote form for you.';
+      
+      case InsuranceCategory.AUTO:
+        navigate('/insurance/auto/quote');
+        return 'I\'ve opened the auto insurance quote form for you.';
+      
+      case InsuranceCategory.PET:
+        navigate('/insurance/pet/quote');
+        return 'I\'ve opened the pet insurance quote form for you.';
+      
+      case InsuranceCategory.HEALTH:
+        navigate('/insurance/health/quote');
+        return 'I\'ve opened the health insurance quote form for you.';
+      
+      default:
+        toast({
+          title: 'Category Not Supported',
+          description: `The ${category} category is not supported for quotes yet.`,
+          variant: 'destructive'
+        });
+        return `I tried to open a quote form for ${category} insurance, but this category isn't supported yet.`;
+    }
   };
 
   /**
@@ -67,35 +96,42 @@ export function useAssistantActions() {
   const handleAddPlanToComparison = (action: AddPlanToComparisonAction): string => {
     const { planId, category } = action;
     
-    // Track the action
-    trackEvent('ai_add_plan_to_comparison', EventCategory.ENGAGEMENT, category);
-    
-    // In a real implementation, we would add the plan to the comparison list in a store
-    // For now, we'll just navigate to the comparison page
-    setTimeout(() => {
-      navigate(`/compare-plans?planId=${planId}&category=${category.toLowerCase()}`);
-    }, 1000);
-    
-    return `I've added this plan to your comparison list. You'll be redirected to view your comparisons.`;
+    try {
+      // Add the plan to comparison
+      addPlanToComparison(planId, category);
+      
+      toast({
+        title: 'Plan Added',
+        description: 'The plan has been added to your comparison list.',
+        variant: 'default'
+      });
+      
+      return 'I\'ve added that plan to your comparison list. You can view all compared plans on the comparison page.';
+    } catch (error) {
+      toast({
+        title: 'Error Adding Plan',
+        description: 'There was an error adding the plan to comparison.',
+        variant: 'destructive'
+      });
+      
+      return 'I tried to add that plan to your comparison list, but there was an error. Please try adding it manually.';
+    }
   };
 
   /**
    * Handle the show glossary term action
    */
   const handleShowGlossaryTerm = (action: ShowGlossaryTermAction): string => {
-    const { term, definition } = action;
+    const { term } = action;
     
-    // Track the action
-    trackEvent('ai_show_glossary_term', EventCategory.ENGAGEMENT, term);
-    
-    // Show the term definition in a toast
-    toast({
-      title: term,
-      description: definition,
-      duration: 8000,
-    });
-    
-    return null;
+    try {
+      // Show the term in the glossary
+      showTerm(term);
+      
+      return 'I\'ve opened the glossary to that term for you.';
+    } catch (error) {
+      return 'I tried to show you that term in our glossary, but there was an error. You can find our insurance glossary in the help section.';
+    }
   };
 
   return { processAction };

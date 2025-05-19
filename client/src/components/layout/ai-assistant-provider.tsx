@@ -1,137 +1,129 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { ChatInterface } from '@/components/ai-assistant/chat-interface';
-import { APIStatusCheck } from '@/components/ai-assistant/api-status-check';
-import { checkOpenAIStatus } from '@/services/ai-service';
-import { trackEvent, EventCategory } from '@/lib/analytics';
+import { ApiStatusCheck } from '@/components/ai-assistant/api-status-check';
+import { aiService } from '@/services/ai-service';
+import { UserMemory } from '@/types/assistant';
+import { useToast } from '@/hooks/use-toast';
 
-// Context type definition
 interface AIAssistantContextType {
   isOpen: boolean;
-  isAvailable: boolean;
-  toggleAssistant: () => void;
+  isMinimized: boolean;
   openAssistant: () => void;
   closeAssistant: () => void;
+  toggleMinimize: () => void;
+  userMemory: UserMemory;
+  updateUserMemory: (newMemory: Partial<UserMemory>) => void;
 }
 
-// Default context state
-const defaultContext: AIAssistantContextType = {
-  isOpen: false,
-  isAvailable: false,
-  toggleAssistant: () => {},
-  openAssistant: () => {},
-  closeAssistant: () => {},
-};
+const AIAssistantContext = createContext<AIAssistantContextType | undefined>(undefined);
 
-// Create context
-const AIAssistantContext = createContext<AIAssistantContextType>(defaultContext);
-
-// Custom hook to use the AI Assistant
-export const useAIAssistant = () => useContext(AIAssistantContext);
-
-// Provider props
 interface AIAssistantProviderProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
-
-// Pages where the assistant should not be available
-const EXCLUDED_PATHS = [
-  '/login',
-  '/signup',
-  '/forgot-password',
-  '/reset-password',
-  '/profile/edit',
-  '/legal/terms',
-  '/legal/privacy',
-];
 
 export function AIAssistantProvider({ children }: AIAssistantProviderProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isApiAvailable, setIsApiAvailable] = useState(false);
-  const [isApiChecked, setIsApiChecked] = useState(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isMinimized, setIsMinimized] = useState<boolean>(false);
+  const [userMemory, setUserMemory] = useState<UserMemory>({});
+  const [apiAvailable, setApiAvailable] = useState<boolean>(true);
   const [location] = useLocation();
+  const { toast } = useToast();
 
-  // Check if the assistant should be available on the current page
-  const isAvailable = !EXCLUDED_PATHS.includes(location) && isApiAvailable;
-
-  // Check API status on initial load
-  useEffect(() => {
-    const checkApiStatus = async () => {
-      try {
-        const status = await checkOpenAIStatus();
-        setIsApiAvailable(status.available);
-      } catch (error) {
-        console.error('Error checking API status:', error);
-        setIsApiAvailable(false);
-      } finally {
-        setIsApiChecked(true);
-      }
-    };
-
-    if (!isApiChecked) {
-      checkApiStatus();
-    }
-  }, [isApiChecked]);
-
-  // Automatically close the assistant when navigating to a new page
+  // Close assistant when navigating to a new page
   useEffect(() => {
     if (isOpen) {
-      setIsOpen(false);
+      setIsMinimized(true);
     }
   }, [location]);
 
-  // Toggle assistant visibility
-  const toggleAssistant = () => {
-    const newState = !isOpen;
-    setIsOpen(newState);
-    
-    // Track the toggle event
-    trackEvent(
-      newState ? 'assistant_opened' : 'assistant_closed', 
-      EventCategory.ENGAGEMENT,
-      'toggle_button'
-    );
-  };
+  // Check API availability on mount
+  useEffect(() => {
+    const checkAvailability = async () => {
+      try {
+        const available = await aiService.checkAvailability();
+        setApiAvailable(available);
+      } catch (error) {
+        setApiAvailable(false);
+      }
+    };
 
-  // Open the assistant
+    checkAvailability();
+  }, []);
+
   const openAssistant = () => {
-    if (!isOpen) {
-      setIsOpen(true);
-      trackEvent('assistant_opened', EventCategory.ENGAGEMENT, 'explicit_open');
+    if (!apiAvailable) {
+      toast({
+        title: 'AI Assistant Unavailable',
+        description: 'The AI assistant is currently unavailable. Please try again later.',
+        variant: 'destructive',
+      });
+      return;
     }
+    setIsOpen(true);
+    setIsMinimized(false);
   };
 
-  // Close the assistant
   const closeAssistant = () => {
-    if (isOpen) {
-      setIsOpen(false);
-      trackEvent('assistant_closed', EventCategory.ENGAGEMENT, 'explicit_close');
-    }
+    setIsOpen(false);
+  };
+
+  const toggleMinimize = () => {
+    setIsMinimized(!isMinimized);
+  };
+
+  const updateUserMemory = (newMemory: Partial<UserMemory>) => {
+    setUserMemory(prev => ({
+      ...prev,
+      ...newMemory,
+    }));
+  };
+
+  const contextValue: AIAssistantContextType = {
+    isOpen,
+    isMinimized,
+    openAssistant,
+    closeAssistant,
+    toggleMinimize,
+    userMemory,
+    updateUserMemory,
   };
 
   return (
-    <AIAssistantContext.Provider
-      value={{
-        isOpen,
-        isAvailable,
-        toggleAssistant,
-        openAssistant,
-        closeAssistant,
-      }}
-    >
+    <AIAssistantContext.Provider value={contextValue}>
       {children}
-
-      {/* API Status Check Component */}
-      {!isApiChecked && <APIStatusCheck />}
       
-      {/* Assistant Dialog */}
-      {isOpen && isAvailable && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white dark:bg-slate-950 rounded-lg shadow-xl w-full max-w-xl h-[80vh] overflow-hidden flex flex-col">
-            <ChatInterface onClose={closeAssistant} />
-          </div>
+      {isOpen && (
+        <div 
+          className={`fixed bottom-4 right-4 z-50 w-[400px] max-w-[calc(100vw-2rem)] transition-all duration-300 ease-in-out ${
+            isMinimized ? 'h-12 shadow-md' : 'max-h-[80vh]'
+          }`}
+        >
+          {isMinimized ? (
+            <div 
+              className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-3 rounded-md shadow-md cursor-pointer flex items-center justify-between"
+              onClick={toggleMinimize}
+            >
+              <span className="font-medium">Briki AI Assistant</span>
+              <span className="text-xs opacity-70">Click to expand</span>
+            </div>
+          ) : (
+            <ChatInterface 
+              userMemory={userMemory}
+              onClose={closeAssistant}
+              onMinimize={toggleMinimize}
+            />
+          )}
         </div>
       )}
     </AIAssistantContext.Provider>
   );
+}
+
+export function useAIAssistant() {
+  const context = useContext(AIAssistantContext);
+  if (context === undefined) {
+    throw new Error('useAIAssistant must be used within an AIAssistantProvider');
+  }
+  return context;
 }
