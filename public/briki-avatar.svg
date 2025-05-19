@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="100" cy="100" r="95" fill="#4F46E5" opacity="0.1" />
+  <circle cx="100" cy="100" r="85" fill="#4F46E5" opacity="0.2" />
+  
+  <!-- Briki Logo Simple B -->
+  <path d="M65 60H135C142.732 60 150 67.2681 150 75V85C150 92.7319 142.732 100 135 100H120V120C120 127.732 112.732 135 105 135H65C57.2681 135 50 127.732 50 120V75C50 67.2681 57.2681 60 65 60Z" fill="#4F46E5" />
+  
+  <!-- Inner Cutout for the B -->
+  <path d="M85 80H115C117.761 80 120 82.2386 120 85V90C120 92.7614 117.761 95 115 95H85V110C85 112.761 82.7614 115 80 115H70C67.2386 115 65 112.761 65 110V85C65 82.2386 67.2386 80 70 80H85Z" fill="white" />
+  
+  <!-- Smile -->
+  <path d="M70 150C70 150 85 170 130 150" stroke="#4F46E5" stroke-width="6" stroke-linecap="round" />
+</svg>
