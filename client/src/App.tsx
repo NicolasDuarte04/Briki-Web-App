@@ -32,6 +32,14 @@ import SettingsPage from "@/pages/settings-page";
 import ApiSettingsPage from "@/pages/api-settings-page";
 import ComparePlansPage from "@/pages/compare-plans";  // Updated to use the main compare plans component
 
+// Import new public site pages
+import FeaturesPage from "@/pages/features";
+import PricingPage from "@/pages/pricing";
+import AskBrikiPage from "@/pages/ask-briki";
+import BlogPage from "@/pages/blog";
+import ForumPage from "@/pages/forum";
+import CareersPage from "@/pages/careers";
+
 // Import redirects from their respective files
 import { 
   AutoInsuranceRedirect,
@@ -151,6 +159,14 @@ function Router() {
         <Route path="/company-dashboard/upload" component={CompanyQuoteUploadPage} />
         <Route path="/company-dashboard/preview" component={CompanyPreviewPage} />
         <Route path="/company-dashboard/request-pilot" component={CompanyRequestPilotPage} />
+        
+        {/* New public site routes */}
+        <Route path="/features" component={FeaturesPage} />
+        <Route path="/pricing" component={PricingPage} />
+        <Route path="/ask-briki" component={AskBrikiPage} />
+        <Route path="/blog" component={BlogPage} />
+        <Route path="/forum" component={ForumPage} />
+        <Route path="/careers" component={CareersPage} />
         
         <Route component={NotFound} />
       </Switch>
