@@ -463,12 +463,19 @@ export default function AIAssistantScreen() {
     } catch (error) {
       console.error("Assistant response error:", error);
       
-      // Track the error event
-      trackAssistantEvent(AssistantEventType.ASSISTANT_ERROR, {
-        errorType: 'api_error',
-        messageLength: inputMessage.trim().length,
-        errorMessage: error instanceof Error ? error.message : 'Unknown error'
-      });
+      // Track the error event using the regular tracking method
+      trackEvent(
+        'assistant_error',
+        EventCategory.ERROR,
+        'API Error',
+        undefined,
+        {
+          sessionId: uuidv4(),
+          errorType: 'api_error',
+          messageLength: inputMessage.trim().length,
+          errorMessage: error instanceof Error ? error.message : 'Unknown error'
+        }
+      );
       
       // Handle error - remove loading message and add error message
       setMessages(prev => {
