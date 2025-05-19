@@ -1,0 +1,55 @@
+You are now working on **Phase 8** of the Briki AI Assistant development.
+
+This phase introduces visual explanation components — like glossary cards, tooltips, and visual diagrams — that Briki can use mid-chat to **educate users interactively**.
+
+---
+
+### Objectives:
+
+1. **Build GlossaryCard Component**
+   - Create a reusable `GlossaryCard` component for terms like “deductible”, “co-pay”, “exclusion”, etc.
+   - Component should include:
+     • Term title (e.g., “Deductible”)
+     • Plain-language definition
+     • Optional visual aid (icon or illustration placeholder)
+     • Source or “learn more” link (if available)
+   - Use Tailwind + ShadCN styling for consistency
+   - Place it in `components/assistant/widgets/GlossaryCard.tsx`
+
+2. **Enable AI Assistant to Trigger GlossaryCards**
+   - Update the backend to allow OpenAI to return glossary triggers like:
+     ```json
+     {
+       "type": "show_glossary",
+       "term": "deductible",
+       "definition": "A deductible is the amount you pay before your insurance starts covering costs.",
+       "icon": "deductible-icon"
+     }
+     ```
+   - In the frontend assistant logic, detect this type and inject a `GlossaryCard` into the chat
+
+3. **Create a Simple Visual Explainer Component**
+   - Create a second reusable widget: `VisualExplainerCard`
+   - Use it for side-by-side comparisons (e.g., “Basic vs Premium Coverage”)
+   - Include:
+     • Title
+     • Left vs Right table-style comparison
+     • Icons or colored indicators for clarity
+
+4. **Smart Rendering Inside the Chat**
+   - Just like plan cards, inject glossary cards and explainer cards **inline** in the message history
+   - Position them below the related assistant message
+   - Make them fully responsive and scroll-friendly
+
+5. **Test with Real Assistant Queries**
+   - Trigger glossary widgets when user asks things like:
+     • “What is a deductible?”
+     • “Can you explain exclusions?”
+     • “What’s the difference between co-pay and out-of-pocket?”
+   - Use either simulated or live OpenAI responses with structured metadata
+
+---
+
+This phase equips Briki with **visual intelligence** — making it the most educational insurance assistant in Latin America.
+
+Once complete, we’ll move to **Phase 9: Analytics + Interaction Logging** to start tracking what users ask and how Briki responds.
