@@ -183,12 +183,8 @@ export default function AIAssistantScreen() {
         return [...filtered, errorMessage];
       });
       
-      // Show toast notification
-      toast({
-        title: "Error",
-        description: "Failed to get a response from the assistant.",
-        variant: "destructive"
-      });
+      // Show error notification
+      alert("Error: Failed to get a response from the assistant.");
     } finally {
       setIsSending(false);
     }
