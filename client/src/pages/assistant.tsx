@@ -316,6 +316,13 @@ export default function AIAssistantScreen() {
       timestamp: new Date().toISOString()
     };
     
+    // Track user message analytics
+    trackUserMessage(userMessage.content, {
+      messageId: userMessage.id,
+      memoryContext: Object.keys(userMemory).length > 0,
+      conversationLength: messages.length
+    });
+    
     // Clear input field
     setInputMessage("");
     
@@ -353,6 +360,33 @@ export default function AIAssistantScreen() {
           widgetData: response.widgetData
         };
         
+        // Track assistant response analytics
+        trackAssistantResponse(
+          assistantMessage.content.length,
+          !!assistantMessage.widgetData,
+          !!response.action,
+          {
+            messageId: assistantMessage.id,
+            hasError: assistantMessage.error,
+            widgetType: assistantMessage.widgetData?.type || null
+          }
+        );
+        
+        // Track specific widget types if they exist
+        if (assistantMessage.widgetData) {
+          if (assistantMessage.widgetData.type === 'show_glossary') {
+            trackGlossaryTermDisplay(
+              (assistantMessage.widgetData as typeof import('../services/ai-service').GlossaryWidgetData).term,
+              { messageId: assistantMessage.id }
+            );
+          } else if (assistantMessage.widgetData.type === 'show_comparison') {
+            trackVisualExplainerDisplay(
+              (assistantMessage.widgetData as typeof import('../services/ai-service').VisualComparisonWidgetData).title,
+              { messageId: assistantMessage.id }
+            );
+          }
+        }
+        
         return [...filtered, assistantMessage];
       });
       
@@ -360,6 +394,24 @@ export default function AIAssistantScreen() {
       if (response.action) {
         // Add a small delay to allow the user to read the message before action is processed
         setActionPending(true);
+        
+        // Track the assistant action for analytics
+        trackAssistantAction(response.action.type, {
+          actionCategory: response.action.category || null,
+          conversationLength: messages.length,
+          hasCustomMessage: !!response.action.message
+        });
+        
+        // For specific action types, track more detailed analytics
+        if (response.action.type === 'navigate_to_quote_flow' && 'category' in response.action) {
+          trackQuoteFlowLaunch(
+            response.action.category as string,
+            { 
+              source: 'assistant',
+              hasPreloadData: 'preload' in response.action && !!response.action.preload
+            }
+          );
+        }
         
         // Show a notification that action is being performed
         toast({
@@ -423,6 +475,12 @@ export default function AIAssistantScreen() {
 
   // Handle selecting a suggested question
   const handleSuggestedQuestion = (question: string) => {
+    // Track when a user clicks on a suggested question
+    trackSuggestedPromptClick(question, {
+      conversationLength: messages.length,
+      source: 'suggestion_chip'
+    });
+    
     setInputMessage(question);
     // Focus on the textarea after setting the question
     const textarea = document.querySelector('textarea');
