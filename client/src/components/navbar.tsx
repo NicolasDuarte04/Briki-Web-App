@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { Loader2, Bell, Menu, X, User, Settings, LogOut, Bot, SparklesIcon } from "lucide-react";
 import { useLanguage, LanguageSelector } from "@/components/language-selector";
 import { AIAssistantButton } from "@/components/layout";
-import { useAIAssistantUI } from "@/components/layout";
+import { useAIAssistant } from "@/components/layout";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -28,7 +28,7 @@ export default function Navbar() {
   const [location, navigate] = useLocation();
   const { user, isLoading, logoutMutation } = useAuth();
   const { t } = useLanguage();
-  const { toggleAssistant } = useAIAssistantUI();
+  const { toggleAssistant } = useAIAssistant();
   
   // Check if current page should show AI Assistant
   const excludedPaths = ['/', '/auth', '/countdown', '/login', '/register', '/terms', '/learn-more'];

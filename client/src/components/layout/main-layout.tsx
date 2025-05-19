@@ -25,7 +25,7 @@ import {
   Bot,
   ChevronDown,
 } from "lucide-react";
-import { useAIAssistantUI } from "@/components/layout";
+import { useAIAssistant } from "@/components/layout";
 import {
   Sheet,
   SheetContent,
@@ -52,7 +52,7 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
   const [location, navigate] = useLocation();
   const { user, isLoading, logoutMutation } = useAuth();
   const { t } = useLanguage();
-  const { toggleAssistant } = useAIAssistantUI();
+  const { toggleAssistant } = useAIAssistant();
   
   // Check if current page should show AI Assistant
   const excludedPaths = ['/', '/auth', '/countdown', '/login', '/register', '/terms', '/learn-more', '/landing'];

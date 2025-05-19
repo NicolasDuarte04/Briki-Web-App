@@ -1,204 +1,97 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { SparklesIcon, AlertCircle, Trophy, RefreshCw } from 'lucide-react';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import React from 'react';
 import { Button } from '@/components/ui/button';
-import { useAIAssistant } from '@/hooks/use-ai-assistant';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Skeleton } from '@/components/ui/skeleton';
-import { InsuranceCategory } from '@/services/api/insurance-providers';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { useToast } from '@/hooks/use-toast';
+import { InsuranceCategory } from '@/types/insurance';
+import { useNavigation } from '@/lib/navigation';
+import { trackEvent, EventCategory } from '@/lib/analytics';
 
 interface PlanRecommenderProps {
   category?: InsuranceCategory;
-  criteria?: Record<string, any>;
-  className?: string;
-  onRecommendationGenerated?: (recommendation: string) => void;
+  onClose?: () => void;
 }
 
 /**
- * Component that shows AI-generated insurance plan recommendations
+ * AI Assistant component that helps recommend insurance plans
+ * based on user preferences and history
  */
-export default function PlanRecommender({
+export const PlanRecommender: React.FC<PlanRecommenderProps> = ({ 
   category = 'travel',
-  criteria = {},
-  className = '',
-  onRecommendationGenerated
-}: PlanRecommenderProps) {
-  const [activeCategory, setActiveCategory] = useState<InsuranceCategory>(category);
-  const [recommendation, setRecommendation] = useState('');
-  const { getRecommendation, isRecommendationLoading } = useAIAssistant();
-
-  // Criteria templates for different insurance categories
-  const criteriaSets: Record<InsuranceCategory, Record<string, any>> = {
-    travel: {
-      destination: criteria.destination || 'Mexico',
-      duration: criteria.duration || '14 days',
-      activities: criteria.activities || 'General tourism, hiking',
-      travelers: criteria.travelers || 2,
-      age: criteria.age || '30-40',
-      budget: criteria.budget || 'Medium ($100-200)'
-    },
-    auto: {
-      vehicleType: criteria.vehicleType || 'Sedan',
-      vehicleYear: criteria.vehicleYear || 2020,
-      driverAge: criteria.driverAge || 35,
-      drivingHistory: criteria.drivingHistory || 'No accidents',
-      usage: criteria.usage || 'Daily commute (15 miles)',
-      budget: criteria.budget || 'Medium ($500-1000/year)'
-    },
-    pet: {
-      petType: criteria.petType || 'Dog',
-      breed: criteria.breed || 'Mixed',
-      age: criteria.age || 3,
-      preExistingConditions: criteria.preExistingConditions || 'None',
-      coverageType: criteria.coverageType || 'Accident and illness',
-      budget: criteria.budget || 'Medium ($30-50/month)'
-    },
-    health: {
-      age: criteria.age || 35,
-      preExistingConditions: criteria.preExistingConditions || 'None',
-      coverageNeeds: criteria.coverageNeeds || 'General checkups, emergency care',
-      dependents: criteria.dependents || 0,
-      medicationNeeds: criteria.medicationNeeds || 'Occasional',
-      budget: criteria.budget || 'Medium ($200-400/month)'
-    }
-  };
-
-  const handleCategoryChange = (category: InsuranceCategory) => {
-    setActiveCategory(category);
-    setRecommendation('');
-  };
-
-  const handleGetRecommendation = async () => {
-    const currentCriteria = criteriaSets[activeCategory];
-    
-    try {
-      const result = await getRecommendation(activeCategory, currentCriteria);
-      setRecommendation(result);
-      
-      if (onRecommendationGenerated) {
-        onRecommendationGenerated(result);
-      }
-    } catch (error) {
-      console.error('Error getting recommendation:', error);
-      setRecommendation('Sorry, I had trouble generating a recommendation. Please try again.');
-    }
-  };
-
-  const categoryLabels: Record<InsuranceCategory, string> = {
-    travel: 'Travel',
-    auto: 'Auto',
-    pet: 'Pet',
-    health: 'Health'
-  };
+  onClose 
+}) => {
+  const { toast } = useToast();
+  const { navigate } = useNavigation();
   
-  // Format criteria for display
-  const formatCriteria = (criteria: Record<string, any>) => {
-    return Object.entries(criteria).map(([key, value]) => {
-      const formattedKey = key.replace(/([A-Z])/g, ' $1').toLowerCase();
-      const capitalizedKey = formattedKey.charAt(0).toUpperCase() + formattedKey.slice(1);
-      return { 
-        label: capitalizedKey, 
-        value: value.toString() 
-      };
+  const handleSelectCategory = (selectedCategory: InsuranceCategory) => {
+    // Track selection in analytics
+    trackEvent('plan_recommender_select', EventCategory.ENGAGEMENT, selectedCategory);
+    
+    // Navigate to the selected category page
+    navigate(`/insurance/${selectedCategory}`);
+    
+    // Show confirmation toast
+    toast({
+      title: "Category selected",
+      description: `You've selected ${selectedCategory} insurance. Showing available plans.`,
     });
+    
+    // Close the assistant if a callback was provided
+    if (onClose) {
+      onClose();
+    }
   };
 
   return (
-    <Card className={`shadow-glow-sm border-primary/20 backdrop-blur-sm bg-background/90 ${className}`}>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-lg flex items-center gap-2">
-          <SparklesIcon className="h-5 w-5 text-primary" />
-          AI Insurance Recommendations
-        </CardTitle>
+    <Card className="w-full bg-card border-border">
+      <CardHeader>
+        <CardTitle className="text-xl text-primary">Insurance Plan Recommender</CardTitle>
+        <CardDescription>
+          Select an insurance category to view recommended plans
+        </CardDescription>
       </CardHeader>
-      
-      <CardContent className="space-y-4">
-        <Tabs defaultValue={activeCategory} onValueChange={(val) => handleCategoryChange(val as InsuranceCategory)}>
-          <TabsList className="grid grid-cols-4 w-full">
-            {Object.entries(categoryLabels).map(([value, label]) => (
-              <TabsTrigger key={value} value={value}>{label}</TabsTrigger>
-            ))}
-          </TabsList>
-          
-          {Object.keys(categoryLabels).map((category) => (
-            <TabsContent key={category} value={category} className="space-y-4 pt-2">
-              <div className="space-y-2">
-                <div className="text-sm font-medium">Insurance criteria</div>
-                <div className="grid grid-cols-2 gap-2">
-                  {formatCriteria(criteriaSets[category as InsuranceCategory]).map((item, index) => (
-                    <div key={index} className="text-xs border rounded-md p-2 bg-muted/40">
-                      <span className="font-medium">{item.label}:</span> {item.value}
-                    </div>
-                  ))}
-                </div>
-              </div>
-              
-              <Button 
-                className="w-full"
-                onClick={handleGetRecommendation}
-                disabled={isRecommendationLoading}
-              >
-                {isRecommendationLoading ? (
-                  <>
-                    <RefreshCw size={16} className="mr-2 animate-spin" />
-                    Analyzing...
-                  </>
-                ) : recommendation ? (
-                  <>
-                    <RefreshCw size={16} className="mr-2" />
-                    Regenerate Recommendation
-                  </>
-                ) : (
-                  <>
-                    <SparklesIcon size={16} className="mr-2" />
-                    Get AI Recommendation
-                  </>
-                )}
-              </Button>
-              
-              {recommendation && !isRecommendationLoading && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <Alert variant="default" className="bg-primary/10 border-primary/20">
-                    <Trophy className="h-4 w-4 text-primary" />
-                    <AlertTitle>Your Personalized Recommendation</AlertTitle>
-                    <AlertDescription className="mt-2 text-sm">
-                      {recommendation.split('\n\n').map((paragraph, idx) => (
-                        <p key={idx} className="mb-2">{paragraph}</p>
-                      ))}
-                    </AlertDescription>
-                  </Alert>
-                </motion.div>
-              )}
-              
-              {isRecommendationLoading && (
-                <div className="space-y-3">
-                  <Skeleton className="h-5 w-40" />
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-[90%]" />
-                  <Skeleton className="h-4 w-[95%]" />
-                  <Skeleton className="h-4 w-[85%]" />
-                </div>
-              )}
-            </TabsContent>
-          ))}
-        </Tabs>
+      <CardContent className="grid grid-cols-2 gap-3">
+        <Button 
+          variant={category === 'travel' ? "default" : "outline"}
+          className="w-full justify-start"
+          onClick={() => handleSelectCategory('travel')}
+        >
+          Travel Insurance
+        </Button>
+        <Button 
+          variant={category === 'auto' ? "default" : "outline"}
+          className="w-full justify-start"
+          onClick={() => handleSelectCategory('auto')}
+        >
+          Auto Insurance
+        </Button>
+        <Button 
+          variant={category === 'pet' ? "default" : "outline"}
+          className="w-full justify-start"
+          onClick={() => handleSelectCategory('pet')}
+        >
+          Pet Insurance
+        </Button>
+        <Button 
+          variant={category === 'health' ? "default" : "outline"}
+          className="w-full justify-start"
+          onClick={() => handleSelectCategory('health')}
+        >
+          Health Insurance
+        </Button>
       </CardContent>
-      
-      <CardFooter className="flex justify-between items-center pt-0">
-        <div className="text-xs text-muted-foreground italic">
-          Recommendations based on specified criteria
-        </div>
-        <div className="flex items-center gap-1 text-xs">
-          <AlertCircle size={10} className="text-yellow-500" />
-          <span>Results are suggestions only</span>
-        </div>
+      <CardFooter className="flex justify-between">
+        <Button variant="ghost" size="sm" onClick={onClose}>
+          Close
+        </Button>
+        <Button 
+          size="sm"
+          onClick={() => handleSelectCategory(category)}
+        >
+          View All Plans
+        </Button>
       </CardFooter>
     </Card>
   );
-}
+};
+
+export default PlanRecommender;
