@@ -313,7 +313,7 @@ export default function AIAssistantScreen() {
           content: response.response,
           timestamp: new Date().toISOString(),
           error: !!response.error,
-          widgetData: widgetData
+          widgetData: response.widgetData
         };
         
         return [...filtered, assistantMessage];
