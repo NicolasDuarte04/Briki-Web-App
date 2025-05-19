@@ -7,7 +7,17 @@ import { Bot, Send, User, Loader2, AlertCircle, Star } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { v4 as uuidv4 } from "uuid";
-import { askAssistant, parseWidgetData, AssistantWidgetType } from "../services/ai-service";
+import { 
+  askAssistant, 
+  parseWidgetData, 
+  AssistantWidgetType,
+  GlossaryWidgetData,
+  VisualComparisonWidgetData,
+  AssistantActionType,
+  NavigateToQuoteFlowAction,
+  OpenComparisonToolAction,
+  FilterPlanResultsAction
+} from "../services/ai-service";
 import { useAssistantActions } from "../hooks/use-assistant-actions";
 import { useToast } from "../components/ui/use-toast";
 import AssistantWidget from "../components/assistant/widgets/AssistantWidget";
@@ -390,12 +400,12 @@ export default function AIAssistantScreen() {
         if (assistantMessage.widgetData) {
           if (assistantMessage.widgetData.type === 'show_glossary') {
             trackGlossaryTermDisplay(
-              (assistantMessage.widgetData as typeof import('../services/ai-service').GlossaryWidgetData).term,
+              (assistantMessage.widgetData as GlossaryWidgetData).term,
               { messageId: assistantMessage.id }
             );
           } else if (assistantMessage.widgetData.type === 'show_comparison') {
             trackVisualExplainerDisplay(
-              (assistantMessage.widgetData as typeof import('../services/ai-service').VisualComparisonWidgetData).title,
+              (assistantMessage.widgetData as VisualComparisonWidgetData).title,
               { messageId: assistantMessage.id }
             );
           }
@@ -411,7 +421,7 @@ export default function AIAssistantScreen() {
         
         // Track the assistant action for analytics
         trackAssistantAction(response.action.type, {
-          actionCategory: response.action.category || null,
+          actionCategory: (response.action as NavigateToQuoteFlowAction | OpenComparisonToolAction | FilterPlanResultsAction)?.category || null,
           conversationLength: messages.length,
           hasCustomMessage: !!response.action.message
         });
