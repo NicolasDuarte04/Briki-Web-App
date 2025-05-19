@@ -4,7 +4,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from '@/hooks/use-toast';
 import { InsuranceCategory } from '@/types/insurance';
 import { useNavigation } from '@/lib/navigation';
-import { trackEvent, EventCategory } from '@/lib/analytics';
+import { trackEvent } from '@/lib/analytics';
+import { EventCategory } from '@/constants/analytics';
 
 interface PlanRecommenderProps {
   category?: InsuranceCategory;
