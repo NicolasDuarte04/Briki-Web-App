@@ -108,6 +108,18 @@ router.post('/ask', async (req, res) => {
       return res.status(400).json({ error: 'Message is required and must be a string' });
     }
     
+    // Verify API key is set
+    if (!process.env.OPENAI_API_KEY) {
+      console.error('OPENAI_API_KEY environment variable is not set');
+      return res.status(500).json({
+        error: 'OpenAI API key is not configured',
+        response: "I apologize, but my connection to the knowledge base is currently unavailable. Please try again later."
+      });
+    }
+    
+    console.log('API Key available:', !!process.env.OPENAI_API_KEY);
+    console.log('API Key prefix:', process.env.OPENAI_API_KEY?.substring(0, 5) + '...');
+    
     // Format the context as a system message addition if it exists
     let enhancedSystemPrompt = SYSTEM_PROMPT;
     
@@ -181,26 +193,52 @@ router.post('/ask', async (req, res) => {
       }
     }
     
+    console.log('Making API request to OpenAI...');
+    
     // Call OpenAI API with the enhanced system prompt
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        { role: "system", content: enhancedSystemPrompt },
-        { role: "user", content: message }
-      ],
-      max_tokens: 1000
-    });
+    try {
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          { role: "system", content: enhancedSystemPrompt },
+          { role: "user", content: message }
+        ],
+        max_tokens: 1000
+      });
+      
+      console.log('OpenAI API response received successfully');
+      
+      // Extract and send response
+      const response = completion.choices[0]?.message?.content || 
+        "I'm sorry, I couldn't generate a response at this time.";
+      
+      res.json({ response });
+    } catch (apiError: any) {
+      // Log detailed API error information
+      console.error('OpenAI API error details:', {
+        status: apiError.status,
+        statusText: apiError.statusText,
+        message: apiError.message,
+        type: apiError.type,
+        code: apiError.code,
+        param: apiError.param,
+      });
+      
+      // Return the actual error information for debugging
+      res.status(500).json({
+        error: `OpenAI API Error (${apiError.status}): ${apiError.message}`,
+        errorType: apiError.type || 'unknown',
+        errorCode: apiError.code || 'unknown',
+        response: "I apologize, but I encountered an issue connecting to my knowledge base. Please try again later."
+      });
+    }
+  } catch (error: any) {
+    console.error('General error in AI assistant endpoint:', error);
     
-    // Extract and send response
-    const response = completion.choices[0]?.message?.content || 
-      "I'm sorry, I couldn't generate a response at this time.";
-    
-    res.json({ response });
-    
-  } catch (error) {
-    console.error('Error in AI assistant endpoint:', error);
+    // Return detailed error information
     res.status(500).json({ 
-      error: 'Failed to get response from assistant',
+      error: `Error: ${error.message || 'Unknown error'}`,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
       response: "I apologize, but I encountered an issue processing your request. Please try again later."
     });
   }
