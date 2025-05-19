@@ -44,6 +44,7 @@ import {
   InsurancePlansRedirect 
 } from "@/pages/redirects/plans-redirects";
 import AIAssistantDemo from "@/pages/ai-assistant-demo";
+import AIAssistantScreen from "@/pages/assistant";
 import CountdownPageNew from "@/pages/countdown-page-new";
 import BrikiPilotPortal from "@/pages/briki-pilot-portal";
 import LandingPage from "@/pages/landing-page";
@@ -138,6 +139,7 @@ function Router() {
         <Route path="/profile" component={ProfilePage} />
         <Route path="/settings" component={SettingsPage} />
         <Route path="/api-settings" component={ApiSettingsPage} />
+        <Route path="/assistant" component={AIAssistantScreen} />
         
         {/* Company/Partner Routes */}
         <Route path="/company" component={CompanyPage} />
