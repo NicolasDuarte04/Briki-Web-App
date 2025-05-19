@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Shield, Zap, Globe, Heart } from "lucide-react";
+import { Shield, Zap, Globe, Heart, Bot, MessageSquareText } from "lucide-react";
 import GlassCard from "@/components/glass-card";
 
 /**
@@ -13,9 +13,14 @@ export default function Features() {
       description: "Compare plans across travel, auto, pet, and health insurance categories to find the perfect fit."
     },
     {
+      icon: <Bot className="h-6 w-6 text-blue-500" />,
+      title: "AI-Powered Assistant",
+      description: "Get answers, recommendations, and navigation in seconds with our intelligent conversation assistant."
+    },
+    {
       icon: <Zap className="h-6 w-6 text-blue-500" />,
-      title: "AI-Powered Recommendations",
-      description: "Get personalized suggestions based on your unique needs and profile."
+      title: "Smart Recommendations",
+      description: "Receive personalized suggestions based on your unique needs and profile."
     },
     {
       icon: <Globe className="h-6 w-6 text-blue-500" />,
