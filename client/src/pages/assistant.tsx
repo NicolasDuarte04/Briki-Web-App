@@ -27,6 +27,9 @@ const initialGreeting = {
   timestamp: new Date().toISOString()
 };
 
+import { extractJsonFromText, type WidgetData } from "@/components/assistant/AssistantWidget";
+import { AssistantWidget } from "@/components/assistant/AssistantWidget";
+
 interface Message {
   id: string;
   sender: "user" | "assistant";
@@ -34,61 +37,81 @@ interface Message {
   timestamp: string;
   isLoading?: boolean;
   error?: boolean;
+  widgetData?: WidgetData | null;
 }
 
 // Message bubble component for cleaner structure
 const MessageBubble: React.FC<{ message: Message }> = ({ message }) => {
   const isUser = message.sender === "user";
   
+  // Extract content without JSON for rendering
+  let displayContent = message.content;
+  if (message.sender === "assistant" && message.widgetData) {
+    // Remove the JSON part from the display content
+    const jsonMatch = message.content.match(/```json\s*({[\s\S]*?})\s*```/);
+    if (jsonMatch && jsonMatch.index !== undefined) {
+      displayContent = message.content.substring(0, jsonMatch.index).trim();
+    }
+  }
+  
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className={`flex mb-4 ${isUser ? "justify-end" : "justify-start"}`}
+      className="mb-4"
     >
-      <div className={`flex items-start gap-2 max-w-[80%] ${isUser ? "flex-row-reverse" : ""}`}>
-        {/* Avatar */}
-        {message.sender === "assistant" ? (
-          <Avatar className="h-8 w-8 bg-primary/10">
-            <AvatarImage src="/briki-bot-avatar.png" />
-            <AvatarFallback>
-              <Bot className="h-4 w-4 text-primary" />
-            </AvatarFallback>
-          </Avatar>
-        ) : (
-          <Avatar className="h-8 w-8 bg-gray-100">
-            <AvatarFallback>
-              <User className="h-4 w-4 text-gray-600" />
-            </AvatarFallback>
-          </Avatar>
-        )}
-        
-        {/* Message bubble */}
-        <div 
-          className={`rounded-2xl px-4 py-2 ${
-            isUser 
-              ? "bg-primary text-white" 
-              : message.error 
-                ? "bg-red-50 text-red-800 border border-red-200"
-                : "bg-gray-100 text-gray-800"
-          }`}
-        >
-          {message.isLoading ? (
-            <div className="flex items-center gap-2">
-              <Loader2 className="h-4 w-4 animate-spin text-gray-500" />
-              <p className="text-sm">Thinking...</p>
-            </div>
-          ) : message.error ? (
-            <div className="flex items-start gap-2">
-              <AlertCircle className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
-              <p className="text-sm">{message.content}</p>
-            </div>
+      <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
+        <div className={`flex items-start gap-2 max-w-[80%] ${isUser ? "flex-row-reverse" : ""}`}>
+          {/* Avatar */}
+          {message.sender === "assistant" ? (
+            <Avatar className="h-8 w-8 bg-primary/10">
+              <AvatarImage src="/briki-bot-avatar.png" />
+              <AvatarFallback>
+                <Bot className="h-4 w-4 text-primary" />
+              </AvatarFallback>
+            </Avatar>
           ) : (
-            <p className="text-sm">{message.content}</p>
+            <Avatar className="h-8 w-8 bg-gray-100">
+              <AvatarFallback>
+                <User className="h-4 w-4 text-gray-600" />
+              </AvatarFallback>
+            </Avatar>
           )}
+          
+          {/* Message bubble */}
+          <div 
+            className={`rounded-2xl px-4 py-2 ${
+              isUser 
+                ? "bg-primary text-white" 
+                : message.error 
+                  ? "bg-red-50 text-red-800 border border-red-200"
+                  : "bg-gray-100 text-gray-800"
+            }`}
+          >
+            {message.isLoading ? (
+              <div className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin text-gray-500" />
+                <p className="text-sm">Thinking...</p>
+              </div>
+            ) : message.error ? (
+              <div className="flex items-start gap-2">
+                <AlertCircle className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
+                <p className="text-sm">{displayContent}</p>
+              </div>
+            ) : (
+              <p className="text-sm">{displayContent}</p>
+            )}
+          </div>
         </div>
       </div>
+      
+      {/* Render widget if available */}
+      {message.sender === "assistant" && message.widgetData && (
+        <div className="mt-2 ml-10">
+          <AssistantWidget data={message.widgetData} />
+        </div>
+      )}
     </motion.div>
   );
 };
@@ -152,6 +175,9 @@ export default function AIAssistantScreen() {
       // Call the API to get a response
       const response = await askAssistant(userMessage.content);
       
+      // Check if the response contains structured data in JSON format
+      const widgetData = extractJsonFromText(response.response);
+      
       // Remove loading message
       setMessages(prev => {
         const filtered = prev.filter(msg => msg.id !== loadingMessageId);
@@ -162,7 +188,8 @@ export default function AIAssistantScreen() {
           sender: "assistant",
           content: response.response,
           timestamp: new Date().toISOString(),
-          error: !!response.error
+          error: !!response.error,
+          widgetData: widgetData
         };
         
         return [...filtered, assistantMessage];

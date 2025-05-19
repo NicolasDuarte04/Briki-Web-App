@@ -1,0 +1,50 @@
+You are now working on **Phase 5** of the Briki AI Assistant screen development.
+
+The goal of this phase is to allow the assistant to trigger specific **UI actions** based on the meaning of user questions — such as showing plan cards, glossary terms, or filtered comparisons.
+
+To do this, we will use **structured metadata** inside the OpenAI response (from function calling or manual prompt formatting) and handle those actions in the frontend.
+
+---
+
+### Objectives:
+
+1. **Structured Response Format**
+   - Update the backend prompt to tell OpenAI to include structured metadata in replies when relevant.
+   - Use a lightweight format like this:
+     ```json
+     {
+       "type": "show_plan_recommendations",
+       "filters": {
+         "pet_age": 8,
+         "preexisting_conditions": ["cancer"]
+       },
+       "message": "Based on what you've told me, these are some plans that could work well for your dog..."
+     }
+     ```
+   - You can simulate this logic for now if needed — no need to generate real plans yet, just structure
+
+2. **Add a Response Handler on the Frontend**
+   - In the AI response flow, detect if the message contains a `type` field
+   - Based on the `type`, trigger a frontend UI update:
+     • `type: "show_plan_recommendations"` → Inject mocked plan cards below the response
+     • `type: "show_glossary"` → Show a styled tooltip or card explaining a term like deductible
+     • `type: "compare_plans"` → Render a two-column plan comparison card
+   - Store this extra UI element in state and render it after the assistant message
+
+3. **Create Mocked Plan/Glossary Components**
+   - Create simple card components to render when triggered:
+     • PlanCard with name, price, coverage summary
+     • GlossaryCard with title + short explanation
+     • ComparisonCard with two plan objects side by side
+   - Style these components to match Briki's design system (Tailwind + ShadCN)
+
+4. **Inject These UI Elements into the Chat Feed**
+   - Render these cards inline inside the message history (below the related message)
+   - Make them scrollable and responsive
+   - Use a component like `<AssistantWidget type="plan" data={...} />`
+
+---
+
+This phase will make Briki feel like an *interactive expert*, not just a chatbot.
+
+Once complete, we’ll proceed to **Phase 6: Full assistant personality, fallback handling, and personalization memory**.
