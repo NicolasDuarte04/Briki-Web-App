@@ -3,7 +3,8 @@ import { useLocation } from 'wouter';
 import { AssistantAction } from '@/services/ai-service';
 import { useCompareStore } from '@/store/compare-store';
 import { useQuoteStore } from '@/store/quote-store';
-import { trackEvent, EventCategory } from '@/lib/analytics';
+import { trackEvent } from '@/lib/analytics';
+import { EventCategory } from '@/constants/analytics';
 
 /**
  * Hook to process assistant actions
@@ -26,7 +27,7 @@ export function useAssistantActions() {
     try {
       trackEvent(
         'assistant_action_executed',
-        EventCategory.ACTION,
+        EventCategory.Assistant,
         action.type
       );
 
@@ -104,7 +105,7 @@ export function useAssistantActions() {
       console.error("Error processing assistant action:", error);
       trackEvent(
         'assistant_action_error',
-        EventCategory.ERROR,
+        EventCategory.Assistant,
         `action_type_${action.type}`
       );
       return false;

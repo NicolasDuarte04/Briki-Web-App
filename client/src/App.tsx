@@ -14,7 +14,8 @@ import { LoginNotification } from "@/components/login-notification";
 import { useNavigation } from "@/lib/navigation";
 import { useAnalytics } from "@/hooks/use-analytics";
 import { useEffect } from "react";
-import { initGA, trackEvent, EventCategory } from "@/lib/analytics";
+import { initGA, trackEvent } from "@/lib/analytics";
+import { EventCategory } from "@/constants/analytics";
 
 import NotFound from "@/pages/not-found";
 import HomePageNew from "@/pages/home-page-new";
