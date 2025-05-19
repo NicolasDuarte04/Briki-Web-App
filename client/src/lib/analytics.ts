@@ -1,104 +1,106 @@
 /**
- * Analytics module for tracking user interactions
+ * Analytics module for Briki
  */
 
-// Event categories
+// Define event categories for better organization
 export enum EventCategory {
+  // User engagement events (clicks, views, etc.)
   ENGAGEMENT = 'engagement',
+  
+  // User interaction events (form submissions, search, etc.)
+  INTERACTION = 'interaction',
+  
+  // Conversion events (quote completion, plan purchase, etc.)
   CONVERSION = 'conversion',
+  
+  // Error events (API failures, validation errors, etc.)
   ERROR = 'error',
-  PERFORMANCE = 'performance',
-  FEATURE = 'feature',
 }
 
-/**
- * Track an event in the analytics system
- * @param eventName Name of the event
- * @param category Category of the event
- * @param label Optional label for the event
- * @param value Optional numeric value associated with the event
- */
+// Initialize Google Analytics when the app loads
+export function initAnalytics() {
+  const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID;
+  
+  if (!measurementId) {
+    console.warn('Google Analytics Measurement ID not found. Analytics will not be tracked.');
+    return;
+  }
+  
+  // Add Google Analytics script to the head
+  const script1 = document.createElement('script');
+  script1.async = true;
+  script1.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
+  document.head.appendChild(script1);
+  
+  // Initialize gtag
+  const script2 = document.createElement('script');
+  script2.innerHTML = `
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', '${measurementId}');
+  `;
+  document.head.appendChild(script2);
+}
+
+// Track page views - useful for single-page applications
+export function trackPageView(url: string) {
+  if (typeof window === 'undefined' || !window.gtag) {
+    return;
+  }
+  
+  const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID;
+  if (!measurementId) {
+    return;
+  }
+  
+  window.gtag('config', measurementId, {
+    page_path: url,
+  });
+}
+
+// Track events with category support
 export function trackEvent(
-  eventName: string,
-  category: EventCategory = EventCategory.ENGAGEMENT,
-  label?: string,
-  value?: number
+  action: string,
+  category: EventCategory,
+  params?: Record<string, any>
 ) {
-  // Check if Google Analytics is available
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', eventName, {
-      event_category: category,
-      event_label: label,
-      value: value,
-    });
+  if (typeof window === 'undefined' || !window.gtag) {
+    return;
   }
-
-  // Log to console in development environment
-  if (process.env.NODE_ENV === 'development') {
-    console.log(`[Analytics] ${eventName} (${category})${label ? ` - ${label}` : ''}${value !== undefined ? ` = ${value}` : ''}`);
+  
+  // Basic event tracking
+  window.gtag('event', action, {
+    event_category: category,
+    ...params,
+  });
+  
+  // For debugging in development
+  if (import.meta.env.DEV) {
+    console.log(`[Analytics] Event: ${action}`, {
+      category,
+      ...params,
+    });
   }
 }
 
-/**
- * Track a page view
- * @param path Path of the page
- */
-export function trackPageView(path: string) {
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('config', import.meta.env.VITE_GA_MEASUREMENT_ID, {
-      page_path: path,
-    });
-  }
-
-  // Log to console in development environment
-  if (process.env.NODE_ENV === 'development') {
-    console.log(`[Analytics] Page View: ${path}`);
-  }
-}
-
-/**
- * Track a timing event
- * @param category Category of the timing
- * @param variable Variable being timed
- * @param time Time in milliseconds
- * @param label Optional label for the timing
- */
-export function trackTiming(
-  category: string,
-  variable: string,
-  time: number,
-  label?: string
+// Track errors
+export function trackError(
+  errorType: string,
+  errorMessage: string,
+  errorDetails?: Record<string, any>
 ) {
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', 'timing_complete', {
-      name: variable,
-      value: time,
-      event_category: category,
-      event_label: label,
-    });
-  }
-
-  // Log to console in development environment
-  if (process.env.NODE_ENV === 'development') {
-    console.log(`[Analytics] Timing - ${category} / ${variable}: ${time}ms${label ? ` (${label})` : ''}`);
-  }
+  trackEvent('error', EventCategory.ERROR, {
+    error_type: errorType,
+    error_message: errorMessage,
+    ...errorDetails,
+  });
 }
 
-/**
- * Track an error
- * @param description Description of the error
- * @param fatal Whether the error was fatal
- */
-export function trackError(description: string, fatal: boolean = false) {
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', 'exception', {
-      description,
-      fatal,
-    });
-  }
-
-  // Log to console in development environment
-  if (process.env.NODE_ENV === 'development') {
-    console.error(`[Analytics] Error${fatal ? ' (Fatal)' : ''}: ${description}`);
+// Declare global type for gtag
+declare global {
+  interface Window {
+    dataLayer: any[];
+    gtag: (...args: any[]) => void;
   }
 }

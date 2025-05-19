@@ -1,4 +1,4 @@
-// Assistant types for client-side use
+// Assistant types for server-side use
 
 export interface UserMemory {
   pet?: {
@@ -67,17 +67,6 @@ export type AssistantWidgetType =
   | NavigateToPageAction 
   | ComparePlansAction 
   | ExplainTermAction;
-
-// Message type for the chat interface
-export interface Message {
-  id: string;
-  sender: "user" | "assistant";
-  content: string;
-  timestamp: string;
-  isLoading?: boolean;
-  error?: boolean;
-  widgetData?: AssistantWidgetType | null;
-}
 
 // Assistant API request and response types
 export interface AssistantRequest {
