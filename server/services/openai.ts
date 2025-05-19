@@ -9,8 +9,9 @@ const DEFAULT_MODEL = "gpt-4o";
 /**
  * System message providing context for the insurance assistant
  */
-const SYSTEM_PROMPT = `You are Briki AI, an intelligent assistant for the Briki insurance marketplace.
-As a specialized insurance assistant, help users understand insurance options across multiple categories:
+const SYSTEM_PROMPT = `You are Briki, an insurance assistant trained to help users understand, compare, and purchase insurance. You are clear, friendly, and knowledgeable — never pushy. You simplify complex ideas and respond with empathy, like a helpful insurance advisor.
+
+As a specialized insurance assistant for the Briki insurance marketplace, you help users navigate options across multiple categories:
 - Travel insurance
 - Auto insurance
 - Pet insurance
@@ -18,19 +19,20 @@ As a specialized insurance assistant, help users understand insurance options ac
 
 Your main responsibilities:
 1. Answer questions about insurance coverage, benefits, and restrictions
-2. Explain insurance terminology in simple terms
-3. Help users compare different insurance plans
-4. Provide personalized recommendations based on user needs
-5. Guide users through the insurance selection process
+2. Explain insurance terminology in simple terms using relatable examples
+3. Help users compare different insurance plans based on their needs
+4. Provide personalized recommendations based on user criteria
+5. Guide users through the insurance selection process with patience
 
 Important rules:
-- Be concise and clear in your explanations
-- Use a friendly, conversational tone
+- Be concise and clear in your explanations, avoiding industry jargon
+- Use a friendly, conversational tone that builds trust
 - If you don't know something, admit it rather than making up information
 - Focus only on insurance-related topics
 - Don't provide personal financial or legal advice
 - Never share confidential information
 - When making recommendations, clarify that these are suggestions and the user should review plan details
+- Use metaphors and examples to explain complex insurance concepts
 
 You have specific knowledge about the insurance providers in our marketplace:
 - Travel: WorldNomads, Allianz, SafetyWing, GeoBlue, AXA
@@ -38,7 +40,39 @@ You have specific knowledge about the insurance providers in our marketplace:
 - Pet: Figo, HealthyPaws
 - Health: SafetyWing, GeoBlue, AXA, LibertyMutual, Cigna, Bupa, Colmena
 
-Our marketplace is focused on serving customers in Colombia and Mexico, with some providers offering coverage in other countries.`;
+Our marketplace is focused on serving customers in Colombia and Mexico, with some providers offering coverage in other countries.
+
+When possible, include structured data in your responses using JSON format within triple backticks to provide additional functionality:
+
+For plan recommendations:
+\`\`\`json
+{
+  "type": "show_plan_recommendations",
+  "filters": {
+    "category": "travel",
+    "budget": "medium",
+    "coverage_level": "comprehensive"
+  }
+}
+\`\`\`
+
+For glossary terms:
+\`\`\`json
+{
+  "type": "show_glossary",
+  "term": "deductible"
+}
+\`\`\`
+
+For plan comparisons:
+\`\`\`json
+{
+  "type": "compare_plans",
+  "category": "pet",
+  "plan_ids": ["petplan-premium", "nationwide-whole"]
+}
+\`\`\`
+`;
 
 interface ChatMessage {
   role: 'system' | 'user' | 'assistant';
@@ -88,25 +122,55 @@ export async function getChatCompletionFromOpenAI(
 }
 
 /**
- * Provides fallback responses when the OpenAI API is unavailable
+ * Provides fallback responses when the OpenAI API is unavailable or responses are off-topic
  */
 function getFallbackResponse(messages: ChatMessage[]): string {
   // Get the last user message
   const lastUserMessage = messages.filter(m => m.role === 'user').pop();
   
   if (!lastUserMessage) {
-    return "I'm here to help with insurance questions. What would you like to know?";
+    return "I'm Briki, your friendly insurance assistant. How can I help you today?";
   }
   
   const userQuery = lastUserMessage.content.toLowerCase();
   
+  // Check for non-insurance related topics or vague queries
+  const nonInsuranceKeywords = [
+    'politics', 'sport', 'recipe', 'movie', 'music', 'weather', 
+    'stocks', 'investment', 'dating', 'games', 'gaming'
+  ];
+  
+  if (nonInsuranceKeywords.some(keyword => userQuery.includes(keyword))) {
+    return "I'm not sure how to help with that, but if it's about insurance, I'll do my best. Try asking me about travel, pet, auto, or health coverage. I can explain insurance terms, compare plans, or help you understand what coverage might be best for your situation.";
+  }
+  
   // Provide some basic pre-written responses for common insurance questions
   if (userQuery.includes('deductible')) {
-    return "A deductible is the amount you pay out of pocket before your insurance coverage begins. For example, if you have a $500 deductible and a $3,000 medical bill, you would pay the first $500, and your insurance would cover the rest according to your plan terms.";
+    return `A deductible is the amount you pay out of pocket before your insurance coverage begins. 
+
+For example, if you have a $500 deductible and a $3,000 medical bill, you would pay the first $500, and your insurance would cover the rest according to your plan terms.
+
+Would you like to see some plans with different deductible options?
+
+\`\`\`json
+{
+  "type": "show_glossary",
+  "term": "deductible"
+}
+\`\`\``;
   }
   
   if (userQuery.includes('premium')) {
-    return "An insurance premium is the amount you pay to your insurance company for coverage. This payment can be made monthly, quarterly, or annually, depending on your policy terms. Premium costs are based on factors such as coverage type, your age, location, and other risk factors.";
+    return `An insurance premium is the amount you pay to your insurance company for coverage. This payment can be made monthly, quarterly, or annually, depending on your policy terms.
+
+Premium costs are based on factors such as coverage type, your age, location, and other risk factors.
+
+\`\`\`json
+{
+  "type": "show_glossary",
+  "term": "premium"
+}
+\`\`\``;
   }
   
   if (userQuery.includes('coverage')) {
@@ -114,27 +178,88 @@ function getFallbackResponse(messages: ChatMessage[]): string {
   }
   
   if (userQuery.includes('claim')) {
-    return "An insurance claim is a formal request to your insurance company for coverage or compensation for a covered loss or policy event. The claim process typically involves submitting documentation, an investigation by the insurance company, and then approval or denial of the requested compensation.";
+    return `An insurance claim is a formal request to your insurance company for coverage or compensation for a covered loss or policy event. 
+
+The claim process typically involves submitting documentation, an investigation by the insurance company, and then approval or denial of the requested compensation.
+
+\`\`\`json
+{
+  "type": "show_glossary",
+  "term": "claim"
+}
+\`\`\``;
   }
   
   if (userQuery.includes('travel insurance')) {
-    return "Travel insurance provides coverage for unexpected events during your trip, such as medical emergencies, trip cancellations, lost luggage, or travel delays. Different policies offer different levels of protection, so it's important to choose one that matches your specific travel needs and destinations.";
+    return `Travel insurance provides coverage for unexpected events during your trip, such as medical emergencies, trip cancellations, lost luggage, or travel delays. 
+
+Different policies offer different levels of protection, so it's important to choose one that matches your specific travel needs and destinations.
+
+Would you like me to recommend some travel insurance plans?
+
+\`\`\`json
+{
+  "type": "show_plan_recommendations",
+  "filters": {
+    "category": "travel"
+  }
+}
+\`\`\``;
   }
   
   if (userQuery.includes('auto insurance') || userQuery.includes('car insurance')) {
-    return "Auto insurance protects you financially in case of an accident, theft, or damage to your vehicle. Most policies include liability coverage (for damage you cause to others), while comprehensive and collision coverage protect your own vehicle. Additional options can include roadside assistance and rental car coverage.";
+    return `Auto insurance protects you financially in case of an accident, theft, or damage to your vehicle. 
+
+Most policies include liability coverage (for damage you cause to others), while comprehensive and collision coverage protect your own vehicle. Additional options can include roadside assistance and rental car coverage.
+
+Here are some auto insurance plans you might want to consider:
+
+\`\`\`json
+{
+  "type": "show_plan_recommendations",
+  "filters": {
+    "category": "auto"
+  }
+}
+\`\`\``;
   }
   
   if (userQuery.includes('pet insurance')) {
-    return "Pet insurance helps cover veterinary expenses for your pets. Policies typically cover accidents, illnesses, and sometimes preventive care. Coverage levels, deductibles, and premiums vary based on your pet's age, breed, and the plan you choose.";
+    return `Pet insurance helps cover veterinary expenses for your pets. Policies typically cover accidents, illnesses, and sometimes preventive care.
+
+Coverage levels, deductibles, and premiums vary based on your pet's age, breed, and the plan you choose.
+
+Here are some pet insurance options you might want to explore:
+
+\`\`\`json
+{
+  "type": "show_plan_recommendations",
+  "filters": {
+    "category": "pet"
+  }
+}
+\`\`\``;
   }
   
   if (userQuery.includes('health insurance')) {
-    return "Health insurance covers medical expenses for illnesses, injuries, and preventive care. Plans vary widely in terms of coverage, networks of doctors, and costs. Key components include premiums, deductibles, copayments, and coverage limits. Many plans also provide prescription drug coverage and wellness benefits.";
+    return `Health insurance covers medical expenses for illnesses, injuries, and preventive care. Plans vary widely in terms of coverage, networks of doctors, and costs.
+
+Key components include premiums, deductibles, copayments, and coverage limits. Many plans also provide prescription drug coverage and wellness benefits.
+
+Here are some health insurance plans that might be suitable:
+
+\`\`\`json
+{
+  "type": "show_plan_recommendations",
+  "filters": {
+    "category": "health"
+  }
+}
+\`\`\``;
   }
   
   // Default response if no pattern matches
-  return "I'm currently operating in fallback mode due to high demand. I can answer basic insurance questions, help you understand policy terms, or assist with general information about different insurance types. For complex questions, you might want to try again later.";
+  return "I'm not sure how to help with that specific question, but if it's about insurance, I'll do my best. Try asking me about travel, pet, auto, or health coverage. I can explain insurance terms, compare plans, or help you understand what coverage might be best for your situation.";
 }
 
 /**
