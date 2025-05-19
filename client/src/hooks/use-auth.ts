@@ -9,6 +9,7 @@ interface UseAuthReturn extends AuthContextType {
   // Add enhanced authentication functions with company role support
   loginMutation: ReturnType<typeof useLoginMutation>;
   logoutMutation: ReturnType<typeof useLogoutMutation>;
+  registerMutation: ReturnType<typeof useRegisterMutation>;
 }
 
 // Custom hook for login mutation
@@ -70,6 +71,51 @@ function useLoginMutation() {
   });
 }
 
+// Custom hook for registration mutation
+function useRegisterMutation() {
+  const { toast } = useToast();
+  const [, navigate] = useLocation();
+  const context = useContext(AuthContext);
+  
+  return useMutation({
+    mutationFn: async (userData: any) => {
+      if (!context) {
+        throw new Error('Auth context not available');
+      }
+      
+      const success = await context.register(userData);
+      if (!success) {
+        throw new Error('Registration failed');
+      }
+      
+      return { success: true, user: context.user, role: userData.role };
+    },
+    onSuccess: (data) => {
+      console.log('Registration mutation success:', data);
+      
+      // Handle role-based redirection similar to login
+      if (data.role === 'company') {
+        setTimeout(() => {
+          navigate("/company-dashboard");
+        }, 500);
+      } else {
+        // Regular users go to dashboard
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 500);
+      }
+    },
+    onError: (error: Error) => {
+      console.error('Registration error:', error);
+      toast({
+        title: 'Registration failed',
+        description: error.message || 'Could not create your account. Please try again.',
+        variant: 'destructive',
+      });
+    }
+  });
+}
+
 // Custom hook for logout mutation
 function useLogoutMutation() {
   const { toast } = useToast();
@@ -111,6 +157,7 @@ export function useAuth(): UseAuthReturn {
   const context = useContext(AuthContext);
   const loginMutation = useLoginMutation();
   const logoutMutation = useLogoutMutation();
+  const registerMutation = useRegisterMutation();
   
   if (!context) {
     console.warn('Auth context not found, using default values');
@@ -126,6 +173,7 @@ export function useAuth(): UseAuthReturn {
       loginWithGoogle: () => {},
       loginMutation,
       logoutMutation,
+      registerMutation,
     };
   }
   
@@ -133,5 +181,6 @@ export function useAuth(): UseAuthReturn {
     ...context,
     loginMutation,
     logoutMutation,
+    registerMutation,
   };
 }
