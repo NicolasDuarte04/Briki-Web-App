@@ -54,10 +54,10 @@ export default function FeaturesPage() {
             variants={fadeIn}
           >
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              Insurance Made <span className="text-primary">Understandable</span>
+              Understand Insurance <span className="text-primary">in Seconds</span>
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-10">
-              Briki simplifies insurance with AI-powered comparisons, clear visual explanations, and personalized recommendations.
+              No jargon. No confusion. Just crystal-clear insurance comparisons powered by AI that actually make sense.
             </p>
             <motion.div 
               whileHover={{ scale: 1.05 }}
@@ -105,9 +105,9 @@ export default function FeaturesPage() {
               <div className="h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
                 <Sparkles className="h-6 w-6 text-blue-600" />
               </div>
-              <h3 className="text-xl font-semibold mb-4">AI-Powered Plan Comparison</h3>
+              <h3 className="text-xl font-semibold mb-4">Briki Compares, So You Don't Have To</h3>
               <p className="text-gray-600">
-                Our intelligent algorithms analyze thousands of insurance plans to find the perfect match for your unique needs.
+                Our AI analyzes thousands of insurance plans in seconds, comparing the details that actually matter to you — not the fine print that doesn't.
               </p>
             </motion.div>
 
@@ -119,9 +119,9 @@ export default function FeaturesPage() {
               <div className="h-12 w-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-6">
                 <LineChart className="h-6 w-6 text-indigo-600" />
               </div>
-              <h3 className="text-xl font-semibold mb-4">Simple, Visual Explanations</h3>
+              <h3 className="text-xl font-semibold mb-4">See What You're Actually Buying</h3>
               <p className="text-gray-600">
-                Complex insurance terms made simple with visual explanations that help you understand exactly what you're getting.
+                We translate insurance-speak into plain English with visual breakdowns that show exactly what's covered and what's not — no surprises later.
               </p>
             </motion.div>
 
@@ -133,9 +133,9 @@ export default function FeaturesPage() {
               <div className="h-12 w-12 bg-purple-100 rounded-lg flex items-center justify-center mb-6">
                 <Clock className="h-6 w-6 text-purple-600" />
               </div>
-              <h3 className="text-xl font-semibold mb-4">Fast Checkout in Seconds</h3>
+              <h3 className="text-xl font-semibold mb-4">Covered in Clicks, Not Days</h3>
               <p className="text-gray-600">
-                Secure, streamlined checkout process gets you covered in seconds, not hours. No paperwork or phone calls needed.
+                Say goodbye to endless forms and phone trees. Get insured in minutes with our secure, paperless checkout that works on any device.
               </p>
             </motion.div>
           </motion.div>
@@ -152,9 +152,9 @@ export default function FeaturesPage() {
             viewport={{ once: true, margin: "-100px" }}
             variants={fadeIn}
           >
-            <h2 className="text-3xl font-bold text-gray-900">How It Works</h2>
+            <h2 className="text-3xl font-bold text-gray-900">Three Steps to Peace of Mind</h2>
             <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
-              Get insured in three simple steps
+              The simplest way to get the right coverage, guaranteed
             </p>
           </motion.div>
 
@@ -178,9 +178,9 @@ export default function FeaturesPage() {
                   <div className="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center mb-4 mx-auto">
                     <span className="text-blue-600 font-bold">1</span>
                   </div>
-                  <h3 className="text-xl font-semibold mb-3 text-center">Tell Us About Your Needs</h3>
+                  <h3 className="text-xl font-semibold mb-3 text-center">Quick Chat, Not a Questionnaire</h3>
                   <p className="text-gray-600 text-center">
-                    Answer a few simple questions about what you're looking to insure.
+                    Tell Briki what matters to you in everyday language — we skip the insurance exam-style forms.
                   </p>
                 </div>
               </motion.div>
@@ -194,9 +194,9 @@ export default function FeaturesPage() {
                   <div className="h-12 w-12 bg-indigo-100 rounded-full flex items-center justify-center mb-4 mx-auto">
                     <span className="text-indigo-600 font-bold">2</span>
                   </div>
-                  <h3 className="text-xl font-semibold mb-3 text-center">Compare Options</h3>
+                  <h3 className="text-xl font-semibold mb-3 text-center">See the Full Picture</h3>
                   <p className="text-gray-600 text-center">
-                    Our AI finds and compares the best plans for your specific situation.
+                    Watch as Briki instantly surfaces the best options side-by-side with what makes each one unique for your situation.
                   </p>
                 </div>
               </motion.div>
@@ -210,9 +210,9 @@ export default function FeaturesPage() {
                   <div className="h-12 w-12 bg-purple-100 rounded-full flex items-center justify-center mb-4 mx-auto">
                     <span className="text-purple-600 font-bold">3</span>
                   </div>
-                  <h3 className="text-xl font-semibold mb-3 text-center">Get Covered</h3>
+                  <h3 className="text-xl font-semibold mb-3 text-center">Protected in Minutes</h3>
                   <p className="text-gray-600 text-center">
-                    Purchase with a few clicks and get instant coverage confirmation.
+                    Choose your plan, checkout securely, and receive instant digital proof of coverage — all before your coffee gets cold.
                   </p>
                 </div>
               </motion.div>
@@ -231,9 +231,9 @@ export default function FeaturesPage() {
             viewport={{ once: true, margin: "-100px" }}
             variants={fadeIn}
           >
-            <h2 className="text-3xl font-bold text-gray-900">Trusted By</h2>
+            <h2 className="text-3xl font-bold text-gray-900">People Like You Trust Briki</h2>
             <p className="mt-4 text-lg text-gray-600">
-              Thousands of users rely on Briki every day
+              Join thousands who've discovered how insurance shopping should feel
             </p>
           </motion.div>
 
@@ -318,9 +318,9 @@ export default function FeaturesPage() {
           viewport={{ once: true, margin: "-100px" }}
           variants={fadeIn}
         >
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to find your perfect insurance match?</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">Stop Overpaying for Insurance You Don't Understand</h2>
           <p className="text-xl mb-10 max-w-3xl mx-auto">
-            Join thousands of satisfied customers who've simplified their insurance journey with Briki.
+            Join 10,000+ smart shoppers who are saving money and getting better coverage with Briki's AI guidance.
           </p>
           <motion.div 
             className="flex flex-col sm:flex-row justify-center gap-4"
@@ -331,7 +331,7 @@ export default function FeaturesPage() {
               className="bg-white text-blue-600 hover:bg-white/90 py-6 px-8 text-lg font-medium rounded-lg shadow-lg"
               onClick={() => navigate("/auth")}
             >
-              Get Started Now
+              Compare Plans Now
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </motion.div>
