@@ -411,7 +411,7 @@ export default function AIAssistantScreen() {
               ref={messagesContainerRef}
               className="flex-1 mb-4 overflow-y-auto px-4 py-6 max-h-[calc(100vh-16rem)]"
             >
-              {messages.length === 1 && (
+              {messages.length === 1 ? (
                 <div className="flex justify-center mb-8">
                   <div className="text-center max-w-md mx-auto">
                     <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 mx-auto">
@@ -425,6 +425,72 @@ export default function AIAssistantScreen() {
                     </p>
                   </div>
                 </div>
+              ) : (
+                /* Memory panel that appears during conversation */
+                Object.keys(userMemory).length > 0 && (
+                  <div className="mb-4 mx-auto max-w-md">
+                    <div className="bg-blue-50 rounded-lg p-3 border border-blue-100">
+                      <div className="flex items-center mb-2">
+                        <div className="h-6 w-6 bg-blue-100 rounded-full flex items-center justify-center mr-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        <div className="flex justify-between w-full">
+                          <span className="text-xs font-medium text-blue-700">Briki remembers:</span>
+                          <button 
+                            onClick={() => setUserMemory({})} 
+                            className="text-xs text-blue-600 hover:text-blue-800 flex items-center"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                            Clear
+                          </button>
+                        </div>
+                      </div>
+                      <div className="text-xs text-gray-600 grid gap-1">
+                        {userMemory.pet && (
+                          <div className="flex items-start">
+                            <span className="block w-2 h-2 rounded-full bg-blue-400 mt-1.5 mr-2"></span>
+                            <span>
+                              {userMemory.pet.type && `You have a ${userMemory.pet.age ? `${userMemory.pet.age}-year-old ` : ''}${userMemory.pet.type}`}
+                              {userMemory.pet.breed && ` (${userMemory.pet.breed})`}
+                            </span>
+                          </div>
+                        )}
+                        {userMemory.travel && (
+                          <div className="flex items-start">
+                            <span className="block w-2 h-2 rounded-full bg-green-400 mt-1.5 mr-2"></span>
+                            <span>
+                              {userMemory.travel.destination && `Planning travel to ${userMemory.travel.destination}`}
+                              {userMemory.travel.duration && ` for ${userMemory.travel.duration}`}
+                            </span>
+                          </div>
+                        )}
+                        {userMemory.vehicle && (
+                          <div className="flex items-start">
+                            <span className="block w-2 h-2 rounded-full bg-purple-400 mt-1.5 mr-2"></span>
+                            <span>
+                              {userMemory.vehicle.year && userMemory.vehicle.make && `You have a ${userMemory.vehicle.year} ${userMemory.vehicle.make}`}
+                              {userMemory.vehicle.model && ` ${userMemory.vehicle.model}`}
+                            </span>
+                          </div>
+                        )}
+                        {userMemory.health && (
+                          <div className="flex items-start">
+                            <span className="block w-2 h-2 rounded-full bg-red-400 mt-1.5 mr-2"></span>
+                            <span>
+                              {userMemory.health.age && `You are ${userMemory.health.age} years old`}
+                              {userMemory.health.conditions && userMemory.health.conditions.length > 0 && 
+                                ` with ${userMemory.health.conditions.join(', ')}`}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )
               )}
               
               <AnimatePresence>
