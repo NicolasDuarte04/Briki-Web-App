@@ -1,0 +1,53 @@
+You are now working on **Phase 6 of the Briki public site restructure**.
+
+This is the final polish phase before launch. The goal is to ensure the public pages are fully accessible, performant, and production-ready from a front-end perspective. This includes auditing for Lighthouse scores, responsive behavior, and semantic HTML.
+
+---
+
+### Objectives:
+
+1. **Accessibility Improvements**
+   - Ensure all buttons, links, and inputs have accessible labels
+   - Add `aria-labels` where needed
+   - Ensure keyboard navigation works on all taskbar items, CTAs, and inputs
+   - Use semantic HTML tags (`<main>`, `<section>`, `<header>`, etc.) in all public screens
+
+2. **Responsive Design QA**
+   - Check each public screen on mobile, tablet, and desktop sizes
+   - Ensure no layout breaking occurs
+   - Adjust Tailwind breakpoints if needed to preserve alignment and readability
+
+3. **Lighthouse Audit & Performance**
+   - Run Lighthouse (Chrome DevTools) on all public routes:
+     • `/`
+     • `/features`
+     • `/pricing`
+     • `/ask-briki`
+     • `/blog`
+     • `/forum`
+     • `/careers`
+   - Ensure scores are:
+     • Performance: 90+
+     • Accessibility: 95+
+     • Best Practices: 90+
+     • SEO: 90+
+   - Optimize large images or animations if needed
+   - Defer any unnecessary JavaScript and eliminate unused CSS (if detected)
+
+4. **Meta Tags & SEO Validation**
+   - Make sure each page has:
+     • Unique meta title
+     • Meta description
+     • Proper Open Graph tags (optional but recommended)
+   - Confirm that `<title>` tags match the visual H1 headers
+
+5. **Deployment Checklist**
+   - Check favicon, logo scaling, 404 fallback
+   - Validate all routes return expected pages
+   - Ensure no authenticated-only routes are accessible without login
+
+---
+
+Once this is complete, the Briki public site is ready for production deployment.
+
+After this phase, we will start a **new parallel flow** to polish the **post-login experience (dashboard, compare, assistant, quote flow)** — built with the same precision and consistency.
