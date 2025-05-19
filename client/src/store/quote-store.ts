@@ -1,16 +1,16 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 
-// Types for different insurance category quote forms
+// Travel quote data types
 export interface TravelQuoteData {
   destination: string;
   departureDate: string;
   returnDate: string;
   travelers: number;
-  activities: string[];
-  coverage: string;
+  activities?: string[];
+  coverage: 'basic' | 'standard' | 'premium';
 }
 
+// Auto quote data types
 export interface AutoQuoteData {
   vehicleMake: string;
   vehicleModel: string;
@@ -19,184 +19,142 @@ export interface AutoQuoteData {
   primaryDriver: {
     age: number;
     drivingExperience: number;
-    accidentHistory: string;
+    accidentHistory: 'none' | 'minor' | 'one' | 'multiple';
   };
-  coverageType: string;
+  coverageType: 'liability' | 'collision' | 'comprehensive';
 }
 
+// Pet quote data types
 export interface PetQuoteData {
-  petType: string;
+  petType: 'dog' | 'cat' | 'bird' | 'other';
   breed: string;
   age: number;
-  medicalHistory: string[];
-  coverageLevel: string;
+  medicalHistory?: string[];
+  coverageLevel: 'basic' | 'standard' | 'premium';
 }
 
+// Health quote data types
 export interface HealthQuoteData {
   age: number;
   gender: string;
   smoker: boolean;
-  preExistingConditions: string[];
+  preExistingConditions?: string[];
   coverageNeeds: string[];
 }
 
+// Store interface
 interface QuoteStore {
-  // Current active quote data for each category
+  // Travel quotes
   travelQuote: TravelQuoteData | null;
-  autoQuote: AutoQuoteData | null;
-  petQuote: PetQuoteData | null;
-  healthQuote: HealthQuoteData | null;
-  
-  // Last submitted quote data (for filtering plans)
   submittedTravelQuote: TravelQuoteData | null;
-  submittedAutoQuote: AutoQuoteData | null;
-  submittedPetQuote: PetQuoteData | null;
-  submittedHealthQuote: HealthQuoteData | null;
-  
-  // Flag to show quote summary on category pages
   showTravelQuoteSummary: boolean;
-  showAutoQuoteSummary: boolean;
-  showPetQuoteSummary: boolean;
-  showHealthQuoteSummary: boolean;
-  
-  // Actions
-  setTravelQuote: (data: TravelQuoteData) => void;
-  setAutoQuote: (data: AutoQuoteData) => void;
-  setPetQuote: (data: PetQuoteData) => void;
-  setHealthQuote: (data: HealthQuoteData) => void;
-  
+  updateTravelQuote: (data: Partial<TravelQuoteData>) => void;
   submitTravelQuote: () => void;
-  submitAutoQuote: () => void;
-  submitPetQuote: () => void;
-  submitHealthQuote: () => void;
-  
   resetTravelQuote: () => void;
-  resetAutoQuote: () => void;
-  resetPetQuote: () => void;
-  resetHealthQuote: () => void;
   
-  clearAllQuotes: () => void;
+  // Auto quotes
+  autoQuote: AutoQuoteData | null;
+  submittedAutoQuote: AutoQuoteData | null;
+  showAutoQuoteSummary: boolean;
+  updateAutoQuote: (data: Partial<AutoQuoteData>) => void;
+  submitAutoQuote: () => void;
+  resetAutoQuote: () => void;
+  
+  // Pet quotes
+  petQuote: PetQuoteData | null;
+  submittedPetQuote: PetQuoteData | null;
+  showPetQuoteSummary: boolean;
+  updatePetQuote: (data: Partial<PetQuoteData>) => void;
+  submitPetQuote: () => void;
+  resetPetQuote: () => void;
+  
+  // Health quotes
+  healthQuote: HealthQuoteData | null;
+  submittedHealthQuote: HealthQuoteData | null;
+  showHealthQuoteSummary: boolean;
+  updateHealthQuote: (data: Partial<HealthQuoteData>) => void;
+  submitHealthQuote: () => void;
+  resetHealthQuote: () => void;
 }
 
-// Default empty quote data
-const emptyTravelQuote: TravelQuoteData = {
-  destination: '',
-  departureDate: '',
-  returnDate: '',
-  travelers: 1,
-  activities: [],
-  coverage: 'standard'
-};
-
-const emptyAutoQuote: AutoQuoteData = {
-  vehicleMake: '',
-  vehicleModel: '',
-  vehicleYear: new Date().getFullYear(),
-  vehicleValue: 0,
-  primaryDriver: {
-    age: 30,
-    drivingExperience: 5,
-    accidentHistory: 'none'
-  },
-  coverageType: 'comprehensive'
-};
-
-const emptyPetQuote: PetQuoteData = {
-  petType: '',
-  breed: '',
-  age: 0,
-  medicalHistory: [],
-  coverageLevel: 'standard'
-};
-
-const emptyHealthQuote: HealthQuoteData = {
-  age: 30,
-  gender: '',
-  smoker: false,
-  preExistingConditions: [],
-  coverageNeeds: []
-};
-
-export const useQuoteStore = create<QuoteStore>()(
-  persist(
-    (set) => ({
-      // Initial state
-      travelQuote: null,
-      autoQuote: null,
-      petQuote: null,
-      healthQuote: null,
-      
-      submittedTravelQuote: null,
-      submittedAutoQuote: null,
-      submittedPetQuote: null,
-      submittedHealthQuote: null,
-      
-      showTravelQuoteSummary: false,
-      showAutoQuoteSummary: false,
-      showPetQuoteSummary: false,
-      showHealthQuoteSummary: false,
-      
-      // Actions
-      setTravelQuote: (data) => set({ travelQuote: data }),
-      setAutoQuote: (data) => set({ autoQuote: data }),
-      setPetQuote: (data) => set({ petQuote: data }),
-      setHealthQuote: (data) => set({ healthQuote: data }),
-      
-      submitTravelQuote: () => set((state) => ({ 
-        submittedTravelQuote: state.travelQuote, 
-        showTravelQuoteSummary: true 
-      })),
-      submitAutoQuote: () => set((state) => ({ 
-        submittedAutoQuote: state.autoQuote, 
-        showAutoQuoteSummary: true 
-      })),
-      submitPetQuote: () => set((state) => ({ 
-        submittedPetQuote: state.petQuote, 
-        showPetQuoteSummary: true 
-      })),
-      submitHealthQuote: () => set((state) => ({ 
-        submittedHealthQuote: state.healthQuote, 
-        showHealthQuoteSummary: true 
-      })),
-      
-      resetTravelQuote: () => set({ 
-        travelQuote: null, 
-        submittedTravelQuote: null, 
-        showTravelQuoteSummary: false 
-      }),
-      resetAutoQuote: () => set({ 
-        autoQuote: null, 
-        submittedAutoQuote: null, 
-        showAutoQuoteSummary: false 
-      }),
-      resetPetQuote: () => set({ 
-        petQuote: null, 
-        submittedPetQuote: null, 
-        showPetQuoteSummary: false 
-      }),
-      resetHealthQuote: () => set({ 
-        healthQuote: null, 
-        submittedHealthQuote: null, 
-        showHealthQuoteSummary: false 
-      }),
-      
-      clearAllQuotes: () => set({
-        travelQuote: null,
-        autoQuote: null,
-        petQuote: null,
-        healthQuote: null,
-        submittedTravelQuote: null,
-        submittedAutoQuote: null,
-        submittedPetQuote: null,
-        submittedHealthQuote: null,
-        showTravelQuoteSummary: false,
-        showAutoQuoteSummary: false,
-        showPetQuoteSummary: false,
-        showHealthQuoteSummary: false
-      })
-    }),
-    {
-      name: 'briki-quote-storage',
-    }
-  )
-);
+export const useQuoteStore = create<QuoteStore>((set) => ({
+  // Travel quotes
+  travelQuote: null,
+  submittedTravelQuote: null,
+  showTravelQuoteSummary: false,
+  updateTravelQuote: (data) => set((state) => ({ 
+    travelQuote: { 
+      ...state.travelQuote, 
+      ...data 
+    } 
+  })),
+  submitTravelQuote: () => set((state) => ({ 
+    submittedTravelQuote: state.travelQuote,
+    showTravelQuoteSummary: true
+  })),
+  resetTravelQuote: () => set({ 
+    travelQuote: null,
+    submittedTravelQuote: null,
+    showTravelQuoteSummary: false
+  }),
+  
+  // Auto quotes
+  autoQuote: null,
+  submittedAutoQuote: null,
+  showAutoQuoteSummary: false,
+  updateAutoQuote: (data) => set((state) => ({ 
+    autoQuote: { 
+      ...state.autoQuote, 
+      ...data 
+    } 
+  })),
+  submitAutoQuote: () => set((state) => ({ 
+    submittedAutoQuote: state.autoQuote,
+    showAutoQuoteSummary: true
+  })),
+  resetAutoQuote: () => set({ 
+    autoQuote: null,
+    submittedAutoQuote: null,
+    showAutoQuoteSummary: false
+  }),
+  
+  // Pet quotes
+  petQuote: null,
+  submittedPetQuote: null,
+  showPetQuoteSummary: false,
+  updatePetQuote: (data) => set((state) => ({ 
+    petQuote: { 
+      ...state.petQuote, 
+      ...data 
+    } 
+  })),
+  submitPetQuote: () => set((state) => ({ 
+    submittedPetQuote: state.petQuote,
+    showPetQuoteSummary: true
+  })),
+  resetPetQuote: () => set({ 
+    petQuote: null,
+    submittedPetQuote: null,
+    showPetQuoteSummary: false
+  }),
+  
+  // Health quotes
+  healthQuote: null,
+  submittedHealthQuote: null,
+  showHealthQuoteSummary: false,
+  updateHealthQuote: (data) => set((state) => ({ 
+    healthQuote: { 
+      ...state.healthQuote, 
+      ...data 
+    } 
+  })),
+  submitHealthQuote: () => set((state) => ({ 
+    submittedHealthQuote: state.healthQuote,
+    showHealthQuoteSummary: true
+  })),
+  resetHealthQuote: () => set({ 
+    healthQuote: null,
+    submittedHealthQuote: null,
+    showHealthQuoteSummary: false
+  }),
+}));

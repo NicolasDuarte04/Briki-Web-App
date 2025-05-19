@@ -3,9 +3,11 @@ import { travelPlans } from "@/components/plans/mockPlans";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Plane, Shield, Globe, ArrowRight, BadgeCheck, MapPin, Zap, HeartPulse, Search } from "lucide-react";
 import { HeroWrapper, ContentWrapper } from "@/components/layout";
+import { QuoteSummary } from "@/components/quote-summary";
+import { useQuoteStore } from "@/store/quote-store";
 import { useCompareStore } from "@/store/compare-store";
 import { ComparePageTrigger } from "@/components/compare-page-trigger";
 import { useToast } from "@/hooks/use-toast";
@@ -294,6 +296,9 @@ export default function TravelInsurancePage() {
               Choose from our range of travel insurance plans designed to provide the right coverage for your journey.
             </p>
           </motion.div>
+          
+          {/* Quote Summary */}
+          <QuoteSummary category="travel" />
           
           {/* Filter/sort controls */}
           <motion.div

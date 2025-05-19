@@ -165,9 +165,9 @@ export default function AutoInsurancePage() {
                   variant="outline" 
                   size="lg" 
                   className="font-medium border-white/30 text-white hover:bg-white/10"
-                  onClick={() => navigate('/get-quote')}
+                  onClick={() => navigate('/insurance/auto/quote')}
                 >
-                  Get Custom Quote
+                  Tell Us About Your Car
                 </Button>
               </div>
             </div>

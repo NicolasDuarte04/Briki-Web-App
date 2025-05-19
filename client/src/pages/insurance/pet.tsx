@@ -165,9 +165,9 @@ export default function PetInsurancePage() {
                   variant="outline" 
                   size="lg" 
                   className="font-medium border-white/30 text-white hover:bg-white/10"
-                  onClick={() => navigate('/get-quote')}
+                  onClick={() => navigate('/insurance/pet/quote')}
                 >
-                  Get Custom Quote
+                  Tell Us About Your Pet
                 </Button>
               </div>
             </div>
