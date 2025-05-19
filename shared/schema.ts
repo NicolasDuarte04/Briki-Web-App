@@ -1,359 +1,130 @@
-import { pgTable, serial, text, varchar, timestamp, pgEnum, boolean, integer, date, real, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, serial, varchar, timestamp, text, integer, boolean, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Database tables for user management
+// Base tables
 export const users = pgTable("users", {
-  id: varchar("id").primaryKey(), // String ID to support both number and OAuth string IDs
-  name: text("name"), // Name as a text field
-  username: text("username"),
-  email: text("email").unique().notNull(),
-  password: text("password"),
-  role: varchar("role").default("user"),
-  profileImageUrl: text("profile_image_url"),
-  firstName: text("first_name"),
-  lastName: text("last_name"),
+  id: varchar("id").primaryKey(),
+  email: varchar("email").unique(),
+  firstName: varchar("first_name"),
+  lastName: varchar("last_name"),
+  profileImageUrl: varchar("profile_image_url"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-  company_profile: jsonb("company_profile")
 });
 
-// Database table for session management
+// Session storage table for authentication
 export const sessions = pgTable("sessions", {
   sid: varchar("sid").primaryKey(),
   sess: jsonb("sess").notNull(),
   expire: timestamp("expire").notNull(),
 });
 
-// Insurance category enum
-export const insuranceCategoryEnum = pgEnum("insurance_category", [
-  "travel",
-  "auto",
-  "pet",
-  "health",
-]);
+// Insurance categories
+export const INSURANCE_CATEGORIES = {
+  TRAVEL: "travel",
+  AUTO: "auto",
+  PET: "pet",
+  HEALTH: "health"
+} as const;
 
-export type InsuranceCategory = "travel" | "auto" | "pet" | "health";
+export type InsuranceCategory = typeof INSURANCE_CATEGORIES[keyof typeof INSURANCE_CATEGORIES];
 
-// Base fields for all insurance plans
-export interface BasePlanFields {
-  id: string;
-  planId: string;
-  name: string;
-  provider: string;
-  category: InsuranceCategory;
-  basePrice: number;
-  coverageAmount: number;
-  description?: string;
-  rating?: string;
-  reviews?: number;
-  country?: string;
-  badge?: string;
-}
+// Quote schemas
+export const travelQuoteSchema = z.object({
+  id: z.string().optional(),
+  userId: z.string().optional(),
+  destination: z.string().min(2, "Destination is required"),
+  departureDate: z.date({ required_error: "Departure date is required" }),
+  returnDate: z.date({ required_error: "Return date is required" }),
+  travelers: z.number().min(1, "At least one traveler is required").max(10, "Maximum 10 travelers allowed"),
+  activities: z.array(z.string()).optional(),
+  coverageLevel: z.enum(["basic", "standard", "premium"]).optional(),
+  includesMedical: z.boolean().optional(),
+  includesCancellation: z.boolean().optional(),
+  includesValuables: z.boolean().optional(),
+  createdAt: z.date().optional(),
+  updatedAt: z.date().optional(),
+  category: z.literal(INSURANCE_CATEGORIES.TRAVEL)
+});
 
-// Category-specific fields for Travel Insurance
-export interface TravelPlanFields {
-  tripCancellation: number;
-  tripInterruption: number;
-  emergencyMedical: number;
-  medicalEvacuation: number;
-  baggageCoverage: number;
-  baggageDelay: number;
-  travelDelay: number;
-  adventureActivities: boolean;
-  preExistingConditions: boolean;
-  rentalCarCoverage: number;
-  coverage24h: boolean;
-}
+// Type definitions
+export type User = typeof users.$inferSelect;
+export type UpsertUser = typeof users.$inferInsert;
 
-// Category-specific fields for Auto Insurance
-export interface AutoPlanFields {
-  liabilityCoverage: number;
-  collisionCoverage: number;
-  comprehensiveCoverage: number;
-  personalInjuryProtection: number;
-  uninsuredMotoristCoverage: boolean;
-  roadSideAssistance: boolean;
-  rentalReimbursement: number;
-  deductible: number;
-  multiVehicleDiscount: boolean;
-  antiTheftDiscount: boolean;
-  safeDriverDiscount: boolean;
-}
+export type TravelQuote = z.infer<typeof travelQuoteSchema>;
 
-// Category-specific fields for Pet Insurance
-export interface PetPlanFields {
-  annualLimit: number;
-  deductible: number;
-  reimbursement: number;
-  illnessCoverage: boolean;
-  accidentCoverage: boolean;
-  wellnessCoverage: boolean;
-  dentalCoverage: boolean;
-  prescriptionCoverage: boolean;
-  behavioralTherapy: boolean;
-  waitingPeriod: string;
-  maximumAge: number;
-}
-
-// Category-specific fields for Health Insurance
-export interface HealthPlanFields {
-  annualDeductible: number;
-  outOfPocketMax: number;
-  coInsurance: string;
-  primaryCareVisit: string;
-  specialistVisit: string;
-  emergencyRoomCare: string;
-  hospitalStay: string;
-  prescriptionDrugCoverage: string;
-  preventiveCare: string;
-  maternityCare: boolean;
-  mentalHealthCoverage: boolean;
-  networkType: string;
-}
-
-// Field labels for UI display
-export const planFieldLabels: Record<InsuranceCategory, Record<string, string>> = {
-  travel: {
-    basePrice: "Monthly Premium",
-    coverageAmount: "Max Coverage",
-    tripCancellation: "Trip Cancellation",
-    tripInterruption: "Trip Interruption",
-    emergencyMedical: "Emergency Medical",
-    medicalEvacuation: "Medical Evacuation",
-    baggageCoverage: "Baggage Coverage",
-    baggageDelay: "Baggage Delay",
-    travelDelay: "Travel Delay",
-    adventureActivities: "Adventure Activities",
-    preExistingConditions: "Pre-existing Conditions",
-    rentalCarCoverage: "Rental Car Coverage",
-    coverage24h: "24/7 Coverage"
-  },
-  auto: {
-    basePrice: "Annual Premium",
-    coverageAmount: "Total Coverage",
-    liabilityCoverage: "Liability Coverage",
-    collisionCoverage: "Collision Coverage",
-    comprehensiveCoverage: "Comprehensive Coverage",
-    personalInjuryProtection: "Personal Injury Protection",
-    uninsuredMotoristCoverage: "Uninsured Motorist",
-    roadSideAssistance: "Roadside Assistance",
-    rentalReimbursement: "Rental Reimbursement",
-    deductible: "Deductible",
-    multiVehicleDiscount: "Multi-Vehicle Discount",
-    antiTheftDiscount: "Anti-Theft Discount",
-    safeDriverDiscount: "Safe Driver Discount"
-  },
-  pet: {
-    basePrice: "Annual Premium",
-    coverageAmount: "Max Annual Coverage",
-    annualLimit: "Annual Limit",
-    deductible: "Deductible",
-    reimbursement: "Reimbursement %",
-    illnessCoverage: "Illness Coverage",
-    accidentCoverage: "Accident Coverage",
-    wellnessCoverage: "Wellness Coverage",
-    dentalCoverage: "Dental Coverage",
-    prescriptionCoverage: "Prescription Coverage",
-    behavioralTherapy: "Behavioral Therapy",
-    waitingPeriod: "Waiting Period",
-    maximumAge: "Maximum Pet Age"
-  },
-  health: {
-    basePrice: "Monthly Premium",
-    coverageAmount: "Lifetime Maximum",
-    annualDeductible: "Annual Deductible",
-    outOfPocketMax: "Out-of-Pocket Maximum",
-    coInsurance: "Co-Insurance",
-    primaryCareVisit: "Primary Care Visit",
-    specialistVisit: "Specialist Visit",
-    emergencyRoomCare: "Emergency Room Care",
-    hospitalStay: "Hospital Stay",
-    prescriptionDrugCoverage: "Prescription Drug Coverage",
-    preventiveCare: "Preventive Care",
-    maternityCare: "Maternity Care",
-    mentalHealthCoverage: "Mental Health Coverage",
-    networkType: "Network Type"
-  }
-};
-
-// Helper function to format field values for display
-export const formatFieldValue = (value: any, field: string): string => {
-  if (value === undefined || value === null) {
-    return 'N/A';
-  }
-  
-  // Format currency fields
-  if (
-    field === 'basePrice' || 
-    field === 'coverageAmount' || 
-    field === 'tripCancellation' || 
-    field === 'tripInterruption' || 
-    field === 'emergencyMedical' || 
-    field === 'medicalEvacuation' || 
-    field === 'baggageCoverage' || 
-    field === 'baggageDelay' || 
-    field === 'travelDelay' || 
-    field === 'rentalCarCoverage' || 
-    field === 'liabilityCoverage' || 
-    field === 'collisionCoverage' || 
-    field === 'comprehensiveCoverage' || 
-    field === 'personalInjuryProtection' || 
-    field === 'rentalReimbursement' || 
-    field === 'deductible' || 
-    field === 'annualLimit' || 
-    field === 'annualDeductible' || 
-    field === 'outOfPocketMax'
-  ) {
-    // Format as currency
-    return `$${value.toLocaleString()}`;
-  }
-  
-  // Format percentage fields
-  if (field === 'reimbursement') {
-    return `${value}%`;
-  }
-  
-  // Format boolean fields
-  if (typeof value === 'boolean') {
-    return value ? '✅ Yes' : '❌ No';
-  }
-  
-  // Default return the value as string
-  return String(value);
-};
-
-// Quote table for storing user quote submissions
+// Quote tables
 export const quotes = pgTable("quotes", {
   id: serial("id").primaryKey(),
   userId: varchar("user_id").references(() => users.id),
   category: varchar("category").notNull(),
-  country: varchar("country").notNull(),
-  email: varchar("email").notNull(),
-  firstName: varchar("first_name").notNull(),
-  lastName: varchar("last_name").notNull(),
-  startDate: date("start_date").notNull(),
-  endDate: date("end_date").notNull(),
-  travelersCount: integer("travelers_count").notNull(),
-  quoteDetails: jsonb("quote_details"),
-  quoteReference: varchar("quote_reference").notNull(),
-  totalPrice: real("total_price"),
-  statusCode: varchar("status_code"),
-  status: varchar("status"), // Added status field
-  notificationSent: boolean("notification_sent").default(false), // Added notification field
+  details: jsonb("details").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-  expiresAt: timestamp("expires_at")
+  status: varchar("status").default("draft"),
 });
 
-// Trip table for storing user trips
-export const trips = pgTable("trips", {
-  id: serial("id").primaryKey(),
-  userId: varchar("user_id").references(() => users.id),
-  destination: varchar("destination").notNull(),
-  startDate: date("start_date").notNull(),
-  endDate: date("end_date").notNull(),
-  travelersCount: integer("travelers_count").notNull(),
-  status: varchar("status").default("planning"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow()
-});
-
-// Insurance plans table for storing available plans
-export const insurancePlans = pgTable("insurance_plans", {
-  id: serial("id").primaryKey(),
-  planId: varchar("plan_id").notNull().unique(),
-  name: varchar("name").notNull(),
-  provider: varchar("provider").notNull(),
-  category: varchar("category").notNull(),
-  basePrice: real("base_price").notNull(),
-  coverageAmount: real("coverage_amount").notNull(),
-  description: text("description"),
-  rating: varchar("rating"),
-  reviews: integer("reviews"),
-  country: varchar("country"),
-  badge: varchar("badge"),
-  planDetails: jsonb("plan_details"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow()
-});
-
-// Orders table for tracking insurance purchases
-export const orders = pgTable("orders", {
-  id: serial("id").primaryKey(),
-  userId: varchar("user_id").references(() => users.id),
-  planId: varchar("plan_id").references(() => insurancePlans.planId),
-  quoteId: integer("quote_id").references(() => quotes.id),
-  orderReference: varchar("order_reference").notNull(),
-  status: varchar("status").default("pending"),
-  totalAmount: real("total_amount").notNull(),
-  paymentMethod: varchar("payment_method"),
-  paymentId: varchar("payment_id"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow()
-});
-
-// Create insert schemas 
-export const insertUserSchema = createInsertSchema(users).extend({
-  // Make username optional since we now use email as primary identifier
-  username: z.string().optional().nullable(),
-  // Keep email required  
-  email: z.string().email("Please enter a valid email"),
-  // Add validation for password
-  password: z.string().min(8, "Password must be at least 8 characters").nullable(),
-  // Make id optional since it's auto-generated
-  id: z.string().optional(),
-  // Make name optional
-  name: z.string().optional().nullable(),
-  // Make role optional with default
-  role: z.string().optional().nullable().default("user"),
-  // Add profile fields
-  firstName: z.string().optional().nullable(),
-  lastName: z.string().optional().nullable(),
-  profileImageUrl: z.string().optional().nullable(),
-  // Make company_profile optional
-  company_profile: z.any().optional()
-});
-export const insertQuoteSchema = createInsertSchema(quotes, {
-  id: undefined,
-  createdAt: undefined,
-  updatedAt: undefined
-});
-export const insertTripSchema = createInsertSchema(trips, {
-  id: undefined,
-  createdAt: undefined,
-  updatedAt: undefined
-});
-export const insertInsurancePlanSchema = createInsertSchema(insurancePlans, {
-  id: undefined,
-  createdAt: undefined,
-  updatedAt: undefined
-});
-export const insertOrderSchema = createInsertSchema(orders, {
-  id: undefined,
-  createdAt: undefined,
-  updatedAt: undefined
-});
-
-// Export types for CRUD operations
-export type InsertUser = z.infer<typeof insertUserSchema>;
-export type User = typeof users.$inferSelect;
-
-// Legacy CustomUser type has been deprecated
-// Use the User type from db schema instead which is more complete
-
-export type InsertQuote = z.infer<typeof insertQuoteSchema>;
 export type Quote = typeof quotes.$inferSelect;
+export const insertQuoteSchema = createInsertSchema(quotes).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertQuote = z.infer<typeof insertQuoteSchema>;
 
-export type InsertTrip = z.infer<typeof insertTripSchema>;
-export type Trip = typeof trips.$inferSelect;
+// Insurance plans
+export interface BasePlanFields {
+  planId: string;
+  name: string;
+  basePrice: number;
+  coverageAmount: number;
+}
 
-export type InsertInsurancePlan = z.infer<typeof insertInsurancePlanSchema>;
-export type InsurancePlan = typeof insurancePlans.$inferSelect;
+export interface TravelPlan extends BasePlanFields {
+  category: typeof INSURANCE_CATEGORIES.TRAVEL;
+  destinations: string[];
+  coversMedical: boolean;
+  coversCancellation: boolean;
+  coversValuables: boolean;
+  maxTripDuration: number;
+  provider: string;
+  description?: string;
+  features: string[];
+  rating?: string;
+}
 
-export type InsertOrder = z.infer<typeof insertOrderSchema>;
-export type Order = typeof orders.$inferSelect;
+export interface AutoPlan extends BasePlanFields {
+  category: typeof INSURANCE_CATEGORIES.AUTO;
+  vehicleTypes: string[];
+  comprehensive: boolean;
+  roadside: boolean;
+  provider: string;
+  description?: string;
+  features: string[];
+  rating?: string;
+}
 
-// Types for sessions
-export type Session = typeof sessions.$inferSelect;
-export type InsertSession = typeof sessions.$inferInsert;
+export interface PetPlan extends BasePlanFields {
+  category: typeof INSURANCE_CATEGORIES.PET;
+  petTypes: string[];
+  coversIllness: boolean;
+  coversAccident: boolean;
+  provider: string;
+  description?: string;
+  features: string[];
+  rating?: string;
+}
+
+export interface HealthPlan extends BasePlanFields {
+  category: typeof INSURANCE_CATEGORIES.HEALTH;
+  coversPreventive: boolean;
+  coversEmergency: boolean;
+  coversSpecialist: boolean;
+  provider: string;
+  description?: string;
+  features: string[];
+  rating?: string;
+}
+
+export type InsurancePlan = TravelPlan | AutoPlan | PetPlan | HealthPlan;

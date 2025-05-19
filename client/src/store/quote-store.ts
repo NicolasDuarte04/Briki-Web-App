@@ -1,135 +1,95 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { TravelQuote, INSURANCE_CATEGORIES, InsuranceCategory } from '@shared/schema';
+import { createId } from '@/lib/utils';
 
-// Define the structure for travel quote data
-interface TravelQuote {
-  destination: string;
-  departureDate: Date;
-  returnDate: Date;
-  travelers: number;
-  travelerAge: number;
-  tripCost: number;
-  activities?: string[];
-  medicalConditions?: boolean;
-  cancellationCoverage?: boolean;
-  baggageCoverage?: boolean;
-  medicalCoverage?: boolean;
-  adventureActivities?: boolean;
-}
+// Initialize default values for new travel quotes
+const createDefaultTravelQuote = (): TravelQuote => ({
+  id: createId('travel'),
+  destination: '',
+  departureDate: undefined as unknown as Date,
+  returnDate: undefined as unknown as Date,
+  travelers: 1,
+  activities: [],
+  includesMedical: false,
+  includesCancellation: false,
+  includesValuables: false,
+  coverageLevel: 'standard',
+  category: INSURANCE_CATEGORIES.TRAVEL
+});
 
-// Define the structure for auto quote data
-interface AutoQuote {
-  vehicleMake: string;
-  vehicleModel: string;
-  vehicleYear: number;
-  vehicleValue: number;
-  driverAge: number;
-  drivingHistory: string;
-  coverage: string;
-  deductible: number;
-  isLeased: boolean;
-  hasAntiTheft: boolean;
-}
-
-// Define the structure for health quote data
-interface HealthQuote {
-  age: number;
-  gender: string;
-  smoker: boolean;
-  preExistingConditions: boolean;
-  coverage: string;
-  dependents: number;
-  income: number;
-}
-
-// Define the structure for pet quote data
-interface PetQuote {
-  petType: string;
-  petBreed: string;
-  petAge: number;
-  preExistingConditions: boolean;
-  coverageLevel: string;
-  annualLimit: number;
-  deductible: number;
-}
-
-// Define insurance categories
-export type InsuranceCategory = 'travel' | 'auto' | 'health' | 'pet';
-
-// Define the structure for the entire quote store
-interface QuoteStore {
-  travelQuote: TravelQuote | null;
-  autoQuote: AutoQuote | null;
-  healthQuote: HealthQuote | null;
-  petQuote: PetQuote | null;
-  submittedQuotes: InsuranceCategory[];
+interface QuoteState {
+  // Current quote being worked on
+  travelQuote: TravelQuote;
+  
+  // Submitted quotes history
+  submittedQuotes: TravelQuote[];
   
   // Actions
-  setTravelQuote: (quote: TravelQuote) => void;
-  setAutoQuote: (quote: AutoQuote) => void;
-  setHealthQuote: (quote: HealthQuote) => void;
-  setPetQuote: (quote: PetQuote) => void;
-  submitQuote: (category: InsuranceCategory) => void;
-  clearQuote: (category: InsuranceCategory) => void;
-  resetQuotes: () => void;
+  updateTravelQuote: (updates: Partial<TravelQuote>) => void;
+  submitTravelQuote: () => void;
+  resetTravelQuote: () => void;
+  clearSubmittedQuotes: () => void;
 }
 
-// Create the store with persistence
-export const useQuoteStore = create<QuoteStore>()(
+export const useQuoteStore = create<QuoteState>()(
   persist(
     (set) => ({
-      travelQuote: null,
-      autoQuote: null,
-      healthQuote: null,
-      petQuote: null,
+      // Initial state
+      travelQuote: createDefaultTravelQuote(),
       submittedQuotes: [],
       
-      // Actions
-      setTravelQuote: (quote: TravelQuote) => set({ travelQuote: quote }),
-      setAutoQuote: (quote: AutoQuote) => set({ autoQuote: quote }),
-      setHealthQuote: (quote: HealthQuote) => set({ healthQuote: quote }),
-      setPetQuote: (quote: PetQuote) => set({ petQuote: quote }),
-      
-      submitQuote: (category: InsuranceCategory) => 
+      // Update the current travel quote
+      updateTravelQuote: (updates: Partial<TravelQuote>) => 
         set((state) => ({
-          submittedQuotes: Array.from(new Set([...state.submittedQuotes, category]))
+          travelQuote: { ...state.travelQuote, ...updates }
         })),
-        
-      clearQuote: (category: InsuranceCategory) => 
-        set((state) => {
-          const newState: Partial<QuoteStore> = {
-            submittedQuotes: state.submittedQuotes.filter(c => c !== category)
-          };
-          
-          // Clear the specific quote type
-          switch (category) {
-            case 'travel':
-              newState.travelQuote = null;
-              break;
-            case 'auto':
-              newState.autoQuote = null;
-              break;
-            case 'health':
-              newState.healthQuote = null;
-              break;
-            case 'pet':
-              newState.petQuote = null;
-              break;
-          }
-          
-          return newState;
-        }),
-        
-      resetQuotes: () => set({ 
-        travelQuote: null,
-        autoQuote: null,
-        healthQuote: null,
-        petQuote: null,
-        submittedQuotes: []
-      }),
+      
+      // Submit the current travel quote
+      submitTravelQuote: () => 
+        set((state) => ({
+          submittedQuotes: [...state.submittedQuotes, {
+            ...state.travelQuote,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          }],
+          travelQuote: createDefaultTravelQuote()
+        })),
+      
+      // Reset current travel quote to defaults
+      resetTravelQuote: () => 
+        set(() => ({
+          travelQuote: createDefaultTravelQuote()
+        })),
+      
+      // Clear all submitted quotes
+      clearSubmittedQuotes: () => 
+        set(() => ({
+          submittedQuotes: []
+        })),
     }),
     {
-      name: 'briki-insurance-quotes',
+      name: 'briki-quotes-storage',
+      partialize: (state) => ({ 
+        travelQuote: state.travelQuote,
+        submittedQuotes: state.submittedQuotes,
+      }),
     }
   )
 );
+
+// Function to get quotes by category
+export const getQuotesByCategory = (quotes: TravelQuote[], category: InsuranceCategory): TravelQuote[] => {
+  return quotes.filter(quote => quote.category === category);
+};
+
+// Function to get the most recent quote
+export const getMostRecentQuote = (quotes: TravelQuote[]): TravelQuote | undefined => {
+  if (quotes.length === 0) return undefined;
+  
+  return quotes.reduce((prev, current) => {
+    const prevDate = prev.createdAt || new Date(0);
+    const currentDate = current.createdAt || new Date(0);
+    return currentDate > prevDate ? current : prev;
+  });
+};
