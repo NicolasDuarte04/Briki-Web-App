@@ -83,7 +83,10 @@ import CompanyPage from "@/pages/company-page";
 import CompanyLoginPage from "@/pages/company-login-page";
 import CompanyRegisterPage from "@/pages/company-register-page";
 import CompanyDashboardPage from "@/pages/company-dashboard-page";
-import CompanyQuoteUploadPage from "@/pages/company-quote-upload-page";
+import CompanyUploadPage from "@/pages/company-upload-page";
+import CompanyAnalysisPage from "@/pages/company-analysis-page";
+import CompanyMarketplacePage from "@/pages/company-marketplace-page";
+import CompanySettingsPage from "@/pages/company-settings-page";
 import CompanyPreviewPage from "@/pages/company-preview-page";
 import CompanyRequestPilotPage from "@/pages/company-request-pilot-page";
 import ContactSalesPage from "@/pages/contact-sales-page";
@@ -156,7 +159,11 @@ function Router() {
         <Route path="/company-register" component={CompanyRegisterPage} />
         <Route path="/contact-sales" component={ContactSalesPage} />
         <Route path="/company-dashboard" component={CompanyDashboardPage} />
-        <Route path="/company-dashboard/upload" component={CompanyQuoteUploadPage} />
+        <Route path="/company-dashboard/upload" component={CompanyUploadPage} />
+        <Route path="/company-dashboard/analysis" component={CompanyAnalysisPage} />
+        <Route path="/company-dashboard/marketplace" component={CompanyMarketplacePage} />
+        <Route path="/company-dashboard/settings" component={CompanySettingsPage} />
+        {/* Legacy routes */}
         <Route path="/company-dashboard/preview" component={CompanyPreviewPage} />
         <Route path="/company-dashboard/request-pilot" component={CompanyRequestPilotPage} />
         
