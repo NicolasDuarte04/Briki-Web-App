@@ -3,8 +3,10 @@ import { autoPlans } from "@/components/plans/mockPlans";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Car, Shield, Clock, ArrowRight, BadgeCheck, Wrench, Zap, Settings, Search } from "lucide-react";
+import { useQuoteStore } from "@/store/quote-store";
+import { QuoteSummary } from "@/components/quote-summary";
 import { HeroWrapper, ContentWrapper } from "@/components/layout";
 import { useCompareStore } from "@/store/compare-store";
 import { ComparePageTrigger } from "@/components/compare-page-trigger";
@@ -297,6 +299,9 @@ export default function AutoInsurancePage() {
               Choose from our carefully designed auto insurance plans to find the perfect coverage for your vehicle.
             </p>
           </motion.div>
+          
+          {/* Quote Summary */}
+          <QuoteSummary category="auto" />
           
           {/* Filter/sort controls */}
           <motion.div

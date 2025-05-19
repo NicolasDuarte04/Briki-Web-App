@@ -21,7 +21,7 @@ import {
   PetQuoteData, 
   HealthQuoteData 
 } from '@/store/quote-store';
-import { InsuranceCategory } from '@/components/plans/PlanCard';
+import { InsuranceCategory } from '@/types/insurance';
 import { format, differenceInDays } from 'date-fns';
 
 interface QuoteSummaryProps {
@@ -175,7 +175,8 @@ export const QuoteSummary: React.FC<QuoteSummaryProps> = ({ category }) => {
           
           <div className="flex items-center gap-2">
             <span className="font-medium">Accident history:</span>
-            <Badge variant={data.primaryDriver.accidentHistory === 'none' ? 'success' : 'secondary'}>
+            <Badge variant={data.primaryDriver.accidentHistory === 'none' ? 'outline' : 'secondary'} 
+                  className={data.primaryDriver.accidentHistory === 'none' ? 'bg-green-100 text-green-800 hover:bg-green-200' : ''}>
               {data.primaryDriver.accidentHistory === 'none' ? 'No accidents' : 
                data.primaryDriver.accidentHistory === 'minor' ? 'Minor accidents' :
                data.primaryDriver.accidentHistory === 'one' ? 'One accident' : 'Multiple accidents'}
