@@ -518,8 +518,9 @@ export default function AIAssistantScreen() {
     trackEvent(
       'assistant_feedback_submitted',
       EventCategory.ENGAGEMENT,
+      'Feedback submitted',
+      rating,
       {
-        rating,
         comment: feedbackComment,
         conversationLength: messages.length,
         userMessages: messages.filter(m => m.sender === "user").length,
@@ -683,6 +684,76 @@ export default function AIAssistantScreen() {
                   <MessageBubble key={msg.id} message={msg} />
                 ))}
                 <div ref={messageEndRef} />
+              </AnimatePresence>
+
+              {/* Feedback Component */}
+              <AnimatePresence>
+                {showFeedback && !feedbackSubmitted && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    className="mt-6 mb-6 mx-auto max-w-md"
+                  >
+                    <Card className="border-2 border-primary/20 shadow-md">
+                      <CardHeader className="bg-gradient-to-r from-primary/10 to-secondary/10 pb-2">
+                        <CardTitle className="text-lg">How helpful was the assistant?</CardTitle>
+                        <CardDescription>Your feedback helps us improve</CardDescription>
+                      </CardHeader>
+                      <CardContent className="pt-4">
+                        <div className="flex justify-center space-x-2 mb-4">
+                          {[1, 2, 3, 4, 5].map((rating) => (
+                            <button
+                              key={rating}
+                              type="button"
+                              onClick={() => {
+                                const stars = document.querySelectorAll('.rating-star');
+                                stars.forEach((star, idx) => {
+                                  if (idx < rating) {
+                                    star.classList.add('text-yellow-500');
+                                    star.classList.add('fill-yellow-500');
+                                  } else {
+                                    star.classList.remove('text-yellow-500');
+                                    star.classList.remove('fill-yellow-500');
+                                  }
+                                });
+                              }}
+                              className="p-2 rounded-full transition-colors hover:bg-gray-100"
+                            >
+                              <Star className="h-6 w-6 rating-star" />
+                            </button>
+                          ))}
+                        </div>
+                        <Textarea
+                          placeholder="What did you like or dislike? (optional)"
+                          value={feedbackComment}
+                          onChange={(e) => setFeedbackComment(e.target.value)}
+                          className="resize-none"
+                          rows={2}
+                        />
+                      </CardContent>
+                      <CardFooter className="flex justify-end gap-2 pt-0">
+                        <Button
+                          variant="outline"
+                          onClick={() => setShowFeedback(false)}
+                        >
+                          Maybe Later
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            const filledStars = document.querySelectorAll('.rating-star.fill-yellow-500').length;
+                            if (filledStars > 0) {
+                              handleFeedbackSubmit(filledStars as 1|2|3|4|5);
+                            }
+                          }}
+                          className="bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90"
+                        >
+                          Submit Feedback
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                  </motion.div>
+                )}
               </AnimatePresence>
             </div>
             
