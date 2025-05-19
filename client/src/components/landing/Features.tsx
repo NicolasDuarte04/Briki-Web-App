@@ -61,10 +61,7 @@ export default function Features() {
               }}
             >
               <GlassCard
-                className="h-full p-6"
-                variant="blue"
-                hover="lift"
-                disableMotion={true}
+                className="h-full p-6 bg-blue-50/30 dark:bg-blue-900/10 hover:shadow-lg transition-all duration-300"
               >
                 <div className="rounded-full bg-blue-100 dark:bg-blue-900/30 w-12 h-12 flex items-center justify-center mb-4">
                   {feature.icon}
