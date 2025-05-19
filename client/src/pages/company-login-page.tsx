@@ -47,15 +47,24 @@ export default function CompanyLoginPage() {
   const onSubmit = async (data: FormValues) => {
     try {
       // Map email to username for the login API and add company role flag
-      await loginMutation.mutateAsync({
+      const result = await loginMutation.mutateAsync({
         username: data.email, // Using email as username for companies
         password: data.password,
         role: 'company'
       });
       
-      // NOTE: Redirection is now handled centrally by the auth hook
-      // This ensures consistent routing behavior across all login points
-      
+      if (result) {
+        // Show success toast
+        toast({
+          title: "Login Successful",
+          description: "Redirecting to your dashboard...",
+        });
+        
+        // Explicitly redirect to company dashboard
+        setTimeout(() => {
+          navigate("/company-dashboard");
+        }, 500);
+      }
     } catch (error) {
       console.error("Login error:", error);
       toast({

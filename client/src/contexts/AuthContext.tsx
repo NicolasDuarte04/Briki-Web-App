@@ -92,6 +92,13 @@ export function AuthProvider({ children }: Props) {
           title: 'Login successful',
           description: `Welcome back, ${userData.user.name || userData.user.username || 'user'}!`,
         });
+        
+        // Role-based redirection logic
+        if (userData.user.role === 'company') {
+          // Add analytics tracking for company login if needed
+          console.log('Company user authenticated, redirection will be handled by login page');
+        }
+        
         return true;
       } else {
         const error = await response.json();

@@ -1,0 +1,44 @@
+We're preparing to expand and refocus Briki Copilot into a full SaaS-grade platform. Before we move forward with the redesign and implementation, I need a full audit of the current Copilot system.
+
+Please answer the following:
+
+---
+
+### 1. Current Screens and Routes
+- What are the currently implemented pages or screens under the Briki Copilot experience?
+- Please list the files and routes associated with each (e.g., `/company-dashboard`, `/request-pilot`, `/company-quote-upload`, etc.)
+- Which screens are protected by role-based auth for company users?
+
+---
+
+### 2. Folder and Component Structure
+- Which folder(s) in `client/src` are dedicated to Briki Copilot? (e.g., `pages/company/`, `components/copilot/`, etc.)
+- Do we have any centralized layout component (like `CompanyDashboardLayout`) for Copilot-related pages?
+- Are any Copilot views still using shared components/styles from the main (B2C) app that should now be decoupled?
+
+---
+
+### 3. Auth + Routing Logic
+- What logic is currently used to detect company/broker users and route them to Copilot vs the consumer dashboard?
+- Are we storing company role data in JWT/session/localStorage, and how is it used during route protection?
+- Does Copilot use a different login/register flow or share the same form with role detection?
+
+---
+
+### 4. Plan Management Features
+- Do any current Copilot screens support:
+  - Uploading plan data (CSV, form, or JSON)?
+  - Viewing submitted plans?
+  - Plan performance metrics?
+- If not, are there placeholder components or unfinished routes?
+
+---
+
+### 5. Copilot UI and Design
+- Are the current Copilot pages using the same theme and design components as the consumer-facing Briki app?
+- Do we have a separate design language in place for Copilot (or do we need to define one)?
+- Is Copilot mobile-friendly in its current state?
+
+---
+
+Please organize your response clearly, and let me know what’s working well vs what should be removed or rebuilt from scratch. This will help us define the structure for the new dual-model platform: public Briki listings + premium Copilot SaaS tools.
