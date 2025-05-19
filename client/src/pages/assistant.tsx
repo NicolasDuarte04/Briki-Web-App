@@ -7,9 +7,10 @@ import { Bot, Send, User, Loader2, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { v4 as uuidv4 } from "uuid";
-import { askAssistant } from "../services/ai-service";
+import { askAssistant, parseWidgetData, AssistantWidgetType } from "../services/ai-service";
 import { useAssistantActions } from "../hooks/use-assistant-actions";
 import { useToast } from "../components/ui/use-toast";
+import AssistantWidget from "../components/assistant/widgets/AssistantWidget";
 
 // Insurance-related suggested questions to assist users
 const suggestedQuestions = [
@@ -29,9 +30,6 @@ const initialGreeting = {
   timestamp: new Date().toISOString()
 };
 
-import { extractJsonFromText, type WidgetData } from "@/components/assistant/AssistantWidget";
-import { AssistantWidget } from "@/components/assistant/AssistantWidget";
-
 interface Message {
   id: string;
   sender: "user" | "assistant";
@@ -39,22 +37,15 @@ interface Message {
   timestamp: string;
   isLoading?: boolean;
   error?: boolean;
-  widgetData?: WidgetData | null;
+  widgetData?: AssistantWidgetType | null;
 }
 
 // Message bubble component for cleaner structure
 const MessageBubble: React.FC<{ message: Message }> = ({ message }) => {
   const isUser = message.sender === "user";
   
-  // Extract content without JSON for rendering
+  // The content is already cleaned by the AI service, so no need to strip JSON
   let displayContent = message.content;
-  if (message.sender === "assistant" && message.widgetData) {
-    // Remove the JSON part from the display content
-    const jsonMatch = message.content.match(/```json\s*({[\s\S]*?})\s*```/);
-    if (jsonMatch && jsonMatch.index !== undefined) {
-      displayContent = message.content.substring(0, jsonMatch.index).trim();
-    }
-  }
   
   return (
     <motion.div
@@ -310,9 +301,6 @@ export default function AIAssistantScreen() {
     try {
       // Call the API with user message and memory context
       const response = await askAssistant(userMessage.content, userMemory);
-      
-      // Check if the response contains structured data in JSON format
-      const widgetData = extractJsonFromText(response.response);
       
       // Remove loading message
       setMessages(prev => {
