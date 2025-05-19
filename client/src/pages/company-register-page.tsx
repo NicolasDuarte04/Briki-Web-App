@@ -70,6 +70,8 @@ export default function CompanyRegisterPage() {
         username: data.companyName,
         email: data.email,
         password: data.password,
+        confirmPassword: data.confirmPassword,
+        name: data.companyName,
         role: 'company',
         companyProfile: {
           name: data.companyName,
@@ -84,8 +86,10 @@ export default function CompanyRegisterPage() {
         variant: "default",
       });
       
-      // NOTE: Redirection is now handled centrally by the auth hook
-      // This ensures consistent routing behavior across all registration points
+      // Explicitly redirect to company dashboard
+      setTimeout(() => {
+        navigate("/company-dashboard");
+      }, 1000);
       
     } catch (error) {
       console.error("Registration error:", error);
