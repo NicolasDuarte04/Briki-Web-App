@@ -58,16 +58,46 @@ export interface IStorage {
   getUserQuotes(userId: string): Promise<Quote[]>;
   updateQuoteStatus(id: number, status: string): Promise<Quote>;
   markQuoteNotificationSent(id: number): Promise<Quote>;
+  
+  // Company operations
+  getCompanyProfile(userId: string): Promise<CompanyProfile | undefined>;
+  createCompanyProfile(profile: InsertCompanyProfile): Promise<CompanyProfile>;
+  updateCompanyProfile(id: number, updates: Partial<InsertCompanyProfile>): Promise<CompanyProfile>;
+  
+  // Plan operations
+  createCompanyPlan(plan: InsertCompanyPlan): Promise<CompanyPlan>;
+  getCompanyPlan(id: number): Promise<CompanyPlan | undefined>;
+  getCompanyPlans(companyId: number): Promise<CompanyPlan[]>;
+  getCompanyPlansByCategory(companyId: number, category: InsuranceCategory): Promise<CompanyPlan[]>;
+  updateCompanyPlan(id: number, updates: Partial<InsertCompanyPlan>): Promise<CompanyPlan>;
+  deleteCompanyPlan(id: number): Promise<boolean>;
+  
+  // Analytics operations
+  getPlanAnalytics(planId: number): Promise<PlanAnalytic[]>;
+  recordPlanView(planId: number): Promise<PlanAnalytic>;
+  recordPlanComparison(planId: number): Promise<PlanAnalytic>;
+  recordPlanConversion(planId: number): Promise<PlanAnalytic>;
+  getDashboardAnalytics(companyId: number): Promise<any>;
 }
 
 // Implementation for PostgreSQL database
 export class DatabaseStorage implements IStorage {
+  // TODO: Fix LSP issues with quotes table (quoteReference and notificationSent)
   // Helper function to generate unique quote reference
   private generateQuoteReference(): string {
     // Format: BRK-{random 8 char alphanumeric}-{timestamp}
     const randomPart = nanoid(8).toUpperCase();
     const timestamp = Date.now().toString().slice(-6);
     return `BRK-${randomPart}-${timestamp}`;
+  }
+  
+  // Helper function to generate a unique plan ID
+  private generatePlanId(category: string, companyId: number): string {
+    // Format: {category}-{companyId}-{random 6 char alphanumeric}-{timestamp}
+    const randomPart = nanoid(6).toUpperCase();
+    const timestamp = Date.now().toString().slice(-4);
+    const categoryPrefix = category.substring(0, 3).toUpperCase();
+    return `${categoryPrefix}-${companyId}-${randomPart}-${timestamp}`;
   }
   
   // Utility function to generate a username from email
@@ -417,6 +447,437 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error("Error marking quote notification sent:", error);
       throw error;
+    }
+  }
+
+  // Company operations
+  async getCompanyProfile(userId: string): Promise<CompanyProfile | undefined> {
+    try {
+      const [profile] = await db
+        .select()
+        .from(companyProfiles)
+        .where(eq(companyProfiles.userId, userId));
+      
+      return profile;
+    } catch (error) {
+      console.error("Error getting company profile:", error);
+      return undefined;
+    }
+  }
+
+  async createCompanyProfile(profile: InsertCompanyProfile): Promise<CompanyProfile> {
+    try {
+      const [newProfile] = await db
+        .insert(companyProfiles)
+        .values(profile)
+        .returning();
+      
+      return newProfile;
+    } catch (error) {
+      console.error("Error creating company profile:", error);
+      throw error;
+    }
+  }
+
+  async updateCompanyProfile(id: number, updates: Partial<InsertCompanyProfile>): Promise<CompanyProfile> {
+    try {
+      const [updatedProfile] = await db
+        .update(companyProfiles)
+        .set({
+          ...updates,
+          updatedAt: new Date()
+        })
+        .where(eq(companyProfiles.id, id))
+        .returning();
+      
+      return updatedProfile;
+    } catch (error) {
+      console.error("Error updating company profile:", error);
+      throw error;
+    }
+  }
+
+  // Plan operations
+  async createCompanyPlan(plan: InsertCompanyPlan): Promise<CompanyPlan> {
+    try {
+      // Generate a unique plan ID if not provided
+      if (!plan.planId) {
+        plan.planId = this.generatePlanId(plan.category, plan.companyId);
+      }
+      
+      // Ensure features is an array
+      if (plan.features && typeof plan.features === 'string') {
+        plan.features = JSON.parse(plan.features as any);
+      }
+      
+      const [newPlan] = await db
+        .insert(companyPlans)
+        .values(plan)
+        .returning();
+      
+      // Create an initial analytics entry for the plan
+      await this.recordPlanView(newPlan.id);
+      
+      return newPlan;
+    } catch (error) {
+      console.error("Error creating company plan:", error);
+      throw error;
+    }
+  }
+
+  async getCompanyPlan(id: number): Promise<CompanyPlan | undefined> {
+    try {
+      const [plan] = await db
+        .select()
+        .from(companyPlans)
+        .where(eq(companyPlans.id, id));
+      
+      return plan;
+    } catch (error) {
+      console.error("Error getting company plan:", error);
+      return undefined;
+    }
+  }
+
+  async getCompanyPlans(companyId: number): Promise<CompanyPlan[]> {
+    try {
+      const plans = await db
+        .select()
+        .from(companyPlans)
+        .where(eq(companyPlans.companyId, companyId))
+        .orderBy(companyPlans.updatedAt);
+      
+      return plans;
+    } catch (error) {
+      console.error("Error getting company plans:", error);
+      return [];
+    }
+  }
+
+  async getCompanyPlansByCategory(companyId: number, category: InsuranceCategory): Promise<CompanyPlan[]> {
+    try {
+      const plans = await db
+        .select()
+        .from(companyPlans)
+        .where(
+          and(
+            eq(companyPlans.companyId, companyId),
+            eq(companyPlans.category, category)
+          )
+        )
+        .orderBy(companyPlans.updatedAt);
+      
+      return plans;
+    } catch (error) {
+      console.error("Error getting company plans by category:", error);
+      return [];
+    }
+  }
+
+  async updateCompanyPlan(id: number, updates: Partial<InsertCompanyPlan>): Promise<CompanyPlan> {
+    try {
+      // Ensure features is an array if provided
+      if (updates.features && typeof updates.features === 'string') {
+        updates.features = JSON.parse(updates.features as any);
+      }
+      
+      const [updatedPlan] = await db
+        .update(companyPlans)
+        .set({
+          ...updates,
+          updatedAt: new Date()
+        })
+        .where(eq(companyPlans.id, id))
+        .returning();
+      
+      return updatedPlan;
+    } catch (error) {
+      console.error("Error updating company plan:", error);
+      throw error;
+    }
+  }
+
+  async deleteCompanyPlan(id: number): Promise<boolean> {
+    try {
+      // Instead of actually deleting, mark as archived
+      const [archivedPlan] = await db
+        .update(companyPlans)
+        .set({
+          status: 'archived',
+          updatedAt: new Date()
+        })
+        .where(eq(companyPlans.id, id))
+        .returning();
+      
+      return !!archivedPlan;
+    } catch (error) {
+      console.error("Error deleting company plan:", error);
+      return false;
+    }
+  }
+
+  // Analytics operations
+  async getPlanAnalytics(planId: number): Promise<PlanAnalytic[]> {
+    try {
+      const analytics = await db
+        .select()
+        .from(planAnalytics)
+        .where(eq(planAnalytics.planId, planId))
+        .orderBy(asc(planAnalytics.date));
+      
+      return analytics;
+    } catch (error) {
+      console.error("Error getting plan analytics:", error);
+      return [];
+    }
+  }
+
+  async recordPlanView(planId: number): Promise<PlanAnalytic> {
+    try {
+      // Check if we have an analytics record for today
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      const [existingRecord] = await db
+        .select()
+        .from(planAnalytics)
+        .where(
+          and(
+            eq(planAnalytics.planId, planId),
+            eq(planAnalytics.date, today)
+          )
+        );
+      
+      if (existingRecord) {
+        // Update existing record
+        const [updated] = await db
+          .update(planAnalytics)
+          .set({
+            views: existingRecord.views + 1
+          })
+          .where(eq(planAnalytics.id, existingRecord.id))
+          .returning();
+        
+        return updated;
+      } else {
+        // Create new record
+        const [newRecord] = await db
+          .insert(planAnalytics)
+          .values({
+            planId,
+            views: 1,
+            comparisons: 0,
+            conversions: 0,
+            date: today
+          })
+          .returning();
+        
+        return newRecord;
+      }
+    } catch (error) {
+      console.error("Error recording plan view:", error);
+      throw error;
+    }
+  }
+
+  async recordPlanComparison(planId: number): Promise<PlanAnalytic> {
+    try {
+      // Check if we have an analytics record for today
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      const [existingRecord] = await db
+        .select()
+        .from(planAnalytics)
+        .where(
+          and(
+            eq(planAnalytics.planId, planId),
+            eq(planAnalytics.date, today)
+          )
+        );
+      
+      if (existingRecord) {
+        // Update existing record
+        const [updated] = await db
+          .update(planAnalytics)
+          .set({
+            comparisons: existingRecord.comparisons + 1
+          })
+          .where(eq(planAnalytics.id, existingRecord.id))
+          .returning();
+        
+        return updated;
+      } else {
+        // Create new record
+        const [newRecord] = await db
+          .insert(planAnalytics)
+          .values({
+            planId,
+            views: 0,
+            comparisons: 1,
+            conversions: 0,
+            date: today
+          })
+          .returning();
+        
+        return newRecord;
+      }
+    } catch (error) {
+      console.error("Error recording plan comparison:", error);
+      throw error;
+    }
+  }
+
+  async recordPlanConversion(planId: number): Promise<PlanAnalytic> {
+    try {
+      // Check if we have an analytics record for today
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      const [existingRecord] = await db
+        .select()
+        .from(planAnalytics)
+        .where(
+          and(
+            eq(planAnalytics.planId, planId),
+            eq(planAnalytics.date, today)
+          )
+        );
+      
+      if (existingRecord) {
+        // Update existing record
+        const [updated] = await db
+          .update(planAnalytics)
+          .set({
+            conversions: existingRecord.conversions + 1
+          })
+          .where(eq(planAnalytics.id, existingRecord.id))
+          .returning();
+        
+        return updated;
+      } else {
+        // Create new record
+        const [newRecord] = await db
+          .insert(planAnalytics)
+          .values({
+            planId,
+            views: 0,
+            comparisons: 0,
+            conversions: 1,
+            date: today
+          })
+          .returning();
+        
+        return newRecord;
+      }
+    } catch (error) {
+      console.error("Error recording plan conversion:", error);
+      throw error;
+    }
+  }
+
+  async getDashboardAnalytics(companyId: number): Promise<any> {
+    try {
+      // Get all plans for this company
+      const plans = await this.getCompanyPlans(companyId);
+      
+      if (!plans.length) {
+        return {
+          totalViews: 0,
+          totalComparisons: 0,
+          totalConversions: 0,
+          planCount: 0,
+          categoryBreakdown: {},
+          topPlans: [],
+          recentActivity: []
+        };
+      }
+      
+      // Get all analytics for these plans
+      const planIds = plans.map(plan => plan.id);
+      
+      // Get analytics for the past 30 days
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      
+      const analytics = await db
+        .select()
+        .from(planAnalytics)
+        .where(
+          and(
+            sql`${planAnalytics.planId} IN (${planIds.join(', ')})`,
+            sql`${planAnalytics.date} >= ${thirtyDaysAgo.toISOString()}`
+          )
+        );
+      
+      // Calculate totals
+      const totalViews = analytics.reduce((sum, record) => sum + record.views, 0);
+      const totalComparisons = analytics.reduce((sum, record) => sum + record.comparisons, 0);
+      const totalConversions = analytics.reduce((sum, record) => sum + record.conversions, 0);
+      
+      // Calculate category breakdown
+      const categoryBreakdown: Record<string, number> = {};
+      plans.forEach(plan => {
+        const category = plan.category;
+        categoryBreakdown[category] = (categoryBreakdown[category] || 0) + 1;
+      });
+      
+      // Get top performing plans
+      const planAnalyticsSummary = planIds.map(planId => {
+        const planAnalytics = analytics.filter(a => a.planId === planId);
+        const plan = plans.find(p => p.id === planId);
+        
+        return {
+          planId,
+          planName: plan?.name || 'Unknown Plan',
+          category: plan?.category || 'unknown',
+          views: planAnalytics.reduce((sum, record) => sum + record.views, 0),
+          comparisons: planAnalytics.reduce((sum, record) => sum + record.comparisons, 0),
+          conversions: planAnalytics.reduce((sum, record) => sum + record.conversions, 0)
+        };
+      });
+      
+      // Sort by views
+      const topPlans = planAnalyticsSummary
+        .sort((a, b) => b.views - a.views)
+        .slice(0, 5);
+      
+      // Get recent activity
+      const recentActivities = analytics
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+        .slice(0, 10)
+        .map(activity => {
+          const plan = plans.find(p => p.id === activity.planId);
+          return {
+            date: activity.date,
+            planName: plan?.name || 'Unknown Plan',
+            planId: activity.planId,
+            views: activity.views,
+            comparisons: activity.comparisons,
+            conversions: activity.conversions
+          };
+        });
+      
+      return {
+        totalViews,
+        totalComparisons,
+        totalConversions,
+        planCount: plans.length,
+        categoryBreakdown,
+        topPlans,
+        recentActivity: recentActivities
+      };
+    } catch (error) {
+      console.error("Error getting dashboard analytics:", error);
+      return {
+        totalViews: 0,
+        totalComparisons: 0,
+        totalConversions: 0,
+        planCount: 0,
+        categoryBreakdown: {},
+        topPlans: [],
+        recentActivity: []
+      };
     }
   }
 }

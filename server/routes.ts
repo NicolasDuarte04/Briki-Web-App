@@ -3,9 +3,17 @@ import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { isAuthenticated } from "./auth/local-auth";
 import { storage } from "./storage";
-import { pool } from "./db"; // Add the pool import here
+import { pool } from "./db";
 import Stripe from "stripe";
-import { users, trips, insurancePlans, orders } from "@shared/schema";
+import { 
+  users, 
+  companyProfiles,
+  companyPlans,
+  planAnalytics,
+  InsertCompanyPlan,
+  INSURANCE_CATEGORIES,
+  InsuranceCategory
+} from "@shared/schema";
 import { z } from "zod";
 import { 
   getChatCompletionFromOpenAI, 
@@ -225,6 +233,208 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     });
   }
+  
+  // Company routes
+  // Get company profile
+  app.get("/api/company/profile", isAuthenticated, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (!req.user?.id) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      const profile = await storage.getCompanyProfile(req.user.id);
+      
+      if (!profile) {
+        return res.status(404).json({ message: "Company profile not found" });
+      }
+      
+      res.json(profile);
+    } catch (error: any) {
+      console.error("Error retrieving company profile:", error);
+      res.status(500).json({ message: error.message || "Server error" });
+    }
+  });
+  
+  // Plan management endpoints
+  
+  // Get all company plans
+  app.get("/api/company/plans", isAuthenticated, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (!req.user?.id) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      // Get company profile to get company ID
+      const profile = await storage.getCompanyProfile(req.user.id);
+      
+      if (!profile) {
+        return res.status(404).json({ message: "Company profile not found" });
+      }
+      
+      const plans = await storage.getCompanyPlans(profile.id);
+      
+      res.json(plans);
+    } catch (error: any) {
+      console.error("Error retrieving company plans:", error);
+      res.status(500).json({ message: error.message || "Server error" });
+    }
+  });
+  
+  // Get company plans by category
+  app.get("/api/company/plans/:category", isAuthenticated, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (!req.user?.id) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      const { category } = req.params;
+      
+      // Validate category
+      const validCategories = Object.values(INSURANCE_CATEGORIES);
+      if (!validCategories.includes(category as InsuranceCategory)) {
+        return res.status(400).json({ message: "Invalid category" });
+      }
+      
+      // Get company profile to get company ID
+      const profile = await storage.getCompanyProfile(req.user.id);
+      
+      if (!profile) {
+        return res.status(404).json({ message: "Company profile not found" });
+      }
+      
+      const plans = await storage.getCompanyPlansByCategory(profile.id, category as InsuranceCategory);
+      
+      res.json(plans);
+    } catch (error: any) {
+      console.error("Error retrieving company plans by category:", error);
+      res.status(500).json({ message: error.message || "Server error" });
+    }
+  });
+  
+  // Create new plan
+  app.post("/api/company/plans", isAuthenticated, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (!req.user?.id) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      // Get company profile to get company ID
+      const profile = await storage.getCompanyProfile(req.user.id);
+      
+      if (!profile) {
+        return res.status(404).json({ message: "Company profile not found" });
+      }
+      
+      // Validate plan data
+      const planData = req.body;
+      
+      // Add company ID to plan data
+      planData.companyId = profile.id;
+      
+      // Create the plan
+      const plan = await storage.createCompanyPlan(planData);
+      
+      res.status(201).json(plan);
+    } catch (error: any) {
+      console.error("Error creating company plan:", error);
+      res.status(500).json({ message: error.message || "Server error" });
+    }
+  });
+  
+  // Plan upload (CSV/Excel)
+  app.post("/api/company/plans/upload", isAuthenticated, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (!req.user?.id) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      // Get company profile to get company ID
+      const profile = await storage.getCompanyProfile(req.user.id);
+      
+      if (!profile) {
+        return res.status(404).json({ message: "Company profile not found" });
+      }
+      
+      // Process uploaded file data
+      const { 
+        plans, 
+        category,
+        isPublic = false 
+      } = req.body;
+      
+      if (!plans || !Array.isArray(plans) || !category) {
+        return res.status(400).json({ message: "Invalid request data" });
+      }
+      
+      // Validate category
+      const validCategories = Object.values(INSURANCE_CATEGORIES);
+      if (!validCategories.includes(category)) {
+        return res.status(400).json({ message: "Invalid category" });
+      }
+      
+      // Process and validate each plan
+      const createdPlans = [];
+      const errors = [];
+      
+      for (const [index, planData] of plans.entries()) {
+        try {
+          // Add company ID and category to plan data
+          const planToCreate = {
+            ...planData,
+            companyId: profile.id,
+            category,
+            visibility: isPublic ? 'public' : 'private'
+          };
+          
+          // Create the plan
+          const plan = await storage.createCompanyPlan(planToCreate);
+          createdPlans.push(plan);
+        } catch (error: any) {
+          errors.push({
+            row: index + 1,
+            message: error.message || "Unknown error",
+            data: planData
+          });
+        }
+      }
+      
+      // Return created plans and any errors
+      res.status(201).json({
+        success: true,
+        plans: createdPlans,
+        errors,
+        totalCreated: createdPlans.length,
+        totalErrors: errors.length
+      });
+    } catch (error: any) {
+      console.error("Error uploading company plans:", error);
+      res.status(500).json({ message: error.message || "Server error" });
+    }
+  });
+  
+  // Get dashboard analytics
+  app.get("/api/company/analytics", isAuthenticated, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (!req.user?.id) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      // Get company profile to get company ID
+      const profile = await storage.getCompanyProfile(req.user.id);
+      
+      if (!profile) {
+        return res.status(404).json({ message: "Company profile not found" });
+      }
+      
+      // Get analytics
+      const analytics = await storage.getDashboardAnalytics(profile.id);
+      
+      res.json(analytics);
+    } catch (error: any) {
+      console.error("Error retrieving company analytics:", error);
+      res.status(500).json({ message: error.message || "Server error" });
+    }
+  });
   
   // AI Assistant endpoints
   
