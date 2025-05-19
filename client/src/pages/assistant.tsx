@@ -8,6 +8,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { v4 as uuidv4 } from "uuid";
 import { askAssistant } from "@/services/ai-service";
+import { useAssistantActions } from "@/hooks/use-assistant-actions";
+import { useToast } from "@/components/ui/use-toast";
 
 // Insurance-related suggested questions to assist users
 const suggestedQuestions = [
