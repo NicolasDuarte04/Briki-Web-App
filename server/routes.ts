@@ -38,6 +38,7 @@ const tripSchema = z.object({
 // Import routes
 import googleAuthRoutes from './routes/google-auth';
 import quotesRoutes from './routes/quotes';
+import aiRouter from './routes/ai';
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup Replit authentication
@@ -46,6 +47,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Mount API routes
   app.use('/api/auth', googleAuthRoutes);
   app.use('/api/quotes', quotesRoutes);
+  app.use('/api/ai', aiRouter);
 
   // Initialize database - using a more resilient approach
   try {
