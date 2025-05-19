@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import Footer from "@/components/footer";
 import { 
   Hero, 
+  AiAssistantSection,
   Features, 
   PartnerSection, 
   Testimonials, 
@@ -121,6 +122,9 @@ export default function LandingPage() {
       <main className="flex-grow">
         {/* Hero Section - Consumer Section */}
         <Hero />
+        
+        {/* AI Assistant Section - Highlight New Feature */}
+        <AiAssistantSection />
         
         {/* Features Section - Consumer Benefits */}
         <Features />

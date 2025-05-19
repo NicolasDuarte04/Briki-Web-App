@@ -79,7 +79,6 @@ export default function AiAssistantSection() {
               gradientFrom="from-blue-600"
               gradientTo="to-cyan-500"
               icon={<ArrowRight className="ml-2 h-5 w-5" />}
-              iconPosition="right"
             >
               Try the Assistant
             </GradientButton>
