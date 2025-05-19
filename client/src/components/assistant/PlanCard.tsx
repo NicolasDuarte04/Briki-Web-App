@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Check, Star } from "lucide-react";
 
 // Sample mock plans for development purposes
-export const mockPlans = {
+export const mockPlans: Record<string, PlanCardProps[]> = {
   pet: [
     {
       id: 'petplan-premium',
@@ -191,7 +191,7 @@ export const mockPlans = {
       badge: 'Best value'
     }
   ]
-};
+} as const;
 
 // Define types for our plan data
 export interface PlanCardProps {
