@@ -2,7 +2,7 @@ import React from 'react';
 import { Bot, SparklesIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { useAIAssistantUI } from './ai-assistant-provider';
+import { useAIAssistant } from './ai-assistant-provider';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -29,7 +29,7 @@ export function AIAssistantButton({
   size,
   disabled
 }: AIAssistantButtonProps) {
-  const { isOpen, toggleAssistant } = useAIAssistantUI();
+  const { isOpen, toggleAssistant } = useAIAssistant();
   
   if (displayVariant === 'fab') {
     return (
