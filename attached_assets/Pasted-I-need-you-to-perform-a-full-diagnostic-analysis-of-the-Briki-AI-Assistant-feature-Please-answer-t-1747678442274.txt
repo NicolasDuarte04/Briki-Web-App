@@ -1,0 +1,35 @@
+I need you to perform a full diagnostic analysis of the Briki AI Assistant feature.
+
+Please answer the following questions in detail so we can clearly understand the current architecture, limitations, and what must be done to make the assistant fully functional and production-ready.
+
+1. **Does the Briki AI Assistant currently send requests to the OpenAI API?**
+   - If yes, which file handles that communication?
+   - Is the API key correctly configured and securely stored?
+   - Is it using GPT-4 or GPT-3.5?
+
+2. **Where is the user input handled?**
+   - Which file contains the logic for handling user messages (e.g., `handleChatMessage()` or similar)?
+   - What steps are taken after a user submits a question? Is it passed through OpenAI directly or routed through an internal service?
+
+3. **Are the assistant’s responses currently dynamic or hardcoded?**
+   - If dynamic, does it retrieve real-time responses from OpenAI?
+   - If hardcoded or mocked, where is that data coming from?
+
+4. **Is the assistant integrated with Briki’s insurance plan data?**
+   - Can it recommend actual insurance plans from the app’s catalog?
+   - If not, what data does it currently have access to?
+
+5. **What would need to be done to allow the assistant to recommend real insurance options from our dataset?**
+   - Could we use embeddings and semantic search?
+   - Is the plan data accessible through an internal API or local database?
+   - What files should we modify or create?
+
+6. **How are AI conversations stored or tracked (if at all)?**
+   - Are user questions and answers stored in a database or local cache?
+   - Can we log and improve responses based on user feedback?
+
+7. **What would be the recommended path to make the assistant truly intelligent and useful — both from a technical and UX standpoint?**
+
+Please structure your response with filenames, code locations, and a high-level action plan. We're aiming to make this feature fully functional before an investor demo, and we need to know exactly what’s working, what’s not, and what’s missing.
+
+Thanks.

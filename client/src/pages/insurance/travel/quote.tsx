@@ -1,327 +1,91 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { useLocation } from 'wouter';
-import { z } from 'zod';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Plane, ArrowRight, MapPin, CalendarDays, Users, Activity, Shield } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { DatePicker } from '@/components/ui/date-picker';
-import { Checkbox } from '@/components/ui/checkbox';
-import { useToast } from '@/hooks/use-toast';
-import { useQuoteStore } from '@/store/quote-store';
-import { Badge } from '@/components/ui/badge';
+import React from "react";
+import { useLocation } from "wouter";
+import TravelQuoteForm from "@/components/forms/travel-quote-form";
+import { INSURANCE_CATEGORIES } from "@shared/schema";
 
-// Define the form schema
-const travelQuoteSchema = z.object({
-  destination: z.string().min(2, {
-    message: "Destination must be at least 2 characters.",
-  }),
-  departureDate: z.date({
-    required_error: "Departure date is required.",
-  }),
-  returnDate: z.date({
-    required_error: "Return date is required.",
-  }).refine(
-    (date) => date > new Date(),
-    {
-      message: "Return date must be in the future",
-    }
-  ),
-  travelers: z.coerce.number().int().min(1, {
-    message: "At least one traveler is required.",
-  }).max(10, {
-    message: "Maximum 10 travelers per quote.",
-  }),
-  activities: z.array(z.string()).optional(),
-  coverage: z.enum(['basic', 'standard', 'premium'], {
-    required_error: "Please select coverage level.",
-  }),
-}).refine((data) => data.returnDate > data.departureDate, {
-  message: "Return date must be after departure date",
-  path: ["returnDate"],
-});
-
-// Define the activities options
-const activitiesOptions = [
-  { id: 'hiking', label: 'Hiking' },
-  { id: 'skiing', label: 'Skiing / Snowboarding' },
-  { id: 'diving', label: 'Scuba Diving' },
-  { id: 'surfing', label: 'Surfing' },
-  { id: 'biking', label: 'Mountain Biking' },
-  { id: 'climbing', label: 'Rock Climbing' },
-];
-
-// Component for travel quote
-export default function TravelQuoteForm() {
-  const [, navigate] = useLocation();
-  const { toast } = useToast();
-  const { travelQuote, updateTravelQuote, submitTravelQuote } = useQuoteStore();
+export default function TravelQuotePage() {
+  const [location] = useLocation();
   
-  // Define form
-  const form = useForm<z.infer<typeof travelQuoteSchema>>({
-    resolver: zodResolver(travelQuoteSchema),
-    defaultValues: {
-      destination: travelQuote?.destination || '',
-      departureDate: travelQuote?.departureDate ? new Date(travelQuote.departureDate) : new Date(),
-      returnDate: travelQuote?.returnDate ? new Date(travelQuote.returnDate) : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      travelers: travelQuote?.travelers || 1,
-      activities: travelQuote?.activities || [],
-      coverage: travelQuote?.coverage || 'standard',
-    },
-  });
-
-  // Submit handler
-  function onSubmit(values: z.infer<typeof travelQuoteSchema>) {
-    // Update the store with form values
-    updateTravelQuote({
-      ...values,
-      departureDate: values.departureDate.toISOString(),
-      returnDate: values.returnDate.toISOString(),
-    });
-    
-    // Submit the quote to show on the main page
-    submitTravelQuote();
-    
-    // Show success toast
-    toast({
-      title: "Quote submitted!",
-      description: "We've personalized travel insurance plans for you.",
-    });
-    
-    // Navigate to the travel insurance page
-    navigate('/insurance/travel');
-  }
-
   return (
-    <div className="container py-12 max-w-3xl">
-      <div className="mb-8">
-        <div className="flex items-center gap-2 mb-4">
-          <Badge className="bg-blue-600">
-            <Plane className="h-3.5 w-3.5 mr-1.5" />
-            Travel
-          </Badge>
-        </div>
-        <h1 className="text-3xl font-bold tracking-tight mb-2">Get Your Travel Insurance Quote</h1>
-        <p className="text-lg text-gray-600">
-          Tell us about your trip to get personalized travel insurance recommendations.
+    <div className="container mx-auto py-10 max-w-5xl">
+      <div className="space-y-2 mb-10">
+        <h1 className="text-3xl font-bold">Travel Insurance Quote</h1>
+        <p className="text-muted-foreground">
+          Tell us about your trip and get personalized travel insurance options from top providers.
         </p>
       </div>
       
-      <Card className="border-blue-100 shadow-md">
-        <CardHeader className="bg-blue-50 rounded-t-lg">
-          <CardTitle className="flex items-center gap-2">
-            <Plane className="h-5 w-5 text-blue-600" />
-            Trip Details
-          </CardTitle>
-          <CardDescription>
-            Enter the details of your upcoming trip
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pt-6">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Destination */}
-                <FormField
-                  control={form.control}
-                  name="destination"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-1.5">
-                        <MapPin className="h-4 w-4 text-blue-500" />
-                        Destination
-                      </FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g. France, Japan, etc." {...field} />
-                      </FormControl>
-                      <FormDescription>
-                        Enter your main travel destination.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                {/* Number of travelers */}
-                <FormField
-                  control={form.control}
-                  name="travelers"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-1.5">
-                        <Users className="h-4 w-4 text-blue-500" />
-                        Number of Travelers
-                      </FormLabel>
-                      <FormControl>
-                        <Input type="number" min={1} max={10} {...field} />
-                      </FormControl>
-                      <FormDescription>
-                        How many people are traveling?
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="col-span-1 md:col-span-2">
+          <TravelQuoteForm />
+        </div>
+        
+        <div className="hidden md:block">
+          <div className="bg-slate-50 p-6 rounded-lg shadow-sm border space-y-4">
+            <h3 className="font-semibold text-lg">Why Choose Briki for Travel Insurance?</h3>
+            
+            <div className="space-y-3">
+              <div className="flex items-start gap-2">
+                <div className="rounded-full bg-blue-100 p-1 mt-0.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <p className="text-sm">Compare quotes from multiple insurers in seconds</p>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Departure Date */}
-                <FormField
-                  control={form.control}
-                  name="departureDate"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel className="flex items-center gap-1.5">
-                        <CalendarDays className="h-4 w-4 text-blue-500" />
-                        Departure Date
-                      </FormLabel>
-                      <FormControl>
-                        <DatePicker 
-                          date={field.value} 
-                          setDate={field.onChange}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        When does your trip begin?
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                {/* Return Date */}
-                <FormField
-                  control={form.control}
-                  name="returnDate"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel className="flex items-center gap-1.5">
-                        <CalendarDays className="h-4 w-4 text-blue-500" />
-                        Return Date
-                      </FormLabel>
-                      <FormControl>
-                        <DatePicker 
-                          date={field.value} 
-                          setDate={field.onChange}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        When does your trip end?
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <div className="flex items-start gap-2">
+                <div className="rounded-full bg-blue-100 p-1 mt-0.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <p className="text-sm">Instant coverage for your trip with digital policies</p>
               </div>
               
-              {/* Activities */}
-              <FormField
-                control={form.control}
-                name="activities"
-                render={() => (
-                  <FormItem>
-                    <div className="mb-2">
-                      <FormLabel className="flex items-center gap-1.5">
-                        <Activity className="h-4 w-4 text-blue-500" />
-                        Activities
-                      </FormLabel>
-                      <FormDescription>
-                        Select any high-risk activities you plan to do during your trip
-                      </FormDescription>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
-                      {activitiesOptions.map((activity) => (
-                        <FormField
-                          key={activity.id}
-                          control={form.control}
-                          name="activities"
-                          render={({ field }) => {
-                            return (
-                              <FormItem
-                                key={activity.id}
-                                className="flex flex-row items-start space-x-3 space-y-0"
-                              >
-                                <FormControl>
-                                  <Checkbox
-                                    checked={field.value?.includes(activity.id)}
-                                    onCheckedChange={(checked) => {
-                                      return checked
-                                        ? field.onChange([...field.value || [], activity.id])
-                                        : field.onChange(
-                                            field.value?.filter(
-                                              (value) => value !== activity.id
-                                            )
-                                          )
-                                    }}
-                                  />
-                                </FormControl>
-                                <FormLabel className="text-sm font-normal">
-                                  {activity.label}
-                                </FormLabel>
-                              </FormItem>
-                            )
-                          }}
-                        />
-                      ))}
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              {/* Coverage */}
-              <FormField
-                control={form.control}
-                name="coverage"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-1.5">
-                      <Shield className="h-4 w-4 text-blue-500" />
-                      Coverage Level
-                    </FormLabel>
-                    <Select 
-                      onValueChange={field.onChange} 
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select coverage level" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="basic">Basic - Essential coverage only</SelectItem>
-                        <SelectItem value="standard">Standard - Balanced protection</SelectItem>
-                        <SelectItem value="premium">Premium - Comprehensive coverage</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormDescription>
-                      Choose the level of coverage that fits your needs.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <div className="pt-4">
-                <Button 
-                  type="submit" 
-                  className="w-full"
-                  size="lg"
-                >
-                  Show Personalized Plans
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
+              <div className="flex items-start gap-2">
+                <div className="rounded-full bg-blue-100 p-1 mt-0.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <p className="text-sm">24/7 emergency assistance worldwide</p>
               </div>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
+              
+              <div className="flex items-start gap-2">
+                <div className="rounded-full bg-blue-100 p-1 mt-0.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <p className="text-sm">Coverage for medical emergencies, trip cancellations, lost baggage, and more</p>
+              </div>
+              
+              <div className="flex items-start gap-2">
+                <div className="rounded-full bg-blue-100 p-1 mt-0.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <p className="text-sm">Simple claims process with fast payouts</p>
+              </div>
+            </div>
+            
+            <div className="pt-4 mt-4 border-t">
+              <h4 className="font-medium text-sm mb-2">Need help?</h4>
+              <p className="text-sm text-muted-foreground">
+                Our insurance experts are available to assist you with your travel insurance needs.
+              </p>
+              <div className="mt-3 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                </svg>
+                <span className="text-sm font-medium">1-800-555-BRIKI</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
