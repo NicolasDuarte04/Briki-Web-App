@@ -10,16 +10,20 @@ const _trackAssistantEvent = (
     // Update the EventCategory for consistency
     const category = EventCategory.INSURANCE; // Using existing category
     
+    // Create enhanced metadata object with session data
+    const enhancedMetadata = {
+      sessionId: getAssistantSessionId(),
+      timestamp: new Date().toISOString(),
+      ...metadata
+    };
+    
+    // Use the proper parameter order for trackEvent
     trackEvent(
       eventType,
       category,
-      null,
-      undefined,
-      {
-        sessionId: getAssistantSessionId(),
-        timestamp: new Date().toISOString(),
-        ...metadata
-      }
+      metadata.label || eventType, // Use provided label or eventType as string
+      metadata.value, // Pass numeric value if available
+      enhancedMetadata // Pass the enhanced metadata as additionalParams
     );
   } catch (error) {
     console.error('Error tracking assistant event:', error);
