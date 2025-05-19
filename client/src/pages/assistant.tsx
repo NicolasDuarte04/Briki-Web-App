@@ -427,9 +427,10 @@ export default function AIAssistantScreen() {
         });
         
         // For specific action types, track more detailed analytics
-        if (response.action.type === 'navigate_to_quote_flow' && 'category' in response.action) {
+        if (response.action.type === 'navigate_to_quote_flow') {
+          const quoteAction = response.action as NavigateToQuoteFlowAction;
           trackQuoteFlowLaunch(
-            response.action.category as string,
+            quoteAction.category,
             { 
               source: 'assistant',
               hasPreloadData: 'preload' in response.action && !!response.action.preload
