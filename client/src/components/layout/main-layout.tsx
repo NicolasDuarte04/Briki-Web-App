@@ -58,6 +58,10 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
   const excludedPaths = ['/', '/auth', '/countdown', '/login', '/register', '/terms', '/learn-more', '/landing'];
   const showAIAssistant = user && !excludedPaths.some(path => location === path || location.startsWith(`${path}/`));
   
+  // Public pages where we don't want to show the MainLayout navigation (they use PublicLayout)
+  const publicPages = ['/', '/features', '/pricing', '/ask-briki', '/blog', '/forum', '/careers', '/auth'];
+  const isPublicPage = publicPages.some(path => location === path || location.startsWith(`${path}/`));
+  
   // Handle scroll effect for transparent-to-solid transition
   useEffect(() => {
     const handleScroll = () => {
