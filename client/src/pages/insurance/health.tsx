@@ -22,22 +22,44 @@ export default function HealthInsurancePage() {
   
   const handleCompareToggle = (id: string | number, isSelected: boolean) => {
     if (isSelected) {
-      // Check if we're at the maximum number of plans
-      if (selectedPlans.length >= 4) {
-        toast({
-          title: "Máximo de planes alcanzado",
-          description: "Puedes comparar un máximo de 4 planes a la vez.",
-          variant: "destructive"
-        });
-        return;
-      }
+      // Find the full plan data from our mock data
+      const planToAdd = healthPlans.find(p => p.id === id);
+      if (!planToAdd) return;
       
-      addPlan({ id, category: 'health' });
+      // Try to add the plan to comparison
+      const added = addPlan({
+        ...planToAdd,
+        category: 'health'
+      });
+      
+      // If adding failed, check why
+      if (!added) {
+        // Check if we're trying to mix categories
+        const selectedCategories = [...new Set(selectedPlans.map(p => p.category))];
+        if (selectedCategories.length > 0 && !selectedCategories.includes('health')) {
+          toast({
+            title: "Cannot compare plans from different categories",
+            description: "You can only compare plans from the same insurance category. Please clear your selection or remove plans from other categories first.",
+            variant: "destructive"
+          });
+          return;
+        }
+        
+        // Otherwise, it's probably a maximum plans issue
+        if (selectedPlans.length >= 4) {
+          toast({
+            title: "Maximum plans reached",
+            description: "You can compare a maximum of 4 plans at once.",
+            variant: "destructive"
+          });
+          return;
+        }
+      }
       
       // Show a toast when a plan is added
       toast({
-        title: "Plan añadido para comparar",
-        description: `${selectedPlans.length + 1} planes seleccionados.`
+        title: "Plan added to comparison",
+        description: `${selectedPlans.length + 1} health insurance plans selected.`
       });
     } else {
       removePlan(id);
