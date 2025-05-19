@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useNavigation } from '@/lib/navigation';
 import { Button } from '@/components/ui/button';
 import GradientButton from '@/components/gradient-button';
+import { Helmet } from 'react-helmet';
 import { 
   Sparkles, 
   LineChart, 
@@ -38,9 +39,20 @@ export default function FeaturesPage() {
 
   return (
     <PublicLayout>
-      {/* Hero Section with Ambient Background */}
-      <section className="relative overflow-hidden">
-        {/* Ambient Background Effect */}
+      <Helmet>
+        <title>Briki Features – AI-Powered Insurance Comparison</title>
+        <meta name="description" content="See how Briki uses AI to help you compare travel, auto, pet, and health insurance in real time. No jargon. Just clarity." />
+        <meta property="og:title" content="Briki Features – AI-Powered Insurance Comparison" />
+        <meta property="og:description" content="See how Briki uses AI to help you compare travel, auto, pet, and health insurance in real time. No jargon. Just clarity." />
+        <meta property="og:type" content="website" />
+        <meta name="robots" content="index, follow" />
+      </Helmet>
+      
+      {/* Main content area with all sections */}
+      <main id="main-content">
+        {/* Hero Section with Ambient Background */}
+        <section className="relative overflow-hidden" aria-labelledby="hero-heading">
+          {/* Ambient Background Effect */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute top-0 left-1/4 w-1/2 h-1/2 bg-blue-400/10 rounded-full blur-3xl" />
           <div className="absolute bottom-0 right-1/4 w-1/2 h-1/2 bg-indigo-400/10 rounded-full blur-3xl" />
@@ -53,7 +65,7 @@ export default function FeaturesPage() {
             animate="visible"
             variants={fadeIn}
           >
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            <h1 id="hero-heading" className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
               Understand Insurance <span className="text-primary">in Seconds</span>
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-10">
@@ -337,6 +349,7 @@ export default function FeaturesPage() {
           </motion.div>
         </motion.div>
       </section>
+      </main>
     </PublicLayout>
   );
 }
