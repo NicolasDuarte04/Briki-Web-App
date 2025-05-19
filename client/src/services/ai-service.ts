@@ -81,7 +81,7 @@ export function parseAssistantAction(response: string): AssistantActionType | nu
   try {
     // Look for specially formatted JSON in the response
     // The format we're looking for is: [ACTION_JSON]{ ... }[/ACTION_JSON]
-    const actionMatch = response.match(/\[ACTION_JSON\](.*?)\[\/ACTION_JSON\]/s);
+    const actionMatch = response.match(/\[ACTION_JSON\]([\s\S]*?)\[\/ACTION_JSON\]/);
     
     if (actionMatch && actionMatch[1]) {
       const actionData = JSON.parse(actionMatch[1].trim());

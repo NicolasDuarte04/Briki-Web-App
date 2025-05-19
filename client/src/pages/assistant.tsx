@@ -1,15 +1,15 @@
 import React, { useState, useRef, useEffect } from "react";
-import { AuthenticatedLayout, ContentWrapper } from "@/components/layout";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
+import { AuthenticatedLayout, ContentWrapper } from "../components/layout";
+import { Button } from "../components/ui/button";
+import { Textarea } from "../components/ui/textarea";
+import { Badge } from "../components/ui/badge";
 import { Bot, Send, User, Loader2, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { v4 as uuidv4 } from "uuid";
-import { askAssistant } from "@/services/ai-service";
-import { useAssistantActions } from "@/hooks/use-assistant-actions";
-import { useToast } from "@/components/ui/use-toast";
+import { askAssistant } from "../services/ai-service";
+import { useAssistantActions } from "../hooks/use-assistant-actions";
+import { useToast } from "../components/ui/use-toast";
 
 // Insurance-related suggested questions to assist users
 const suggestedQuestions = [
@@ -151,6 +151,9 @@ export default function AIAssistantScreen() {
   const [messages, setMessages] = useState<Message[]>([initialGreeting]);
   const [isSending, setIsSending] = useState(false);
   const [userMemory, setUserMemory] = useState<UserMemory>({});
+  const [actionPending, setActionPending] = useState(false);
+  const { processAction } = useAssistantActions();
+  const { toast } = useToast();
   
   const messageEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -265,9 +268,13 @@ export default function AIAssistantScreen() {
   // Handle sending a message to the OpenAI API
   const handleSendMessage = async () => {
     // Input validation
-    if (!inputMessage.trim() || isSending) return;
+    if (!inputMessage.trim() || isSending || actionPending) return;
     if (inputMessage.length > 500) {
-      alert("Please limit your message to 500 characters.");
+      toast({
+        title: "Message too long",
+        description: "Please limit your message to 500 characters.",
+        variant: "destructive"
+      });
       return;
     }
     
@@ -323,6 +330,45 @@ export default function AIAssistantScreen() {
         
         return [...filtered, assistantMessage];
       });
+      
+      // Process any action from the assistant response
+      if (response.action) {
+        // Add a small delay to allow the user to read the message before action is processed
+        setActionPending(true);
+        
+        // Show a notification that action is being performed
+        toast({
+          title: "Assistant Action",
+          description: response.action.message || "I'm taking the action you requested...",
+          duration: 3000
+        });
+        
+        // Execute the action with a small delay for better UX
+        setTimeout(() => {
+          try {
+            const success = processAction(response.action || null);
+            
+            if (!success) {
+              toast({
+                title: "Action Failed",
+                description: "I couldn't complete that action, but I can still help with your questions.",
+                variant: "destructive",
+                duration: 3000
+              });
+            }
+          } catch (error) {
+            console.error("Error processing action:", error);
+            toast({
+              title: "Action Error",
+              description: "There was a problem completing the requested action.",
+              variant: "destructive",
+              duration: 3000
+            });
+          } finally {
+            setActionPending(false);
+          }
+        }, 1000);
+      }
     } catch (error) {
       // Handle error - remove loading message and add error message
       setMessages(prev => {
@@ -340,7 +386,11 @@ export default function AIAssistantScreen() {
       });
       
       // Show error notification
-      alert("Error: Failed to get a response from the assistant.");
+      toast({
+        title: "Assistant Error",
+        description: "Failed to get a response from the assistant.",
+        variant: "destructive"
+      });
     } finally {
       setIsSending(false);
     }
