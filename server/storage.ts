@@ -1,14 +1,24 @@
 import { db } from "./db";
-import { eq, and, asc, desc, sql } from "drizzle-orm";
+import { eq, and, asc, desc, sql, ilike } from "drizzle-orm";
 import { z } from "zod";
 import { nanoid } from 'nanoid';
 import { 
   users,
   quotes, 
+  companyProfiles,
+  companyPlans,
+  planAnalytics,
   InsertQuote, 
   Quote, 
   InsuranceCategory,
-  User as SchemaUser
+  User as SchemaUser,
+  CompanyProfile,
+  InsertCompanyProfile,
+  CompanyPlan,
+  InsertCompanyPlan,
+  PlanAnalytic,
+  InsertPlanAnalytic,
+  INSURANCE_CATEGORIES
 } from "@shared/schema";
 
 // Updated user input schema to match our enhanced DB schema
