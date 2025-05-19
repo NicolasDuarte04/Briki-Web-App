@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { Car, Shield, Clock, ArrowRight, BadgeCheck, Wrench, Zap, Tool, Search } from "lucide-react";
+import { Car, Shield, Clock, ArrowRight, BadgeCheck, Wrench, Zap, Settings, Search } from "lucide-react";
 import { HeroWrapper, ContentWrapper } from "@/components/layout";
 import { useCompareStore } from "@/store/compare-store";
 import { ComparePageTrigger } from "@/components/compare-page-trigger";
@@ -264,7 +264,7 @@ export default function AutoInsurancePage() {
             className="bg-gradient-to-br from-blue-50 to-white p-8 rounded-2xl border border-blue-100 shadow-sm hover:shadow-md transition-all"
           >
             <div className="rounded-full bg-blue-100 w-14 h-14 flex items-center justify-center mb-5">
-              <Tool className="h-7 w-7 text-blue-600" />
+              <Settings className="h-7 w-7 text-blue-600" />
             </div>
             <h3 className="text-xl font-bold mb-3 text-gray-900">24/7 Roadside Assistance</h3>
             <p className="text-gray-600">

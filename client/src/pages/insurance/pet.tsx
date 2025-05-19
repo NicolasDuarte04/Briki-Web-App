@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { Heart, Shield, ArrowRight, BadgeCheck, Search, Paw, Syringe, Wallet } from "lucide-react";
+import { Heart, Shield, ArrowRight, BadgeCheck, Search, PawPrint, Syringe, Wallet } from "lucide-react";
 import { HeroWrapper, ContentWrapper } from "@/components/layout";
 import { useCompareStore } from "@/store/compare-store";
 import { ComparePageTrigger } from "@/components/compare-page-trigger";
@@ -143,7 +143,7 @@ export default function PetInsurancePage() {
                 variant="outline" 
                 className="mb-4 bg-white/10 text-white border-white/20 backdrop-blur-sm"
               >
-                <Paw className="h-3.5 w-3.5 mr-1.5" />
+                <PawPrint className="h-3.5 w-3.5 mr-1.5" />
                 Pet Insurance
               </Badge>
               <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
@@ -179,7 +179,7 @@ export default function PetInsurancePage() {
               className="hidden md:block"
             >
               <div className="relative w-72 h-72 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center overflow-hidden">
-                <Paw className="w-40 h-40 text-white/80" />
+                <PawPrint className="w-40 h-40 text-white/80" />
                 <div className="absolute inset-0 bg-gradient-to-t from-blue-500/40 to-transparent" />
               </div>
             </motion.div>
@@ -286,7 +286,7 @@ export default function PetInsurancePage() {
           >
             <div className="flex items-center gap-2 mb-4">
               <Badge className="bg-blue-600">
-                <Paw className="h-3.5 w-3.5 mr-1.5" />
+                <PawPrint className="h-3.5 w-3.5 mr-1.5" />
                 Pet
               </Badge>
               <span className="text-sm text-gray-500">•</span>
