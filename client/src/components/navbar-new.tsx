@@ -258,9 +258,9 @@ export default function NavbarNew() {
                     </DropdownMenuItem>
                     <DropdownMenuItem 
                       className="cursor-pointer hover:bg-primary/5 focus:bg-primary/5" 
-                      onClick={() => navigate("/ai-assistant")}
+                      onClick={() => navigate("/assistant")}
                     >
-                      <SparklesIcon className="mr-2 h-4 w-4 text-primary/70" />
+                      <Bot className="mr-2 h-4 w-4 text-primary/70" />
                       <span>AI Assistant</span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
@@ -425,7 +425,7 @@ export default function NavbarNew() {
                           {[
                             { name: 'Your Profile', icon: User, path: '/profile' },
                             { name: 'Settings', icon: Settings, path: '/settings' },
-                            ...(showAIAssistant ? [{ name: 'AI Assistant', icon: Bot, path: '/ai-assistant' }] : []),
+                            ...(showAIAssistant ? [{ name: 'AI Assistant', icon: Bot, path: '/assistant' }] : []),
                           ].map((item) => (
                             <motion.div
                               key={item.name}
