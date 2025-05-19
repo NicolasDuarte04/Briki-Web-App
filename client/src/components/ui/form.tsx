@@ -1,15 +1,13 @@
-"use client"
-
 import * as React from "react"
 import * as LabelPrimitive from "@radix-ui/react-label"
 import { Slot } from "@radix-ui/react-slot"
 import {
   Controller,
+  ControllerProps,
+  FieldPath,
+  FieldValues,
   FormProvider,
   useFormContext,
-  type ControllerProps,
-  type FieldPath,
-  type FieldValues,
 } from "react-hook-form"
 
 import { cn } from "@/lib/utils"
@@ -147,7 +145,7 @@ const FormMessage = React.forwardRef<
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, children, ...props }, ref) => {
   const { error, formMessageId } = useFormField()
-  const body = error ? String(error?.message ?? "") : children
+  const body = error ? String(error?.message) : children
 
   if (!body) {
     return null
@@ -166,41 +164,6 @@ const FormMessage = React.forwardRef<
 })
 FormMessage.displayName = "FormMessage"
 
-// New component for success state feedback
-const FormSuccess = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & { show?: boolean }
->(({ className, children, show = true, ...props }, ref) => {
-  if (!show) {
-    return null
-  }
-
-  return (
-    <div
-      ref={ref}
-      className={cn("flex items-center gap-1 text-sm font-medium text-green-600", className)}
-      {...props}
-    >
-      <svg 
-        xmlns="http://www.w3.org/2000/svg" 
-        width="16" 
-        height="16" 
-        viewBox="0 0 24 24" 
-        fill="none" 
-        stroke="currentColor" 
-        strokeWidth="2" 
-        strokeLinecap="round" 
-        strokeLinejoin="round"
-        className="stroke-current"
-      >
-        <path d="M20 6L9 17l-5-5" />
-      </svg>
-      {children}
-    </div>
-  )
-})
-FormSuccess.displayName = "FormSuccess"
-
 export {
   useFormField,
   Form,
@@ -209,6 +172,5 @@ export {
   FormControl,
   FormDescription,
   FormMessage,
-  FormSuccess,
   FormField,
 }
