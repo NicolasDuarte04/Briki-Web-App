@@ -1,0 +1,36 @@
+Before we begin developing the new **Briki AI Assistant** screen (Phases 4 to 10), we want to clarify some key architectural and technical questions. Please answer only the questions below. Once we’ve reviewed your answers, we will provide the actual build instructions starting with Phase 4.
+
+---
+
+### Pre-Development Questions
+
+**1. Navigation & Routing**
+- What is the current routing system being used (e.g., React Router, Next.js routing)?
+- How should we add a new screen route (e.g., `/assistant`) without breaking the app's navigation state?
+
+**2. Layout & UI Libraries**
+- What component libraries and layout systems are being used? (e.g., TailwindCSS, ShadCN/UI, custom layout framework?)
+- Are there reusable components we should inherit (e.g., Header, Footer, Container)?
+
+**3. Global State & API Access**
+- What state management system is used? (e.g., Redux, Zustand, Context API?)
+- How should the Assistant screen access user info, session data, or app state if needed later (e.g., to recommend plans)?
+
+**4. Messaging Logic (For Later Phases)**
+- Is there an existing messaging/chat component we can use or extend for this assistant?
+- If not, do we need to build one from scratch in upcoming phases?
+
+**5. Theming & Styling**
+- What is the best practice to ensure this new screen matches the current Briki color palette and design system?
+- Should we import an existing layout wrapper or create a new scoped one for `/assistant`?
+
+**6. AI API Integration Readiness**
+- Do we already have OpenAI API keys or infrastructure in place for calling GPT endpoints?
+- What’s the best way to set up a secure API call in the current architecture (via serverless function, direct client call with token gating, etc.)?
+
+**7. Anything We Should Be Aware Of?**
+- Are there any known restrictions, tech debt, or pending refactors that could interfere with the rollout of this new screen?
+
+---
+
+Please answer each question clearly. Once we’ve reviewed your responses, we’ll begin **Phase 4: Initial UI Structure**.
