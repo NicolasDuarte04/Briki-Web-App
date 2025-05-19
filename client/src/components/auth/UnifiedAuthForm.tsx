@@ -161,7 +161,7 @@ export default function UnifiedAuthForm({ mode, onSuccess }: UnifiedAuthFormProp
     return (
       <form onSubmit={loginForm.handleSubmit(handleLoginSubmit)} className="space-y-5">
         <div className="space-y-2">
-          <Label htmlFor="email" className="text-gray-800 dark:text-gray-200 font-medium">Email</Label>
+          <Label htmlFor="email" className="text-gray-800 font-medium">Email</Label>
           <Input
             id="email"
             type="email"
@@ -177,7 +177,7 @@ export default function UnifiedAuthForm({ mode, onSuccess }: UnifiedAuthFormProp
         
         <div className="space-y-2">
           <div className="flex justify-between items-center">
-            <Label htmlFor="password" className="text-gray-800 dark:text-gray-200 font-medium">Password</Label>
+            <Label htmlFor="password" className="text-gray-800 font-medium">Password</Label>
             <button
               type="button"
               onClick={() => {/* Handle forgot password */}}
@@ -268,7 +268,7 @@ export default function UnifiedAuthForm({ mode, onSuccess }: UnifiedAuthFormProp
     <form onSubmit={registerForm.handleSubmit(handleRegisterSubmit)} className="space-y-5">
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="firstName" className="text-gray-800 dark:text-gray-200 font-medium">First Name</Label>
+          <Label htmlFor="firstName" className="text-gray-800 font-medium">First Name</Label>
           <Input
             id="firstName"
             placeholder="John"
@@ -280,7 +280,7 @@ export default function UnifiedAuthForm({ mode, onSuccess }: UnifiedAuthFormProp
           )}
         </div>
         <div className="space-y-2">
-          <Label htmlFor="lastName" className="text-gray-800 dark:text-gray-200 font-medium">Last Name</Label>
+          <Label htmlFor="lastName" className="text-gray-800 font-medium">Last Name</Label>
           <Input
             id="lastName"
             placeholder="Doe"
@@ -294,7 +294,7 @@ export default function UnifiedAuthForm({ mode, onSuccess }: UnifiedAuthFormProp
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="register-email" className="text-gray-800 dark:text-gray-200 font-medium">Email</Label>
+        <Label htmlFor="register-email" className="text-gray-800 font-medium">Email</Label>
         <Input
           id="register-email"
           type="email"
@@ -309,7 +309,7 @@ export default function UnifiedAuthForm({ mode, onSuccess }: UnifiedAuthFormProp
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="register-password" className="text-gray-800 dark:text-gray-200 font-medium">Password</Label>
+        <Label htmlFor="register-password" className="text-gray-800 font-medium">Password</Label>
         <div className="relative">
           <Input
             id="register-password"
@@ -356,7 +356,7 @@ export default function UnifiedAuthForm({ mode, onSuccess }: UnifiedAuthFormProp
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="confirmPassword" className="text-gray-800 dark:text-gray-200 font-medium">Confirm Password</Label>
+        <Label htmlFor="confirmPassword" className="text-gray-800 font-medium">Confirm Password</Label>
         <div className="relative">
           <Input
             id="confirmPassword"
