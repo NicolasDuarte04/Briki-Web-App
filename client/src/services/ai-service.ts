@@ -13,6 +13,58 @@ export interface AskAssistantResponse {
 }
 
 /**
+ * Types for assistant widgets and visualizations
+ * These define the display components that can be embedded in responses
+ */
+
+// Base widget type
+export interface WidgetData {
+  type: string;
+}
+
+// Glossary term widget
+export interface GlossaryWidgetData extends WidgetData {
+  type: 'show_glossary';
+  term: string;
+  definition: string;
+  icon?: string;
+  source?: string;
+  sourceUrl?: string;
+}
+
+// Visual comparison widget
+export interface ComparisonItem {
+  label: string;
+  leftValue: string | boolean;
+  rightValue: string | boolean;
+}
+
+export interface VisualComparisonWidgetData extends WidgetData {
+  type: 'show_comparison';
+  title: string;
+  leftTitle: string;
+  rightTitle: string;
+  items: ComparisonItem[];
+  leftColor?: string;
+  rightColor?: string;
+}
+
+// Plan recommendation widget (already existed in some form)
+export interface PlanRecommendationWidgetData extends WidgetData {
+  type: 'show_plan_recommendations';
+  category: 'travel' | 'pet' | 'auto' | 'health';
+  filters?: Record<string, any>;
+  planIds?: string[];
+  message?: string;
+}
+
+// Union type for all possible widget types
+export type AssistantWidgetType = 
+  | GlossaryWidgetData
+  | VisualComparisonWidgetData
+  | PlanRecommendationWidgetData;
+
+/**
  * Types for assistant actions and navigation
  * These types represent the structured data that the assistant can return
  * to trigger navigation or UI changes in the app
@@ -72,6 +124,7 @@ export type AssistantActionType =
  */
 export interface AskAssistantResponseWithAction extends AskAssistantResponse {
   action?: AssistantActionType;
+  widgetData?: AssistantWidgetType;
 }
 
 /**
@@ -101,11 +154,42 @@ export function parseAssistantAction(response: string): AssistantActionType | nu
 }
 
 /**
- * Clean the response by removing any action JSON
+ * Attempts to parse any structured widget data from the assistant response
+ */
+export function parseWidgetData(response: string): AssistantWidgetType | null {
+  try {
+    // Look for JSON data at the end of the message
+    // Format: ```json { ... } ```
+    const widgetMatch = response.match(/```json\s*([\s\S]*?)\s*```\s*$/);
+    
+    if (widgetMatch && widgetMatch[1]) {
+      const widgetData = JSON.parse(widgetMatch[1].trim());
+      
+      // Validate that it's a proper widget with a type
+      if (widgetData && widgetData.type) {
+        // Return the widget data with the appropriate type
+        return widgetData as AssistantWidgetType;
+      }
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('Error parsing widget data:', error);
+    return null;
+  }
+}
+
+/**
+ * Clean the response by removing any action JSON and widget JSON
  */
 export function cleanAssistantResponse(response: string): string {
   // Remove the action JSON from the response
-  return response.replace(/\[ACTION_JSON\]([\s\S]*?)\[\/ACTION_JSON\]/g, '').trim();
+  let cleaned = response.replace(/\[ACTION_JSON\]([\s\S]*?)\[\/ACTION_JSON\]/g, '');
+  
+  // Remove the widget JSON from the response (if at the end)
+  cleaned = cleaned.replace(/```json\s*([\s\S]*?)\s*```\s*$/, '');
+  
+  return cleaned.trim();
 }
 
 export async function askAssistant(message: string, context?: Record<string, any>): Promise<AskAssistantResponseWithAction> {
@@ -136,13 +220,17 @@ export async function askAssistant(message: string, context?: Record<string, any
     // Check if the response contains an action
     const action = parseAssistantAction(data.response);
     
-    // Clean the response if an action was found
-    const cleanedResponse = action ? cleanAssistantResponse(data.response) : data.response;
+    // Check if the response contains widget data
+    const widgetData = parseWidgetData(data.response);
+    
+    // Clean the response if an action or widget was found
+    const cleanedResponse = (action || widgetData) ? cleanAssistantResponse(data.response) : data.response;
     
     return {
       ...data,
       response: cleanedResponse,
       action,
+      widgetData
     };
   } catch (error) {
     console.error('Error in AI assistant service:', error);
