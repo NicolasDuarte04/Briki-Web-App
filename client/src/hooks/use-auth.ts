@@ -50,8 +50,13 @@ function useLoginMutation() {
         description: 'Welcome back! Redirecting to your dashboard...',
       });
       
-      // Custom role-based redirection would happen in the component
-      // If company login, component will handle redirection to /company-dashboard
+      // Handle company role automatically - this ensures the routing
+      // works consistently for partner logins
+      if (data.role === 'company') {
+        setTimeout(() => {
+          navigate("/company-dashboard");
+        }, 500);
+      }
       // For regular users, redirection to home is default
     },
     onError: (error: Error) => {
