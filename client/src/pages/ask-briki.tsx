@@ -86,10 +86,10 @@ export default function AskBrikiPage() {
             transition={{ duration: 0.6 }}
           >
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              Ask Briki Anything About Insurance
+              Talk to an Assistant That <span className="text-primary">Actually Knows Insurance</span>
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-10">
-              Get instant, accurate answers to all your insurance questions from our AI assistant
+              No more generic answers or confusing agent-speak. Briki translates insurance complexity into conversations that make sense.
             </p>
           </motion.div>
         </div>
@@ -174,20 +174,36 @@ export default function AskBrikiPage() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.5 }}
           >
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Popular Questions</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Questions People Actually Ask</h2>
             <div className="grid md:grid-cols-2 gap-4">
-              <div className="bg-white p-4 rounded-lg shadow-sm">
-                <h3 className="font-medium text-gray-900">What factors affect my car insurance premiums?</h3>
-              </div>
-              <div className="bg-white p-4 rounded-lg shadow-sm">
-                <h3 className="font-medium text-gray-900">How much life insurance do I need?</h3>
-              </div>
-              <div className="bg-white p-4 rounded-lg shadow-sm">
-                <h3 className="font-medium text-gray-900">What does homeowner's insurance typically cover?</h3>
-              </div>
-              <div className="bg-white p-4 rounded-lg shadow-sm">
-                <h3 className="font-medium text-gray-900">Does pet insurance cover routine checkups?</h3>
-              </div>
+              <motion.div 
+                className="bg-white p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                whileHover={{ y: -3 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
+                <h3 className="font-medium text-gray-900">"Why is my premium so high when I've never had an accident?"</h3>
+              </motion.div>
+              <motion.div 
+                className="bg-white p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                whileHover={{ y: -3 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
+                <h3 className="font-medium text-gray-900">"Do I need special insurance for my expensive camera while traveling?"</h3>
+              </motion.div>
+              <motion.div 
+                className="bg-white p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                whileHover={{ y: -3 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
+                <h3 className="font-medium text-gray-900">"My dog has allergies. Will pet insurance cover his special food?"</h3>
+              </motion.div>
+              <motion.div 
+                className="bg-white p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                whileHover={{ y: -3 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
+                <h3 className="font-medium text-gray-900">"If I rent a car abroad, is it covered by my regular policy?"</h3>
+              </motion.div>
             </div>
           </motion.div>
         </div>
@@ -202,9 +218,9 @@ export default function AskBrikiPage() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-3xl font-bold mb-6">Ready to get all your insurance questions answered?</h2>
+            <h2 className="text-3xl font-bold mb-6">Got Insurance Questions? Get Straight Answers.</h2>
             <p className="text-xl mb-10 max-w-2xl mx-auto">
-              Log in to use the full Briki Assistant with personalized recommendations and instant answers.
+              Sign in to unlock personalized advice, policy comparisons, and jargon-free explanations tailored just for you.
             </p>
             <motion.div
               whileHover={{ scale: 1.05 }}
@@ -214,7 +230,7 @@ export default function AskBrikiPage() {
                 className="bg-white text-blue-600 hover:bg-white/90 px-8 py-3 rounded-lg text-lg font-medium"
                 onClick={() => navigate("/auth")}
               >
-                Log in to Ask Briki
+                Ask Briki a Question
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </motion.div>
