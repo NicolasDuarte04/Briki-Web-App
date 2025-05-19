@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/use-auth";
 import { Loader2, Bell, Menu, User, Settings, LogOut, Bot, SparklesIcon, ChevronDown, FileText } from "lucide-react";
 import { useLanguage, LanguageSelector } from "@/components/language-selector";
-import { AIAssistantButton, useAIAssistantUI } from "@/components/layout";
+import { AIAssistantButton, useAIAssistant } from "@/components/layout";
 import GlassCard from "@/components/glass-card";
 import GradientButton from "@/components/gradient-button";
 import { useNavigation } from "@/lib/navigation";
@@ -31,7 +31,7 @@ export default function NavbarNew() {
   const [isScrolled, setIsScrolled] = useState(false);
   const { user, isLoading, isAuthenticated, logout } = useAuth();
   const { t } = useLanguage();
-  const { toggleAssistant } = useAIAssistantUI();
+  const { toggleAssistant } = useAIAssistant();
   
   // Use centralized navigation service
   const { location, navigate, navPaths, isActivePath } = useNavigation();
