@@ -162,9 +162,9 @@ export default function TravelInsurancePage() {
                   variant="outline" 
                   size="lg" 
                   className="font-medium border-white/30 text-white hover:bg-white/10"
-                  onClick={() => navigate('/get-quote')}
+                  onClick={() => navigate('/insurance/travel/quote')}
                 >
-                  Get Custom Quote
+                  Enter Trip Details and Get Quotes
                 </Button>
               </div>
             </div>
