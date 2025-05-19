@@ -11,6 +11,17 @@ import { askAssistant, parseWidgetData, AssistantWidgetType } from "../services/
 import { useAssistantActions } from "../hooks/use-assistant-actions";
 import { useToast } from "../components/ui/use-toast";
 import AssistantWidget from "../components/assistant/widgets/AssistantWidget";
+import { 
+  startAssistantSession, 
+  endAssistantSession,
+  trackUserMessage,
+  trackAssistantResponse,
+  trackAssistantAction,
+  trackSuggestedPromptClick,
+  trackGlossaryTermDisplay,
+  trackVisualExplainerDisplay,
+  trackQuoteFlowLaunch
+} from "../lib/assistant-analytics";
 
 // Insurance-related suggested questions to assist users
 const suggestedQuestions = [
@@ -155,6 +166,25 @@ export default function AIAssistantScreen() {
   
   const messageEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  
+  // Initialize analytics session when component mounts
+  useEffect(() => {
+    // Start tracking the assistant session
+    startAssistantSession({
+      initialMessages: messages.length,
+      memoryState: Object.keys(userMemory).length > 0
+    });
+    
+    // End tracking when component unmounts
+    return () => {
+      endAssistantSession({
+        totalMessages: messages.length,
+        userMessages: messages.filter(m => m.sender === "user").length,
+        assistantMessages: messages.filter(m => m.sender === "assistant").length,
+        memoryUsed: Object.keys(userMemory).length > 0
+      });
+    };
+  }, []);
 
   // Auto-scroll to the bottom of messages
   useEffect(() => {
