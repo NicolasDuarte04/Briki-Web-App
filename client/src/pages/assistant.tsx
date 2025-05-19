@@ -20,7 +20,8 @@ import { useAssistantActions } from "../hooks/use-assistant-actions";
 import { useToast } from "../components/ui/use-toast";
 import AssistantWidget from "../components/assistant/widgets/AssistantWidget";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../components/ui/card";
-import { trackEvent, EventCategory } from "../lib/analytics";
+import { trackEvent } from "../lib/analytics";
+import { EventCategory } from "../constants/analytics";
 import { 
   startAssistantSession, 
   endAssistantSession,
