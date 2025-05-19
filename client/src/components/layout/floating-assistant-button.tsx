@@ -1,50 +1,45 @@
-import React from 'react';
-import { useLocation } from 'wouter';
-import { useAuth } from '@/hooks/use-auth';
-import AIAssistantButton from '@/components/navbar/ai-assistant-button';
+import { Bot, X } from 'lucide-react';
+import { useAIAssistant } from './ai-assistant-provider';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
-/**
- * Floating AI assistant button that appears in the corner of every page
- * but excludes itself from certain pages where it would be redundant
- * and only shows when user is authenticated
- */
-export function FloatingAssistantButton() {
-  const [location] = useLocation();
-  const { user } = useAuth();
-  
-  // Don't show the floating button on these pages
-  const excludedPaths = [
-    '/ai-assistant', // AI demo page already has assistant components
-    '/', // Countdown page 
-    '/auth', // Login/Register page
-    '/countdown', // Alternate countdown page path
-    '/login', // Alternate login path
-    '/register', // Alternate register path
-    '/terms', // Terms page
-    '/learn-more', // Learn more page
-  ];
-  
-  // Check if current path is in the excluded list
-  const isExcludedPath = excludedPaths.some(path => 
-    location === path || location.startsWith(`${path}/`)
+interface FloatingAssistantButtonProps {
+  position?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left';
+  className?: string;
+}
+
+export function FloatingAssistantButton({
+  position = 'bottom-right',
+  className
+}: FloatingAssistantButtonProps) {
+  const { isOpen, isAvailable, toggleAssistant } = useAIAssistant();
+
+  if (!isAvailable) return null;
+
+  const positionClasses = {
+    'bottom-right': 'bottom-4 right-4',
+    'bottom-left': 'bottom-4 left-4',
+    'top-right': 'top-4 right-4',
+    'top-left': 'top-4 left-4',
+  };
+
+  return (
+    <Button
+      onClick={toggleAssistant}
+      className={cn(
+        'fixed z-50 shadow-lg transition-all duration-300 transform hover:scale-105',
+        isOpen ? 'bg-gray-600 hover:bg-gray-700' : 'bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700',
+        positionClasses[position],
+        'w-12 h-12 p-0 rounded-full flex items-center justify-center',
+        className
+      )}
+      aria-label={isOpen ? 'Close AI Assistant' : 'Open AI Assistant'}
+    >
+      {isOpen ? (
+        <X className="h-5 w-5" />
+      ) : (
+        <Bot className="h-5 w-5" />
+      )}
+    </Button>
   );
-  
-  // Don't show the button if:
-  // 1. User is not authenticated OR
-  // 2. Current path is in the excluded list
-  if (!user || isExcludedPath) {
-    console.log("Hiding AI Assistant Button:", { 
-      path: location, 
-      isAuthenticated: !!user,
-      isExcludedPath
-    });
-    return null;
-  }
-  
-  console.log("Showing AI Assistant Button:", { 
-    path: location, 
-    isAuthenticated: !!user,
-    isExcludedPath: false
-  });
-  return <AIAssistantButton displayVariant="fab" />;
 }

@@ -1,90 +1,66 @@
-import React from 'react';
+import { Bot } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Bot, AlertTriangle } from 'lucide-react';
 import { useAIAssistant } from '@/components/layout/ai-assistant-provider';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { cn } from '@/lib/utils';
+import { useLocation } from 'wouter';
+import { trackEvent, EventCategory } from '@/lib/analytics';
 
 interface AIAssistantButtonProps {
-  variant?: 'icon' | 'full';
+  variant?: 'default' | 'ghost' | 'outline';
+  size?: 'sm' | 'md' | 'lg';
   className?: string;
 }
 
-/**
- * Button component that toggles the AI Assistant visibility
- * Renders differently based on API availability state
- */
-export const AIAssistantButton: React.FC<AIAssistantButtonProps> = ({ 
-  variant = 'icon',
-  className = ''
-}) => {
-  const { toggleAssistant, isApiAvailable } = useAIAssistant();
-  
-  // If the API availability is still being checked (null), show loading state
-  if (isApiAvailable === null) {
-    return (
-      <Button
-        variant="ghost"
-        size={variant === 'icon' ? 'icon' : 'default'}
-        disabled
-        className={`relative ${className}`}
-      >
-        <Bot className="h-5 w-5 text-muted-foreground animate-pulse" />
-        {variant === 'full' && <span className="ml-2">AI Assistant</span>}
-      </Button>
-    );
-  }
-  
-  // Render the button differently based on API availability
-  if (isApiAvailable === false) {
-    return (
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size={variant === 'icon' ? 'icon' : 'default'}
-              onClick={toggleAssistant}
-              className={`relative ${className}`}
-            >
-              <Bot className="h-5 w-5 text-amber-500" />
-              {variant === 'full' && <span className="ml-2">AI Assistant</span>}
-              <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-500">
-                  <AlertTriangle className="h-3 w-3 text-white" />
-                </span>
-              </span>
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="bottom">
-            <p className="text-xs">AI Assistant (Limited Mode)</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    );
-  }
-  
-  // Normal state when API is available
-  return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            variant="ghost"
-            size={variant === 'icon' ? 'icon' : 'default'}
-            onClick={toggleAssistant}
-            className={`relative hover:bg-primary/10 ${className}`}
-          >
-            <Bot className="h-5 w-5 text-primary" />
-            {variant === 'full' && <span className="ml-2">AI Assistant</span>}
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent side="bottom">
-          <p className="text-xs">Ask Briki Assistant</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  );
-};
+export function AIAssistantButton({
+  variant = 'outline',
+  size = 'md',
+  className
+}: AIAssistantButtonProps) {
+  const { isAvailable, openAssistant } = useAIAssistant();
+  const [location] = useLocation();
 
-export default AIAssistantButton;
+  // Only show the button on certain pages
+  // We don't need the assistant on the assistant page itself or certain utility pages
+  const shouldShowButton = () => {
+    const excludedPaths = [
+      '/assistant',
+      '/login',
+      '/signup',
+      '/forgot-password',
+      '/reset-password',
+    ];
+    
+    return isAvailable && !excludedPaths.some(path => location === path);
+  };
+
+  if (!shouldShowButton()) return null;
+
+  const handleClick = () => {
+    trackEvent('navbar_assistant_open', EventCategory.ENGAGEMENT, 'navbar_button');
+    openAssistant();
+  };
+
+  const sizeClasses = {
+    sm: 'h-8 px-2',
+    md: 'h-10 px-3',
+    lg: 'h-12 px-4',
+  };
+
+  return (
+    <Button
+      variant={variant}
+      className={cn(
+        "bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700",
+        "text-white border-0",
+        sizeClasses[size],
+        "transition-all duration-300 flex items-center gap-2",
+        className
+      )}
+      onClick={handleClick}
+      aria-label="Open AI Assistant"
+    >
+      <Bot className="h-4 w-4" />
+      <span>Ask Assistant</span>
+    </Button>
+  );
+}
