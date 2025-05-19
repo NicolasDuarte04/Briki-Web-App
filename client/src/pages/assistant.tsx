@@ -93,7 +93,14 @@ const MessageBubble: React.FC<{ message: Message }> = ({ message }) => {
                 <p className="text-sm">{displayContent}</p>
               </div>
             ) : (
-              <p className="text-sm">{displayContent}</p>
+              <div>
+                <p className="text-sm">{displayContent}</p>
+                {message.widgetData && (
+                  <div className="mt-3">
+                    <AssistantWidget data={message.widgetData} />
+                  </div>
+                )}
+              </div>
             )}
           </div>
         </div>
