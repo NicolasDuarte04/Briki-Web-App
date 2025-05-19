@@ -9,9 +9,6 @@ import {
   CTASection 
 } from "@/components/landing";
 import { FEATURES } from "@/config";
-import { useLocation } from "wouter";
-import { useAuth } from "@/hooks/use-auth";
-import { useLanguage } from "@/components/language-selector";
 import { PublicLayout } from "@/components/layout/public-layout";
 
 /**
@@ -19,10 +16,6 @@ import { PublicLayout } from "@/components/layout/public-layout";
  * Features sections for both B2C and B2B audiences
  */
 export default function LandingPage() {
-  const [, navigate] = useLocation();
-  const { user } = useAuth();
-  const { t } = useLanguage();
-
   // Track page view
   useEffect(() => {
     console.log("Landing page viewed");
