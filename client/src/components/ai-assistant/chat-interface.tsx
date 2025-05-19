@@ -1,664 +1,414 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { Bot, Send, User, Loader2, AlertCircle, Star, X, ChevronDown, ChevronUp, MessageSquare } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { v4 as uuidv4 } from "uuid";
-import { 
-  askAssistant, 
-  parseWidgetData, 
-  AssistantWidgetType,
-  GlossaryWidgetData,
-  VisualComparisonWidgetData,
-  AssistantActionType,
-  NavigateToQuoteFlowAction,
-  OpenComparisonToolAction,
-  FilterPlanResultsAction
-} from "@/services/ai-service";
-import { useAssistantActions } from "@/hooks/use-assistant-actions";
-import { useToast } from "@/components/ui/use-toast";
-import AssistantWidget from "@/components/assistant/widgets/AssistantWidget";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { trackEvent, EventCategory } from "@/lib/analytics";
-import { 
-  startAssistantSession, 
-  endAssistantSession,
-  trackUserMessage,
-  trackAssistantResponse,
-  trackAssistantAction,
-  trackSuggestedPromptClick,
-  trackGlossaryTermDisplay,
-  trackVisualExplainerDisplay,
-  trackQuoteFlowLaunch
-} from "@/lib/assistant-analytics";
-
-// Insurance-related suggested questions to assist users
-const suggestedQuestions = [
-  "What's the best plan for my 8-year-old dog?",
-  "Explain what a deductible is",
-  "Compare two pet insurance plans",
-  "How does travel insurance work?",
-  "Do I need rental car coverage?",
-  "What health insurance covers pre-existing conditions?"
-];
-
-// Initial greeting message from the assistant
-const initialGreeting = {
-  id: uuidv4(),
-  sender: "assistant" as const,
-  content: "Hi! I'm Briki. Ask me anything about insurance plans, coverage, or claims and I'll guide you through it.",
-  timestamp: new Date().toISOString()
-};
-
-interface Message {
-  id: string;
-  sender: "user" | "assistant";
-  content: string;
-  timestamp: string;
-  isLoading?: boolean;
-  error?: boolean;
-  widgetData?: AssistantWidgetType | null;
-}
-
-// Message bubble component with improved styling
-const MessageBubble: React.FC<{ message: Message }> = ({ message }) => {
-  const isUser = message.sender === "user";
-  
-  // The content is already cleaned by the AI service, so no need to strip JSON
-  let displayContent = message.content;
-  
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="mb-5"
-    >
-      <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
-        <div className={`flex items-start gap-3 max-w-[85%] ${isUser ? "flex-row-reverse" : ""}`}>
-          {/* Avatar */}
-          {message.sender === "assistant" ? (
-            <Avatar className="h-10 w-10 bg-gradient-to-br from-indigo-500 to-purple-600 ring-2 ring-white/25 shadow-md">
-              <AvatarImage src="/briki-avatar.svg" alt="Briki Assistant" />
-              <AvatarFallback>
-                <Bot className="h-5 w-5 text-white" />
-              </AvatarFallback>
-            </Avatar>
-          ) : (
-            <Avatar className="h-9 w-9 bg-gradient-to-br from-emerald-500 to-teal-600 ring-2 ring-white/20 shadow-md">
-              <AvatarFallback>
-                <User className="h-4 w-4 text-white" />
-              </AvatarFallback>
-            </Avatar>
-          )}
-          
-          {/* Message bubble */}
-          <div 
-            className={`rounded-2xl px-5 py-3 shadow-sm ${
-              isUser 
-                ? "bg-gradient-to-r from-primary to-blue-600 text-white font-medium" 
-                : message.error 
-                  ? "bg-red-50 text-red-800 border border-red-200"
-                  : "bg-gray-100 text-gray-800 border border-gray-200/80"
-            }`}
-          >
-            {message.isLoading ? (
-              <div className="flex items-center gap-2 py-1">
-                <div className="flex space-x-1">
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
-                </div>
-                <p className="text-sm text-gray-500">Thinking...</p>
-              </div>
-            ) : message.error ? (
-              <div className="flex items-start gap-2">
-                <AlertCircle className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
-                <p className="text-sm">{displayContent}</p>
-              </div>
-            ) : (
-              <div>
-                <p className="text-sm leading-relaxed">{displayContent}</p>
-                {message.widgetData && (
-                  <div className="mt-4">
-                    <AssistantWidget data={message.widgetData} />
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  );
-};
-
-// Interface for memory context
-interface UserMemory {
-  pet?: {
-    type?: string;
-    age?: number;
-    breed?: string;
-    conditions?: string[];
-  };
-  travel?: {
-    destination?: string;
-    duration?: string;
-    date?: string;
-    travelers?: number;
-    activities?: string[];
-  };
-  vehicle?: {
-    make?: string;
-    model?: string;
-    year?: number;
-    value?: string;
-  };
-  health?: {
-    age?: number;
-    conditions?: string[];
-    medications?: string[];
-  };
-}
+import { useState, useRef, useEffect } from 'react';
+import { Send, ArrowDown, User, Bot, X, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Card } from '@/components/ui/card';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Spinner } from '@/components/ui/spinner';
+import { useToast } from '@/components/ui/use-toast';
+import { AIMessage, AIResponse } from '@/types/assistant';
+import { sendMessageToAssistant, getAssistantSuggestions, submitAssistantFeedback } from '@/services/ai-service';
+import { useAssistantActions } from '@/hooks/use-assistant-actions';
+import { trackMessageSent, trackResponseReceived, trackFeedbackGiven } from '@/lib/assistant-analytics';
+import { cn } from '@/lib/utils';
 
 interface ChatInterfaceProps {
-  placement?: "floating" | "inline";
-  autoExpand?: boolean;
-  showClose?: boolean;
-  onClose?: () => void;
+  onClose: () => void;
 }
 
-export const ChatInterface: React.FC<ChatInterfaceProps> = ({
-  placement = "floating",
-  autoExpand = false,
-  showClose = true,
-  onClose
-}) => {
-  const [inputMessage, setInputMessage] = useState("");
-  const [messages, setMessages] = useState<Message[]>([initialGreeting]);
-  const [isSending, setIsSending] = useState(false);
-  const [userMemory, setUserMemory] = useState<UserMemory>({});
-  const [actionPending, setActionPending] = useState(false);
-  const [showFeedback, setShowFeedback] = useState(false);
-  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(autoExpand);
-  const [feedbackComment, setFeedbackComment] = useState("");
-  const { processAction } = useAssistantActions();
+export function ChatInterface({ onClose }: ChatInterfaceProps) {
+  const [messages, setMessages] = useState<AIMessage[]>([]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [feedbackGiven, setFeedbackGiven] = useState<Record<string, 'positive' | 'negative' | null>>({});
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const { toast } = useToast();
-  
-  const messageEndRef = useRef<HTMLDivElement>(null);
-  const messagesContainerRef = useRef<HTMLDivElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  
-  // Initialize analytics session when component mounts
+  const { processAction } = useAssistantActions();
+
+  // Add welcome message on first load
   useEffect(() => {
-    if (isExpanded) {
-      // Start tracking the assistant session
-      startAssistantSession({
-        initialMessages: messages.length,
-        memoryState: Object.keys(userMemory).length > 0
-      });
+    if (messages.length === 0) {
+      setMessages([
+        {
+          id: 'welcome',
+          role: 'assistant',
+          content: 'Hello! I\'m your Briki Insurance Assistant. I can help you understand insurance options, explain terms, and guide you through our plans. How can I assist you today?',
+          timestamp: new Date().toISOString(),
+        }
+      ]);
     }
-    
-    // End tracking when component unmounts
-    return () => {
-      if (isExpanded) {
-        endAssistantSession({
-          totalMessages: messages.length,
-          userMessages: messages.filter(m => m.sender === "user").length,
-          assistantMessages: messages.filter(m => m.sender === "assistant").length,
-          memoryUsed: Object.keys(userMemory).length > 0
-        });
-      }
-    };
-  }, [isExpanded]);
-  
-  // Auto-scroll to the bottom of messages
+  }, [messages.length]);
+
+  // Scroll to bottom when messages change
   useEffect(() => {
     scrollToBottom();
-  }, [messages, isExpanded]);
-  
-  // Focus the textarea when expanded
-  useEffect(() => {
-    if (isExpanded && textareaRef.current) {
-      setTimeout(() => {
-        textareaRef.current?.focus();
-      }, 300);
-    }
-  }, [isExpanded]);
-
-  // Extract and update user context from messages
-  useEffect(() => {
-    // Only process if there are messages
-    if (messages.length <= 1) return;
-    
-    // Only process user messages
-    const userMessages = messages.filter(m => m.sender === "user");
-    if (userMessages.length === 0) return;
-    
-    // Get the most recent user message
-    const lastUserMessage = userMessages[userMessages.length - 1].content.toLowerCase();
-    
-    // Extract context based on patterns
-    // ... (context extraction logic)
   }, [messages]);
 
+  // Focus input on mount
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, []);
+
+  // Scroll to bottom of messages
   const scrollToBottom = () => {
-    messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
-  // Handle sending a message to the OpenAI API
+  // Handle sending a message
   const handleSendMessage = async () => {
-    // Input validation
-    if (!inputMessage.trim() || isSending || actionPending) return;
-    if (inputMessage.length > 500) {
-      toast({
-        title: "Message too long",
-        description: "Please limit your message to 500 characters.",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    setIsSending(true);
-    
-    // Add user message to the chat
-    const userMessage: Message = {
-      id: uuidv4(),
-      sender: "user",
-      content: inputMessage.trim(),
-      timestamp: new Date().toISOString()
-    };
-    
-    // Track user message analytics
-    trackUserMessage(userMessage.content, {
-      messageId: userMessage.id,
-      memoryContext: Object.keys(userMemory).length > 0,
-      conversationLength: messages.length
-    });
-    
-    // Clear input field
-    setInputMessage("");
-    
-    // Add user message to chat
-    setMessages(prev => [...prev, userMessage]);
-    
-    // Add loading message
-    const loadingMessageId = uuidv4();
-    const loadingMessage: Message = {
-      id: loadingMessageId,
-      sender: "assistant",
-      content: "",
+    if (!input.trim() || isLoading) return;
+
+    const userMessage: AIMessage = {
+      id: `user-${Date.now()}`,
+      role: 'user',
+      content: input.trim(),
       timestamp: new Date().toISOString(),
-      isLoading: true
     };
-    
-    // Show loading indicator
-    setMessages(prev => [...prev, loadingMessage]);
-    
+
+    setMessages(prev => [...prev, userMessage]);
+    setInput('');
+    setSuggestions([]);
+    setIsLoading(true);
+
+    // Track user message in analytics
+    trackMessageSent(userMessage.content.length, userMessage.content.includes('?'));
+
     try {
-      // Call the API with user message and memory context
-      const response = await askAssistant(userMessage.content, userMemory);
+      const startTime = Date.now();
       
-      // Remove loading message
-      setMessages(prev => {
-        const filtered = prev.filter(msg => msg.id !== loadingMessageId);
-        
-        // Create the assistant's response message
-        const assistantMessage: Message = {
-          id: uuidv4(),
-          sender: "assistant",
-          content: response.response,
-          timestamp: new Date().toISOString(),
-          error: !!response.error,
-          widgetData: response.widgetData
-        };
-        
-        // Track assistant response analytics
-        trackAssistantResponse(
-          assistantMessage.content.length,
-          !!assistantMessage.widgetData,
-          !!response.action,
-          {
-            messageId: assistantMessage.id,
-            hasError: assistantMessage.error,
-            widgetType: assistantMessage.widgetData?.type || null
-          }
-        );
-        
-        // Track specific widget types if they exist
-        if (assistantMessage.widgetData) {
-          if (assistantMessage.widgetData.type === 'show_glossary') {
-            trackGlossaryTermDisplay(
-              (assistantMessage.widgetData as GlossaryWidgetData).term,
-              { messageId: assistantMessage.id }
-            );
-          } else if (assistantMessage.widgetData.type === 'show_comparison') {
-            trackVisualExplainerDisplay(
-              (assistantMessage.widgetData as VisualComparisonWidgetData).title,
-              { messageId: assistantMessage.id }
-            );
-          }
-        }
-        
-        return [...filtered, assistantMessage];
+      // Format messages for the API
+      const messageHistory = messages.map(msg => ({
+        role: msg.role,
+        content: msg.content
+      }));
+      
+      messageHistory.push({
+        role: userMessage.role,
+        content: userMessage.content
       });
+
+      // Get response from AI
+      const response = await sendMessageToAssistant(messageHistory);
       
-      // Process any action from the assistant response
+      const processingTime = Date.now() - startTime;
+
+      // Process any actions from the AI
       if (response.action) {
-        // Add a small delay to allow the user to read the message before action is processed
-        setActionPending(true);
-        
-        // Track the assistant action for analytics
-        trackAssistantAction(response.action.type, {
-          actionCategory: (response.action as NavigateToQuoteFlowAction | OpenComparisonToolAction | FilterPlanResultsAction)?.category || null,
-          conversationLength: messages.length,
-          hasCustomMessage: !!response.action.message
-        });
-        
-        // For specific action types, track more detailed analytics
-        if (response.action.type === 'navigate_to_quote_flow') {
-          const quoteAction = response.action as NavigateToQuoteFlowAction;
-          trackQuoteFlowLaunch(
-            quoteAction.category,
-            { 
-              source: 'assistant',
-              hasPreloadData: 'preload' in response.action && !!response.action.preload
-            }
-          );
+        const actionResult = processAction(response.action);
+        if (actionResult) {
+          response.message += `\n\n_${actionResult}_`;
         }
-        
-        // Show a notification that action is being performed
-        toast({
-          title: "Assistant Action",
-          description: response.action.message || "I'm taking the action you requested...",
-          duration: 3000
-        });
-        
-        // Execute the action with a small delay for better UX
-        setTimeout(() => {
-          try {
-            const success = processAction(response.action || null);
-            
-            if (!success) {
-              toast({
-                title: "Action Failed",
-                description: "I couldn't complete that action, but I can still help with your questions.",
-                variant: "destructive",
-                duration: 3000
-              });
-            }
-          } catch (error) {
-            console.error("Error processing action:", error);
-            toast({
-              title: "Action Error",
-              description: "There was a problem completing the requested action.",
-              variant: "destructive",
-              duration: 3000
-            });
-          } finally {
-            setActionPending(false);
-          }
-        }, 1000);
       }
-    } catch (error) {
-      console.error("Assistant response error:", error);
+
+      // Create assistant message
+      const assistantMessage: AIMessage = {
+        id: `assistant-${Date.now()}`,
+        role: 'assistant',
+        content: response.message,
+        timestamp: new Date().toISOString(),
+        widgetData: response.widgetData
+      };
+
+      setMessages(prev => [...prev, assistantMessage]);
       
-      // Track the error event
-      trackEvent(
-        'assistant_error',
-        EventCategory.ERROR,
-        'API Error',
-        undefined,
-        {
-          errorType: 'api_error',
-          messageLength: inputMessage.trim().length
-        }
+      // Track response in analytics
+      trackResponseReceived(
+        assistantMessage.content.length,
+        processingTime,
+        !!assistantMessage.widgetData
       );
+    } catch (error) {
+      console.error('Error sending message to assistant:', error);
       
-      // Remove loading message and show error message
-      setMessages(prev => {
-        const filtered = prev.filter(msg => msg.id !== loadingMessageId);
-        
-        // Create an error message
-        const errorMessage: Message = {
-          id: uuidv4(),
-          sender: "assistant",
-          content: "I'm sorry, I'm having trouble connecting to my knowledge base right now. Please try again in a moment.",
-          timestamp: new Date().toISOString(),
-          error: true
-        };
-        
-        return [...filtered, errorMessage];
+      // Create error message
+      const errorMessage: AIMessage = {
+        id: `error-${Date.now()}`,
+        role: 'assistant',
+        content: 'Sorry, I encountered an error processing your request. Please try again or contact support if the issue persists.',
+        timestamp: new Date().toISOString(),
+        error: true
+      };
+
+      setMessages(prev => [...prev, errorMessage]);
+      
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Failed to get a response from the assistant',
+        variant: 'destructive',
       });
     } finally {
-      setIsSending(false);
+      setIsLoading(false);
     }
   };
 
-  // Handle suggested question click
-  const handleSuggestedQuestionClick = (question: string) => {
-    // Track this event
-    trackSuggestedPromptClick(question, { 
-      source: 'assistant', 
-      position: suggestedQuestions.indexOf(question)
-    });
-    
-    setInputMessage(question);
-    setTimeout(() => {
-      handleSendMessage();
-    }, 100);
+  // Handle input changes
+  const handleInputChange = async (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    setInput(value);
+
+    // If input is long enough and not loading, get suggestions
+    if (value.trim().length > 3 && !isLoading) {
+      try {
+        const suggestions = await getAssistantSuggestions(value.trim());
+        setSuggestions(suggestions);
+      } catch (error) {
+        console.error('Error getting suggestions:', error);
+      }
+    } else {
+      setSuggestions([]);
+    }
   };
 
-  // Toggle the assistant expansion state
-  const toggleExpand = () => {
-    setIsExpanded(prev => !prev);
-  };
-
-  // Handle the enter key for sending messages
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  // Handle key press events in the input field
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
   };
 
-  // Handle textarea input changes, auto-resize
-  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setInputMessage(e.target.value);
-    
-    // Auto-resize logic
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = Math.min(textareaRef.current.scrollHeight, 120) + "px";
+  // Use a suggestion
+  const useSuggestion = (suggestion: string) => {
+    setInput(suggestion);
+    setSuggestions([]);
+    if (inputRef.current) {
+      inputRef.current.focus();
     }
   };
 
-  // Get memory items for display
-  const getMemoryItems = () => {
-    const items: { key: string; value: string }[] = [];
-    
-    if (userMemory.pet?.type) {
-      items.push({ key: "Pet Type", value: userMemory.pet.type });
+  // Give feedback on a message
+  const giveFeedback = async (messageId: string, type: 'positive' | 'negative') => {
+    if (feedbackGiven[messageId]) return;
+
+    try {
+      await submitAssistantFeedback(messageId, type);
+      setFeedbackGiven(prev => ({
+        ...prev,
+        [messageId]: type
+      }));
+      
+      // Track feedback in analytics
+      trackFeedbackGiven(type === 'positive', false);
+      
+      toast({
+        title: 'Thank you!',
+        description: 'Your feedback helps us improve.',
+      });
+    } catch (error) {
+      console.error('Error submitting feedback:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to submit feedback. Please try again.',
+        variant: 'destructive',
+      });
     }
-    if (userMemory.pet?.age) {
-      items.push({ key: "Pet Age", value: `${userMemory.pet.age} years` });
-    }
-    if (userMemory.travel?.destination) {
-      items.push({ key: "Travel To", value: userMemory.travel.destination });
-    }
-    if (userMemory.vehicle?.make) {
-      items.push({ key: "Vehicle", value: `${userMemory.vehicle.year} ${userMemory.vehicle.make}` });
-    }
-    if (userMemory.health?.age) {
-      items.push({ key: "Age", value: `${userMemory.health.age} years` });
-    }
-    
-    return items;
   };
 
-  // Floating chat UI elements for when the assistant is minimized
-  const floatingButton = (
-    <motion.div
-      initial={{ scale: 0.8, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      transition={{ duration: 0.3 }}
-      className="fixed bottom-6 right-6 z-50"
-    >
-      <button
-        onClick={toggleExpand}
-        className="rounded-full w-14 h-14 bg-gradient-to-r from-primary to-blue-600 text-white shadow-lg flex items-center justify-center hover:shadow-xl transition-all"
-      >
-        <MessageSquare className="h-6 w-6" />
-      </button>
-    </motion.div>
-  );
-
-  // Chat interface component
-  const chatContainer = (
-    <AnimatePresence>
-      {isExpanded && (
-        <motion.div
-          initial={{ opacity: 0, y: 50, scale: 0.9 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 50, scale: 0.9 }}
-          transition={{ duration: 0.3 }}
-          className={`bg-card rounded-2xl shadow-xl border border-gray-200/50 overflow-hidden flex flex-col ${
-            placement === "floating" 
-              ? "fixed bottom-6 right-6 w-[380px] h-[600px] max-h-[80vh] z-50" 
-              : "w-full h-full"
-          }`}
+  return (
+    <div className="flex flex-col h-full">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-indigo-600 to-purple-700 text-white p-4 rounded-t-lg flex justify-between items-center">
+        <div className="flex items-center gap-2">
+          <Bot className="h-5 w-5" />
+          <h2 className="text-lg font-semibold">Briki AI Assistant</h2>
+        </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onClose}
+          className="text-white hover:bg-white/20"
+          aria-label="Close Assistant"
         >
-          {/* Header */}
-          <div className="p-4 border-b flex items-center justify-between bg-gradient-to-r from-indigo-600 to-blue-600 text-white">
-            <div className="flex items-center gap-2">
-              <Avatar className="h-8 w-8 bg-white/20 ring-2 ring-white/20">
-                <AvatarFallback>
-                  <Bot className="h-4 w-4 text-white" />
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <h3 className="font-medium">Briki Assistant</h3>
-                <p className="text-xs text-white/80">Ask me about insurance</p>
-              </div>
+          <X className="h-5 w-5" />
+        </Button>
+      </div>
+
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto p-4 bg-slate-50 dark:bg-slate-900">
+        {messages.map(message => (
+          <MessageBubble 
+            key={message.id} 
+            message={message} 
+            giveFeedback={giveFeedback}
+            feedbackGiven={feedbackGiven[message.id]}
+          />
+        ))}
+        
+        {isLoading && (
+          <div className="flex items-center gap-2 animate-pulse mb-4 ml-4">
+            <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-800 flex items-center justify-center">
+              <Bot className="h-4 w-4 text-indigo-600 dark:text-indigo-300" />
             </div>
-            <div className="flex items-center gap-1">
-              {showClose && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={onClose || toggleExpand}
-                  className="h-8 w-8 text-white/90 hover:bg-white/10 rounded-full"
-                >
-                  {placement === "floating" ? (
-                    <ChevronDown className="h-5 w-5" />
-                  ) : (
-                    <X className="h-5 w-5" />
-                  )}
-                </Button>
-              )}
+            <div className="flex gap-1">
+              <div className="h-2 w-2 rounded-full bg-indigo-400 animate-bounce" style={{ animationDelay: "0s" }} />
+              <div className="h-2 w-2 rounded-full bg-indigo-400 animate-bounce" style={{ animationDelay: "0.2s" }} />
+              <div className="h-2 w-2 rounded-full bg-indigo-400 animate-bounce" style={{ animationDelay: "0.4s" }} />
             </div>
           </div>
-          
-          {/* Messages container */}
-          <div 
-            ref={messagesContainerRef}
-            className="flex-1 overflow-y-auto p-4 bg-gradient-to-b from-gray-50 to-white"
+        )}
+
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* Suggestions */}
+      {suggestions.length > 0 && (
+        <div className="px-4 pt-2 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">Suggestions:</p>
+          <div className="flex flex-wrap gap-2 mb-2">
+            {suggestions.map((suggestion, index) => (
+              <Button
+                key={index}
+                variant="outline"
+                size="sm"
+                className="bg-slate-100 dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-sm"
+                onClick={() => useSuggestion(suggestion)}
+              >
+                {suggestion}
+              </Button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Input */}
+      <div className="p-4 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700">
+        <div className="flex items-end gap-2">
+          <Textarea
+            ref={inputRef}
+            value={input}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyPress}
+            placeholder="Type your message..."
+            className="resize-none min-h-[60px] max-h-[120px]"
+          />
+          <Button
+            onClick={handleSendMessage}
+            disabled={!input.trim() || isLoading}
+            className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 flex-shrink-0"
+            size="icon"
+            aria-label="Send message"
           >
-            {/* Memory display */}
-            {Object.keys(userMemory).length > 0 && (
-              <div className="mb-4 bg-blue-50 rounded-xl p-3 border border-blue-100">
-                <div className="flex items-center text-sm text-blue-700 mb-2 font-medium">
-                  <Star className="h-4 w-4 mr-1" /> Briki remembers:
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {getMemoryItems().map((item, index) => (
-                    <Badge 
-                      key={index} 
-                      variant="outline"
-                      className="bg-white border-blue-200 text-blue-800 px-2 py-1 text-xs"
-                    >
-                      {item.key}: {item.value}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            )}
-            
-            {/* Messages */}
-            <div className="space-y-1">
-              {messages.map((msg) => (
-                <MessageBubble key={msg.id} message={msg} />
-              ))}
-              
-              <div ref={messageEndRef} />
-            </div>
+            {isLoading ? <Spinner size="sm" /> : <Send className="h-4 w-4" />}
+          </Button>
+        </div>
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+          Press Enter to send, Shift+Enter for a new line
+        </p>
+      </div>
+    </div>
+  );
+}
+
+interface MessageBubbleProps {
+  message: AIMessage;
+  giveFeedback: (messageId: string, type: 'positive' | 'negative') => void;
+  feedbackGiven: 'positive' | 'negative' | null | undefined;
+}
+
+function MessageBubble({ message, giveFeedback, feedbackGiven }: MessageBubbleProps) {
+  const isUser = message.role === 'user';
+  const isError = !!message.error;
+  
+  return (
+    <div 
+      className={cn(
+        "mb-4 max-w-[85%]",
+        isUser ? "ml-auto" : "mr-auto"
+      )}
+    >
+      <div className="flex items-start gap-2">
+        {!isUser && (
+          <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-800 flex-shrink-0 flex items-center justify-center">
+            <Bot className="h-4 w-4 text-indigo-600 dark:text-indigo-300" />
+          </div>
+        )}
+        
+        <Card
+          className={cn(
+            "p-3",
+            isUser 
+              ? "bg-indigo-500 text-white" 
+              : isError 
+                ? "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800" 
+                : "bg-white dark:bg-slate-800"
+          )}
+        >
+          <div className="whitespace-pre-wrap break-words">
+            {message.content}
           </div>
           
-          {/* Suggested questions */}
-          {messages.length < 3 && (
-            <div className="p-3 bg-gray-50 border-t border-gray-200">
-              <p className="text-xs text-gray-500 mb-2">Try asking:</p>
-              <div className="flex flex-wrap gap-2">
-                {suggestedQuestions.slice(0, 3).map((question, index) => (
-                  <Badge 
-                    key={index}
-                    variant="outline"
-                    className="cursor-pointer bg-white hover:bg-primary/5 transition-colors"
-                    onClick={() => handleSuggestedQuestionClick(question)}
-                  >
-                    {question}
-                  </Badge>
-                ))}
-              </div>
+          {/* Widget Data would be rendered here */}
+          {message.widgetData && (
+            <div className="mt-2 p-2 bg-slate-50 dark:bg-slate-700 rounded-md">
+              <pre className="text-xs overflow-auto">
+                {JSON.stringify(message.widgetData, null, 2)}
+              </pre>
             </div>
           )}
           
-          {/* Input area */}
-          <div className="p-3 border-t bg-white">
-            <div className="relative">
-              <Textarea
-                ref={textareaRef}
-                value={inputMessage}
-                onChange={handleInputChange}
-                onKeyDown={handleKeyDown}
-                placeholder="Type your message..."
-                className="resize-none min-h-[50px] max-h-[120px] py-3 px-4 rounded-2xl border-gray-300 focus:ring-2 focus:ring-primary/30 focus:border-primary/50 pr-12 shadow-sm"
-                disabled={isSending || actionPending}
-              />
-              <Button
-                size="icon"
-                onClick={handleSendMessage}
-                disabled={!inputMessage.trim() || isSending || actionPending}
-                className="absolute right-2 bottom-2 h-8 w-8 rounded-full bg-primary hover:bg-primary/90 text-white"
-              >
-                {isSending ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Send className="h-4 w-4" />
-                )}
-              </Button>
-            </div>
+          {/* Message timestamp */}
+          <div className="text-xs mt-2 opacity-70 text-right">
+            {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
           </div>
-        </motion.div>
+        </Card>
+        
+        {isUser && (
+          <div className="w-8 h-8 rounded-full bg-indigo-500 flex-shrink-0 flex items-center justify-center">
+            <User className="h-4 w-4 text-white" />
+          </div>
+        )}
+      </div>
+      
+      {/* Feedback buttons for assistant messages */}
+      {!isUser && !isError && (
+        <div className="flex items-center gap-2 mt-1 ml-10">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className={cn(
+                  "h-6 w-6",
+                  feedbackGiven === 'positive' && "text-green-500"
+                )}
+                onClick={() => giveFeedback(message.id, 'positive')}
+                disabled={feedbackGiven !== undefined}
+              >
+                <ThumbsUp className="h-3 w-3" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>This was helpful</p>
+            </TooltipContent>
+          </Tooltip>
+          
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className={cn(
+                  "h-6 w-6",
+                  feedbackGiven === 'negative' && "text-red-500"
+                )}
+                onClick={() => giveFeedback(message.id, 'negative')}
+                disabled={feedbackGiven !== undefined}
+              >
+                <ThumbsDown className="h-3 w-3" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>This wasn't helpful</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
       )}
-    </AnimatePresence>
+    </div>
   );
-
-  // Render different layouts based on placement
-  if (placement === "floating") {
-    return (
-      <>
-        {!isExpanded && floatingButton}
-        {chatContainer}
-      </>
-    );
-  }
-
-  // Inline placement (full container)
-  return chatContainer;
-};
-
-export default ChatInterface;
+}

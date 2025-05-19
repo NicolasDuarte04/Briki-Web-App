@@ -1,116 +1,78 @@
-import React, { useEffect, useState } from 'react';
-import { testAIAssistantConnection } from '@/services/ai-service';
-import { Badge } from '@/components/ui/badge';
-import { AlertTriangle, CheckCircle, RefreshCw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { trackEvent, EventCategory } from '@/lib/analytics';
-
-interface ApiStatusCheckProps {
-  onStatusChange?: (isAvailable: boolean) => void;
-  showIndicator?: boolean;
-}
+import { useState, useEffect } from 'react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { AlertCircle, CheckCircle2 } from 'lucide-react';
+import { checkOpenAIStatus } from '@/services/ai-service';
 
 /**
- * Component to check AI API availability and show status
- * This is used to provide fallbacks in case the OpenAI API is unreachable
+ * Component that checks the availability of the OpenAI API
+ * and displays appropriate status messages
  */
-export const ApiStatusCheck: React.FC<ApiStatusCheckProps> = ({ 
-  onStatusChange,
-  showIndicator = false
-}) => {
-  const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
-  const [isChecking, setIsChecking] = useState(false);
-  const [errorDetails, setErrorDetails] = useState<string | null>(null);
-  
-  const checkApiStatus = async () => {
-    setIsChecking(true);
-    
-    try {
-      const result = await testAIAssistantConnection();
-      
-      setIsAvailable(result.success);
-      setErrorDetails(result.error || null);
-      
-      if (onStatusChange) {
-        onStatusChange(result.success);
-      }
-      
-      // Track the status check result
-      trackEvent(
-        'ai_api_status_check',
-        EventCategory.SYSTEM,
-        result.success ? 'success' : 'failure',
-        result.status
-      );
-    } catch (error) {
-      setIsAvailable(false);
-      setErrorDetails(error instanceof Error ? error.message : String(error));
-      
-      if (onStatusChange) {
-        onStatusChange(false);
-      }
-      
-      trackEvent(
-        'ai_api_status_check_error',
-        EventCategory.ERROR,
-        'connection_error'
-      );
-    } finally {
-      setIsChecking(false);
-    }
-  };
-  
-  // Check the API status when the component mounts
+export function APIStatusCheck() {
+  const [status, setStatus] = useState<'checking' | 'available' | 'unavailable'>('checking');
+  const [error, setError] = useState<string | null>(null);
+
   useEffect(() => {
+    const checkApiStatus = async () => {
+      try {
+        const result = await checkOpenAIStatus();
+        
+        if (result.available) {
+          setStatus('available');
+        } else {
+          setStatus('unavailable');
+          setError(result.message || 'OpenAI API is currently unavailable');
+        }
+      } catch (err) {
+        setStatus('unavailable');
+        setError('Failed to check OpenAI API status');
+        console.error('API status check error:', err);
+      }
+    };
+
     checkApiStatus();
-    
-    // Re-check every 5 minutes
-    const interval = setInterval(() => {
-      checkApiStatus();
-    }, 5 * 60 * 1000);
-    
-    return () => clearInterval(interval);
   }, []);
-  
-  if (!showIndicator) {
+
+  // Don't show anything when still checking to avoid UI flashing
+  if (status === 'checking') {
     return null;
   }
-  
-  return (
-    <div className="flex items-center gap-2">
-      {isAvailable === null ? (
-        <Badge variant="outline" className="bg-gray-100 text-gray-500">
-          <div className="flex items-center gap-1">
-            <RefreshCw className="h-3 w-3 animate-spin" />
-            <span>Checking AI</span>
-          </div>
-        </Badge>
-      ) : isAvailable ? (
-        <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200">
-          <div className="flex items-center gap-1">
-            <CheckCircle className="h-3 w-3" />
-            <span>AI Ready</span>
-          </div>
-        </Badge>
-      ) : (
-        <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
-          <div className="flex items-center gap-1">
-            <AlertTriangle className="h-3 w-3" />
-            <span>AI Unavailable</span>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="h-4 w-4 rounded-full ml-1 hover:bg-amber-100" 
-              onClick={checkApiStatus}
-              disabled={isChecking}
-            >
-              <RefreshCw className={`h-3 w-3 ${isChecking ? 'animate-spin' : ''}`} />
-            </Button>
-          </div>
-        </Badge>
-      )}
-    </div>
-  );
-};
 
-export default ApiStatusCheck;
+  // Don't show the success message after a brief period
+  if (status === 'available') {
+    return (
+      <div className="fixed bottom-4 right-4 z-40 w-80 transition-opacity" 
+           style={{ animation: 'fadeOut 1s ease-in-out 3s forwards' }}>
+        <Alert variant="default" className="bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-900">
+          <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
+          <AlertTitle className="text-green-800 dark:text-green-300">Ready to help</AlertTitle>
+          <AlertDescription className="text-green-700 dark:text-green-400 text-sm">
+            AI Assistant is available and ready to answer your questions.
+          </AlertDescription>
+        </Alert>
+        <style jsx>{`
+          @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; display: none; }
+          }
+        `}</style>
+      </div>
+    );
+  }
+
+  // Show error message if API is unavailable
+  if (status === 'unavailable') {
+    return (
+      <div className="fixed bottom-4 right-4 z-40 w-80">
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>AI Assistant unavailable</AlertTitle>
+          <AlertDescription className="text-sm">
+            {error}. Our team has been notified and is working to restore service.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
+  return null;
+}

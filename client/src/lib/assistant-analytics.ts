@@ -1,182 +1,111 @@
-import { trackEvent, EventCategory } from './analytics';
-import { AssistantActionType } from '@/services/ai-service';
-
-/**
- * Track when a new assistant session begins
- */
-export function startAssistantSession(metadata: {
-  initialMessages: number;
-  memoryState: boolean;
-}) {
-  trackEvent(
-    'assistant_session_start',
-    EventCategory.ENGAGEMENT,
-    undefined,
-    undefined,
-    metadata
-  );
-}
-
-/**
- * Track when an assistant session ends
- */
-export function endAssistantSession(metadata: {
-  totalMessages: number;
-  userMessages: number;
-  assistantMessages: number;
-  memoryUsed: boolean;
-}) {
-  trackEvent(
-    'assistant_session_end',
-    EventCategory.ENGAGEMENT,
-    undefined,
-    undefined,
-    metadata
-  );
-}
+import { trackEvent, EventCategory } from '@/lib/analytics';
 
 /**
  * Track when a user sends a message to the assistant
+ * @param messageLength The length of the message
+ * @param isQuestion Whether the message is a question
  */
-export function trackUserMessage(
-  message: string,
-  metadata: {
-    messageId: string;
-    memoryContext: boolean;
-    conversationLength: number;
-  }
-) {
+export function trackMessageSent(messageLength: number, isQuestion: boolean) {
   trackEvent(
-    'user_message_sent',
+    'assistant_message_sent',
     EventCategory.ENGAGEMENT,
-    undefined,
-    message.length,
-    metadata
+    isQuestion ? 'question' : 'statement',
+    Math.min(Math.floor(messageLength / 10) * 10, 300) // Bucket message lengths (0-10, 11-20, etc, capped at 300)
   );
 }
 
 /**
- * Track when the assistant responds to a user message
+ * Track when the assistant sends a response
+ * @param responseLength The length of the response
+ * @param processingTimeMs The time it took to process the request
+ * @param hasWidget Whether the response includes a widget
  */
-export function trackAssistantResponse(
-  messageLength: number,
-  hasWidget: boolean,
-  hasAction: boolean,
-  metadata: {
-    messageId: string;
-    hasError: boolean;
-    widgetType: string | null;
-  }
+export function trackResponseReceived(
+  responseLength: number,
+  processingTimeMs: number,
+  hasWidget: boolean
 ) {
   trackEvent(
-    'assistant_response',
+    'assistant_response_received',
     EventCategory.ENGAGEMENT,
-    metadata.hasError ? 'error' : 'success',
-    messageLength,
-    {
-      ...metadata,
-      hasWidget,
-      hasAction
-    }
+    hasWidget ? 'with_widget' : 'text_only',
+    Math.min(Math.floor(processingTimeMs / 100) * 100, 10000) // Bucket processing times (0-100ms, 101-200ms, etc, capped at 10s)
+  );
+
+  // Track response length in a separate event
+  trackEvent(
+    'assistant_response_length',
+    EventCategory.ANALYTICS,
+    'characters',
+    Math.min(Math.floor(responseLength / 50) * 50, 2000) // Bucket response lengths (0-50, 51-100, etc, capped at 2000)
   );
 }
 
 /**
- * Track when an assistant action is triggered
+ * Track when a user gives feedback on a response
+ * @param isPositive Whether the feedback was positive
+ * @param hasComment Whether the user left a comment
+ */
+export function trackFeedbackGiven(
+  isPositive: boolean,
+  hasComment: boolean
+) {
+  trackEvent(
+    'assistant_feedback_given',
+    EventCategory.FEEDBACK,
+    isPositive ? 'positive' : 'negative',
+    hasComment ? 1 : 0
+  );
+}
+
+/**
+ * Track assistant-initiated actions like opening a quote flow
+ * @param actionType The type of action
+ * @param actionTarget The target of the action (e.g., the insurance category)
  */
 export function trackAssistantAction(
-  actionType: AssistantActionType,
-  metadata: {
-    actionCategory?: string | null;
-    conversationLength: number;
-    hasCustomMessage: boolean;
-  }
+  actionType: string,
+  actionTarget: string
 ) {
   trackEvent(
-    'assistant_action_triggered',
-    EventCategory.ACTION,
-    actionType,
-    undefined,
-    metadata
-  );
-}
-
-/**
- * Track when a user clicks on a suggested prompt
- */
-export function trackSuggestedPromptClick(
-  prompt: string,
-  metadata: {
-    source: 'assistant' | 'home';
-    position: number;
-  }
-) {
-  trackEvent(
-    'suggested_prompt_click',
-    EventCategory.ENGAGEMENT,
-    metadata.source,
-    prompt.length,
-    metadata
-  );
-}
-
-/**
- * Track when a glossary term is displayed
- */
-export function trackGlossaryTermDisplay(
-  term: string,
-  metadata: {
-    messageId: string;
-  }
-) {
-  trackEvent(
-    'glossary_term_display',
-    EventCategory.CONTENT,
-    'insurance_term',
-    undefined,
-    {
-      ...metadata,
-      term
-    }
-  );
-}
-
-/**
- * Track when a visual explainer is displayed
- */
-export function trackVisualExplainerDisplay(
-  title: string,
-  metadata: {
-    messageId: string;
-  }
-) {
-  trackEvent(
-    'visual_explainer_display',
-    EventCategory.CONTENT,
-    'comparison',
-    undefined,
-    {
-      ...metadata,
-      title
-    }
-  );
-}
-
-/**
- * Track when the assistant launches a quote flow
- */
-export function trackQuoteFlowLaunch(
-  category: string,
-  metadata: {
-    source: 'assistant' | 'category_page' | 'home';
-    hasPreloadData: boolean;
-  }
-) {
-  trackEvent(
-    'quote_flow_launch',
+    `assistant_action_${actionType}`,
     EventCategory.CONVERSION,
-    category,
-    undefined,
-    metadata
+    actionTarget
+  );
+}
+
+/**
+ * Track when specific widgets are displayed
+ * @param widgetType The type of widget
+ * @param widgetContext Additional context about the widget
+ */
+export function trackWidgetDisplayed(
+  widgetType: string,
+  widgetContext: string
+) {
+  trackEvent(
+    `assistant_widget_displayed`,
+    EventCategory.ENGAGEMENT,
+    widgetType,
+    0,
+    { context: widgetContext }
+  );
+}
+
+/**
+ * Track when users interact with widgets
+ * @param widgetType The type of widget
+ * @param interactionType The type of interaction
+ */
+export function trackWidgetInteraction(
+  widgetType: string,
+  interactionType: string
+) {
+  trackEvent(
+    `assistant_widget_interaction`,
+    EventCategory.ENGAGEMENT,
+    widgetType,
+    0,
+    { interaction: interactionType }
   );
 }
