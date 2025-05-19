@@ -56,23 +56,97 @@ Always place this JSON at the END of your message, after your conversational res
 /**
  * POST /api/ai/ask
  * Send a message to the AI assistant and get a response
+ * Now supports context memory for personalized responses
  */
 router.post('/ask', async (req, res) => {
   try {
-    const { message } = req.body;
+    const { message, context } = req.body;
     
     if (!message || typeof message !== 'string') {
       return res.status(400).json({ error: 'Message is required and must be a string' });
     }
     
-    // Call OpenAI API
+    // Format the context as a system message addition if it exists
+    let enhancedSystemPrompt = SYSTEM_PROMPT;
+    
+    if (context && Object.keys(context).length > 0) {
+      // Create a formatted context string based on available user information
+      const contextSections = [];
+      
+      // Add pet information if available
+      if (context.pet) {
+        const petContext = [];
+        if (context.pet.type) petContext.push(`Type: ${context.pet.type}`);
+        if (context.pet.age) petContext.push(`Age: ${context.pet.age} years old`);
+        if (context.pet.breed) petContext.push(`Breed: ${context.pet.breed}`);
+        if (context.pet.conditions && context.pet.conditions.length > 0) {
+          petContext.push(`Health conditions: ${context.pet.conditions.join(', ')}`);
+        }
+        
+        if (petContext.length > 0) {
+          contextSections.push(`User's pet information:\n${petContext.join('\n')}`);
+        }
+      }
+      
+      // Add travel information if available
+      if (context.travel) {
+        const travelContext = [];
+        if (context.travel.destination) travelContext.push(`Destination: ${context.travel.destination}`);
+        if (context.travel.duration) travelContext.push(`Duration: ${context.travel.duration}`);
+        if (context.travel.date) travelContext.push(`Date: ${context.travel.date}`);
+        if (context.travel.travelers) travelContext.push(`Number of travelers: ${context.travel.travelers}`);
+        if (context.travel.activities && context.travel.activities.length > 0) {
+          travelContext.push(`Activities: ${context.travel.activities.join(', ')}`);
+        }
+        
+        if (travelContext.length > 0) {
+          contextSections.push(`User's travel information:\n${travelContext.join('\n')}`);
+        }
+      }
+      
+      // Add vehicle information if available
+      if (context.vehicle) {
+        const vehicleContext = [];
+        if (context.vehicle.make) vehicleContext.push(`Make: ${context.vehicle.make}`);
+        if (context.vehicle.model) vehicleContext.push(`Model: ${context.vehicle.model}`);
+        if (context.vehicle.year) vehicleContext.push(`Year: ${context.vehicle.year}`);
+        if (context.vehicle.value) vehicleContext.push(`Estimated value: ${context.vehicle.value}`);
+        
+        if (vehicleContext.length > 0) {
+          contextSections.push(`User's vehicle information:\n${vehicleContext.join('\n')}`);
+        }
+      }
+      
+      // Add health information if available
+      if (context.health) {
+        const healthContext = [];
+        if (context.health.age) healthContext.push(`Age: ${context.health.age} years old`);
+        if (context.health.conditions && context.health.conditions.length > 0) {
+          healthContext.push(`Health conditions: ${context.health.conditions.join(', ')}`);
+        }
+        if (context.health.medications && context.health.medications.length > 0) {
+          healthContext.push(`Medications: ${context.health.medications.join(', ')}`);
+        }
+        
+        if (healthContext.length > 0) {
+          contextSections.push(`User's health information:\n${healthContext.join('\n')}`);
+        }
+      }
+      
+      // Add the context sections to the system prompt if we have any
+      if (contextSections.length > 0) {
+        enhancedSystemPrompt += `\n\nREMEMBERED USER CONTEXT:\n${contextSections.join('\n\n')}\n\nUse this context to personalize your responses when relevant but without explicitly mentioning that you're using remembered information.`;
+      }
+    }
+    
+    // Call OpenAI API with the enhanced system prompt
     const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
+      model: "gpt-4o",
       messages: [
-        { role: "system", content: SYSTEM_PROMPT },
+        { role: "system", content: enhancedSystemPrompt },
         { role: "user", content: message }
       ],
-      max_tokens: 500
+      max_tokens: 1000
     });
     
     // Extract and send response
