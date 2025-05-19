@@ -272,7 +272,7 @@ export default function UnifiedAuthForm({ mode, onSuccess }: UnifiedAuthFormProp
           <Input
             id="firstName"
             placeholder="John"
-            className="rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 shadow-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 h-11"
+            className="rounded-lg border-gray-200 bg-white text-gray-800 shadow-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 h-11"
             {...registerForm.register("firstName")}
           />
           {registerForm.formState.errors.firstName && (
@@ -284,7 +284,7 @@ export default function UnifiedAuthForm({ mode, onSuccess }: UnifiedAuthFormProp
           <Input
             id="lastName"
             placeholder="Doe"
-            className="rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 shadow-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 h-11"
+            className="rounded-lg border-gray-200 bg-white text-gray-800 shadow-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 h-11"
             {...registerForm.register("lastName")}
           />
           {registerForm.formState.errors.lastName && (
@@ -300,7 +300,7 @@ export default function UnifiedAuthForm({ mode, onSuccess }: UnifiedAuthFormProp
           type="email"
           placeholder="your.email@example.com"
           autoComplete="email"
-          className="rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 shadow-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 h-11"
+          className="rounded-lg border-gray-200 bg-white text-gray-800 shadow-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 h-11"
           {...registerForm.register("email")}
         />
         {registerForm.formState.errors.email && (
@@ -316,7 +316,7 @@ export default function UnifiedAuthForm({ mode, onSuccess }: UnifiedAuthFormProp
             type={showPassword ? "text" : "password"}
             placeholder="••••••••"
             autoComplete="new-password"
-            className="rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 shadow-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 h-11 pr-10"
+            className="rounded-lg border-gray-200 bg-white text-gray-800 shadow-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 h-11 pr-10"
             {...registerForm.register("password")}
           />
           <button
@@ -363,7 +363,7 @@ export default function UnifiedAuthForm({ mode, onSuccess }: UnifiedAuthFormProp
             type={showConfirmPassword ? "text" : "password"}
             placeholder="••••••••"
             autoComplete="new-password"
-            className="rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 shadow-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 h-11 pr-10"
+            className="rounded-lg border-gray-200 bg-white text-gray-800 shadow-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 h-11 pr-10"
             {...registerForm.register("confirmPassword")}
           />
           <button
@@ -386,7 +386,7 @@ export default function UnifiedAuthForm({ mode, onSuccess }: UnifiedAuthFormProp
           onCheckedChange={(checked) => {
             registerForm.setValue("acceptTerms", checked === true);
           }}
-          className="mt-1 h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500"
+          className="mt-1 h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-500"
         />
         <div className="flex flex-col space-y-1">
           <div className="flex flex-wrap items-center">
