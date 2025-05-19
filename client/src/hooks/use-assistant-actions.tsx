@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { useLocation } from 'wouter';
-import { useToast } from '@/components/ui/use-toast';
-import { AssistantActionType } from '@/services/ai-service';
+import { useToast } from '../components/ui/use-toast';
+import { AssistantActionType } from '../services/ai-service';
 
 /**
  * Custom hook to handle assistant actions
@@ -110,9 +110,11 @@ export function useAssistantActions() {
           return true;
         }
         
-        default:
-          console.warn('Unsupported action type:', action.type);
+        default: {
+          const actionType = action as any;
+          console.warn('Unsupported action type:', actionType.type);
           return false;
+        }
       }
     } catch (error) {
       console.error('Error processing assistant action:', error);
