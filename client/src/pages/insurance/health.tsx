@@ -3,8 +3,10 @@ import { healthPlans } from "@/components/plans/mockPlans";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Heart, Shield, Activity, ArrowRight, BadgeCheck, Stethoscope, UserPlus, Search } from "lucide-react";
+import { QuoteSummary } from "@/components/quote-summary";
+import { useQuoteStore } from "@/store/quote-store";
 import { HeroWrapper, ContentWrapper } from "@/components/layout";
 import { useCompareStore } from "@/store/compare-store";
 import { ComparePageTrigger } from "@/components/compare-page-trigger";
@@ -297,6 +299,9 @@ export default function HealthInsurancePage() {
               Choose from our range of health insurance options designed to provide comprehensive coverage for you and your family.
             </p>
           </motion.div>
+          
+          {/* Quote Summary */}
+          <QuoteSummary category="health" />
           
           {/* Filter/sort controls */}
           <motion.div
