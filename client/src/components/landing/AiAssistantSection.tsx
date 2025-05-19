@@ -92,118 +92,61 @@ export default function AiAssistantSection() {
             viewport={{ once: true }}
             transition={{ duration: 0.7, delay: 0.2 }}
           >
-            <div className="max-w-md mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
+            <div className="max-w-md mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-xl overflow-hidden">
               {/* Header */}
-              <div className="px-5 py-4 bg-gradient-to-r from-blue-500/90 to-indigo-500/90 text-white">
+              <div className="px-5 py-4 bg-gradient-to-r from-blue-600 to-cyan-500 text-white">
                 <div className="flex items-center">
-                  {/* Custom avatar */}
-                  <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center mr-2.5 backdrop-blur-sm">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-white">
-                      <path d="M12 16C15.866 16 19 12.866 19 9C19 5.13401 15.866 2 12 2C8.13401 2 5 5.13401 5 9C5 10.5 5.5 11.5 6.5 12.5L4 20L11.5 17.5C11.6648 17.5005 11.8296 17.5005 11.9944 17.5L12 17.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M14 12.5L14.5 15.5L18 20L20 12.5L18 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </div>
+                  <Bot className="h-6 w-6 mr-2" />
                   <h3 className="font-semibold">Briki AI Assistant</h3>
                 </div>
               </div>
               
               {/* Chat area */}
-              <div className="p-6 bg-gray-50 dark:bg-gray-900 h-72 space-y-5">
+              <div className="p-5 bg-gray-50 dark:bg-gray-900 h-64">
                 {/* Bot message */}
-                <motion.div 
-                  className="flex"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <div className="w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800/50 flex items-center justify-center mr-3 flex-shrink-0 shadow-sm">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-blue-600 dark:text-blue-400">
-                      <path d="M12 16C15.866 16 19 12.866 19 9C19 5.13401 15.866 2 12 2C8.13401 2 5 5.13401 5 9C5 10.5 5.5 11.5 6.5 12.5L4 20L11.5 17.5C11.6648 17.5005 11.8296 17.5005 11.9944 17.5L12 17.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M14 12.5L14.5 15.5L18 20L20 12.5L18 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
+                <div className="flex mb-4">
+                  <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3 flex-shrink-0">
+                    <Bot className="h-4 w-4 text-blue-600" />
                   </div>
-                  <div className="bg-white dark:bg-gray-800 rounded-lg py-3 px-4 shadow-sm border border-gray-100 dark:border-gray-700 max-w-sm">
-                    <p className="text-gray-800 dark:text-gray-200">Hello! I'm your Briki AI Assistant. How can I help with your insurance needs today?</p>
+                  <div className="bg-white dark:bg-gray-800 rounded-lg py-2 px-3 shadow max-w-sm">
+                    <p className="text-gray-700 dark:text-gray-300">Hello! I'm your Briki AI Assistant. How can I help with your insurance needs today?</p>
                   </div>
-                </motion.div>
+                </div>
                 
                 {/* User message */}
-                <motion.div 
-                  className="flex justify-end"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: 0.5 }}
-                >
-                  <div className="bg-blue-100 dark:bg-blue-900/30 text-blue-900 dark:text-blue-100 rounded-lg py-3 px-4 max-w-sm border border-blue-200/50 dark:border-blue-800/30">
-                    <p>I'm flying to Spain for 3 weeks. What's the best travel insurance in case I need medical care abroad?</p>
+                <div className="flex justify-end mb-4">
+                  <div className="bg-blue-600 rounded-lg py-2 px-3 text-white max-w-sm">
+                    <p>I want to insure my 9-year-old dog with arthritis.</p>
                   </div>
-                  <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center ml-3 flex-shrink-0 border border-gray-300/50 dark:border-gray-600/50 shadow-sm">
-                    <MessageCircle className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                  <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center ml-3 flex-shrink-0">
+                    <MessageCircle className="h-4 w-4 text-gray-600" />
                   </div>
-                </motion.div>
+                </div>
                 
-                {/* Typing indicator */}
-                <motion.div 
-                  className="flex"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.3, delay: 0.8 }}
-                >
-                  <div className="w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800/50 flex items-center justify-center mr-3 flex-shrink-0 shadow-sm">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-blue-600 dark:text-blue-400">
-                      <path d="M12 16C15.866 16 19 12.866 19 9C19 5.13401 15.866 2 12 2C8.13401 2 5 5.13401 5 9C5 10.5 5.5 11.5 6.5 12.5L4 20L11.5 17.5C11.6648 17.5005 11.8296 17.5005 11.9944 17.5L12 17.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M14 12.5L14.5 15.5L18 20L20 12.5L18 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
+                {/* Bot response with feature */}
+                <div className="flex mb-4">
+                  <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3 flex-shrink-0">
+                    <Bot className="h-4 w-4 text-blue-600" />
                   </div>
-                  <div className="flex space-x-1 items-center px-4 py-2">
-                    <span className="text-xs text-gray-500 dark:text-gray-400">Briki is typing</span>
-                    <div className="flex space-x-1">
-                      <div className="w-1.5 h-1.5 bg-blue-500/60 dark:bg-blue-400/60 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
-                      <div className="w-1.5 h-1.5 bg-blue-500/60 dark:bg-blue-400/60 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
-                      <div className="w-1.5 h-1.5 bg-blue-500/60 dark:bg-blue-400/60 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
+                  <div className="space-y-2 max-w-sm">
+                    <div className="bg-white dark:bg-gray-800 rounded-lg py-2 px-3 shadow">
+                      <p className="text-gray-700 dark:text-gray-300">I can help with that! I found 3 plans that cover pets with pre-existing conditions.</p>
+                    </div>
+                    <div className="bg-blue-50 dark:bg-gray-700 border border-blue-100 dark:border-gray-600 rounded-lg p-3">
+                      <p className="text-xs text-blue-700 dark:text-blue-300 font-semibold mb-1">RECOMMENDED PLANS</p>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">• PetAssure Complete Care</p>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">• Healthy Paws Senior Plan</p>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">• Pawsome Coverage Plus</p>
                     </div>
                   </div>
-                </motion.div>
-                
-                {/* Bot response with recommendation */}
-                <motion.div 
-                  className="flex"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: 1.2 }}
-                >
-                  <div className="w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800/50 flex items-center justify-center mr-3 flex-shrink-0 shadow-sm">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-blue-600 dark:text-blue-400">
-                      <path d="M12 16C15.866 16 19 12.866 19 9C19 5.13401 15.866 2 12 2C8.13401 2 5 5.13401 5 9C5 10.5 5.5 11.5 6.5 12.5L4 20L11.5 17.5C11.6648 17.5005 11.8296 17.5005 11.9944 17.5L12 17.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M14 12.5L14.5 15.5L18 20L20 12.5L18 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </div>
-                  <div className="space-y-3 max-w-sm">
-                    <div className="bg-white dark:bg-gray-800 rounded-lg py-3 px-4 shadow-sm border border-gray-100 dark:border-gray-700">
-                      <p className="text-gray-800 dark:text-gray-200">I've found a few plans that include emergency medical coverage and trip cancellation protection. Here's a good one to start with:</p>
-                    </div>
-                    <div className="bg-blue-50/80 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/30 rounded-lg p-4 shadow-sm">
-                      <div className="flex items-center mb-2">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-blue-600 dark:text-blue-400 mr-2">
-                          <path d="M9 12L11 14L15 10M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                        <p className="text-sm text-blue-700 dark:text-blue-300 font-semibold">RECOMMENDED PLAN</p>
-                      </div>
-                      <div className="bg-white/50 dark:bg-gray-800/50 rounded-md p-2.5 border border-blue-50 dark:border-blue-900/30">
-                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">GlobalSecure Travel Protection</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">• Emergency medical coverage up to $500,000</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">• Coverage in all EU countries</p>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
+                </div>
               </div>
               
               {/* Input area */}
-              <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-                <div className="bg-gray-100 dark:bg-gray-800/80 rounded-full flex items-center px-4 py-2.5 border border-gray-200 dark:border-gray-700">
+              <div className="p-3 border-t dark:border-gray-700">
+                <div className="bg-gray-100 dark:bg-gray-800 rounded-full flex items-center px-4 py-2">
                   <input type="text" className="bg-transparent flex-1 outline-none text-gray-700 dark:text-gray-300 text-sm" placeholder="Type your question..." disabled />
-                  <button className="ml-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors">
+                  <button className="ml-2 text-blue-600 dark:text-blue-400">
                     <ArrowRight className="h-4 w-4" />
                   </button>
                 </div>
@@ -212,7 +155,7 @@ export default function AiAssistantSection() {
             
             {/* Decorative elements */}
             <div className="absolute -z-10 w-32 h-32 bg-blue-200/50 dark:bg-blue-900/20 rounded-full -bottom-6 -right-6 blur-xl"></div>
-            <div className="absolute -z-10 w-24 h-24 bg-indigo-200/50 dark:bg-indigo-900/20 rounded-full -top-6 -left-6 blur-xl"></div>
+            <div className="absolute -z-10 w-24 h-24 bg-cyan-200/50 dark:bg-cyan-900/20 rounded-full -top-6 -left-6 blur-xl"></div>
           </motion.div>
         </div>
       </div>
