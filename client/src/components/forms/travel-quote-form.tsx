@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useNavigate } from "wouter";
+import { useLocation } from "wouter";
 import { useQuoteStore } from "@/store/quote-store";
 
 import { 
@@ -39,8 +39,11 @@ const travelQuoteSchema = z.object({
 type TravelQuoteFormValues = z.infer<typeof travelQuoteSchema>;
 
 export const TravelQuoteForm = () => {
-  const navigate = useNavigate();
-  const { setTravelQuote } = useQuoteStore();
+  const [_, setLocation] = useLocation();
+  const { setTravelQuote, submitQuote } = useQuoteStore((state) => ({
+    setTravelQuote: state.setTravelQuote,
+    submitQuote: state.submitQuote
+  }));
 
   // Default form values
   const defaultValues: Partial<TravelQuoteFormValues> = {
@@ -77,9 +80,12 @@ export const TravelQuoteForm = () => {
       medicalCoverage: data.medicalCoverage || false,
       adventureActivities: data.adventureActivities || false
     });
+    
+    // Submit the quote to mark it as completed
+    submitQuote('travel');
 
     // Navigate to the travel plans page
-    navigate("/insurance/travel/plans");
+    setLocation("/insurance/travel/plans");
   };
 
   return (
