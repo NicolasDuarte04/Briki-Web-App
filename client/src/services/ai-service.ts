@@ -198,6 +198,7 @@ export async function askAssistant(message: string, context?: Record<string, any
   }
   
   try {
+    console.log('Sending message to assistant API...');
     const response = await fetch('/api/ai/ask', {
       method: 'POST',
       headers: {
@@ -209,13 +210,28 @@ export async function askAssistant(message: string, context?: Record<string, any
       }),
     });
     
+    const data = await response.json();
+    
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error('AI Assistant API error:', errorData);
-      throw new Error(errorData.error || 'Failed to get response from assistant');
+      console.error('AI Assistant API error:', data);
+      
+      // Log detailed error information for debugging
+      if (data.errorType) {
+        console.error(`OpenAI error type: ${data.errorType}, code: ${data.errorCode}`);
+      }
+      
+      return { 
+        response: data.response || 'I apologize, but I encountered an issue connecting to my knowledge base. Please try again.',
+        error: data.error || 'Failed to get response from assistant',
+        errorDetails: {
+          type: data.errorType,
+          code: data.errorCode,
+          status: response.status
+        }
+      };
     }
     
-    const data = await response.json();
+    console.log('Assistant API response received successfully');
     
     // Check if the response contains an action
     const action = parseAssistantAction(data.response);
