@@ -3,7 +3,7 @@ import { AuthenticatedLayout, ContentWrapper } from "../components/layout";
 import { Button } from "../components/ui/button";
 import { Textarea } from "../components/ui/textarea";
 import { Badge } from "../components/ui/badge";
-import { Bot, Send, User, Loader2, AlertCircle } from "lucide-react";
+import { Bot, Send, User, Loader2, AlertCircle, Star } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { v4 as uuidv4 } from "uuid";
@@ -11,6 +11,8 @@ import { askAssistant, parseWidgetData, AssistantWidgetType } from "../services/
 import { useAssistantActions } from "../hooks/use-assistant-actions";
 import { useToast } from "../components/ui/use-toast";
 import AssistantWidget from "../components/assistant/widgets/AssistantWidget";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../components/ui/card";
+import { trackEvent, EventCategory } from "../lib/analytics";
 import { 
   startAssistantSession, 
   endAssistantSession,
