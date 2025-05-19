@@ -1,156 +1,140 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Search, Info, Lightbulb, RefreshCw } from 'lucide-react';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { useAIAssistant } from '@/hooks/use-ai-assistant';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { trackEvent, EventCategory } from '@/lib/analytics';
 
-interface TermExplainerProps {
-  className?: string;
-  presetTerms?: string[];
+interface InsuranceTerm {
+  term: string;
+  definition: string;
+  example?: string;
 }
 
+interface TermExplainerProps {
+  initialTerm?: string;
+  onClose?: () => void;
+}
+
+// Common insurance terms database
+const INSURANCE_TERMS: InsuranceTerm[] = [
+  {
+    term: "Premium",
+    definition: "The amount you pay to the insurance company for your policy, typically on a monthly, quarterly, or annual basis.",
+    example: "If your monthly premium is $50, you'll pay $600 per year for coverage."
+  },
+  {
+    term: "Deductible",
+    definition: "The amount you must pay out-of-pocket before your insurance coverage begins to pay.",
+    example: "With a $500 deductible, you'll pay the first $500 of covered services before insurance pays."
+  },
+  {
+    term: "Copayment",
+    definition: "A fixed amount you pay for a covered service, usually when you receive the service.",
+    example: "A $20 copay for doctor visits means you pay $20 each time you see your doctor."
+  },
+  {
+    term: "Coverage Limit",
+    definition: "The maximum amount your insurance will pay for covered services.",
+    example: "A $1 million coverage limit means your insurer won't pay more than that amount during your policy period."
+  },
+  {
+    term: "Claim",
+    definition: "A formal request to your insurance company asking for payment based on the terms of your policy.",
+    example: "After a car accident, you file a claim with your insurance company to pay for repairs."
+  },
+  {
+    term: "Exclusion",
+    definition: "Specific conditions, treatments, or situations that your insurance policy does not cover.",
+    example: "Many health insurance policies exclude cosmetic procedures from coverage."
+  },
+  {
+    term: "Waiting Period",
+    definition: "The time you must wait after purchasing a policy before coverage begins for certain benefits.",
+    example: "Many dental plans have a 6-month waiting period for major procedures."
+  },
+  {
+    term: "Underwriting",
+    definition: "The process insurers use to evaluate risk and determine premium rates for applicants.",
+    example: "During underwriting, a life insurer reviews your health history to set your premium."
+  }
+];
+
 /**
- * A component that uses AI to explain insurance terms
+ * Component that explains insurance terminology to users in an accessible way
+ * Provides definitions, examples, and context for insurance terms
  */
-export default function TermExplainer({ className = '', presetTerms = [] }: TermExplainerProps) {
-  const [term, setTerm] = useState('');
-  const [explanation, setExplanation] = useState('');
-  const [searchedTerm, setSearchedTerm] = useState('');
-  const { explainTerm, isTermExplanationLoading } = useAIAssistant();
+export const TermExplainer: React.FC<TermExplainerProps> = ({ 
+  initialTerm,
+  onClose 
+}) => {
+  const [searchTerm, setSearchTerm] = useState(initialTerm || "");
+  
+  // Filter terms based on search input
+  const filteredTerms = searchTerm 
+    ? INSURANCE_TERMS.filter(item => 
+        item.term.toLowerCase().includes(searchTerm.toLowerCase()) || 
+        item.definition.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : INSURANCE_TERMS;
 
-  const defaultTerms = presetTerms.length > 0 ? presetTerms : [
-    "Deductible",
-    "Premium",
-    "Claim",
-    "Coverage",
-    "Policy",
-    "Exclusion"
-  ];
-
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!term.trim() || isTermExplanationLoading) return;
-    
-    setSearchedTerm(term);
-    setExplanation('');
-    
-    try {
-      const result = await explainTerm(term);
-      setExplanation(result);
-    } catch (error) {
-      console.error('Error explaining term:', error);
-      setExplanation('Sorry, I had trouble explaining that term. Please try again.');
-    }
-  };
-
-  const handleTermClick = async (selectedTerm: string) => {
-    setTerm(selectedTerm);
-    setSearchedTerm(selectedTerm);
-    setExplanation('');
-    
-    try {
-      const result = await explainTerm(selectedTerm);
-      setExplanation(result);
-    } catch (error) {
-      console.error('Error explaining term:', error);
-      setExplanation('Sorry, I had trouble explaining that term. Please try again.');
-    }
+  // Track term interactions
+  const handleTermClick = (term: string) => {
+    trackEvent('term_explainer_view', EventCategory.ENGAGEMENT, term);
   };
 
   return (
-    <Card className={`shadow-glow-sm border-primary/20 backdrop-blur-sm bg-background/90 ${className}`}>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-lg flex items-center gap-2">
-          <Info className="h-5 w-5 text-primary" />
-          Insurance Term Explainer
-        </CardTitle>
+    <Card className="w-full bg-card border-border">
+      <CardHeader>
+        <CardTitle className="text-xl text-primary">Insurance Terms Explained</CardTitle>
+        <CardDescription>
+          Common insurance terminology simplified
+        </CardDescription>
       </CardHeader>
-      
-      <CardContent className="space-y-4">
-        <form onSubmit={handleSearch} className="flex gap-2">
-          <Input
+      <CardContent>
+        <div className="mb-4">
+          <input
             type="text"
-            placeholder="Enter an insurance term..."
-            value={term}
-            onChange={(e) => setTerm(e.target.value)}
-            disabled={isTermExplanationLoading}
-            className="flex-grow"
+            placeholder="Search for a term..."
+            className="w-full p-2 border rounded-md bg-background"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <Button 
-            type="submit" 
-            disabled={!term.trim() || isTermExplanationLoading}
-            className={isTermExplanationLoading ? 'animate-pulse' : ''}
-          >
-            {isTermExplanationLoading ? (
-              <RefreshCw size={16} className="mr-2 animate-spin" />
-            ) : (
-              <Search size={16} className="mr-2" />
-            )}
-            Explain
-          </Button>
-        </form>
+        </div>
         
-        {!searchedTerm && (
-          <div className="space-y-2">
-            <div className="text-sm text-muted-foreground flex items-center gap-1.5">
-              <Lightbulb size={14} className="text-yellow-500" />
-              <span>Popular insurance terms</span>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {defaultTerms.map((defaultTerm, index) => (
-                <Button
-                  key={index}
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleTermClick(defaultTerm)}
-                  className="h-8"
-                >
-                  {defaultTerm}
-                </Button>
-              ))}
-            </div>
+        <Accordion type="single" collapsible className="w-full">
+          {filteredTerms.map((item, index) => (
+            <AccordionItem key={index} value={item.term}>
+              <AccordionTrigger 
+                onClick={() => handleTermClick(item.term)}
+                className="text-primary font-medium hover:text-primary/80"
+              >
+                {item.term}
+              </AccordionTrigger>
+              <AccordionContent>
+                <p className="text-sm mb-2">{item.definition}</p>
+                {item.example && (
+                  <p className="text-xs text-muted-foreground italic">
+                    Example: {item.example}
+                  </p>
+                )}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+        
+        {filteredTerms.length === 0 && (
+          <div className="text-center py-4 text-muted-foreground">
+            No matching terms found. Try a different search.
           </div>
         )}
-        
-        {searchedTerm && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2 }}
-            className="mt-4 space-y-3"
-          >
-            <div className="font-medium text-primary">
-              {searchedTerm}
-            </div>
-            
-            {isTermExplanationLoading ? (
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-[90%]" />
-                <Skeleton className="h-4 w-[80%]" />
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-[85%]" />
-              </div>
-            ) : (
-              <div className="text-sm leading-relaxed space-y-2">
-                {explanation.split('\n\n').map((paragraph, idx) => (
-                  <p key={idx}>{paragraph}</p>
-                ))}
-              </div>
-            )}
-          </motion.div>
-        )}
       </CardContent>
-      
-      <CardFooter className="text-xs text-muted-foreground italic pt-0">
-        <div className="flex items-center gap-1.5">
-          <Info size={12} />
-          Powered by Briki AI
-        </div>
+      <CardFooter>
+        <Button variant="ghost" size="sm" className="ml-auto" onClick={onClose}>
+          Close
+        </Button>
       </CardFooter>
     </Card>
   );
-}
+};
+
+export default TermExplainer;
