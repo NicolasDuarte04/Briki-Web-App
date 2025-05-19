@@ -2,14 +2,14 @@ import React, { useMemo } from "react";
 import { InsurancePlan } from "@/store/compare-store";
 import { 
   InsuranceCategory, 
-  planFieldLabels, 
-  formatFieldValue,
+  planFieldLabels,
   BasePlanFields,
   TravelPlanFields,
   AutoPlanFields,
   PetPlanFields,
   HealthPlanFields
 } from "@shared/schema";
+import { formatFieldValue } from "@/utils/format";
 import { 
   Table, 
   TableBody, 
