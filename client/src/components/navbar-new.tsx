@@ -96,13 +96,20 @@ export default function NavbarNew() {
           
           {/* Desktop navigation */}
           <div className="hidden md:ml-6 md:flex md:items-center space-x-1">
-            {['home', 'travelInsurance', 'autoInsurance', 'petInsurance', 'healthInsurance'].map((item, index) => {
-              const active = isActivePath(navPaths[index]);
+            {[
+              { label: 'Features', path: navPaths[1] },
+              { label: 'Pricing', path: navPaths[2] },
+              { label: 'Ask Briki', path: navPaths[3] },
+              { label: 'Blog', path: navPaths[4] },
+              { label: 'Forum', path: navPaths[5] },
+              { label: 'Careers', path: navPaths[6] }
+            ].map((item, index) => {
+              const active = isActivePath(item.path);
               
               return (
                 <Link 
-                  key={item} 
-                  href={navPaths[index]}
+                  key={item.label} 
+                  href={item.path}
                   className="relative group"
                 >
                   <motion.div
@@ -114,7 +121,7 @@ export default function NavbarNew() {
                     whileHover={{ y: -2 }}
                     transition={{ type: "spring", stiffness: 500, damping: 15 }}
                   >
-                    {t(item)}
+                    {item.label}
                     {active && (
                       <motion.div
                         layoutId="navbar-indicator"
@@ -333,11 +340,12 @@ export default function NavbarNew() {
                 <div className="py-4">
                   <div className="space-y-2">
                     {[
-                      { name: 'home', path: navPaths[0] },
-                      { name: 'travelInsurance', path: navPaths[1] },
-                      { name: 'autoInsurance', path: navPaths[2] },
-                      { name: 'petInsurance', path: navPaths[3] },
-                      { name: 'healthInsurance', path: navPaths[4] },
+                      { name: 'Features', path: navPaths[1] },
+                      { name: 'Pricing', path: navPaths[2] },
+                      { name: 'Ask Briki', path: navPaths[3] },
+                      { name: 'Blog', path: navPaths[4] },
+                      { name: 'Forum', path: navPaths[5] },
+                      { name: 'Careers', path: navPaths[6] },
                     ].map((item) => (
                       <motion.div
                         key={item.name}

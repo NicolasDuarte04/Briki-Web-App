@@ -112,10 +112,12 @@ export function useNavigation() {
   // Generate paths for main navigation items based on auth state
   const navPaths = [
     '/', // Home
-    getInsurancePath('travel', isAuthenticated),
-    getInsurancePath('auto', isAuthenticated),
-    getInsurancePath('pet', isAuthenticated),
-    getInsurancePath('health', isAuthenticated),
+    '/features',
+    '/pricing',
+    '/ask-briki',
+    '/blog',
+    '/forum',
+    '/careers',
   ];
 
   return {
