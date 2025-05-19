@@ -165,9 +165,9 @@ export default function HealthInsurancePage() {
                   variant="outline" 
                   size="lg" 
                   className="font-medium border-white/30 text-white hover:bg-white/10"
-                  onClick={() => navigate('/get-quote')}
+                  onClick={() => navigate('/insurance/health/quote')}
                 >
-                  Get Custom Quote
+                  Enter Health Details
                 </Button>
               </div>
             </div>
