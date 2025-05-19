@@ -161,6 +161,9 @@ export default function AIAssistantScreen() {
   const [isSending, setIsSending] = useState(false);
   const [userMemory, setUserMemory] = useState<UserMemory>({});
   const [actionPending, setActionPending] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
+  const [feedbackComment, setFeedbackComment] = useState("");
   const { processAction } = useAssistantActions();
   const { toast } = useToast();
   
@@ -185,6 +188,15 @@ export default function AIAssistantScreen() {
       });
     };
   }, []);
+  
+  // Show feedback prompt after multiple user interactions
+  useEffect(() => {
+    // Only show feedback after 3 or more user messages and not already submitted
+    const userMessageCount = messages.filter(m => m.sender === "user").length;
+    if (userMessageCount >= 3 && !feedbackSubmitted && !showFeedback) {
+      setShowFeedback(true);
+    }
+  }, [messages, feedbackSubmitted, showFeedback]);
 
   // Auto-scroll to the bottom of messages
   useEffect(() => {
@@ -447,6 +459,15 @@ export default function AIAssistantScreen() {
         }, 1000);
       }
     } catch (error) {
+      console.error("Assistant response error:", error);
+      
+      // Track the error event
+      trackAssistantEvent(AssistantEventType.ASSISTANT_ERROR, {
+        errorType: 'api_error',
+        messageLength: inputMessage.trim().length,
+        errorMessage: error instanceof Error ? error.message : 'Unknown error'
+      });
+      
       // Handle error - remove loading message and add error message
       setMessages(prev => {
         const filtered = prev.filter(msg => msg.id !== loadingMessageId);
@@ -454,7 +475,7 @@ export default function AIAssistantScreen() {
         const errorMessage: Message = {
           id: uuidv4(),
           sender: "assistant",
-          content: "I'm sorry, I encountered a problem while processing your request. Please try again later.",
+          content: "Hmm, I couldn't get that just now. Want to try rephrasing or ask something else?",
           timestamp: new Date().toISOString(),
           error: true
         };
@@ -487,6 +508,33 @@ export default function AIAssistantScreen() {
     if (textarea) {
       textarea.focus();
     }
+  };
+  
+  // Handle user feedback submission
+  const handleFeedbackSubmit = (rating: 1 | 2 | 3 | 4 | 5) => {
+    // Track the feedback event with analytics
+    trackEvent(
+      'assistant_feedback_submitted',
+      EventCategory.ENGAGEMENT,
+      {
+        rating,
+        comment: feedbackComment,
+        conversationLength: messages.length,
+        userMessages: messages.filter(m => m.sender === "user").length,
+        assistantMessages: messages.filter(m => m.sender === "assistant").length
+      }
+    );
+    
+    // Update UI state
+    setFeedbackSubmitted(true);
+    setShowFeedback(false);
+    
+    // Thank the user
+    toast({
+      title: "Thank you for your feedback!",
+      description: "Your input helps us improve the assistant.",
+      duration: 3000
+    });
   };
 
   return (
