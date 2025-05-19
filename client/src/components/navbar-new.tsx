@@ -306,8 +306,7 @@ export default function NavbarNew() {
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <GradientButton 
                     onClick={() => navigate("/auth")}
-                    className="ml-2 shadow-md"
-                    size="sm"
+                    className="ml-2 shadow-md py-1 px-4 text-sm"
                   >
                     {t('signUp')}
                   </GradientButton>
@@ -415,14 +414,11 @@ export default function NavbarNew() {
                         {showAIAssistant && (
                           <div className="mt-5 px-4">
                             <GradientButton
-                              variant="secondary"
-                              size="sm"
-                              className="w-full gap-2 shadow-md"
+                              className="w-full shadow-md py-1 px-3 text-sm"
                               onClick={() => {
                                 toggleAssistant();
                                 setIsOpen(false);
                               }}
-                              icon={<SparklesIcon className="h-4 w-4" />}
                             >
                               Chat with AI Assistant
                             </GradientButton>
