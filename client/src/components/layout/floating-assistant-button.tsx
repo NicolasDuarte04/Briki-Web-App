@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation } from 'wouter';
 import { useAuth } from '@/hooks/use-auth';
-import { AIAssistantButton } from './ai-assistant-button';
+import AIAssistantButton from '@/components/navbar/ai-assistant-button';
 
 /**
  * Floating AI assistant button that appears in the corner of every page
