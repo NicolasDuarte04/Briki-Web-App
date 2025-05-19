@@ -1,7 +1,6 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useState, useContext, ReactNode } from 'react';
 import { ChatInterface } from '@/components/ai-assistant';
 
-// Context type definition
 interface AIAssistantContextType {
   isOpen: boolean;
   openAssistant: () => void;
@@ -9,47 +8,47 @@ interface AIAssistantContextType {
   toggleAssistant: () => void;
 }
 
-// Create context with default values
-const AIAssistantContext = createContext<AIAssistantContextType>({
-  isOpen: false,
-  openAssistant: () => {},
-  closeAssistant: () => {},
-  toggleAssistant: () => {}
-});
-
-// Hook to use the AI Assistant context
-export const useAIAssistantUI = () => useContext(AIAssistantContext);
+const AIAssistantContext = createContext<AIAssistantContextType | undefined>(undefined);
 
 interface AIAssistantProviderProps {
-  children: React.ReactNode;
-  initialOpen?: boolean;
+  children: ReactNode;
 }
 
-/**
- * Provider component that makes the AI assistant available throughout the app
- */
-export function AIAssistantProvider({ 
-  children, 
-  initialOpen = false 
-}: AIAssistantProviderProps) {
-  const [isOpen, setIsOpen] = useState(initialOpen);
+export const AIAssistantProvider: React.FC<AIAssistantProviderProps> = ({ children }) => {
+  const [isOpen, setIsOpen] = useState(false);
 
-  const openAssistant = useCallback(() => setIsOpen(true), []);
-  const closeAssistant = useCallback(() => setIsOpen(false), []);
-  const toggleAssistant = useCallback(() => setIsOpen(prev => !prev), []);
+  const openAssistant = () => setIsOpen(true);
+  const closeAssistant = () => setIsOpen(false);
+  const toggleAssistant = () => setIsOpen(prev => !prev);
 
   return (
-    <AIAssistantContext.Provider value={{ 
-      isOpen, 
-      openAssistant, 
-      closeAssistant, 
-      toggleAssistant 
-    }}>
+    <AIAssistantContext.Provider 
+      value={{ 
+        isOpen, 
+        openAssistant, 
+        closeAssistant, 
+        toggleAssistant 
+      }}
+    >
       {children}
-      <ChatInterface 
-        autoExpand={isOpen} 
-        onClose={closeAssistant} 
+      <ChatInterface
+        placement="floating"
+        autoExpand={isOpen}
+        showClose={true}
+        onClose={closeAssistant}
       />
     </AIAssistantContext.Provider>
   );
-}
+};
+
+export const useAIAssistant = (): AIAssistantContextType => {
+  const context = useContext(AIAssistantContext);
+  
+  if (context === undefined) {
+    throw new Error('useAIAssistant must be used within an AIAssistantProvider');
+  }
+  
+  return context;
+};
+
+export default AIAssistantProvider;

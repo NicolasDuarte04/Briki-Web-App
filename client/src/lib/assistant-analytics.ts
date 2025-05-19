@@ -1,240 +1,182 @@
 import { trackEvent, EventCategory } from './analytics';
-import { v4 as uuidv4 } from 'uuid';
+import { AssistantActionType } from '@/services/ai-service';
 
-// Internal helper function to track all assistant events
-const _trackAssistantEvent = (
-  eventType: AssistantEventType,
-  metadata: Record<string, any> = {}
-): void => {
-  try {
-    // Update the EventCategory for consistency
-    const category = EventCategory.INSURANCE; // Using existing category
-    
-    // Create enhanced metadata object with session data
-    const enhancedMetadata = {
-      sessionId: getAssistantSessionId(),
-      timestamp: new Date().toISOString(),
-      ...metadata
-    };
-    
-    // Use the proper parameter order for trackEvent
-    trackEvent(
-      eventType,
-      category,
-      metadata.label || eventType, // Use provided label or eventType as string
-      metadata.value, // Pass numeric value if available
-      enhancedMetadata // Pass the enhanced metadata as additionalParams
-    );
-  } catch (error) {
-    console.error('Error tracking assistant event:', error);
-    // Don't throw - analytics should never block the app
-  }
-};
-
-// Define specific event types for the AI Assistant
-export enum AssistantEventType {
-  // User interaction events
-  USER_MESSAGE_SENT = 'user_message_sent',
-  SUGGESTED_PROMPT_CLICKED = 'suggested_prompt_clicked',
-  MEMORY_CLEARED = 'memory_cleared',
-  
-  // Assistant response events
-  ASSISTANT_MESSAGE_SENT = 'assistant_message_sent',
-  ASSISTANT_ACTION_TRIGGERED = 'assistant_action_triggered',
-  ASSISTANT_ERROR = 'assistant_error',
-  
-  // Feature usage events
-  QUOTE_FLOW_LAUNCHED = 'quote_flow_launched_by_ai',
-  GLOSSARY_TERM_OPENED = 'glossary_term_opened',
-  VISUAL_EXPLAINER_DISPLAYED = 'visual_explainer_displayed',
-  PLAN_RECOMMENDATION_SHOWN = 'plan_recommendation_shown',
-  
-  // Session lifecycle events
-  SESSION_STARTED = 'assistant_session_started',
-  SESSION_ENDED = 'assistant_session_ended',
-  
-  // Feedback events
-  USER_FEEDBACK_GIVEN = 'user_feedback_given'
+/**
+ * Track when a new assistant session begins
+ */
+export function startAssistantSession(metadata: {
+  initialMessages: number;
+  memoryState: boolean;
+}) {
+  trackEvent(
+    'assistant_session_start',
+    EventCategory.ENGAGEMENT,
+    undefined,
+    undefined,
+    metadata
+  );
 }
 
-// Storage key for the session ID
-const SESSION_ID_KEY = 'briki_assistant_session_id';
-
 /**
- * Generate or retrieve a persistent session ID for the assistant interaction
+ * Track when an assistant session ends
  */
-export const getAssistantSessionId = (): string => {
-  // Check if we already have a session ID in localStorage
-  let sessionId = localStorage.getItem(SESSION_ID_KEY);
-  
-  // If no session ID exists, create one and store it
-  if (!sessionId) {
-    sessionId = uuidv4();
-    localStorage.setItem(SESSION_ID_KEY, sessionId);
-  }
-  
-  return sessionId;
-};
-
-/**
- * Reset the assistant session ID 
- * Call this when starting a new distinct session
- */
-export const resetAssistantSessionId = (): string => {
-  const newSessionId = uuidv4();
-  localStorage.setItem(SESSION_ID_KEY, newSessionId);
-  return newSessionId;
-};
-
-/**
- * Track an assistant-related event with appropriate metadata
- * This is non-blocking and won't interfere with app flow
- */
-export const trackAssistantEvent = (
-  eventType: AssistantEventType,
-  metadata: Record<string, any> = {}
-): void => {
-  // Get or create session ID
-  const sessionId = getAssistantSessionId();
-  
-  // Add timestamp and session ID to all events
-  const enrichedMetadata = {
-    ...metadata,
-    timestamp: new Date().toISOString(),
-    sessionId
-  };
-  
-  // Track the event using the general tracking function
-  // This is non-blocking as the trackEvent implementation doesn't return a Promise
+export function endAssistantSession(metadata: {
+  totalMessages: number;
+  userMessages: number;
+  assistantMessages: number;
+  memoryUsed: boolean;
+}) {
   trackEvent(
-    eventType,
+    'assistant_session_end',
     EventCategory.ENGAGEMENT,
-    metadata.label || eventType,
     undefined,
-    enrichedMetadata
+    undefined,
+    metadata
   );
-  
-  // For development and testing, also log to console
-  if (process.env.NODE_ENV !== 'production') {
-    console.log('Assistant Event:', { 
-      type: eventType,
-      ...enrichedMetadata
-    });
-  }
-};
-
-/**
- * Start tracking an assistant session
- * Call this when the assistant page is first loaded
- */
-export const startAssistantSession = (metadata: Record<string, any> = {}): void => {
-  // Reset the session ID for a fresh session
-  resetAssistantSessionId();
-  
-  // Track session start event
-  trackAssistantEvent(AssistantEventType.SESSION_STARTED, metadata);
-};
-
-/**
- * End tracking an assistant session
- * Call this when the user leaves the assistant page
- */
-export const endAssistantSession = (metadata: Record<string, any> = {}): void => {
-  trackAssistantEvent(AssistantEventType.SESSION_ENDED, metadata);
-};
+}
 
 /**
  * Track when a user sends a message to the assistant
  */
-export const trackUserMessage = (message: string, metadata: Record<string, any> = {}): void => {
-  // Don't include the full message content in analytics for privacy
-  // Just include length and a sanitized content flag
-  trackAssistantEvent(AssistantEventType.USER_MESSAGE_SENT, {
-    ...metadata,
-    messageLength: message.length,
-    hasContent: message.trim().length > 0,
-    // For topic analysis, we could add NLP-based categorization here
-  });
-};
+export function trackUserMessage(
+  message: string,
+  metadata: {
+    messageId: string;
+    memoryContext: boolean;
+    conversationLength: number;
+  }
+) {
+  trackEvent(
+    'user_message_sent',
+    EventCategory.ENGAGEMENT,
+    undefined,
+    message.length,
+    metadata
+  );
+}
 
 /**
- * Track when the assistant sends a response
+ * Track when the assistant responds to a user message
  */
-export const trackAssistantResponse = (
-  responseLength: number, 
-  hasWidgets: boolean,
+export function trackAssistantResponse(
+  messageLength: number,
+  hasWidget: boolean,
   hasAction: boolean,
-  metadata: Record<string, any> = {}
-): void => {
-  trackAssistantEvent(AssistantEventType.ASSISTANT_MESSAGE_SENT, {
-    ...metadata,
-    responseLength,
-    hasWidgets,
-    hasAction
-  });
-};
+  metadata: {
+    messageId: string;
+    hasError: boolean;
+    widgetType: string | null;
+  }
+) {
+  trackEvent(
+    'assistant_response',
+    EventCategory.ENGAGEMENT,
+    metadata.hasError ? 'error' : 'success',
+    messageLength,
+    {
+      ...metadata,
+      hasWidget,
+      hasAction
+    }
+  );
+}
 
 /**
- * Track when an assistant action is triggered (e.g., navigation)
+ * Track when an assistant action is triggered
  */
-export const trackAssistantAction = (
-  actionType: string,
-  metadata: Record<string, any> = {}
-): void => {
-  trackAssistantEvent(AssistantEventType.ASSISTANT_ACTION_TRIGGERED, {
-    ...metadata,
-    actionType
-  });
-};
+export function trackAssistantAction(
+  actionType: AssistantActionType,
+  metadata: {
+    actionCategory?: string | null;
+    conversationLength: number;
+    hasCustomMessage: boolean;
+  }
+) {
+  trackEvent(
+    'assistant_action_triggered',
+    EventCategory.ACTION,
+    actionType,
+    undefined,
+    metadata
+  );
+}
 
 /**
- * Track when a suggested prompt is clicked
+ * Track when a user clicks on a suggested prompt
  */
-export const trackSuggestedPromptClick = (
-  promptText: string,
-  metadata: Record<string, any> = {}
-): void => {
-  trackAssistantEvent(AssistantEventType.SUGGESTED_PROMPT_CLICKED, {
-    ...metadata,
-    promptText
-  });
-};
+export function trackSuggestedPromptClick(
+  prompt: string,
+  metadata: {
+    source: 'assistant' | 'home';
+    position: number;
+  }
+) {
+  trackEvent(
+    'suggested_prompt_click',
+    EventCategory.ENGAGEMENT,
+    metadata.source,
+    prompt.length,
+    metadata
+  );
+}
 
 /**
  * Track when a glossary term is displayed
  */
-export const trackGlossaryTermDisplay = (
+export function trackGlossaryTermDisplay(
   term: string,
-  metadata: Record<string, any> = {}
-): void => {
-  trackAssistantEvent(AssistantEventType.GLOSSARY_TERM_OPENED, {
-    ...metadata,
-    term
-  });
-};
+  metadata: {
+    messageId: string;
+  }
+) {
+  trackEvent(
+    'glossary_term_display',
+    EventCategory.CONTENT,
+    'insurance_term',
+    undefined,
+    {
+      ...metadata,
+      term
+    }
+  );
+}
 
 /**
  * Track when a visual explainer is displayed
  */
-export const trackVisualExplainerDisplay = (
+export function trackVisualExplainerDisplay(
   title: string,
-  metadata: Record<string, any> = {}
-): void => {
-  trackAssistantEvent(AssistantEventType.VISUAL_EXPLAINER_DISPLAYED, {
-    ...metadata,
-    title
-  });
-};
+  metadata: {
+    messageId: string;
+  }
+) {
+  trackEvent(
+    'visual_explainer_display',
+    EventCategory.CONTENT,
+    'comparison',
+    undefined,
+    {
+      ...metadata,
+      title
+    }
+  );
+}
 
 /**
- * Track when a quote flow is launched from the assistant
+ * Track when the assistant launches a quote flow
  */
-export const trackQuoteFlowLaunch = (
+export function trackQuoteFlowLaunch(
   category: string,
-  metadata: Record<string, any> = {}
-): void => {
-  trackAssistantEvent(AssistantEventType.QUOTE_FLOW_LAUNCHED, {
-    ...metadata,
-    category
-  });
-};
+  metadata: {
+    source: 'assistant' | 'category_page' | 'home';
+    hasPreloadData: boolean;
+  }
+) {
+  trackEvent(
+    'quote_flow_launch',
+    EventCategory.CONVERSION,
+    category,
+    undefined,
+    metadata
+  );
+}
