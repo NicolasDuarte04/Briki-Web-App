@@ -227,7 +227,7 @@ export default function UnifiedAuthForm({ mode, onSuccess }: UnifiedAuthFormProp
         
         <Button 
           type="submit" 
-          className="w-full h-11 rounded-lg bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 transition-all duration-300 text-white font-medium shadow-md hover:shadow-lg shadow-indigo-500/10"
+          className="briki-button w-full h-11 rounded-lg bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 transition-all duration-300 text-white font-medium shadow-md hover:shadow-lg shadow-blue-500/10"
           disabled={isLoading}
         >
           {isLoading ? (
