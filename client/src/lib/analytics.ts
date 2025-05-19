@@ -1,3 +1,5 @@
+import { EventCategory } from '../constants/analytics';
+
 // Define the gtag function globally
 declare global {
   interface Window {
@@ -62,17 +64,17 @@ export const trackEvent = (
 
 // Custom company dashboard events
 export const trackPlanUpload = (planCount: number, category: string) => {
-  trackEvent('plan_upload', 'company_dashboard', category, planCount);
+  trackEvent('plan_upload', EventCategory.CompanyDashboard, category, planCount);
 };
 
 export const trackPlanView = (planId: string, planName: string) => {
-  trackEvent('plan_view', 'company_plans', planName);
+  trackEvent('plan_view', EventCategory.PlanManagement, planName);
 };
 
 export const trackAnalyticsDashboardView = (companyId: number) => {
-  trackEvent('analytics_dashboard_view', 'company_dashboard', `company_${companyId}`);
+  trackEvent('analytics_dashboard_view', EventCategory.CompanyDashboard, `company_${companyId}`);
 };
 
 export const trackMarketplaceView = (companyId: number) => {
-  trackEvent('marketplace_view', 'company_dashboard', `company_${companyId}`);
+  trackEvent('marketplace_view', EventCategory.Marketplace, `company_${companyId}`);
 };

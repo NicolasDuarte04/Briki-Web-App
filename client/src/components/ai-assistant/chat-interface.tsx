@@ -21,7 +21,8 @@ import { useAssistantActions } from "@/hooks/use-assistant-actions";
 import { useToast } from "@/components/ui/use-toast";
 import AssistantWidget from "@/components/assistant/widgets/AssistantWidget";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { trackEvent, EventCategory } from "@/lib/analytics";
+import { trackEvent } from "@/lib/analytics";
+import { EventCategory } from "@/constants/analytics";
 import { 
   startAssistantSession, 
   endAssistantSession,
@@ -409,13 +410,9 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       // Track the error event
       trackEvent(
         'assistant_error',
-        EventCategory.ERROR,
+        EventCategory.Assistant,
         'API Error',
-        undefined,
-        {
-          errorType: 'api_error',
-          messageLength: inputMessage.trim().length
-        }
+        undefined
       );
       
       // Remove loading message and show error message

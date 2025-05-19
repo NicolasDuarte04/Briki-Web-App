@@ -1,4 +1,5 @@
-import { trackEvent, EventCategory } from './analytics';
+import { trackEvent } from './analytics';
+import { EventCategory } from '../constants/analytics';
 import { AssistantActionType } from '@/services/ai-service';
 
 /**
@@ -10,10 +11,8 @@ export function startAssistantSession(metadata: {
 }) {
   trackEvent(
     'assistant_session_start',
-    EventCategory.ENGAGEMENT,
-    undefined,
-    undefined,
-    metadata
+    EventCategory.Assistant,
+    'session_start'
   );
 }
 
@@ -28,10 +27,8 @@ export function endAssistantSession(metadata: {
 }) {
   trackEvent(
     'assistant_session_end',
-    EventCategory.ENGAGEMENT,
-    undefined,
-    undefined,
-    metadata
+    EventCategory.Assistant,
+    'session_end'
   );
 }
 
@@ -48,10 +45,9 @@ export function trackUserMessage(
 ) {
   trackEvent(
     'user_message_sent',
-    EventCategory.ENGAGEMENT,
-    undefined,
-    message.length,
-    metadata
+    EventCategory.Assistant,
+    'user_message',
+    message.length
   );
 }
 
@@ -70,14 +66,9 @@ export function trackAssistantResponse(
 ) {
   trackEvent(
     'assistant_response',
-    EventCategory.ENGAGEMENT,
+    EventCategory.Assistant,
     metadata.hasError ? 'error' : 'success',
-    messageLength,
-    {
-      ...metadata,
-      hasWidget,
-      hasAction
-    }
+    messageLength
   );
 }
 
@@ -94,10 +85,8 @@ export function trackAssistantAction(
 ) {
   trackEvent(
     'assistant_action_triggered',
-    EventCategory.ACTION,
-    actionType,
-    undefined,
-    metadata
+    EventCategory.Assistant,
+    actionType
   );
 }
 
@@ -113,10 +102,9 @@ export function trackSuggestedPromptClick(
 ) {
   trackEvent(
     'suggested_prompt_click',
-    EventCategory.ENGAGEMENT,
+    EventCategory.Assistant,
     metadata.source,
-    prompt.length,
-    metadata
+    prompt.length
   );
 }
 
@@ -131,13 +119,8 @@ export function trackGlossaryTermDisplay(
 ) {
   trackEvent(
     'glossary_term_display',
-    EventCategory.CONTENT,
-    'insurance_term',
-    undefined,
-    {
-      ...metadata,
-      term
-    }
+    EventCategory.Assistant,
+    'glossary_term'
   );
 }
 
@@ -152,13 +135,8 @@ export function trackVisualExplainerDisplay(
 ) {
   trackEvent(
     'visual_explainer_display',
-    EventCategory.CONTENT,
-    'comparison',
-    undefined,
-    {
-      ...metadata,
-      title
-    }
+    EventCategory.Assistant,
+    'visual_explainer'
   );
 }
 
@@ -174,9 +152,7 @@ export function trackQuoteFlowLaunch(
 ) {
   trackEvent(
     'quote_flow_launch',
-    EventCategory.CONVERSION,
-    category,
-    undefined,
-    metadata
+    EventCategory.Assistant,
+    category
   );
 }
