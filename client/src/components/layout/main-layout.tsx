@@ -121,17 +121,23 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
               
               {/* Desktop Navigation */}
               <nav className="hidden md:flex items-center space-x-1">
-                <Link href="/insurance/travel" className={`px-4 py-2 text-sm font-medium transition-colors ${isActivePath("/insurance/travel")}`}>
-                  {t('travelInsurance')}
+                <Link href="/features" className={`px-4 py-2 text-sm font-medium transition-colors ${isActivePath("/features")}`}>
+                  Features
                 </Link>
-                <Link href="/insurance/auto" className={`px-4 py-2 text-sm font-medium transition-colors ${isActivePath("/insurance/auto")}`}>
-                  {t('autoInsurance')}
+                <Link href="/pricing" className={`px-4 py-2 text-sm font-medium transition-colors ${isActivePath("/pricing")}`}>
+                  Pricing
                 </Link>
-                <Link href="/insurance/pet" className={`px-4 py-2 text-sm font-medium transition-colors ${isActivePath("/insurance/pet")}`}>
-                  {t('petInsurance')}
+                <Link href="/ask-briki" className={`px-4 py-2 text-sm font-medium transition-colors ${isActivePath("/ask-briki")}`}>
+                  Ask Briki
                 </Link>
-                <Link href="/insurance/health" className={`px-4 py-2 text-sm font-medium transition-colors ${isActivePath("/insurance/health")}`}>
-                  {t('healthInsurance')}
+                <Link href="/blog" className={`px-4 py-2 text-sm font-medium transition-colors ${isActivePath("/blog")}`}>
+                  Blog
+                </Link>
+                <Link href="/forum" className={`px-4 py-2 text-sm font-medium transition-colors ${isActivePath("/forum")}`}>
+                  Forum
+                </Link>
+                <Link href="/careers" className={`px-4 py-2 text-sm font-medium transition-colors ${isActivePath("/careers")}`}>
+                  Careers
                 </Link>
               </nav>
             </div>
