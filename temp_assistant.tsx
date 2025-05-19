@@ -1,13 +1,15 @@
 import React, { useState, useRef, useEffect } from "react";
-import { AuthenticatedLayout } from "../components/layout";
+import { AuthenticatedLayout, ContentWrapper } from "../components/layout";
 import { Button } from "../components/ui/button";
 import { Textarea } from "../components/ui/textarea";
+import { Badge } from "../components/ui/badge";
 import { Bot, Send, User, Loader2, AlertCircle, Star } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { v4 as uuidv4 } from "uuid";
 import { 
   askAssistant, 
+  parseWidgetData, 
   AssistantWidgetType,
   GlossaryWidgetData,
   VisualComparisonWidgetData,
@@ -70,23 +72,23 @@ const MessageBubble: React.FC<{ message: Message }> = ({ message }) => {
   
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="mb-5"
+      className="mb-4"
     >
       <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
         <div className={`flex items-start gap-2 max-w-[80%] ${isUser ? "flex-row-reverse" : ""}`}>
           {/* Avatar */}
           {message.sender === "assistant" ? (
-            <Avatar className="h-8 w-8 bg-primary/5 shrink-0">
+            <Avatar className="h-10 w-10 bg-primary/10 ring-2 ring-primary/20">
               <AvatarImage src="/briki-avatar.svg" alt="Briki Assistant" />
               <AvatarFallback>
-                <Bot className="h-4 w-4 text-primary" />
+                <Bot className="h-5 w-5 text-primary" />
               </AvatarFallback>
             </Avatar>
           ) : (
-            <Avatar className="h-8 w-8 bg-gray-100 shrink-0">
+            <Avatar className="h-8 w-8 bg-gray-100">
               <AvatarFallback>
                 <User className="h-4 w-4 text-gray-600" />
               </AvatarFallback>
@@ -97,7 +99,7 @@ const MessageBubble: React.FC<{ message: Message }> = ({ message }) => {
           <div 
             className={`rounded-2xl px-4 py-2 ${
               isUser 
-                ? "bg-primary/10 text-gray-800" 
+                ? "bg-primary text-white" 
                 : message.error 
                   ? "bg-red-50 text-red-800 border border-red-200"
                   : "bg-gray-100 text-gray-800"
@@ -126,6 +128,13 @@ const MessageBubble: React.FC<{ message: Message }> = ({ message }) => {
           </div>
         </div>
       </div>
+      
+      {/* Render widget if available */}
+      {message.sender === "assistant" && message.widgetData && (
+        <div className="mt-2 ml-10">
+          <AssistantWidget data={message.widgetData} />
+        </div>
+      )}
     </motion.div>
   );
 };
@@ -158,6 +167,7 @@ interface UserMemory {
   };
 }
 
+// Redesigned AI Assistant based on Perplexity-style UI
 export default function AIAssistantScreen() {
   const [inputMessage, setInputMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([initialGreeting]);
@@ -486,12 +496,19 @@ export default function AIAssistantScreen() {
         const errorMessage: Message = {
           id: uuidv4(),
           sender: "assistant",
-          content: "I'm sorry, but I encountered an error processing your request. Please try again.",
+          content: "Hmm, I couldn't get that just now. Want to try rephrasing or ask something else?",
           timestamp: new Date().toISOString(),
           error: true
         };
         
         return [...filtered, errorMessage];
+      });
+      
+      // Show error notification
+      toast({
+        title: "Assistant Error",
+        description: "Failed to get a response from the assistant.",
+        variant: "destructive"
       });
     } finally {
       setIsSending(false);
@@ -557,216 +574,219 @@ export default function AIAssistantScreen() {
         </motion.div>
       </div>
       
-      {/* Messages container - only this part scrolls */}
+      {/* Messages container - the only part that scrolls */}
       <div 
         ref={messagesContainerRef}
         className="flex-1 overflow-y-auto px-4 md:px-0 py-6 mx-auto w-full max-w-2xl"
       >
-        {messages.length === 1 ? (
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="flex flex-col items-center"
-          >
-            <h2 className="text-2xl font-medium text-gray-800 mb-6 mt-8">
-              Ask anything about insurance
-            </h2>
-            
-            {/* Suggested questions in a grid layout */}
-            <div className="grid grid-cols-1 gap-3 w-full max-w-md mb-10">
-              {suggestedQuestions.map((question, index) => (
-                <motion.button
-                  key={index}
-                  whileHover={{ scale: 1.01 }}
-                  whileTap={{ scale: 0.99 }}
-                  className="text-left p-3 bg-white rounded-xl border border-gray-200 text-sm text-gray-800 hover:bg-gray-50 transition-colors shadow-sm"
-                  onClick={() => handleSuggestedQuestion(question)}
+              {messages.length === 1 ? (
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="flex flex-col items-center"
                 >
-                  {question}
-                </motion.button>
-              ))}
-            </div>
-          </motion.div>
-        ) : (
-          <>
-            {/* Memory panel */}
-            {Object.keys(userMemory).length > 0 && (
-              <motion.div 
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mb-6 mx-auto max-w-lg"
-              >
-                <div className="bg-primary/5 rounded-lg p-3 border border-primary/10">
-                  <div className="flex items-center mb-2">
-                    <div className="h-5 w-5 bg-primary/10 rounded-full flex items-center justify-center mr-2">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-primary" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                    <div className="flex justify-between w-full">
-                      <span className="text-xs font-medium text-primary">Briki remembers:</span>
-                      <button 
-                        onClick={() => setUserMemory({})} 
-                        className="text-xs text-primary/80 hover:text-primary flex items-center"
+                  <h2 className="text-2xl font-medium text-gray-800 mb-6 mt-8">
+                    Ask anything about insurance
+                  </h2>
+                  
+                  {/* Suggested questions in a grid layout */}
+                  <div className="grid grid-cols-1 gap-3 w-full max-w-md mb-10">
+                    {suggestedQuestions.map((question, index) => (
+                      <motion.button
+                        key={index}
+                        whileHover={{ scale: 1.01 }}
+                        whileTap={{ scale: 0.99 }}
+                        className="text-left p-3 bg-white rounded-xl border border-gray-200 text-sm text-gray-800 hover:bg-gray-50 transition-colors shadow-sm"
+                        onClick={() => handleSuggestedQuestion(question)}
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                        Clear
-                      </button>
-                    </div>
-                  </div>
-                  <div className="text-xs text-gray-600 grid gap-1">
-                    {userMemory.pet && (
-                      <div className="flex items-start">
-                        <span className="block w-2 h-2 rounded-full bg-primary/60 mt-1.5 mr-2"></span>
-                        <span>
-                          {userMemory.pet.type && `You have a ${userMemory.pet.age ? `${userMemory.pet.age}-year-old ` : ''}${userMemory.pet.type}`}
-                          {userMemory.pet.breed && ` (${userMemory.pet.breed})`}
-                        </span>
-                      </div>
-                    )}
-                    {userMemory.travel && (
-                      <div className="flex items-start">
-                        <span className="block w-2 h-2 rounded-full bg-primary/60 mt-1.5 mr-2"></span>
-                        <span>
-                          {userMemory.travel.destination && `Planning travel to ${userMemory.travel.destination}`}
-                          {userMemory.travel.duration && ` for ${userMemory.travel.duration}`}
-                        </span>
-                      </div>
-                    )}
-                    {userMemory.vehicle && (
-                      <div className="flex items-start">
-                        <span className="block w-2 h-2 rounded-full bg-primary/60 mt-1.5 mr-2"></span>
-                        <span>
-                          {userMemory.vehicle.make && `You drive a ${userMemory.vehicle.year ? `${userMemory.vehicle.year} ` : ''}${userMemory.vehicle.make}`}
-                          {userMemory.vehicle.model && ` ${userMemory.vehicle.model}`}
-                        </span>
-                      </div>
-                    )}
-                    {userMemory.health && (
-                      <div className="flex items-start">
-                        <span className="block w-2 h-2 rounded-full bg-primary/60 mt-1.5 mr-2"></span>
-                        <span>
-                          {userMemory.health.age && `You are ${userMemory.health.age} years old`}
-                          {userMemory.health.conditions && userMemory.health.conditions.length > 0 && ` with ${userMemory.health.conditions.join(', ')}`}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </>
-        )}
-        
-        {/* Conversation messages */}
-        {messages.filter(m => !(m.sender === "assistant" && m === messages[0])).map((message) => (
-          <MessageBubble key={message.id} message={message} />
-        ))}
-        
-        {/* Feedback card that appears after multiple interactions */}
-        <AnimatePresence>
-          {showFeedback && !feedbackSubmitted && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              className="my-6 mx-auto max-w-md"
-            >
-              <Card className="bg-white shadow-sm border border-gray-200">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-base">How am I doing?</CardTitle>
-                  <CardDescription className="text-xs">Your feedback helps me improve</CardDescription>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <div className="flex justify-center gap-2 mb-3">
-                    {[1, 2, 3, 4, 5].map((rating) => (
-                      <button
-                        key={rating}
-                        onClick={() => {
-                          document.querySelectorAll('.rating-star').forEach((el, i) => {
-                            if (i + 1 <= rating) {
-                              el.classList.add('fill-yellow-500');
-                            } else {
-                              el.classList.remove('fill-yellow-500');
-                            }
-                          });
-                        }}
-                        className="p-1 hover:scale-110 transition-transform"
-                      >
-                        <Star className="h-5 w-5 rating-star text-gray-300" />
-                      </button>
+                        {question}
+                      </motion.button>
                     ))}
                   </div>
-                  <Textarea
-                    placeholder="What did you like or dislike? (optional)"
-                    value={feedbackComment}
-                    onChange={(e) => setFeedbackComment(e.target.value)}
-                    className="resize-none text-sm"
-                    rows={2}
-                  />
-                </CardContent>
-                <CardFooter className="flex justify-end gap-2 pt-0">
-                  <Button
-                    variant="outline"
-                    onClick={() => setShowFeedback(false)}
-                    className="text-xs h-8"
+                </motion.div>
+              ) : (
+                /* Memory panel that appears during conversation */
+                Object.keys(userMemory).length > 0 && (
+                  <div className="mb-4 mx-auto max-w-md">
+                    <div className="bg-blue-50 rounded-lg p-3 border border-blue-100">
+                      <div className="flex items-center mb-2">
+                        <div className="h-6 w-6 bg-blue-100 rounded-full flex items-center justify-center mr-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        <div className="flex justify-between w-full">
+                          <span className="text-xs font-medium text-blue-700">Briki remembers:</span>
+                          <button 
+                            onClick={() => setUserMemory({})} 
+                            className="text-xs text-blue-600 hover:text-blue-800 flex items-center"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                            Clear
+                          </button>
+                        </div>
+                      </div>
+                      <div className="text-xs text-gray-600 grid gap-1">
+                        {userMemory.pet && (
+                          <div className="flex items-start">
+                            <span className="block w-2 h-2 rounded-full bg-blue-400 mt-1.5 mr-2"></span>
+                            <span>
+                              {userMemory.pet.type && `You have a ${userMemory.pet.age ? `${userMemory.pet.age}-year-old ` : ''}${userMemory.pet.type}`}
+                              {userMemory.pet.breed && ` (${userMemory.pet.breed})`}
+                            </span>
+                          </div>
+                        )}
+                        {userMemory.travel && (
+                          <div className="flex items-start">
+                            <span className="block w-2 h-2 rounded-full bg-green-400 mt-1.5 mr-2"></span>
+                            <span>
+                              {userMemory.travel.destination && `Planning travel to ${userMemory.travel.destination}`}
+                              {userMemory.travel.duration && ` for ${userMemory.travel.duration}`}
+                            </span>
+                          </div>
+                        )}
+                        {userMemory.vehicle && (
+                          <div className="flex items-start">
+                            <span className="block w-2 h-2 rounded-full bg-purple-400 mt-1.5 mr-2"></span>
+                            <span>
+                              {userMemory.vehicle.year && userMemory.vehicle.make && `You have a ${userMemory.vehicle.year} ${userMemory.vehicle.make}`}
+                              {userMemory.vehicle.model && ` ${userMemory.vehicle.model}`}
+                            </span>
+                          </div>
+                        )}
+                        {userMemory.health && (
+                          <div className="flex items-start">
+                            <span className="block w-2 h-2 rounded-full bg-red-400 mt-1.5 mr-2"></span>
+                            <span>
+                              {userMemory.health.age && `You are ${userMemory.health.age} years old`}
+                              {userMemory.health.conditions && userMemory.health.conditions.length > 0 && 
+                                ` with ${userMemory.health.conditions.join(', ')}`}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )
+              )}
+              
+              <AnimatePresence>
+                {messages.map((msg) => (
+                  <MessageBubble key={msg.id} message={msg} />
+                ))}
+                <div ref={messageEndRef} />
+              </AnimatePresence>
+
+              {/* Feedback Component */}
+              <AnimatePresence>
+                {showFeedback && !feedbackSubmitted && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    className="mt-6 mb-6 mx-auto max-w-md"
                   >
-                    Later
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      const filledStars = document.querySelectorAll('.rating-star.fill-yellow-500').length;
-                      if (filledStars > 0) {
-                        handleFeedbackSubmit(filledStars as 1|2|3|4|5);
-                      }
-                    }}
-                    className="bg-primary text-white hover:bg-primary/90 text-xs h-8"
-                  >
-                    Submit
-                  </Button>
-                </CardFooter>
-              </Card>
-            </motion.div>
-          )}
-        </AnimatePresence>
-        
-        {/* Invisible element to scroll to */}
-        <div ref={messageEndRef} className="h-32" />
+                    <Card className="border-2 border-primary/20 shadow-md">
+                      <CardHeader className="bg-gradient-to-r from-primary/10 to-secondary/10 pb-2">
+                        <CardTitle className="text-lg">How helpful was the assistant?</CardTitle>
+                        <CardDescription>Your feedback helps us improve</CardDescription>
+                      </CardHeader>
+                      <CardContent className="pt-4">
+                        <div className="flex justify-center space-x-2 mb-4">
+                          {[1, 2, 3, 4, 5].map((rating) => (
+                            <button
+                              key={rating}
+                              type="button"
+                              onClick={() => {
+                                const stars = document.querySelectorAll('.rating-star');
+                                stars.forEach((star, idx) => {
+                                  if (idx < rating) {
+                                    star.classList.add('text-yellow-500');
+                                    star.classList.add('fill-yellow-500');
+                                  } else {
+                                    star.classList.remove('text-yellow-500');
+                                    star.classList.remove('fill-yellow-500');
+                                  }
+                                });
+                              }}
+                              className="p-2 rounded-full transition-colors hover:bg-gray-100"
+                            >
+                              <Star className="h-6 w-6 rating-star" />
+                            </button>
+                          ))}
+                        </div>
+                        <Textarea
+                          placeholder="What did you like or dislike? (optional)"
+                          value={feedbackComment}
+                          onChange={(e) => setFeedbackComment(e.target.value)}
+                          className="resize-none"
+                          rows={2}
+                        />
+                      </CardContent>
+                      <CardFooter className="flex justify-end gap-2 pt-0">
+                        <Button
+                          variant="outline"
+                          onClick={() => setShowFeedback(false)}
+                        >
+                          Maybe Later
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            const filledStars = document.querySelectorAll('.rating-star.fill-yellow-500').length;
+                            if (filledStars > 0) {
+                              handleFeedbackSubmit(filledStars as 1|2|3|4|5);
+                            }
+                          }}
+                          className="bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90"
+                        >
+                          Submit Feedback
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+            
+            {/* Input area (fixed at bottom) */}
+            <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-3 md:p-4 shadow-xl z-20">
+              <div className="container mx-auto max-w-7xl">
+                <div className="flex gap-2 items-end">
+                  <div className="flex-1 relative">
+                    <Textarea
+                      className="resize-none min-h-[50px] max-h-[100px] py-3 px-4 rounded-2xl border-gray-300 focus:ring-2 focus:ring-primary/30 focus:border-primary/50 pr-12 shadow-sm"
+                      placeholder="Ask me about insurance..."
+                      value={inputMessage}
+                      onChange={(e) => setInputMessage(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          handleSendMessage();
+                        }
+                      }}
+                      disabled={isSending}
+                    />
+                    <Button 
+                      className="absolute right-2 bottom-2 p-2 h-auto w-auto bg-gradient-to-br from-primary to-secondary text-white hover:opacity-90 transition-all rounded-full shadow-md"
+                      onClick={handleSendMessage}
+                      disabled={!inputMessage.trim() || isSending}
+                    >
+                      {isSending ? (
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                      ) : (
+                        <Send className="h-5 w-5" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ContentWrapper>
       </div>
-      
-      {/* Fixed input area at bottom */}
-      <div className="py-5 px-4 bg-white border-t border-gray-100 w-full">
-        <div className="max-w-2xl mx-auto relative">
-          <Textarea
-            className="resize-none w-full rounded-full border-gray-200 py-3 pl-5 pr-12 shadow-sm focus:ring-1 focus:ring-primary focus:border-primary/50"
-            placeholder="Ask anything about insurance..."
-            value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleSendMessage();
-              }
-            }}
-            disabled={isSending}
-            rows={1}
-          />
-          <Button 
-            className="absolute right-2 bottom-2 p-2 h-8 w-8 bg-primary text-white hover:bg-primary/90 transition-all rounded-full"
-            onClick={handleSendMessage}
-            disabled={!inputMessage.trim() || isSending}
-          >
-            {isSending ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Send className="h-4 w-4" />
-            )}
-          </Button>
-        </div>
-      </div>
-    </div>
+    </AuthenticatedLayout>
   );
 }
