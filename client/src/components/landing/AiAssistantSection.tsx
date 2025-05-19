@@ -94,29 +94,29 @@ export default function AiAssistantSection() {
           >
             <div className="max-w-md mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-xl overflow-hidden">
               {/* Header */}
-              <div className="px-5 py-4 bg-gradient-to-r from-blue-600 to-cyan-500 text-white">
+              <div className="px-5 py-4 bg-gradient-to-r from-blue-600 to-cyan-500">
                 <div className="flex items-center">
-                  <Bot className="h-6 w-6 mr-2" />
-                  <h3 className="font-semibold">Briki AI Assistant</h3>
+                  <Bot className="h-6 w-6 mr-2 text-white" />
+                  <h3 className="font-semibold text-white">Briki AI Assistant</h3>
                 </div>
               </div>
               
               {/* Chat area */}
-              <div className="p-5 bg-gray-50 dark:bg-gray-900 h-64">
+              <div className="p-5 bg-gray-50 dark:bg-gray-900 h-64 overflow-y-auto">
                 {/* Bot message */}
                 <div className="flex mb-4">
                   <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3 flex-shrink-0">
                     <Bot className="h-4 w-4 text-blue-600" />
                   </div>
-                  <div className="bg-white dark:bg-gray-800 rounded-lg py-2 px-3 shadow max-w-sm">
+                  <div className="bg-white dark:bg-gray-800 rounded-lg py-2 px-3 shadow max-w-xs">
                     <p className="text-gray-700 dark:text-gray-300">Hello! I'm your Briki AI Assistant. How can I help with your insurance needs today?</p>
                   </div>
                 </div>
                 
                 {/* User message */}
                 <div className="flex justify-end mb-4">
-                  <div className="bg-blue-600 rounded-lg py-2 px-3 text-white max-w-sm">
-                    <p>I want to insure my 9-year-old dog with arthritis.</p>
+                  <div className="bg-blue-600 rounded-lg py-2 px-3 text-white max-w-xs">
+                    <p>I just bought a car. What's the best insurance that actually covers accidents — not just the basics?</p>
                   </div>
                   <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center ml-3 flex-shrink-0">
                     <MessageCircle className="h-4 w-4 text-gray-600" />
@@ -128,15 +128,19 @@ export default function AiAssistantSection() {
                   <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3 flex-shrink-0">
                     <Bot className="h-4 w-4 text-blue-600" />
                   </div>
-                  <div className="space-y-2 max-w-sm">
+                  <div className="space-y-2 max-w-xs">
                     <div className="bg-white dark:bg-gray-800 rounded-lg py-2 px-3 shadow">
-                      <p className="text-gray-700 dark:text-gray-300">I can help with that! I found 3 plans that cover pets with pre-existing conditions.</p>
+                      <p className="text-gray-700 dark:text-gray-300">Based on your profile, I'd recommend full-coverage plans with roadside assistance and low deductibles. Here's one with great reviews.</p>
                     </div>
                     <div className="bg-blue-50 dark:bg-gray-700 border border-blue-100 dark:border-gray-600 rounded-lg p-3">
-                      <p className="text-xs text-blue-700 dark:text-blue-300 font-semibold mb-1">RECOMMENDED PLANS</p>
-                      <p className="text-sm text-gray-700 dark:text-gray-300">• PetAssure Complete Care</p>
-                      <p className="text-sm text-gray-700 dark:text-gray-300">• Healthy Paws Senior Plan</p>
-                      <p className="text-sm text-gray-700 dark:text-gray-300">• Pawsome Coverage Plus</p>
+                      <p className="text-xs text-blue-700 dark:text-blue-300 font-semibold mb-1">RECOMMENDED PLAN</p>
+                      <div className="text-sm text-gray-700 dark:text-gray-300 flex items-center">
+                        <span className="block font-medium">Total Protection Plus</span>
+                        <span className="ml-auto text-green-600 font-medium">$89/mo</span>
+                      </div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                        Includes collision, comprehensive, liability, and roadside
+                      </div>
                     </div>
                   </div>
                 </div>
