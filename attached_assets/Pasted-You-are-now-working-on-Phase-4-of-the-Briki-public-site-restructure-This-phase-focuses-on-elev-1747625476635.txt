@@ -1,0 +1,47 @@
+You are now working on **Phase 4 of the Briki public site restructure**.
+
+This phase focuses on elevating the visual experience of the public-facing pages by adding subtle animations, ambient background effects, and interactive feedback to improve perceived quality and user engagement.
+
+---
+
+### Objectives:
+
+1. **Implement Ambient Background Effects**
+   - For `/features`, `/ask-briki`, and `/careers`:
+     • Add a subtle animated gradient background or motion visualizer
+     • Use CSS or canvas effects with performance in mind
+     • Options:
+       - Slowly shifting background gradient (e.g., using Tailwind + keyframes)
+       - Floating particle animation layer behind content (SVG or canvas)
+       - Glassmorphism-style blurred light panels behind hero text
+   - Background should be visually calming and on-brand (teal, blue, soft glow — not distracting)
+
+2. **Add Scroll-Triggered Animations**
+   - Use a library like `framer-motion` or simple Tailwind utility classes to trigger animations as users scroll
+   - Animate elements like:
+     • Feature cards (fade in or slide up)
+     • Testimonials or steps in “How Briki Works”
+     • Blog and Forum post cards (hover and fade reveal)
+   - Keep animations subtle and responsive
+
+3. **Enhance Hover & Tap Interactions**
+   - Add motion or scale effects on:
+     • Taskbar links
+     • CTA buttons
+     • Plan cards or info cards (if present)
+   - Use Tailwind transitions and transforms to create clean micro-interactions
+
+4. **Unify Visual Rhythm**
+   - Review all paddings, line-heights, and spacing to ensure consistent rhythm across sections
+   - Use Tailwind tokens (`space-y`, `gap`, `leading`) to improve scannability
+   - Apply consistent section breaks with soft dividers or gradient fades where needed
+
+5. **Mobile Optimization**
+   - Ensure that animations and background visuals degrade gracefully on mobile
+   - Avoid GPU-intensive effects on smaller devices
+
+---
+
+This phase is focused on polish, subtlety, and visual intelligence — it should feel seamless, calming, and professional.
+
+Once complete, we will move to **Phase 5: Refined content pass (copy improvements, testimonials, Q&A depth, SEO headlines).**
