@@ -10,6 +10,70 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
+/**
+ * GET /api/ai/test
+ * Simple diagnostic test endpoint for OpenAI API connection
+ */
+router.get('/test', async (req, res) => {
+  try {
+    // Log API key information (safely)
+    console.log('API Key available:', !!process.env.OPENAI_API_KEY);
+    
+    if (process.env.OPENAI_API_KEY) {
+      const keyPrefix = process.env.OPENAI_API_KEY.substring(0, 5);
+      const keyLength = process.env.OPENAI_API_KEY.length;
+      console.log(`API Key prefix: ${keyPrefix}..., length: ${keyLength}`);
+    } else {
+      console.error('OPENAI_API_KEY is not set in environment');
+      return res.status(500).json({ error: 'API key not configured' });
+    }
+    
+    // Attempt a simple API call with minimal tokens
+    console.log('Testing OpenAI API connection...');
+    const start = Date.now();
+    
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        { role: "system", content: "You are a helpful assistant." },
+        { role: "user", content: "Say hello in one word." }
+      ],
+      max_tokens: 10
+    });
+    
+    const elapsed = Date.now() - start;
+    console.log(`OpenAI API response received in ${elapsed}ms`);
+    
+    // Return success with timing information
+    res.json({ 
+      success: true, 
+      message: completion.choices[0]?.message?.content || "No response",
+      timing: {
+        elapsed_ms: elapsed,
+        model: "gpt-4o",
+        timestamp: new Date().toISOString()
+      }
+    });
+  } catch (error: any) {
+    // Log detailed error information
+    console.error('OpenAI API test error:', {
+      message: error.message,
+      status: error.status,
+      type: error.type,
+      code: error.code
+    });
+    
+    // Return detailed error for debugging
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      status: error.status,
+      type: error.type,
+      code: error.code
+    });
+  }
+});
+
 // System prompt to guide the AI's responses about insurance with structured metadata and actions
 const SYSTEM_PROMPT = `
 You are Briki, a knowledgeable insurance assistant that helps users understand insurance options across various categories including travel, health, auto, and pet insurance.
