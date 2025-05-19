@@ -3,8 +3,10 @@ import { petPlans } from "@/components/plans/mockPlans";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Heart, Shield, ArrowRight, BadgeCheck, Search, PawPrint, Syringe, Wallet } from "lucide-react";
+import { QuoteSummary } from "@/components/quote-summary";
+import { useQuoteStore } from "@/store/quote-store";
 import { HeroWrapper, ContentWrapper } from "@/components/layout";
 import { useCompareStore } from "@/store/compare-store";
 import { ComparePageTrigger } from "@/components/compare-page-trigger";
@@ -297,6 +299,9 @@ export default function PetInsurancePage() {
               Choose from our range of pet insurance options designed to keep your furry family members protected.
             </p>
           </motion.div>
+          
+          {/* Quote Summary */}
+          <QuoteSummary category="pet" />
           
           {/* Filter/sort controls */}
           <motion.div
