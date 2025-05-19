@@ -116,10 +116,39 @@ const MessageBubble: React.FC<{ message: Message }> = ({ message }) => {
   );
 };
 
+// Interface for memory context
+interface UserMemory {
+  pet?: {
+    type?: string;
+    age?: number;
+    breed?: string;
+    conditions?: string[];
+  };
+  travel?: {
+    destination?: string;
+    duration?: string;
+    date?: string;
+    travelers?: number;
+    activities?: string[];
+  };
+  vehicle?: {
+    make?: string;
+    model?: string;
+    year?: number;
+    value?: string;
+  };
+  health?: {
+    age?: number;
+    conditions?: string[];
+    medications?: string[];
+  };
+}
+
 export default function AIAssistantScreen() {
   const [inputMessage, setInputMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([initialGreeting]);
   const [isSending, setIsSending] = useState(false);
+  const [userMemory, setUserMemory] = useState<UserMemory>({});
   
   const messageEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -127,6 +156,104 @@ export default function AIAssistantScreen() {
   // Auto-scroll to the bottom of messages
   useEffect(() => {
     scrollToBottom();
+  }, [messages]);
+  
+  // Extract and update user context from messages
+  useEffect(() => {
+    // Only process if there are messages
+    if (messages.length <= 1) return;
+    
+    // Only process user messages
+    const userMessages = messages.filter(m => m.sender === "user");
+    if (userMessages.length === 0) return;
+    
+    // Get the most recent user message
+    const lastUserMessage = userMessages[userMessages.length - 1].content.toLowerCase();
+    
+    // Extract context based on patterns
+    
+    // Pet insurance context
+    const petTypeMatch = lastUserMessage.match(/my\s+(\w+)\s+(?:pet|dog|cat|bird|hamster)/i);
+    if (petTypeMatch) {
+      setUserMemory(prev => ({
+        ...prev,
+        pet: {
+          ...prev.pet,
+          type: petTypeMatch[1].toLowerCase()
+        }
+      }));
+    }
+    
+    const petAgeMatch = lastUserMessage.match(/(\d+)[\s-]year[\s-]old\s+(?:pet|dog|cat|bird|hamster)/i);
+    if (petAgeMatch) {
+      setUserMemory(prev => ({
+        ...prev,
+        pet: {
+          ...prev.pet,
+          age: parseInt(petAgeMatch[1])
+        }
+      }));
+    }
+    
+    // Travel context
+    const travelMatch = lastUserMessage.match(/(?:trip|travel|going)\s+to\s+(\w+)/i);
+    if (travelMatch) {
+      setUserMemory(prev => ({
+        ...prev,
+        travel: {
+          ...prev.travel,
+          destination: travelMatch[1]
+        }
+      }));
+    }
+    
+    const travelDurationMatch = lastUserMessage.match(/(?:for|duration|stay(?:ing)?)\s+(?:of\s+)?(\d+)\s+(?:days|weeks|months)/i);
+    if (travelDurationMatch) {
+      setUserMemory(prev => ({
+        ...prev,
+        travel: {
+          ...prev.travel,
+          duration: `${travelDurationMatch[1]} ${travelDurationMatch[2] || 'days'}`
+        }
+      }));
+    }
+    
+    // Vehicle context
+    const vehicleMatch = lastUserMessage.match(/(?:my|have a|drive a|own a)\s+(\d{4})\s+(\w+)/i);
+    if (vehicleMatch) {
+      setUserMemory(prev => ({
+        ...prev,
+        vehicle: {
+          ...prev.vehicle,
+          year: parseInt(vehicleMatch[1]),
+          make: vehicleMatch[2]
+        }
+      }));
+    }
+    
+    // Health context
+    const healthConditionMatch = lastUserMessage.match(/(diabetes|heart disease|asthma|allergy|cancer|arthritis)/gi);
+    if (healthConditionMatch) {
+      const conditions = Array.from(new Set(healthConditionMatch.map(c => c.toLowerCase())));
+      setUserMemory(prev => ({
+        ...prev,
+        health: {
+          ...prev.health,
+          conditions: [...(prev.health?.conditions || []), ...conditions]
+        }
+      }));
+    }
+    
+    const ageMatch = lastUserMessage.match(/(?:i am|i'm)\s+(\d+)(?:\s+years old|\s+year old)?/i);
+    if (ageMatch) {
+      setUserMemory(prev => ({
+        ...prev,
+        health: {
+          ...prev.health,
+          age: parseInt(ageMatch[1])
+        }
+      }));
+    }
   }, [messages]);
 
   const scrollToBottom = () => {
@@ -172,8 +299,8 @@ export default function AIAssistantScreen() {
     setMessages(prev => [...prev, loadingMessage]);
     
     try {
-      // Call the API to get a response
-      const response = await askAssistant(userMessage.content);
+      // Call the API with user message and memory context
+      const response = await askAssistant(userMessage.content, userMemory);
       
       // Check if the response contains structured data in JSON format
       const widgetData = extractJsonFromText(response.response);
