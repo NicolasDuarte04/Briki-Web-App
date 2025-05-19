@@ -1,4 +1,5 @@
 export { default as Hero } from './Hero';
+export { default as AiAssistantSection } from './AiAssistantSection';
 export { default as Features } from './Features';
 export { default as PartnerSection } from './PartnerSection';
 export { default as Testimonials } from './Testimonials';
