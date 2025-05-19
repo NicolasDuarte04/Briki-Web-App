@@ -123,27 +123,29 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
                 </h1>
               </Link>
               
-              {/* Desktop Navigation */}
-              <nav className="hidden md:flex items-center space-x-1">
-                <Link href="/features" className={`px-4 py-2 text-sm font-medium transition-colors ${isActivePath("/features")}`}>
-                  Features
-                </Link>
-                <Link href="/pricing" className={`px-4 py-2 text-sm font-medium transition-colors ${isActivePath("/pricing")}`}>
-                  Pricing
-                </Link>
-                <Link href="/ask-briki" className={`px-4 py-2 text-sm font-medium transition-colors ${isActivePath("/ask-briki")}`}>
-                  Ask Briki
-                </Link>
-                <Link href="/blog" className={`px-4 py-2 text-sm font-medium transition-colors ${isActivePath("/blog")}`}>
-                  Blog
-                </Link>
-                <Link href="/forum" className={`px-4 py-2 text-sm font-medium transition-colors ${isActivePath("/forum")}`}>
-                  Forum
-                </Link>
-                <Link href="/careers" className={`px-4 py-2 text-sm font-medium transition-colors ${isActivePath("/careers")}`}>
-                  Careers
-                </Link>
-              </nav>
+              {/* Desktop Navigation - only show on non-public pages */}
+              {!isPublicPage && (
+                <nav className="hidden md:flex items-center space-x-1">
+                  <Link href="/features" className={`px-4 py-2 text-sm font-medium transition-colors ${isActivePath("/features")}`}>
+                    Features
+                  </Link>
+                  <Link href="/pricing" className={`px-4 py-2 text-sm font-medium transition-colors ${isActivePath("/pricing")}`}>
+                    Pricing
+                  </Link>
+                  <Link href="/ask-briki" className={`px-4 py-2 text-sm font-medium transition-colors ${isActivePath("/ask-briki")}`}>
+                    Ask Briki
+                  </Link>
+                  <Link href="/blog" className={`px-4 py-2 text-sm font-medium transition-colors ${isActivePath("/blog")}`}>
+                    Blog
+                  </Link>
+                  <Link href="/forum" className={`px-4 py-2 text-sm font-medium transition-colors ${isActivePath("/forum")}`}>
+                    Forum
+                  </Link>
+                  <Link href="/careers" className={`px-4 py-2 text-sm font-medium transition-colors ${isActivePath("/careers")}`}>
+                    Careers
+                  </Link>
+                </nav>
+              )}
             </div>
             
             {/* User Menu Section */}
@@ -290,37 +292,41 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
                     </SheetTitle>
                   </SheetHeader>
                   
-                  {/* Mobile navigation links */}
+                  {/* Mobile navigation links - only show on non-public pages */}
                   <div className="py-4">
                     <div className="space-y-1">
-                      <Link 
-                        href="/insurance/travel" 
-                        className={`block px-3 py-2 rounded-md text-base font-medium ${location === "/insurance/travel" ? "bg-blue-50 text-blue-600" : "text-gray-500 hover:bg-gray-50 hover:text-blue-600"}`}
-                        onClick={() => setIsOpen(false)}
-                      >
-                        {t('travelInsurance')}
-                      </Link>
-                      <Link 
-                        href="/insurance/auto" 
-                        className={`block px-3 py-2 rounded-md text-base font-medium ${location === "/insurance/auto" ? "bg-blue-50 text-blue-600" : "text-gray-500 hover:bg-gray-50 hover:text-blue-600"}`}
-                        onClick={() => setIsOpen(false)}
-                      >
-                        {t('autoInsurance')}
-                      </Link>
-                      <Link 
-                        href="/insurance/pet" 
-                        className={`block px-3 py-2 rounded-md text-base font-medium ${location === "/insurance/pet" ? "bg-blue-50 text-blue-600" : "text-gray-500 hover:bg-gray-50 hover:text-blue-600"}`}
-                        onClick={() => setIsOpen(false)}
-                      >
-                        {t('petInsurance')}
-                      </Link>
-                      <Link 
-                        href="/insurance/health" 
-                        className={`block px-3 py-2 rounded-md text-base font-medium ${location === "/insurance/health" ? "bg-blue-50 text-blue-600" : "text-gray-500 hover:bg-gray-50 hover:text-blue-600"}`}
-                        onClick={() => setIsOpen(false)}
-                      >
-                        {t('healthInsurance')}
-                      </Link>
+                      {!isPublicPage && (
+                        <>
+                          <Link 
+                            href="/insurance/travel" 
+                            className={`block px-3 py-2 rounded-md text-base font-medium ${location === "/insurance/travel" ? "bg-blue-50 text-blue-600" : "text-gray-500 hover:bg-gray-50 hover:text-blue-600"}`}
+                            onClick={() => setIsOpen(false)}
+                          >
+                            {t('travelInsurance')}
+                          </Link>
+                          <Link 
+                            href="/insurance/auto" 
+                            className={`block px-3 py-2 rounded-md text-base font-medium ${location === "/insurance/auto" ? "bg-blue-50 text-blue-600" : "text-gray-500 hover:bg-gray-50 hover:text-blue-600"}`}
+                            onClick={() => setIsOpen(false)}
+                          >
+                            {t('autoInsurance')}
+                          </Link>
+                          <Link 
+                            href="/insurance/pet" 
+                            className={`block px-3 py-2 rounded-md text-base font-medium ${location === "/insurance/pet" ? "bg-blue-50 text-blue-600" : "text-gray-500 hover:bg-gray-50 hover:text-blue-600"}`}
+                            onClick={() => setIsOpen(false)}
+                          >
+                            {t('petInsurance')}
+                          </Link>
+                          <Link 
+                            href="/insurance/health" 
+                            className={`block px-3 py-2 rounded-md text-base font-medium ${location === "/insurance/health" ? "bg-blue-50 text-blue-600" : "text-gray-500 hover:bg-gray-50 hover:text-blue-600"}`}
+                            onClick={() => setIsOpen(false)}
+                          >
+                            {t('healthInsurance')}
+                          </Link>
+                        </>
+                      )}
                       
                       {/* No account yet? Links */}
                       {!user && (
