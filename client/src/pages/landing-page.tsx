@@ -71,33 +71,28 @@ export default function LandingPage() {
             
             {/* Desktop navigation */}
             <div className="hidden sm:ml-6 sm:flex sm:items-center space-x-1 md:space-x-2">
-              <Link href="/insurance-plans" className="text-gray-600 hover:text-blue-600 px-3 py-2.5 text-sm font-medium transition-colors">
-                {t('travelInsurance')}
+              <Link href="/features" className="text-gray-600 hover:text-blue-600 px-3 py-2.5 text-sm font-medium transition-colors">
+                Features
               </Link>
-              <Link href="/auto-insurance" className="text-gray-600 hover:text-blue-600 px-3 py-2.5 text-sm font-medium transition-colors">
-                {t('autoInsurance')}
+              <Link href="/pricing" className="text-gray-600 hover:text-blue-600 px-3 py-2.5 text-sm font-medium transition-colors">
+                Pricing
               </Link>
-              <Link href="/pet-insurance" className="text-gray-600 hover:text-blue-600 px-3 py-2.5 text-sm font-medium transition-colors">
-                {t('petInsurance')}
+              <Link href="/ask-briki" className="text-gray-600 hover:text-blue-600 px-3 py-2.5 text-sm font-medium transition-colors">
+                Ask Briki
               </Link>
-              <Link href="/health-insurance" className="text-gray-600 hover:text-blue-600 px-3 py-2.5 text-sm font-medium transition-colors">
-                {t('healthInsurance')}
+              <Link href="/blog" className="text-gray-600 hover:text-blue-600 px-3 py-2.5 text-sm font-medium transition-colors">
+                Blog
               </Link>
-              <Link href="/support" className="text-gray-600 hover:text-blue-600 px-3 py-2.5 text-sm font-medium transition-colors">
-                {t('support')}
+              <Link href="/forum" className="text-gray-600 hover:text-blue-600 px-3 py-2.5 text-sm font-medium transition-colors">
+                Forum
+              </Link>
+              <Link href="/careers" className="text-gray-600 hover:text-blue-600 px-3 py-2.5 text-sm font-medium transition-colors">
+                Careers
               </Link>
             </div>
             
             {/* Auth buttons */}
             <div className="flex items-center gap-3">
-              <Button 
-                variant="outline" 
-                onClick={() => navigate("/company-login")}
-                className="hidden sm:flex items-center justify-center px-5 py-2.5 text-sm font-medium text-indigo-700 border border-indigo-300 bg-white hover:bg-indigo-50/80 hover:text-indigo-800 transition-all shadow-sm rounded-md"
-              >
-                <span>For Insurance Companies</span>
-                <span className="ml-2 text-xs opacity-70">→</span>
-              </Button>
               
               <div className="flex items-center space-x-3">
                 <Button 
