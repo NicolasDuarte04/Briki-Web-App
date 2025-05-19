@@ -4,6 +4,7 @@
 
 export interface AskAssistantRequest {
   message: string;
+  context?: Record<string, any>;
 }
 
 export interface AskAssistantResponse {
@@ -13,8 +14,9 @@ export interface AskAssistantResponse {
 
 /**
  * Send a user message to the AI assistant and get a response
+ * Optionally include user context for personalized responses
  */
-export async function askAssistant(message: string): Promise<AskAssistantResponse> {
+export async function askAssistant(message: string, context?: Record<string, any>): Promise<AskAssistantResponse> {
   if (!message || message.trim() === '') {
     throw new Error("Message cannot be empty");
   }
@@ -25,7 +27,10 @@ export async function askAssistant(message: string): Promise<AskAssistantRespons
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ message: message.trim() }),
+      body: JSON.stringify({ 
+        message: message.trim(),
+        context: context || {}
+      }),
     });
     
     if (!response.ok) {
