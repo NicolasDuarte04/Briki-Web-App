@@ -51,23 +51,31 @@ export const useCompareStore = create<CompareState>()(
         // Check if we've reached the maximum number of plans
         if (selectedPlans.length >= maxPlans) {
           console.warn(`Maximum of ${maxPlans} plans can be compared at once`);
-          return;
+          return false;
+        }
+        
+        // IMPORTANT: Check if the plan is from a different category than existing selected plans
+        const selectedCategories = get().getSelectedCategories();
+        if (selectedCategories.length > 0 && !selectedCategories.includes(plan.category)) {
+          console.warn(`Cannot compare plans from different categories. Current category: ${selectedCategories[0]}, Attempted to add: ${plan.category}`);
+          return false;
         }
         
         // Check if we've reached the maximum number of plans for this category
         const plansInCategory = selectedPlans.filter(p => p.category === plan.category);
         if (plansInCategory.length >= maxPlansPerCategory) {
           console.warn(`Maximum of ${maxPlansPerCategory} plans per category can be compared at once`);
-          return;
+          return false;
         }
         
         // Check if the plan is already selected
         if (selectedPlans.some(p => p.id === plan.id)) {
           console.warn(`Plan ${plan.id} is already in comparison`);
-          return;
+          return false;
         }
         
         set({ selectedPlans: [...selectedPlans, plan] });
+        return true;
       },
       
       // Remove a plan from comparison
