@@ -1,23 +1,50 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { MessageSquare } from 'lucide-react';
-import { useAIAssistant } from './ai-assistant-provider';
+import { useLocation } from 'wouter';
+import { useAuth } from '@/hooks/use-auth';
+import { AIAssistantButton } from './ai-assistant-button';
 
+/**
+ * Floating AI assistant button that appears in the corner of every page
+ * but excludes itself from certain pages where it would be redundant
+ * and only shows when user is authenticated
+ */
 export function FloatingAssistantButton() {
-  const { isAvailable, isOpen, openAssistant } = useAIAssistant();
-
-  // Don't render if the assistant is not available or already open
-  if (!isAvailable || isOpen) {
+  const [location] = useLocation();
+  const { user } = useAuth();
+  
+  // Don't show the floating button on these pages
+  const excludedPaths = [
+    '/ai-assistant', // AI demo page already has assistant components
+    '/', // Countdown page 
+    '/auth', // Login/Register page
+    '/countdown', // Alternate countdown page path
+    '/login', // Alternate login path
+    '/register', // Alternate register path
+    '/terms', // Terms page
+    '/learn-more', // Learn more page
+  ];
+  
+  // Check if current path is in the excluded list
+  const isExcludedPath = excludedPaths.some(path => 
+    location === path || location.startsWith(`${path}/`)
+  );
+  
+  // Don't show the button if:
+  // 1. User is not authenticated OR
+  // 2. Current path is in the excluded list
+  if (!user || isExcludedPath) {
+    console.log("Hiding AI Assistant Button:", { 
+      path: location, 
+      isAuthenticated: !!user,
+      isExcludedPath
+    });
     return null;
   }
-
-  return (
-    <Button
-      onClick={() => openAssistant('floating_button')}
-      className="fixed right-4 bottom-4 z-40 shadow-lg rounded-full p-3 h-12 w-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-      aria-label="Open AI Assistant"
-    >
-      <MessageSquare className="w-6 h-6 text-white" />
-    </Button>
-  );
+  
+  console.log("Showing AI Assistant Button:", { 
+    path: location, 
+    isAuthenticated: !!user,
+    isExcludedPath: false
+  });
+  return <AIAssistantButton displayVariant="fab" />;
 }

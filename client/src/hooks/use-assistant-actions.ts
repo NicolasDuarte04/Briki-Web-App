@@ -1,121 +1,115 @@
 import { useCallback } from 'react';
 import { useLocation } from 'wouter';
-import { 
-  AssistantWidgetType, 
-  NavigateToPageAction, 
-  RecommendPlanAction,
-  ComparePlansAction,
-  ExplainTermAction
-} from '@/types/assistant';
-import { trackActionInteraction } from '@/lib/assistant-analytics';
-import { useToast } from '@/hooks/use-toast';
+import { AssistantAction } from '@/services/ai-service';
+import { useCompareStore } from '@/store/compare-store';
+import { useQuoteStore } from '@/store/quote-store';
+import { trackEvent, EventCategory } from '@/lib/analytics';
 
+/**
+ * Hook to process assistant actions
+ */
 export function useAssistantActions() {
   const [, navigate] = useLocation();
-  const { toast } = useToast();
+  const { addPlanToComparison, clearPlans } = useCompareStore();
+  const { setQuote, setCategory } = useQuoteStore();
 
   /**
-   * Handle navigation action
+   * Process an action from the AI assistant
+   * @param action The action to process
+   * @returns boolean indicating success or failure
    */
-  const handleNavigateAction = useCallback((action: NavigateToPageAction) => {
-    trackActionInteraction('navigate_to_page', 'accepted');
-    
-    // Navigate to the specified path
-    navigate(action.path);
-    
-    toast({
-      title: 'Navigating',
-      description: `Taking you to ${action.label}`,
-      duration: 3000,
-    });
-  }, [navigate, toast]);
-
-  /**
-   * Handle plan recommendation action
-   */
-  const handleRecommendPlanAction = useCallback((action: RecommendPlanAction) => {
-    trackActionInteraction('recommend_plan', 'accepted');
-    
-    // Navigate to the plan details page
-    // The structure here depends on your app's routing
-    const path = `/insurance/${action.category}/plan/${action.planId}`;
-    navigate(path);
-    
-    toast({
-      title: 'Plan Recommendation',
-      description: 'Viewing the recommended plan details',
-      duration: 3000,
-    });
-  }, [navigate, toast]);
-
-  /**
-   * Handle compare plans action
-   */
-  const handleComparePlansAction = useCallback((action: ComparePlansAction) => {
-    trackActionInteraction('compare_plans', 'accepted');
-    
-    // Create URL with plan IDs for comparison page
-    const planIdsParam = action.planIds.join(',');
-    const path = `/insurance/${action.category}/compare?planIds=${planIdsParam}`;
-    navigate(path);
-    
-    toast({
-      title: 'Compare Plans',
-      description: `Comparing ${action.planIds.length} plans`,
-      duration: 3000,
-    });
-  }, [navigate, toast]);
-
-  /**
-   * Handle explanation of an insurance term
-   */
-  const handleExplainTermAction = useCallback((action: ExplainTermAction) => {
-    trackActionInteraction('explain_term', 'clicked');
-    
-    // Display the explanation in a toast or modal
-    toast({
-      title: `Term: ${action.term}`,
-      description: action.explanation,
-      duration: 6000, // Longer duration for reading
-    });
-  }, [toast]);
-
-  /**
-   * Main handler for all assistant actions
-   */
-  const handleAction = useCallback((action: AssistantWidgetType | null) => {
-    if (!action) return;
-    
-    switch (action.type) {
-      case 'navigate_to_page':
-        handleNavigateAction(action);
-        break;
-      case 'recommend_plan':
-        handleRecommendPlanAction(action);
-        break;
-      case 'compare_plans':
-        handleComparePlansAction(action);
-        break;
-      case 'explain_term':
-        handleExplainTermAction(action);
-        break;
-      default:
-        // Handle unknown action type
-        console.warn('Unknown action type:', action);
-        break;
+  const processAction = useCallback((action: AssistantAction | null): boolean => {
+    if (!action) {
+      return false;
     }
-  }, [
-    handleNavigateAction,
-    handleRecommendPlanAction,
-    handleComparePlansAction,
-    handleExplainTermAction
-  ]);
 
-  return {
-    handleAction,
-    handleNavigateAction,
-    handleRecommendPlanAction,
-    handleComparePlansAction,
-    handleExplainTermAction,
-  };
+    try {
+      trackEvent(
+        'assistant_action_executed',
+        EventCategory.ACTION,
+        action.type
+      );
+
+      switch (action.type) {
+        case 'navigate_to_quote_flow': {
+          // Handle navigation to a quote flow
+          const { category, preload } = action;
+          
+          // Set the quote data if provided
+          if (preload) {
+            setQuote(preload);
+          }
+          
+          // Set the category
+          setCategory(category);
+          
+          // Navigate to the appropriate quote flow
+          navigate(`/insurance/${category}/quote`);
+          return true;
+        }
+        
+        case 'open_comparison_tool': {
+          // Handle opening the comparison tool
+          const { category, plans } = action;
+          
+          // Clear existing plans
+          clearPlans();
+          
+          // If specific plans are provided, add them to comparison
+          if (plans && Array.isArray(plans)) {
+            plans.forEach(planId => {
+              // In a real impl, we'd fetch and add each plan by ID
+              // addPlanToComparison(fetchPlanById(planId));
+            });
+          }
+          
+          // Navigate to comparison page (with or without category filter)
+          if (category) {
+            navigate(`/compare?category=${category}`);
+          } else {
+            navigate('/compare');
+          }
+          return true;
+        }
+        
+        case 'filter_plan_results': {
+          // Handle filtering plan results
+          const { category, filters } = action;
+          
+          // Construct query params from filters
+          const queryParams = new URLSearchParams();
+          Object.entries(filters).forEach(([key, value]) => {
+            if (value !== undefined && value !== null) {
+              queryParams.append(key, String(value));
+            }
+          });
+          
+          // Navigate to the plans page with filters
+          navigate(`/insurance/${category}/plans?${queryParams.toString()}`);
+          return true;
+        }
+        
+        case 'navigate_to_page': {
+          // Handle navigation to a specific page
+          const { path } = action;
+          navigate(path);
+          return true;
+        }
+        
+        default:
+          console.warn(`Unknown action type: ${(action as any).type}`);
+          return false;
+      }
+    } catch (error) {
+      console.error("Error processing assistant action:", error);
+      trackEvent(
+        'assistant_action_error',
+        EventCategory.ERROR,
+        `action_type_${action.type}`
+      );
+      return false;
+    }
+  }, [navigate, addPlanToComparison, clearPlans, setQuote, setCategory]);
+
+  return { processAction };
 }
