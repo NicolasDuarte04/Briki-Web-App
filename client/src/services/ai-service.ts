@@ -1,257 +1,300 @@
-/**
- * Service for AI Assistant API calls
- */
+import { apiRequest } from '@/lib/queryClient';
 
-export interface AskAssistantRequest {
-  message: string;
-  context?: Record<string, any>;
-}
-
-export interface AskAssistantResponse {
-  response: string;
-  error?: string;
-}
-
-/**
- * Types for assistant widgets and visualizations
- * These define the display components that can be embedded in responses
- */
-
-// Base widget type
-export interface WidgetData {
-  type: string;
-}
-
-// Glossary term widget
-export interface GlossaryWidgetData extends WidgetData {
+// Widget Types
+export interface GlossaryWidgetData {
   type: 'show_glossary';
   term: string;
   definition: string;
-  icon?: string;
-  source?: string;
-  sourceUrl?: string;
+  example?: string;
+  learnMoreUrl?: string;
 }
 
-// Visual comparison widget
-export interface ComparisonItem {
-  label: string;
-  leftValue: string | boolean;
-  rightValue: string | boolean;
-}
-
-export interface VisualComparisonWidgetData extends WidgetData {
+export interface VisualComparisonWidgetData {
   type: 'show_comparison';
   title: string;
-  leftTitle: string;
-  rightTitle: string;
-  items: ComparisonItem[];
-  leftColor?: string;
-  rightColor?: string;
+  description?: string;
+  items: Array<{
+    label: string;
+    value: string;
+    percentage: number;
+  }>;
 }
 
-// Plan recommendation widget (already existed in some form)
-export interface PlanRecommendationWidgetData extends WidgetData {
-  type: 'show_plan_recommendations';
-  category: 'travel' | 'pet' | 'auto' | 'health';
-  filters?: Record<string, any>;
-  planIds?: string[];
-  message?: string;
-}
+export type AssistantWidgetType = GlossaryWidgetData | VisualComparisonWidgetData;
 
-// Union type for all possible widget types
-export type AssistantWidgetType = 
-  | GlossaryWidgetData
-  | VisualComparisonWidgetData
-  | PlanRecommendationWidgetData;
+// Action Types
+export type AssistantActionType = 
+  | 'navigate_to_quote_flow'
+  | 'open_comparison_tool'
+  | 'filter_plan_results'
+  | 'navigate_to_page';
 
-/**
- * Types for assistant actions and navigation
- * These types represent the structured data that the assistant can return
- * to trigger navigation or UI changes in the app
- */
-
-// Base action type
-export interface AssistantAction {
-  type: string;
-  message?: string;
-}
-
-// Navigate to a quote flow
-export interface NavigateToQuoteFlowAction extends AssistantAction {
+export interface NavigateToQuoteFlowAction {
   type: 'navigate_to_quote_flow';
-  category: 'travel' | 'pet' | 'auto' | 'health';
+  category: string;
+  message?: string;
   preload?: Record<string, any>;
 }
 
-// Open the comparison tool
-export interface OpenComparisonToolAction extends AssistantAction {
+export interface OpenComparisonToolAction {
   type: 'open_comparison_tool';
-  category: 'travel' | 'pet' | 'auto' | 'health';
-  planIds?: string[];
+  category?: string;
+  plans?: string[];
+  message?: string;
 }
 
-// Filter plan results
-export interface FilterPlanResultsAction extends AssistantAction {
+export interface FilterPlanResultsAction {
   type: 'filter_plan_results';
-  category: 'travel' | 'pet' | 'auto' | 'health';
+  category: string;
   filters: Record<string, any>;
+  message?: string;
 }
 
-// Show a glossary term
-export interface ShowGlossaryTermAction extends AssistantAction {
-  type: 'show_glossary_term';
-  term: string;
-  definition?: string;
+export interface NavigateToPageAction {
+  type: 'navigate_to_page';
+  path: string;
+  message?: string;
 }
 
-// Redirect to account settings
-export interface RedirectToAccountSettingsAction extends AssistantAction {
-  type: 'redirect_to_account_settings';
-  section?: string;
-}
-
-// Union type of all possible actions
-export type AssistantActionType = 
+export type AssistantAction = 
   | NavigateToQuoteFlowAction
-  | OpenComparisonToolAction
+  | OpenComparisonToolAction 
   | FilterPlanResultsAction
-  | ShowGlossaryTermAction
-  | RedirectToAccountSettingsAction;
+  | NavigateToPageAction;
 
-/**
- * Send a user message to the AI assistant and get a response
- * Optionally include user context for personalized responses
- */
-export interface AskAssistantResponseWithAction extends AskAssistantResponse {
-  action?: AssistantActionType;
+// Response Types
+export interface AskAssistantResponseWithAction {
+  response: string;
   widgetData?: AssistantWidgetType;
+  action?: AssistantAction;
+  error?: boolean;
+}
+
+// Memory Context
+export interface UserMemoryContext {
+  pet?: {
+    type?: string;
+    age?: number;
+    breed?: string;
+    conditions?: string[];
+  };
+  travel?: {
+    destination?: string;
+    duration?: string;
+    date?: string;
+    travelers?: number;
+    activities?: string[];
+  };
+  vehicle?: {
+    make?: string;
+    model?: string;
+    year?: number;
+    value?: string;
+  };
+  health?: {
+    age?: number;
+    conditions?: string[];
+    medications?: string[];
+  };
 }
 
 /**
- * Attempts to parse any structured action data from the assistant response
+ * Main function to ask the AI assistant a question
+ * @param message The user's message to the assistant
+ * @param memoryContext Optional memory context to provide to the assistant
  */
-export function parseAssistantAction(response: string): AssistantActionType | null {
+export async function askAssistant(
+  message: string,
+  memoryContext?: UserMemoryContext
+): Promise<AskAssistantResponseWithAction> {
   try {
-    // Look for specially formatted JSON in the response
-    // The format we're looking for is: [ACTION_JSON]{ ... }[/ACTION_JSON]
-    const actionMatch = response.match(/\[ACTION_JSON\]([\s\S]*?)\[\/ACTION_JSON\]/);
+    // Add a check for empty message
+    if (!message.trim()) {
+      return {
+        response: "I don't see a message there. How can I help you with insurance?",
+        error: false
+      };
+    }
+
+    // Create request payload
+    const payload = {
+      message,
+      context: memoryContext || {}
+    };
+
+    // Make API request
+    const response = await apiRequest('POST', '/api/ai/chat', payload);
     
-    if (actionMatch && actionMatch[1]) {
-      const actionData = JSON.parse(actionMatch[1].trim());
-      
-      // Validate that it's a proper action
-      if (actionData && actionData.type) {
-        // Return the action with the appropriate type
-        return actionData as AssistantActionType;
+    if (!response.ok) {
+      // Check for quota errors specifically
+      if (response.status === 429) {
+        return {
+          response: "I'm currently experiencing high demand. Please try again in a few moments.",
+          error: true
+        };
       }
+      
+      throw new Error(`API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    // Extract widget data if present
+    let widgetData: AssistantWidgetType | undefined;
+    if (data.response) {
+      widgetData = parseWidgetData(data.response);
     }
     
-    return null;
+    // Clean response of any potential JSON
+    const cleanedResponse = cleanResponse(data.response || "I'm having trouble generating a response right now.");
+    
+    return {
+      response: cleanedResponse,
+      widgetData,
+      action: data.action,
+      error: false
+    };
   } catch (error) {
-    console.error('Error parsing assistant action:', error);
-    return null;
+    console.error("Error asking assistant:", error);
+    return {
+      response: "I'm having technical difficulties right now. Please try again in a moment.",
+      error: true
+    };
   }
 }
 
 /**
- * Attempts to parse any structured widget data from the assistant response
+ * Function to explain an insurance term
+ * @param term The insurance term to explain
  */
-export function parseWidgetData(response: string): AssistantWidgetType | null {
+export async function explainInsuranceTerm(term: string): Promise<string> {
   try {
-    // Look for JSON data at the end of the message
-    // Format: ```json { ... } ```
-    const widgetMatch = response.match(/```json\s*([\s\S]*?)\s*```\s*$/);
+    const response = await apiRequest('POST', '/api/ai/explain-term', { term });
     
-    if (widgetMatch && widgetMatch[1]) {
-      const widgetData = JSON.parse(widgetMatch[1].trim());
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data.explanation || "I couldn't find information about that term.";
+  } catch (error) {
+    console.error("Error explaining term:", error);
+    return "I'm having trouble accessing my knowledge base right now.";
+  }
+}
+
+/**
+ * Function to generate insurance plan recommendations
+ * @param category The insurance category (e.g., travel, auto, pet, health)
+ * @param criteria The criteria for the recommendation
+ */
+export async function generateInsuranceRecommendation(
+  category: string,
+  criteria: Record<string, any>
+): Promise<string> {
+  try {
+    const response = await apiRequest('POST', '/api/ai/recommend', { 
+      category, 
+      criteria 
+    });
+    
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data.recommendation || "I couldn't generate a recommendation based on those criteria.";
+  } catch (error) {
+    console.error("Error generating recommendation:", error);
+    return "I'm having trouble generating a recommendation right now.";
+  }
+}
+
+/**
+ * Function to compare insurance plans
+ * @param plans Array of plans to compare
+ */
+export async function comparePlans(plans: any[]): Promise<string> {
+  try {
+    const response = await apiRequest('POST', '/api/ai/compare-plans', { plans });
+    
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data.comparison || "I couldn't compare those plans.";
+  } catch (error) {
+    console.error("Error comparing plans:", error);
+    return "I'm having trouble comparing these plans right now.";
+  }
+}
+
+/**
+ * Helper function to parse widget data from the assistant's response
+ * Looks for JSON objects that define widgets and extracts them
+ * @param response The text response from the assistant
+ */
+export function parseWidgetData(response: string): AssistantWidgetType | undefined {
+  try {
+    // Simple regex to find JSON objects in the response
+    const jsonMatch = response.match(/\{[\s\S]*?\}/);
+    
+    if (jsonMatch) {
+      const potentialJson = jsonMatch[0];
+      const widgetData = JSON.parse(potentialJson);
       
-      // Validate that it's a proper widget with a type
-      if (widgetData && widgetData.type) {
-        // Return the widget data with the appropriate type
+      // Validate that it's a widget
+      if (
+        widgetData && 
+        typeof widgetData === 'object' && 
+        'type' in widgetData &&
+        (widgetData.type === 'show_glossary' || widgetData.type === 'show_comparison')
+      ) {
         return widgetData as AssistantWidgetType;
       }
     }
     
-    return null;
+    return undefined;
   } catch (error) {
-    console.error('Error parsing widget data:', error);
-    return null;
+    console.error("Error parsing widget data:", error);
+    return undefined;
   }
 }
 
 /**
- * Clean the response by removing any action JSON and widget JSON
+ * Helper function to clean any JSON from the response
+ * @param response The text response from the assistant
  */
-export function cleanAssistantResponse(response: string): string {
-  // Remove the action JSON from the response
-  let cleaned = response.replace(/\[ACTION_JSON\]([\s\S]*?)\[\/ACTION_JSON\]/g, '');
-  
-  // Remove the widget JSON from the response (if at the end)
-  cleaned = cleaned.replace(/```json\s*([\s\S]*?)\s*```\s*$/, '');
-  
-  return cleaned.trim();
+function cleanResponse(response: string): string {
+  // Remove JSON objects from the response
+  return response.replace(/\{[\s\S]*?\}/g, '').trim();
 }
 
-export async function askAssistant(message: string, context?: Record<string, any>): Promise<AskAssistantResponseWithAction> {
-  if (!message || message.trim() === '') {
-    throw new Error("Message cannot be empty");
-  }
-  
+/**
+ * Test function to check if the AI assistant API is working
+ */
+export async function testAIAssistantConnection(): Promise<{ success: boolean; error?: string; status?: number }> {
   try {
-    console.log('Sending message to assistant API...');
-    const response = await fetch('/api/ai/ask', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ 
-        message: message.trim(),
-        context: context || {}
-      }),
-    });
-    
-    const data = await response.json();
+    const response = await apiRequest('GET', '/api/ai/test');
     
     if (!response.ok) {
-      console.error('AI Assistant API error:', data);
-      
-      // Log detailed error information for debugging
-      if (data.errorType) {
-        console.error(`OpenAI error type: ${data.errorType}, code: ${data.errorCode}`);
-      }
-      
-      return { 
-        response: data.response || 'I apologize, but I encountered an issue connecting to my knowledge base. Please try again.',
-        error: data.error || 'Failed to get response from assistant',
-        errorDetails: {
-          type: data.errorType,
-          code: data.errorCode,
-          status: response.status
-        }
+      return {
+        success: false,
+        error: `API error: ${response.status}`,
+        status: response.status
       };
     }
     
-    console.log('Assistant API response received successfully');
-    
-    // Check if the response contains an action
-    const action = parseAssistantAction(data.response);
-    
-    // Check if the response contains widget data
-    const widgetData = parseWidgetData(data.response);
-    
-    // Clean the response if an action or widget was found
-    const cleanedResponse = (action || widgetData) ? cleanAssistantResponse(data.response) : data.response;
-    
+    const data = await response.json();
     return {
-      ...data,
-      response: cleanedResponse,
-      action,
-      widgetData
+      success: true,
+      ...data
     };
   } catch (error) {
-    console.error('Error in AI assistant service:', error);
-    return { 
-      response: 'I apologize, but I encountered an issue processing your request. Please try again.',
+    console.error("Error testing AI connection:", error);
+    return {
+      success: false,
       error: error instanceof Error ? error.message : String(error)
     };
   }

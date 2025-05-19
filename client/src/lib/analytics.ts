@@ -1,83 +1,52 @@
-// No duplicate enum needed as there's one below
+/**
+ * Analytics utility module for tracking events
+ */
 
-// Define the gtag function globally
-declare global {
-  interface Window {
-    dataLayer: any[];
-    gtag: (...args: any[]) => void;
-  }
-}
-
-// Initialize Google Analytics
-export const initGA = () => {
-  const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID;
-
-  if (!measurementId) {
-    console.warn('Missing required Google Analytics key: VITE_GA_MEASUREMENT_ID');
-    return;
-  }
-
-  // Add Google Analytics script to the head
-  const script1 = document.createElement('script');
-  script1.async = true;
-  script1.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
-  document.head.appendChild(script1);
-
-  // Initialize gtag
-  const script2 = document.createElement('script');
-  script2.innerHTML = `
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', '${measurementId}');
-  `;
-  document.head.appendChild(script2);
-  
-  console.log('Google Analytics initialized with ID:', measurementId);
-};
-
-// Track page views - useful for single-page applications
-export const trackPageView = (url: string) => {
-  if (typeof window === 'undefined' || !window.gtag) return;
-  
-  const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID;
-  if (!measurementId) return;
-  
-  window.gtag('config', measurementId, {
-    page_path: url
-  });
-  
-  console.log('Page view tracked:', url);
-};
-
-// Track event categories
 export enum EventCategory {
-  USER = 'user',
   ENGAGEMENT = 'engagement',
   CONVERSION = 'conversion',
-  INSURANCE = 'insurance',
-  NAVIGATION = 'navigation',
-  QUOTE = 'quote',
-  ERROR = 'error'
+  ACTION = 'action',
+  ERROR = 'error',
+  CONTENT = 'content'
 }
 
-// Track events with optional parameters
-export const trackEvent = (
-  action: string, 
-  category: EventCategory | string, 
-  label?: string, 
+interface EventMetadata {
+  [key: string]: any;
+}
+
+/**
+ * Track an event in the analytics system
+ * @param eventName Name of the event to track
+ * @param category Category of the event (engagement, conversion, etc.)
+ * @param label Optional label for additional context
+ * @param value Optional numeric value associated with the event
+ * @param metadata Optional additional metadata as key-value pairs
+ */
+export function trackEvent(
+  eventName: string,
+  category: EventCategory,
+  label?: string,
   value?: number,
-  additionalParams?: Record<string, any>
-) => {
-  if (typeof window === 'undefined' || !window.gtag) return;
-  
-  const eventParams = {
-    event_category: category,
-    event_label: label,
-    value: value,
-    ...additionalParams
-  };
-  
-  window.gtag('event', action, eventParams);
-  console.log('Event tracked:', { action, category, label, value, ...additionalParams });
-};
+  metadata?: EventMetadata
+): void {
+  // Google Analytics tracking
+  if (window.gtag) {
+    window.gtag('event', eventName, {
+      event_category: category,
+      event_label: label,
+      value: value,
+      ...metadata
+    });
+  }
+
+  // Log to console in development
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[Analytics]', {
+      eventName,
+      category,
+      label,
+      value,
+      metadata
+    });
+  }
+}
