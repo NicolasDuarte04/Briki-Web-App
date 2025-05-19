@@ -21,32 +21,32 @@ export default function AskBrikiPage() {
     {
       id: '1',
       sender: 'user',
-      content: 'What is travel insurance?'
+      content: "What is travel insurance?"
     },
     {
       id: '2',
       sender: 'assistant',
-      content: 'Travel insurance helps cover unexpected events on your trip, such as medical emergencies, trip cancellations, lost luggage, or travel delays. It provides financial protection and peace of mind while you're away from home. Most policies offer emergency medical coverage, trip cancellation/interruption protection, and baggage loss/delay coverage. The right policy depends on your destination, trip duration, planned activities, and personal health factors.'
+      content: "Travel insurance helps cover unexpected events on your trip, such as medical emergencies, trip cancellations, lost luggage, or travel delays. It provides financial protection and peace of mind while you're away from home. Most policies offer emergency medical coverage, trip cancellation/interruption protection, and baggage loss/delay coverage."
     },
     {
       id: '3',
       sender: 'user',
-      content: 'Can I insure my dog with pre-existing conditions?'
+      content: "Can I insure my dog with pre-existing conditions?"
     },
     {
       id: '4',
       sender: 'assistant',
-      content: 'Yes, you can insure dogs with pre-existing conditions, but coverage varies by provider. Some insurers may exclude specific pre-existing conditions from coverage, while others might cover them after a waiting period (typically 6-12 months without symptoms). Briki can help you compare different pet insurance options that include some level of pre-existing condition coverage. For the best results, be transparent about your pet's medical history when requesting quotes.'
+      content: "Yes, you can insure dogs with pre-existing conditions, but coverage varies by provider. Some insurers may exclude specific pre-existing conditions from coverage, while others might cover them after a waiting period. Briki can help you compare different pet insurance options that include pre-existing condition coverage."
     },
     {
       id: '5',
       sender: 'user',
-      content: 'How much does auto insurance typically cost?'
+      content: "How much does auto insurance typically cost?"
     },
     {
       id: '6',
       sender: 'assistant',
-      content: 'Auto insurance costs vary widely based on several factors. The national average is approximately $1,500-1,800 annually for full coverage, but your rate depends on your driving history, age, location, vehicle type, coverage level, and credit score. Young drivers and those in urban areas typically pay more. You can reduce costs by bundling policies, maintaining a clean driving record, choosing a higher deductible, or qualifying for discounts (good student, safe driver, etc.). Briki can help you compare quotes from multiple providers to find the best rate for your specific situation.'
+      content: "Auto insurance costs vary widely based on several factors. The national average is approximately $1,500-1,800 annually for full coverage, but your rate depends on your driving history, age, location, vehicle type, and credit score. Young drivers and those in urban areas typically pay more."
     }
   ];
 
