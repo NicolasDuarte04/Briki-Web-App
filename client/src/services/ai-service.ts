@@ -1,98 +1,105 @@
-import { apiRequest } from '@/lib/api';
-import { AIResponse } from '@/types/assistant';
+import { apiPost } from '@/lib/api';
+import { AssistantWidgetData, Message, UserMemory } from '@/types/assistant';
+import { trackError } from '@/lib/analytics';
+import { v4 as uuidv4 } from 'uuid';
 
 /**
- * Check if the OpenAI API is available
+ * Response from the OpenAI API
  */
-export async function checkOpenAIStatus(): Promise<{ available: boolean; message?: string }> {
-  try {
-    const response = await apiRequest('/api/ai/status', {
-      method: 'GET',
-    });
+export interface AIResponse {
+  text: string;
+  widgetData?: AssistantWidgetData;
+}
 
-    return response;
-  } catch (error) {
-    console.error('Error checking OpenAI API status:', error);
+/**
+ * Service for interacting with the AI assistant
+ */
+export class AIService {
+  private baseUrl = '/api/ai';
+
+  /**
+   * Get a response from the AI assistant
+   * @param message The message to send to the assistant
+   * @param messageHistory Previous messages for context
+   * @param userMemory User information for personalization
+   * @returns The assistant's response
+   */
+  async getAssistantResponse(
+    message: string,
+    messageHistory: Message[],
+    userMemory?: UserMemory
+  ): Promise<AIResponse> {
+    try {
+      // Format the message history for the API
+      const formattedHistory = messageHistory.map((msg) => ({
+        role: msg.sender === 'user' ? 'user' : 'assistant',
+        content: msg.content,
+      }));
+
+      // Make the API request to our backend
+      const response = await apiPost(`${this.baseUrl}/chat`, {
+        message,
+        history: formattedHistory,
+        userMemory,
+      });
+
+      // Handle response
+      if (!response) {
+        throw new Error('No response received from AI service');
+      }
+
+      return {
+        text: response.text || 'I apologize, but I couldn\'t generate a response at this time.',
+        widgetData: response.widgetData,
+      };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      trackError(`AI chat error: ${errorMessage}`);
+      
+      throw new Error(`Failed to get AI response: ${errorMessage}`);
+    }
+  }
+
+  /**
+   * Generate a new message object
+   * @param sender The sender of the message
+   * @param content The content of the message
+   * @param isLoading Whether the message is loading
+   * @param error Whether there was an error
+   * @param widgetData Optional widget data for rich responses
+   * @returns A formatted message object
+   */
+  generateMessage(
+    sender: 'user' | 'assistant',
+    content: string,
+    isLoading = false,
+    error = false,
+    widgetData?: AssistantWidgetData | null
+  ): Message {
     return {
-      available: false,
-      message: error instanceof Error ? error.message : 'Failed to check API status',
+      id: uuidv4(),
+      sender,
+      content,
+      timestamp: new Date().toISOString(),
+      isLoading,
+      error,
+      widgetData,
     };
   }
-}
 
-/**
- * Send a message to the AI assistant
- * @param messages The conversation history
- * @returns The AI response
- */
-export async function sendMessageToAssistant(
-  messages: Array<{ role: string; content: string }>
-): Promise<AIResponse> {
-  try {
-    const response = await apiRequest('/api/ai/chat', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ messages }),
-    });
-
-    return response;
-  } catch (error) {
-    console.error('Error sending message to assistant:', error);
-    throw new Error(
-      error instanceof Error
-        ? error.message
-        : 'Failed to get a response from the assistant'
-    );
+  /**
+   * Check if the OpenAI API is available
+   * @returns True if the API is available, false otherwise
+   */
+  async checkAvailability(): Promise<boolean> {
+    try {
+      const response = await apiPost(`${this.baseUrl}/health`);
+      return response && response.status === 'ok';
+    } catch (error) {
+      return false;
+    }
   }
 }
 
-/**
- * Get suggestions for the user input
- * @param input The user input
- * @returns An array of suggested completions
- */
-export async function getAssistantSuggestions(input: string): Promise<string[]> {
-  try {
-    const response = await apiRequest('/api/ai/suggestions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ input }),
-    });
-
-    return response.suggestions || [];
-  } catch (error) {
-    console.error('Error getting suggestions:', error);
-    return [];
-  }
-}
-
-/**
- * Submit feedback for a message
- * @param messageId The ID of the message
- * @param type The type of feedback (positive or negative)
- */
-export async function submitAssistantFeedback(
-  messageId: string,
-  type: 'positive' | 'negative'
-): Promise<{ success: boolean }> {
-  try {
-    const response = await apiRequest('/api/ai/feedback', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ messageId, feedbackType: type }),
-    });
-
-    return { success: true };
-  } catch (error) {
-    console.error('Error submitting feedback:', error);
-    throw new Error(
-      error instanceof Error ? error.message : 'Failed to submit feedback'
-    );
-  }
-}
+// Create a singleton instance
+export const aiService = new AIService();

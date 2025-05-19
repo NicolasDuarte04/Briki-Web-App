@@ -1,45 +1,42 @@
-import { Bot, X } from 'lucide-react';
-import { useAIAssistant } from './ai-assistant-provider';
+import React from 'react';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { MessageSquareIcon } from 'lucide-react';
+import { useAIAssistant } from './ai-assistant-provider';
+import { trackEvent, EventCategory } from '@/lib/analytics';
 
 interface FloatingAssistantButtonProps {
-  position?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left';
   className?: string;
 }
 
-export function FloatingAssistantButton({
-  position = 'bottom-right',
-  className
-}: FloatingAssistantButtonProps) {
-  const { isOpen, isAvailable, toggleAssistant } = useAIAssistant();
+export function FloatingAssistantButton({ className = '' }: FloatingAssistantButtonProps) {
+  const { isOpen, openAssistant } = useAIAssistant();
 
-  if (!isAvailable) return null;
-
-  const positionClasses = {
-    'bottom-right': 'bottom-4 right-4',
-    'bottom-left': 'bottom-4 left-4',
-    'top-right': 'top-4 right-4',
-    'top-left': 'top-4 left-4',
+  const handleClick = () => {
+    // Track the event when user opens the assistant
+    trackEvent('assistant_button_clicked', EventCategory.ENGAGEMENT);
+    
+    // Open the assistant
+    openAssistant();
   };
+
+  // Don't show the button if the assistant is already open
+  if (isOpen) {
+    return null;
+  }
 
   return (
     <Button
-      onClick={toggleAssistant}
-      className={cn(
-        'fixed z-50 shadow-lg transition-all duration-300 transform hover:scale-105',
-        isOpen ? 'bg-gray-600 hover:bg-gray-700' : 'bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700',
-        positionClasses[position],
-        'w-12 h-12 p-0 rounded-full flex items-center justify-center',
-        className
-      )}
-      aria-label={isOpen ? 'Close AI Assistant' : 'Open AI Assistant'}
+      onClick={handleClick}
+      className={`fixed bottom-4 right-4 z-40 rounded-full w-14 h-14 shadow-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 p-0 flex items-center justify-center ${className}`}
+      aria-label="Open AI Assistant"
     >
-      {isOpen ? (
-        <X className="h-5 w-5" />
-      ) : (
-        <Bot className="h-5 w-5" />
-      )}
+      <div className="relative">
+        <MessageSquareIcon className="h-6 w-6 text-white" />
+        <span className="absolute -top-1 -right-1 flex h-3 w-3">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+        </span>
+      </div>
     </Button>
   );
 }

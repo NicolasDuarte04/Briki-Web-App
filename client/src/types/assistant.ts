@@ -1,110 +1,184 @@
+import { InsuranceCategory } from '@/types/insurance';
+
 /**
- * Types for AI Assistant functionality
+ * Available assistant widget types
  */
-
-// Basic message structure for the assistant
-export interface AIMessage {
-  id: string;
-  role: 'user' | 'assistant' | 'system';
-  content: string;
-  timestamp: string;
-  widgetData?: any;
-  error?: boolean;
-}
-
-// Response from the AI service
-export interface AIResponse {
-  message: string;
-  widgetData?: any;
-  action?: AIAction | null;
-}
-
-// Possible assistant actions
-export type AIActionType = 
-  | 'navigate_to_quote_flow'
-  | 'add_plan_to_comparison'
-  | 'show_glossary_term';
-
-// Base action interface
-export interface AIAction {
-  type: AIActionType;
-}
-
-// Navigate to quote flow action
-export interface NavigateToQuoteFlowAction extends AIAction {
-  type: 'navigate_to_quote_flow';
-  category: string;
-}
-
-// Add plan to comparison action
-export interface AddPlanToComparisonAction extends AIAction {
-  type: 'add_plan_to_comparison';
-  planId: string;
-  category: string;
-}
-
-// Show glossary term action
-export interface ShowGlossaryTermAction extends AIAction {
-  type: 'show_glossary_term';
-  term: string;
-  definition: string;
-}
-
-// Widget data types
-export enum AIWidgetType {
+export enum AssistantWidgetType {
   GLOSSARY = 'glossary',
   VISUAL_COMPARISON = 'visual_comparison',
+  FAQ = 'faq',
   PLAN_RECOMMENDATION = 'plan_recommendation',
-  FEATURE_HIGHLIGHT = 'feature_highlight',
 }
 
-// Glossary widget data
-export interface GlossaryWidgetData {
-  type: AIWidgetType.GLOSSARY;
+/**
+ * Base interface for all assistant widgets
+ */
+export interface BaseWidgetData {
+  type: AssistantWidgetType;
+}
+
+/**
+ * Glossary widget data for displaying insurance terms
+ */
+export interface GlossaryWidgetData extends BaseWidgetData {
+  type: AssistantWidgetType.GLOSSARY;
   term: string;
   definition: string;
-  relatedTerms?: { term: string; definition: string }[];
+  examples?: string[];
 }
 
-// Visual comparison widget data
-export interface VisualComparisonWidgetData {
-  type: AIWidgetType.VISUAL_COMPARISON;
-  title: string;
-  items: {
-    name: string;
-    features: { name: string; value: string | number | boolean }[];
-    score?: number;
-    highlight?: boolean;
-  }[];
-}
-
-// Plan recommendation widget data
-export interface PlanRecommendationWidgetData {
-  type: AIWidgetType.PLAN_RECOMMENDATION;
+/**
+ * Visual comparison widget for comparing insurance plans
+ */
+export interface VisualComparisonWidgetData extends BaseWidgetData {
+  type: AssistantWidgetType.VISUAL_COMPARISON;
   plans: {
-    id: string;
+    planId: string;
     name: string;
     provider: string;
     price: number;
     features: string[];
-    matchScore: number;
-    category: string;
+    category: InsuranceCategory;
   }[];
-  recommendationReason: string;
+  comparisonFields: string[];
 }
 
-// Feature highlight widget data
-export interface FeatureHighlightWidgetData {
-  type: AIWidgetType.FEATURE_HIGHLIGHT;
-  feature: string;
-  description: string;
-  benefits: string[];
-  imageUrl?: string;
+/**
+ * FAQ widget to present common questions and answers
+ */
+export interface FAQWidgetData extends BaseWidgetData {
+  type: AssistantWidgetType.FAQ;
+  question: string;
+  answer: string;
+  relatedQuestions?: string[];
 }
 
-// Combine all widget data types
-export type AIWidgetData = 
-  | GlossaryWidgetData 
+/**
+ * Plan recommendation widget to suggest plans for the user
+ */
+export interface PlanRecommendationWidgetData extends BaseWidgetData {
+  type: AssistantWidgetType.PLAN_RECOMMENDATION;
+  recommendedPlans: {
+    planId: string;
+    name: string;
+    provider: string;
+    price: number;
+    matchScore: number;
+    features: string[];
+    category: InsuranceCategory;
+  }[];
+  userInputs: Record<string, any>;
+  reasonsForRecommendation: string[];
+}
+
+/**
+ * Union type of all widget data types
+ */
+export type AssistantWidgetData = 
+  | GlossaryWidgetData
   | VisualComparisonWidgetData
-  | PlanRecommendationWidgetData
-  | FeatureHighlightWidgetData;
+  | FAQWidgetData
+  | PlanRecommendationWidgetData;
+
+/**
+ * Assistant action types
+ */
+export enum AssistantActionType {
+  NAVIGATE_TO_QUOTE_FLOW = 'navigate_to_quote_flow',
+  ADD_PLAN_TO_COMPARISON = 'add_plan_to_comparison',
+  SHOW_GLOSSARY_TERM = 'show_glossary_term',
+}
+
+/**
+ * Base interface for all assistant actions
+ */
+export interface BaseAssistantAction {
+  type: AssistantActionType;
+}
+
+/**
+ * Navigate to quote flow action
+ */
+export interface NavigateToQuoteFlowAction extends BaseAssistantAction {
+  type: AssistantActionType.NAVIGATE_TO_QUOTE_FLOW;
+  category: InsuranceCategory;
+  prefillData?: Record<string, any>;
+}
+
+/**
+ * Add plan to comparison action
+ */
+export interface AddPlanToComparisonAction extends BaseAssistantAction {
+  type: AssistantActionType.ADD_PLAN_TO_COMPARISON;
+  planId: string;
+  category: InsuranceCategory;
+}
+
+/**
+ * Show glossary term action
+ */
+export interface ShowGlossaryTermAction extends BaseAssistantAction {
+  type: AssistantActionType.SHOW_GLOSSARY_TERM;
+  term: string;
+}
+
+/**
+ * Union type of all assistant actions
+ */
+export type AssistantAction = 
+  | NavigateToQuoteFlowAction
+  | AddPlanToComparisonAction 
+  | ShowGlossaryTermAction;
+
+/**
+ * Message interface for chat
+ */
+export interface Message {
+  id: string;
+  sender: 'user' | 'assistant';
+  content: string;
+  timestamp: string;
+  isLoading?: boolean;
+  error?: boolean;
+  widgetData?: AssistantWidgetData | null;
+}
+
+/**
+ * User memory for the assistant
+ */
+export interface UserMemory {
+  pet?: {
+    type?: string;
+    age?: number;
+    breed?: string;
+    conditions?: string[];
+  };
+  travel?: {
+    destination?: string;
+    duration?: string;
+    date?: string;
+    travelers?: number;
+    activities?: string[];
+  };
+  vehicle?: {
+    make?: string;
+    model?: string;
+    year?: number;
+    value?: string;
+  };
+  health?: {
+    age?: number;
+    conditions?: string[];
+    medications?: string[];
+  };
+}
+
+/**
+ * Basic insurance types for referencing across the app
+ */
+export interface InsuranceTypes {
+  travel: string;
+  auto: string;
+  pet: string;
+  health: string;
+}
