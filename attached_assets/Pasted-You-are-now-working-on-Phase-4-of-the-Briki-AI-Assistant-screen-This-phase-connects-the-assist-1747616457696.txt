@@ -1,0 +1,39 @@
+You are now working on **Phase 4** of the Briki AI Assistant screen.
+
+This phase connects the assistant to the **OpenAI API** to provide real, insurance-focused responses. The assistant must behave like a domain expert — not a general-purpose chatbot.
+
+---
+
+### Objectives:
+
+1. **Connect to OpenAI API**
+   - Use the OpenAI SDK already available in the codebase
+   - Set up a secure API call to the backend (do NOT expose the API key client-side)
+   - Create a new route in the backend (e.g., POST `/api/ai/ask`) that receives a user message and returns the assistant's reply
+   - Call this endpoint from the frontend after the user sends a message
+
+2. **Restrict the AI to Insurance Topics Only**
+   - Use a structured **system prompt** to define the assistant's purpose and limitations. Example:
+     > *You are Briki, an AI insurance assistant. You only answer questions related to insurance, including travel, pet, health, and auto insurance. If a user asks a non-insurance-related question, politely respond: “I’m here to help only with insurance-related topics. Try asking me about travel, pet, health, or auto coverage.”*
+   - Inject this prompt into every API request
+
+3. **Display Real Responses in Chat**
+   - Replace the fake response logic from Phase 3
+   - After sending a user message:
+     • Show a "Thinking..." bubble while awaiting the API response
+     • Once received, replace it with the actual assistant response
+     • Handle errors gracefully (e.g., “Hmm, I couldn’t get that. Try again.”)
+
+4. **Sanitize & Validate Input**
+   - Strip out empty/invalid strings before sending to the backend
+   - Optionally limit message length (e.g., max 500 characters)
+
+5. **Preserve Local State**
+   - Store each AI response just like before in the message state
+   - Style the AI responses consistently with previous assistant bubbles
+
+---
+
+This phase completes the AI logic and brings the assistant to life. It must feel intelligent, focused, and trustworthy — responding only to insurance-related questions.
+
+Once completed, we’ll move to **Phase 5: Response Actions & Dynamic Plan Integration**.
