@@ -1,0 +1,50 @@
+You are now working on **Phase 9** of the Briki AI Assistant development.
+
+This phase sets up **analytics and usage tracking** for assistant interactions. The goal is to measure what users are doing inside the assistant — without compromising performance or user privacy.
+
+---
+
+### Objectives:
+
+1. **Define Analytics Events**
+   - Create a set of standard event types:
+     • `assistant_message_sent`
+     • `user_message_sent`
+     • `suggested_prompt_clicked`
+     • `assistant_action_triggered` (e.g., plan recommendation, glossary card, quote navigation)
+     • `quote_flow_launched_by_ai`
+     • `glossary_term_opened`
+     • `assistant_session_started`
+     • `assistant_session_ended`
+
+2. **Implement Event Dispatch**
+   - Use the app’s existing event logging setup (or add a lightweight tracking function)
+   - For each tracked event:
+     • Include metadata such as timestamp, session ID, action type, content or tag, and context
+   - Fire analytics calls **non-blocking** so they don’t interfere with app flow
+
+3. **Store Events for Later Analysis**
+   - If no analytics stack is connected yet (e.g., Mixpanel, GA, LogRocket), store logs temporarily in:
+     • Console logs (for dev)
+     • Local browser storage (for testing)
+     • Mock API or in-memory state
+   - Use this phase to verify what **can** be logged before adding a full stack in production
+
+4. **Session Lifecycle Tracking**
+   - Track when the user:
+     • First opens the assistant (`assistant_session_started`)
+     • Sends their first message
+     • Ends interaction (manually or by leaving page = `assistant_session_ended`)
+   - Generate a random session ID at open and pass it through all tracked events
+
+5. **(Optional) Add Logging to Backend**
+   - If the backend is handling AI requests, also log:
+     • Query content
+     • Response latency
+     • OpenAI usage data (e.g., token count if applicable)
+
+---
+
+This phase makes Briki **measurable and optimizable**, allowing you to track how users interact with your AI — and which features are most effective.
+
+Once complete, we’ll proceed to **Phase 10: Final QA, Tone Polishing, and Contingency Flows**.
