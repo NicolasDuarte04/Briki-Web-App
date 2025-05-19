@@ -167,7 +167,7 @@ export default function UnifiedAuthForm({ mode, onSuccess }: UnifiedAuthFormProp
             type="email"
             placeholder="your.email@example.com"
             autoComplete="email"
-            className="rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 shadow-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 h-11"
+            className="rounded-lg border-gray-200 bg-white text-gray-800 shadow-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 h-11"
             {...loginForm.register("email")}
           />
           {loginForm.formState.errors.email && (
@@ -192,7 +192,7 @@ export default function UnifiedAuthForm({ mode, onSuccess }: UnifiedAuthFormProp
               type={showPassword ? "text" : "password"}
               placeholder="••••••••"
               autoComplete="current-password"
-              className="rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 shadow-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 h-11 pr-10"
+              className="rounded-lg border-gray-200 bg-white text-gray-800 shadow-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 h-11 pr-10"
               {...loginForm.register("password")}
             />
             <button
@@ -248,7 +248,7 @@ export default function UnifiedAuthForm({ mode, onSuccess }: UnifiedAuthFormProp
         <Button
           type="button"
           variant="outline"
-          className="w-full h-11 flex items-center justify-center gap-2 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-sm hover:shadow-md"
+          className="w-full h-11 flex items-center justify-center gap-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors shadow-sm hover:shadow-md"
           onClick={handleGoogleLogin}
         >
           <svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -257,7 +257,7 @@ export default function UnifiedAuthForm({ mode, onSuccess }: UnifiedAuthFormProp
             <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
             <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
           </svg>
-          <span className="text-gray-800 dark:text-gray-200 font-medium">Continue with Google</span>
+          <span className="text-gray-800 font-medium">Continue with Google</span>
         </Button>
       </form>
     );
@@ -413,7 +413,7 @@ export default function UnifiedAuthForm({ mode, onSuccess }: UnifiedAuthFormProp
       
       <Button 
         type="submit" 
-        className="w-full h-11 rounded-lg bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 transition-all duration-300 text-white font-medium shadow-md hover:shadow-lg shadow-indigo-500/10"
+        className="briki-button w-full h-11 rounded-lg bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 transition-all duration-300 text-white font-medium shadow-md hover:shadow-lg shadow-blue-500/10"
         disabled={isLoading}
       >
         {isLoading ? (
