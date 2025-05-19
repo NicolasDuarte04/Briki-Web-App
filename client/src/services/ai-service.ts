@@ -105,7 +105,7 @@ export function parseAssistantAction(response: string): AssistantActionType | nu
  */
 export function cleanAssistantResponse(response: string): string {
   // Remove the action JSON from the response
-  return response.replace(/\[ACTION_JSON\](.*?)\[\/ACTION_JSON\]/gs, '').trim();
+  return response.replace(/\[ACTION_JSON\]([\s\S]*?)\[\/ACTION_JSON\]/g, '').trim();
 }
 
 export async function askAssistant(message: string, context?: Record<string, any>): Promise<AskAssistantResponseWithAction> {
