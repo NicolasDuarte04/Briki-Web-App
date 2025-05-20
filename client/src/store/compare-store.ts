@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import { 
   InsuranceCategory, 
   BasePlanFields,
@@ -11,6 +11,14 @@ import {
 
 // Define comprehensive plan type for all categories
 export type InsurancePlan = BasePlanFields & {
+  // Common fields used in comparison UI
+  price?: number;
+  coverage?: string;
+  coverageHighlights?: string[];
+  country?: string;
+  priceRange?: string;
+  
+  // Category-specific details
   categoryDetails?: {
     travel?: TravelPlanFields;
     auto?: AutoPlanFields;
@@ -138,6 +146,16 @@ export const useCompareStore = create<CompareState>()(
       }),
       // Version information for migrations if schema changes
       version: 1,
+      // Use createJSONStorage for more robust hydration
+      storage: createJSONStorage(() => {
+        // Safely check if we're in a browser environment
+        // This prevents hydration errors during SSR or initial render
+        return typeof window !== 'undefined' ? localStorage : {
+          getItem: () => null,
+          setItem: () => null,
+          removeItem: () => null
+        };
+      })
     }
   )
 );
