@@ -16,6 +16,7 @@ import { useAnalytics } from "@/hooks/use-analytics";
 import { useEffect } from "react";
 import { initGA, trackEvent } from "@/lib/analytics";
 import { EventCategory } from "@/constants/analytics";
+import { ColorProvider } from "@/contexts/color-context";
 
 import NotFound from "@/pages/not-found";
 import HomePageNew from "@/pages/home-page-new";
@@ -40,6 +41,7 @@ import AskBrikiPage from "@/pages/ask-briki";
 import BlogPage from "@/pages/blog";
 import ForumPage from "@/pages/forum";
 import CareersPage from "@/pages/careers";
+import ColorPaletteDemo from "@/pages/color-palette-demo";
 
 // Import redirects from their respective files
 import { 
