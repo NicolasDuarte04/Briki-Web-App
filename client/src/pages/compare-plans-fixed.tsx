@@ -291,41 +291,296 @@ export default function ComparePlansFixed() {
           transition={{ duration: 0.2 }}
           layout
         >
-          {/* Comparison content would go here */}
+          {/* Enhanced Comparison Content */}
           <div className="space-y-6">
+            {/* Plans Summary Card */}
             <Card>
-              <CardHeader>
-                <CardTitle>Plans Summary</CardTitle>
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-primary" />
+                  Plans Summary
+                </CardTitle>
                 <CardDescription>Overview of your selected insurance plans</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                   {selectedPlans.map(plan => (
                     <div 
                       key={plan.id}
-                      className="border rounded-lg p-4 flex justify-between items-start"
+                      className="border border-border/60 rounded-lg p-4 flex flex-col shadow-sm hover:shadow-md transition-shadow"
                     >
-                      <div>
-                        <h3 className="font-medium">{plan.name || 'Unnamed Plan'}</h3>
-                        <p className="text-sm text-muted-foreground">{plan.provider || 'Unknown Provider'}</p>
-                        <p className="text-sm mt-1">Price: {formatPrice(plan.price)}</p>
-                        <Badge className="mt-2 capitalize">{plan.category}</Badge>
+                      <div className="flex justify-between items-start mb-3">
+                        <div>
+                          <h3 className="font-medium text-lg">{plan.name || 'Unnamed Plan'}</h3>
+                          <p className="text-sm text-muted-foreground">{plan.provider || 'Unknown Provider'}</p>
+                        </div>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="text-red-500 hover:bg-red-50 hover:text-red-600 h-8 w-8"
+                          onClick={() => removePlan(plan.id || '')}
+                        >
+                          <XCircle className="h-4 w-4" />
+                        </Button>
                       </div>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="text-red-500 hover:bg-red-50 hover:text-red-600"
-                        onClick={() => removePlan(plan.id)}
-                      >
-                        <XCircle className="h-4 w-4" />
-                      </Button>
+                      
+                      <div className="flex flex-col space-y-3 flex-grow">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium">Price:</span>
+                          <span className="text-sm font-bold">
+                            {formatPrice(plan.price)}
+                            {plan.price === bestValues.price && (
+                              <Badge variant="outline" className="ml-2 text-green-600 bg-green-50 border-green-200">
+                                Best Value
+                              </Badge>
+                            )}
+                          </span>
+                        </div>
+                        
+                        {plan.coverage && (
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-medium">Coverage:</span>
+                            <span className="text-sm">{plan.coverage}</span>
+                          </div>
+                        )}
+                        
+                        {plan.country && (
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-medium">Region:</span>
+                            <span className="text-sm">{plan.country}</span>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="mt-3 pt-3 border-t border-border/60">
+                        <Badge className="capitalize" variant="outline" 
+                          style={{
+                            backgroundColor: plan.category === 'travel' ? 'rgba(59, 130, 246, 0.1)' : 
+                                           plan.category === 'auto' ? 'rgba(16, 185, 129, 0.1)' :
+                                           plan.category === 'pet' ? 'rgba(249, 115, 22, 0.1)' :
+                                           plan.category === 'health' ? 'rgba(168, 85, 247, 0.1)' : 'transparent',
+                            color: plan.category === 'travel' ? 'rgb(29, 78, 216)' : 
+                                 plan.category === 'auto' ? 'rgb(5, 150, 105)' :
+                                 plan.category === 'pet' ? 'rgb(234, 88, 12)' :
+                                 plan.category === 'health' ? 'rgb(126, 34, 206)' : 'currentColor',
+                            borderColor: plan.category === 'travel' ? 'rgba(59, 130, 246, 0.2)' : 
+                                       plan.category === 'auto' ? 'rgba(16, 185, 129, 0.2)' :
+                                       plan.category === 'pet' ? 'rgba(249, 115, 22, 0.2)' :
+                                       plan.category === 'health' ? 'rgba(168, 85, 247, 0.2)' : 'transparent',
+                          }}
+                        >
+                          {plan.category}
+                        </Badge>
+                      </div>
                     </div>
                   ))}
                 </div>
               </CardContent>
             </Card>
             
-            {/* Additional comparison UI would be added here */}
+            {/* Detailed Comparison Section */}
+            <Tabs defaultValue="features" className="w-full">
+              <TabsList className="grid w-full grid-cols-3 mb-4">
+                <TabsTrigger value="features">Features</TabsTrigger>
+                <TabsTrigger value="pricing">Pricing</TabsTrigger>
+                <TabsTrigger value="coverage">Coverage Details</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="features" className="space-y-4">
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="overflow-x-auto">
+                      <ScrollArea className="h-[500px]">
+                        <table className="w-full border-collapse">
+                          <thead className="sticky top-0 bg-background z-10">
+                            <tr className="border-b">
+                              <th className="text-left py-3 px-4 font-medium text-muted-foreground bg-muted/50">Feature</th>
+                              {selectedPlans.map(plan => (
+                                <th key={plan.id} className="text-left py-3 px-4 font-medium">
+                                  {plan.name || 'Unnamed Plan'}
+                                </th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {/* Generate rows based on category - these would be category-specific */}
+                            {selectedCategories.length > 0 && selectedCategories[0] === 'travel' && (
+                              <>
+                                <tr className="border-b">
+                                  <td className="py-3 px-4 font-medium bg-muted/30">Trip Cancellation</td>
+                                  {selectedPlans.map(plan => (
+                                    <td key={plan.id} className="py-3 px-4">
+                                      {plan.categoryDetails?.travel?.coversCancellation ? "Included" : "Not covered"}
+                                    </td>
+                                  ))}
+                                </tr>
+                                <tr className="border-b">
+                                  <td className="py-3 px-4 font-medium bg-muted/30">Medical Coverage</td>
+                                  {selectedPlans.map(plan => (
+                                    <td key={plan.id} className="py-3 px-4">
+                                      {plan.categoryDetails?.travel?.coversMedical ? "Included" : "Not covered"}
+                                    </td>
+                                  ))}
+                                </tr>
+                                <tr className="border-b">
+                                  <td className="py-3 px-4 font-medium bg-muted/30">Emergency Evacuation</td>
+                                  {selectedPlans.map(plan => (
+                                    <td key={plan.id} className="py-3 px-4">
+                                      {"Not covered"}
+                                    </td>
+                                  ))}
+                                </tr>
+                              </>
+                            )}
+                            
+                            {/* Default features for any category */}
+                            <tr className="border-b">
+                              <td className="py-3 px-4 font-medium bg-muted/30">Price</td>
+                              {selectedPlans.map(plan => (
+                                <td key={plan.id} className="py-3 px-4">
+                                  {formatPrice(plan.price)}
+                                  {plan.price === bestValues.price && (
+                                    <Badge variant="outline" className="ml-2 text-green-600 bg-green-50 border-green-200">
+                                      Best
+                                    </Badge>
+                                  )}
+                                </td>
+                              ))}
+                            </tr>
+                            <tr className="border-b">
+                              <td className="py-3 px-4 font-medium bg-muted/30">Provider</td>
+                              {selectedPlans.map(plan => (
+                                <td key={plan.id} className="py-3 px-4">{plan.provider || "Unknown"}</td>
+                              ))}
+                            </tr>
+                            <tr className="border-b">
+                              <td className="py-3 px-4 font-medium bg-muted/30">Coverage Region</td>
+                              {selectedPlans.map(plan => (
+                                <td key={plan.id} className="py-3 px-4">{plan.country || "Not specified"}</td>
+                              ))}
+                            </tr>
+                          </tbody>
+                        </table>
+                      </ScrollArea>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="pricing" className="space-y-4">
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      <div>
+                        <h3 className="text-lg font-medium mb-4">Price Comparison</h3>
+                        <div className="space-y-4">
+                          {selectedPlans.map(plan => (
+                            <div key={plan.id} className="flex items-center">
+                              <div className="w-1/3 font-medium">{plan.name}</div>
+                              <div className="w-2/3">
+                                <div className="relative pt-1">
+                                  <div className="flex items-center justify-between">
+                                    <div>
+                                      <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full bg-primary/10 text-primary">
+                                        {formatPrice(plan.price)}
+                                      </span>
+                                    </div>
+                                  </div>
+                                  <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-muted">
+                                    <div 
+                                      style={{ 
+                                        width: `${(plan.price || 0) / (Math.max(...selectedPlans.map(p => p.price || 0)) || 1) * 100}%` 
+                                      }} 
+                                      className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-primary"
+                                    ></div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <h3 className="text-lg font-medium mb-4">Value Analysis</h3>
+                        <Card className="border border-muted">
+                          <CardContent className="p-4">
+                            <p className="text-sm text-muted-foreground mb-4">
+                              Based on your selected plans, here's our analysis of the price-to-coverage value:
+                            </p>
+                            <ul className="space-y-2">
+                              {selectedPlans.map(plan => (
+                                <li key={plan.id} className="flex items-start gap-2">
+                                  {plan.price === bestValues.price ? (
+                                    <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
+                                  ) : (
+                                    <div className="h-5 w-5 rounded-full border border-muted-foreground mt-0.5" />
+                                  )}
+                                  <div>
+                                    <p className="font-medium">{plan.name}</p>
+                                    <p className="text-sm text-muted-foreground">
+                                      {plan.price === bestValues.price 
+                                        ? "Best overall value based on price and coverage" 
+                                        : "Higher price point with similar coverage options"}
+                                    </p>
+                                  </div>
+                                </li>
+                              ))}
+                            </ul>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="coverage" className="space-y-4">
+                <Card>
+                  <CardContent className="pt-6">
+                    {selectedPlans.map(plan => (
+                      <div key={plan.id} className="mb-6 border-b pb-6 last:border-0 last:pb-0">
+                        <h3 className="text-lg font-medium mb-3 flex items-center gap-2">
+                          <span className="h-3 w-3 rounded-full bg-primary/80"></span>
+                          {plan.name}
+                        </h3>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <h4 className="text-sm font-medium mb-2 text-muted-foreground">Coverage Highlights</h4>
+                            {plan.coverageHighlights && plan.coverageHighlights.length > 0 ? (
+                              <ul className="list-disc pl-5 space-y-1">
+                                {plan.coverageHighlights.map((highlight, idx) => (
+                                  <li key={idx} className="text-sm">{highlight}</li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <p className="text-sm text-muted-foreground">No coverage highlights available</p>
+                            )}
+                          </div>
+                          
+                          <div>
+                            <h4 className="text-sm font-medium mb-2 text-muted-foreground">Price & Value</h4>
+                            <div className="space-y-2">
+                              <div className="flex justify-between items-center">
+                                <span className="text-sm">Price:</span>
+                                <span className="text-sm font-medium">{formatPrice(plan.price)}</span>
+                              </div>
+                              {plan.priceRange && (
+                                <div className="flex justify-between items-center">
+                                  <span className="text-sm">Price Range:</span>
+                                  <span className="text-sm">{plan.priceRange}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
           </div>
         </motion.div>
       )}
