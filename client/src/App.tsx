@@ -106,7 +106,7 @@ function Router() {
   useEffect(() => {
     if (location === '/') {
       console.log('Landing page viewed');
-      trackEvent('page_view', EventCategory.NAVIGATION, 'landing_page');
+      trackEvent('page_view', EventCategory.Navigation, 'landing_page');
     }
   }, [location]);
   
@@ -177,6 +177,7 @@ function Router() {
         <Route path="/blog" component={BlogPage} />
         <Route path="/forum" component={ForumPage} />
         <Route path="/careers" component={CareersPage} />
+        <Route path="/color-palette" component={ColorPaletteDemo} />
         
         <Route component={NotFound} />
       </Switch>
@@ -253,14 +254,16 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <LanguageProvider>
-          <RecentlyViewedProvider>
-            <TooltipProvider>
-              <Toaster />
-              <AppContent />
-            </TooltipProvider>
-          </RecentlyViewedProvider>
-        </LanguageProvider>
+        <ColorProvider>
+          <LanguageProvider>
+            <RecentlyViewedProvider>
+              <TooltipProvider>
+                <Toaster />
+                <AppContent />
+              </TooltipProvider>
+            </RecentlyViewedProvider>
+          </LanguageProvider>
+        </ColorProvider>
       </AuthProvider>
     </QueryClientProvider>
   );
