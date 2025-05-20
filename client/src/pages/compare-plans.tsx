@@ -67,12 +67,13 @@ export default function ComparePlansPage() {
           console.error('Analytics error:', error);
         }
         
-        // Calculate best values for numeric comparison after a short delay
-        // to simulate data processing
-        setTimeout(() => {
-          calculateBestValues();
-          setIsLoading(false);
-        }, 500);
+        // Calculate best values immediately instead of with setTimeout
+        // This prevents potential race conditions and unhandled errors
+        calculateBestValues();
+        
+        // Add a small delay just for UX purposes so the transition isn't jarring
+        await new Promise(resolve => setTimeout(resolve, 300));
+        setIsLoading(false);
         
       } catch (error) {
         console.error('Error preparing comparison:', error);
@@ -322,7 +323,7 @@ export default function ComparePlansPage() {
   });
 
   return (
-    <MainLayout>
+    <>
       <div className="container py-8 max-w-7xl">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
