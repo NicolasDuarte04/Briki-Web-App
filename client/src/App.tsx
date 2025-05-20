@@ -231,9 +231,11 @@ function AppContent() {
   // Use MainLayout for B2C routes but not for auth pages (they have their own optimized layout)
   if (location !== '/auth' && !location.startsWith('/company') && !location.startsWith('/briki-pilot')) {
     return (
-      <MainLayout>
-        <Router />
-      </MainLayout>
+      <AIAssistantProvider>
+        <MainLayout>
+          <Router />
+        </MainLayout>
+      </AIAssistantProvider>
     );
   }
   
