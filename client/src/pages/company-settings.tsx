@@ -478,11 +478,11 @@ export default function CompanySettings() {
                       <Avatar className="w-32 h-32 rounded-md border border-slate-600 bg-slate-700">
                         {previewUrl ? (
                           <AvatarImage src={previewUrl} alt="Preview" />
-                        ) : (
-                          <AvatarImage src={companyData?.logoUrl} alt="Company logo" />
-                        )}
+                        ) : companyData && companyData.logoUrl ? (
+                          <AvatarImage src={companyData.logoUrl} alt="Company logo" />
+                        ) : null}
                         <AvatarFallback className="rounded-md text-3xl bg-slate-800 text-blue-500">
-                          {companyData?.name?.[0]?.toUpperCase() || "B"}
+                          {companyData && companyData.name ? companyData.name[0].toUpperCase() : "B"}
                         </AvatarFallback>
                       </Avatar>
                     </div>
