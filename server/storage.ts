@@ -156,9 +156,18 @@ export class DatabaseStorage implements IStorage {
     if (!email) return undefined;
     
     try {
-      // Query the database for the user with this email
+      // Query the database for the user with this email, select specific fields to avoid issues
+      // with missing columns
       const [user] = await db
-        .select()
+        .select({
+          id: users.id,
+          email: users.email,
+          firstName: users.firstName,
+          lastName: users.lastName,
+          profileImageUrl: users.profileImageUrl,
+          role: users.role,
+          createdAt: users.createdAt
+        })
         .from(users)
         .where(eq(users.email, email))
         .limit(1);

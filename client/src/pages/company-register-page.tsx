@@ -86,10 +86,14 @@ export default function CompanyRegisterPage() {
         variant: "default",
       });
       
-      // Explicitly redirect to company dashboard
+      // Add a debugging log to help identify what's happening
+      console.log("Registration successful, redirecting to dashboard...");
+      
+      // Redirect to dashboard after a short delay to allow the toast to show
       setTimeout(() => {
-        navigate("/company-dashboard");
-      }, 1000);
+        // Force a hard navigation instead of a client-side route change
+        window.location.href = "/company-dashboard";
+      }, 1500);
       
     } catch (error) {
       console.error("Registration error:", error);
