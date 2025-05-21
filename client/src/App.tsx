@@ -19,7 +19,8 @@ import { EventCategory } from "@/constants/analytics";
 import { ColorProvider } from "@/contexts/color-context";
 
 import NotFound from "@/pages/not-found";
-import HomePageNew from "@/pages/home-page-new";
+// Removed reference to archived home-page-new.tsx
+import LandingPage from "@/pages/landing-page";
 import Dashboard from "@/pages/dashboard-enhanced";
 // Import our new unified authentication screen
 import AuthPage from "@/pages/AuthPage";

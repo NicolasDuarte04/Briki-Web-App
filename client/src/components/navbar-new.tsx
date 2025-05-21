@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/use-auth";
+import { User as UserType } from "@/contexts/AuthContext"; // Import User type from AuthContext
 import { Loader2, Bell, Menu, User as UserIcon, Settings, LogOut, Bot, SparklesIcon, ChevronDown, FileText } from "lucide-react";
 import { useLanguage, LanguageSelector } from "@/components/language-selector";
 import { AIAssistantButton, useAIAssistant } from "@/components/layout";

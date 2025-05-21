@@ -12,9 +12,18 @@ import { LineChart, BarChart, PieChart } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { InsurancePlan, CompanyProfile, InsuranceCategory } from "@shared/types";
 
 // Mock data for insurance plan analytics
-const mockPlans = [
+interface MockPlan {
+  id: number;
+  name: string;
+  category: string;
+  subscribers: number;
+  trend: number;
+}
+
+const mockPlans: MockPlan[] = [
   { id: 1, name: "Travel Pro", category: "travel", subscribers: 1243, trend: +12.5 },
   { id: 2, name: "Auto Shield Plus", category: "auto", subscribers: 876, trend: -3.2 },
   { id: 3, name: "Pet Care Complete", category: "pet", subscribers: 421, trend: +8.7 },
@@ -28,13 +37,13 @@ export default function CompanyDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
 
   // Fetch company data
-  const { data: companyData, isLoading } = useQuery({
+  const { data: companyData, isLoading } = useQuery<CompanyProfile>({
     queryKey: ["/api/company/profile"],
     enabled: !!user?.id,
   });
 
   // Fetch plans data
-  const { data: plansData, isLoading: plansLoading } = useQuery({
+  const { data: plansData, isLoading: plansLoading } = useQuery<InsurancePlan[]>({
     queryKey: ["/api/company/plans"],
     enabled: !!user?.id,
   });
