@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
   FileUp, 
@@ -7,9 +7,10 @@ import {
   FileText, 
   AlertCircle, 
   Download, 
-  Table,
+  Table as TableIcon,
   Upload,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Info
 } from "lucide-react";
 import CompanyLayout from "@/components/layout/company-layout";
 import { Button } from "@/components/ui/button";
@@ -32,14 +33,59 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
+import { trackEvent } from "@/lib/analytics";
 
 // File validation statuses
-type ValidationStatus = "idle" | "validating" | "success" | "error";
+type ValidationStatus = "idle" | "validating" | "success" | "error" | "uploading";
 
-// Sample validation errors
-const sampleValidationErrors = [
+// API response interfaces
+interface ValidationError {
+  row: number;
+  field?: string;
+  message: string;
+  type?: "missing" | "format" | "invalid";
+}
+
+interface ValidationStats {
+  totalRecords: number;
+  validRecords: number;
+  invalidRecords: number;
+}
+
+interface ValidationResponse {
+  success: boolean;
+  message: string;
+  stats: ValidationStats;
+  errors?: Record<number, string[]>;
+  warnings?: Record<number, string[]>;
+  validPlans?: PlanPreviewData[];
+}
+
+// Plan data preview
+interface PlanPreviewData {
+  name: string;
+  category: string;
+  basePrice: number;
+  coverageAmount: number;
+  provider?: string;
+  features?: string[];
+  planId?: string;
+  [key: string]: any; // For category-specific fields
+}
+
+// Sample validation errors for initial UI state
+const sampleValidationErrors: ValidationError[] = [
   { type: "missing", field: "coverageAmount", row: 3, message: "Coverage amount is required" },
   { type: "format", field: "basePrice", row: 5, message: "Base price must be a number" },
   { type: "invalid", field: "category", row: 8, message: "Category must be one of: auto, travel, pet, health, home" },
@@ -51,10 +97,50 @@ export default function CompanyUploadPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [validationStatus, setValidationStatus] = useState<ValidationStatus>("idle");
   const [validationProgress, setValidationProgress] = useState(0);
-  const [validationErrors, setValidationErrors] = useState<typeof sampleValidationErrors>([]);
+  const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
+  const [validationStats, setValidationStats] = useState<ValidationStats | null>(null);
+  const [validationResponse, setValidationResponse] = useState<ValidationResponse | null>(null);
   const [uploadMethod, setUploadMethod] = useState<"file" | "template">("file");
   const [planCategory, setPlanCategory] = useState<string>("");
   const [isPublic, setIsPublic] = useState(false);
+  const [previewData, setPreviewData] = useState<PlanPreviewData[]>([]);
+  const [showPreviewTable, setShowPreviewTable] = useState(false);
+
+  // Convert API errors structure to our ValidationError format
+  const formatApiErrors = (errors: Record<number, string[]> | undefined): ValidationError[] => {
+    if (!errors) return [];
+    
+    const formattedErrors: ValidationError[] = [];
+    Object.entries(errors).forEach(([rowStr, messages]) => {
+      const row = parseInt(rowStr, 10);
+      
+      messages.forEach(message => {
+        // Try to detect field name from error message
+        let field: string | undefined;
+        let type: "missing" | "format" | "invalid" | undefined;
+        
+        if (message.includes("required")) {
+          type = "missing";
+          // Extract field name from message like "Field 'name' is required"
+          const match = message.match(/'([^']+)'/);
+          field = match ? match[1] : undefined;
+        } else if (message.includes("must be")) {
+          type = "format";
+        } else {
+          type = "invalid";
+        }
+        
+        formattedErrors.push({
+          row,
+          field,
+          message,
+          type
+        });
+      });
+    });
+    
+    return formattedErrors;
+  };
 
   // Handle file selection
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,18 +149,32 @@ export default function CompanyUploadPage() {
       // Check if it's a CSV or Excel file
       if (file.type === "text/csv" || 
           file.type === "application/vnd.ms-excel" || 
-          file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
+          file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+          file.name.endsWith('.csv') ||
+          file.name.endsWith('.xlsx')) {
         setSelectedFile(file);
         // Reset validation state
         setValidationStatus("idle");
         setValidationProgress(0);
         setValidationErrors([]);
+        setPreviewData([]);
+        setShowPreviewTable(false);
+        setValidationResponse(null);
+        
+        // Track file selection in analytics
+        trackEvent('file_selected', 'company', 'plan_upload', {
+          file_type: file.type || file.name.split('.').pop(),
+          file_size: file.size
+        });
       } else {
         toast({
           variant: "destructive",
           title: "Invalid file type",
           description: "Please upload a CSV or Excel file.",
         });
+        
+        // Track invalid file selection
+        trackEvent('invalid_file_selected', 'company', 'plan_upload');
       }
     }
   };
@@ -84,42 +184,178 @@ export default function CompanyUploadPage() {
     fileInputRef.current?.click();
   };
 
-  // Simulate file validation
-  const validateFile = () => {
+  // Real file validation against the API
+  const validateFile = async () => {
     if (!selectedFile) return;
     
     setValidationStatus("validating");
     setValidationProgress(0);
     
-    // Simulate progress
-    const interval = setInterval(() => {
-      setValidationProgress((prev) => {
-        const next = prev + 10;
-        if (next >= 100) {
-          clearInterval(interval);
-          // Simulate validation complete with some errors
-          setTimeout(() => {
-            if (Math.random() > 0.5) {
-              setValidationStatus("error");
-              setValidationErrors(sampleValidationErrors);
-            } else {
-              setValidationStatus("success");
-              setValidationErrors([]);
-            }
-          }, 500);
-          return 100;
-        }
-        return next;
+    // Create a progress simulation for better UX
+    const progressInterval = setInterval(() => {
+      setValidationProgress(prev => {
+        // Only go up to 90% - the final 10% will be set when we get the response
+        return prev < 90 ? prev + 5 : prev;
       });
-    }, 300);
+    }, 200);
+    
+    try {
+      // Prepare form data for file upload
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+      
+      // Track validation start
+      trackEvent('validate_file', 'company', 'plan_upload');
+      
+      // Call the API to validate and parse the file
+      const response = await fetch('/api/company/plans/upload', {
+        method: 'POST',
+        body: formData,
+        // No need to set Content-Type header, it will be set automatically with boundary
+      });
+      
+      // Set progress to 100%
+      clearInterval(progressInterval);
+      setValidationProgress(100);
+      
+      const data = await response.json();
+      
+      // Store the raw API response
+      setValidationResponse(data);
+      
+      if (response.ok) {
+        if (data.stats.validRecords > 0) {
+          // Success - at least some records are valid
+          setValidationStatus("success");
+          setValidationStats(data.stats);
+          
+          // Format any warnings
+          setValidationErrors(data.warnings ? formatApiErrors(data.warnings) : []);
+          
+          // Create preview data from valid plans (mock for now, real data would come from API)
+          setPreviewData(data.validPlans || generateMockPreviewData(data.stats.validRecords));
+          setShowPreviewTable(true);
+          
+          toast({
+            title: "File validated successfully",
+            description: `${data.stats.validRecords} plans validated successfully${data.stats.invalidRecords > 0 ? ` (${data.stats.invalidRecords} with issues)` : ''}.`,
+          });
+          
+          // Track success
+          trackEvent('file_validated', 'company', 'plan_upload', {
+            total_records: data.stats.totalRecords,
+            valid_records: data.stats.validRecords,
+            invalid_records: data.stats.invalidRecords
+          });
+        } else {
+          // No valid records found
+          setValidationStatus("error");
+          setValidationStats(data.stats);
+          setValidationErrors(formatApiErrors(data.errors));
+          setShowPreviewTable(false);
+          
+          toast({
+            variant: "destructive",
+            title: "Validation failed",
+            description: "No valid plans found in your file. Please check the errors and try again.",
+          });
+          
+          // Track failure
+          trackEvent('file_validation_failed', 'company', 'plan_upload', {
+            error_count: data.stats.invalidRecords
+          });
+        }
+      } else {
+        // API returned an error
+        setValidationStatus("error");
+        setValidationErrors([{
+          row: -1,
+          message: data.message || "Unknown error occurred during validation",
+          type: "invalid"
+        }]);
+        setShowPreviewTable(false);
+        
+        toast({
+          variant: "destructive",
+          title: "Validation failed",
+          description: data.message || "An error occurred while validating your file.",
+        });
+        
+        // Track API error
+        trackEvent('api_error', 'company', 'plan_upload', {
+          status: response.status,
+          message: data.message
+        });
+      }
+    } catch (error) {
+      // Network or other error
+      clearInterval(progressInterval);
+      setValidationProgress(100);
+      setValidationStatus("error");
+      setValidationErrors([{
+        row: -1,
+        message: "Connection error. Please try again.",
+        type: "invalid"
+      }]);
+      setShowPreviewTable(false);
+      
+      toast({
+        variant: "destructive",
+        title: "Connection error",
+        description: "Could not connect to the server. Please try again.",
+      });
+      
+      // Track exception
+      trackEvent('exception', 'company', 'plan_upload', {
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
   };
 
-  // Handle upload submit
-  const handleSubmit = () => {
+  // Generate mock preview data for display (will be replaced with real data from API)
+  const generateMockPreviewData = (count: number): PlanPreviewData[] => {
+    const categories = ['travel', 'auto', 'pet', 'health'];
+    const providers = ['Acme Insurance', 'Global Coverage', 'SecureLife', 'TotalProtect'];
+    
+    return Array.from({ length: count }).map((_, i) => ({
+      name: `Insurance Plan ${i + 1}`,
+      category: categories[Math.floor(Math.random() * categories.length)],
+      basePrice: Math.floor(Math.random() * 1000) + 100,
+      coverageAmount: Math.floor(Math.random() * 100000) + 10000,
+      provider: providers[Math.floor(Math.random() * providers.length)],
+      features: ['Feature 1', 'Feature 2', 'Feature 3'].slice(0, Math.floor(Math.random() * 3) + 1),
+      planId: `PLAN-${Date.now()}-${i}`
+    }));
+  };
+
+  // Handle final submit/upload
+  const handleSubmit = async () => {
     if (validationStatus === "success") {
+      if (!validationResponse) {
+        toast({
+          variant: "destructive",
+          title: "Cannot upload plans",
+          description: "Please validate your file first.",
+        });
+        return;
+      }
+      
+      // Since we've already uploaded and validated the file in the validation step,
+      // and since the backend has already saved the valid plans from the file,
+      // we can just show a success message.
+      
+      // In a real implementation, you might want to do a separate API call to confirm
+      // the plans should be finalized/published.
+      
       toast({
-        title: "Plan uploaded successfully",
-        description: "Your insurance plan has been uploaded and is ready for analysis.",
+        title: "Plans uploaded successfully",
+        description: `${validationStats?.validRecords || 0} plans have been uploaded and are ready for analysis.`,
+      });
+      
+      // Track final submission
+      trackEvent('plans_uploaded', 'company', 'plan_upload', {
+        count: validationStats?.validRecords || 0,
+        category: planCategory || 'all'
       });
       
       // Reset the form
@@ -127,18 +363,29 @@ export default function CompanyUploadPage() {
       setValidationStatus("idle");
       setValidationProgress(0);
       setValidationErrors([]);
+      setPreviewData([]);
+      setShowPreviewTable(false);
       setPlanCategory("");
       setIsPublic(false);
+      setValidationResponse(null);
       
-      // Navigate to dashboard or analysis page
-      // window.location.href = "/company-dashboard/analysis";
+      // Navigate to dashboard or analysis page after short delay
+      setTimeout(() => {
+        window.location.href = "/company-dashboard/analysis";
+      }, 1500);
     } else if (validationStatus === "error") {
       toast({
         variant: "destructive",
-        title: "Cannot upload plan",
+        title: "Cannot upload plans",
         description: "Please fix the validation errors before uploading.",
       });
+      
+      // Track failed submission attempt
+      trackEvent('upload_blocked', 'company', 'plan_upload', {
+        error_count: validationErrors.length
+      });
     } else {
+      // If not validated yet, start validation
       validateFile();
     }
   };
@@ -266,7 +513,9 @@ export default function CompanyUploadPage() {
                               <div className="space-y-2 mt-2 max-h-40 overflow-y-auto">
                                 {validationErrors.map((error, index) => (
                                   <div key={index} className="bg-[#01101F] rounded p-2 text-left flex items-start">
-                                    <Badge className="bg-red-500/20 text-red-400 border-red-400/20 mr-2">Row {error.row}</Badge>
+                                    <Badge className="bg-red-500/20 text-red-400 border-red-400/20 mr-2">
+                                      {error.row > 0 ? `Row ${error.row}` : 'File'}
+                                    </Badge>
                                     <p className="text-gray-300 text-sm">{error.message}</p>
                                   </div>
                                 ))}
@@ -285,6 +534,85 @@ export default function CompanyUploadPage() {
                         </div>
                       )}
                     </div>
+                    
+                    {/* Preview Table for Validated Plans */}
+                    {showPreviewTable && previewData.length > 0 && (
+                      <div className="mt-6 bg-[#0A2540] border border-[#1E3A59] rounded-lg p-5">
+                        <div className="flex items-center justify-between mb-4">
+                          <div>
+                            <h3 className="text-white font-medium">Plan Preview</h3>
+                            <p className="text-gray-400 text-sm">
+                              Review the {previewData.length} plan{previewData.length !== 1 ? 's' : ''} before confirming upload
+                            </p>
+                          </div>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button variant="outline" size="icon" className="h-8 w-8 rounded-full border-[#1E3A59]">
+                                  <Info className="h-4 w-4 text-gray-400" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent className="bg-[#01101F] border-[#1E3A59] text-white max-w-[300px]">
+                                <p>This preview shows the validated plans that will be uploaded. You can review them before final submission.</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </div>
+                        
+                        <div className="rounded-md border border-[#1E3A59] overflow-hidden">
+                          <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
+                            <Table className="w-full">
+                              <TableHeader className="bg-[#01101F]">
+                                <TableRow className="hover:bg-[#01101F]/80 border-b border-[#1E3A59]">
+                                  <TableHead className="text-[#33BFFF] font-medium">Name</TableHead>
+                                  <TableHead className="text-[#33BFFF] font-medium">Category</TableHead>
+                                  <TableHead className="text-[#33BFFF] font-medium">Base Price</TableHead>
+                                  <TableHead className="text-[#33BFFF] font-medium">Coverage</TableHead>
+                                  <TableHead className="text-[#33BFFF] font-medium">Provider</TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {previewData.map((plan, index) => (
+                                  <TableRow key={index} className="hover:bg-[#01101F]/50 border-b border-[#1E3A59]">
+                                    <TableCell className="text-white font-medium">{plan.name}</TableCell>
+                                    <TableCell>
+                                      <Badge className="bg-[#1570EF]/10 text-[#33BFFF] border-[#1570EF]/20">
+                                        {plan.category.charAt(0).toUpperCase() + plan.category.slice(1)}
+                                      </Badge>
+                                    </TableCell>
+                                    <TableCell className="text-gray-300">
+                                      ${plan.basePrice.toLocaleString()}
+                                    </TableCell>
+                                    <TableCell className="text-gray-300">
+                                      ${plan.coverageAmount.toLocaleString()}
+                                    </TableCell>
+                                    <TableCell className="text-gray-300">
+                                      {plan.provider || 'N/A'}
+                                    </TableCell>
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
+                          </div>
+                        </div>
+                        
+                        {validationErrors.length > 0 && (
+                          <div className="mt-3 p-2 bg-amber-900/20 border border-amber-500/20 rounded-md">
+                            <div className="flex items-start">
+                              <AlertCircle className="h-4 w-4 text-amber-500 mt-0.5 mr-2 flex-shrink-0" />
+                              <p className="text-sm text-amber-400">
+                                {validationErrors.length} issue{validationErrors.length !== 1 ? 's' : ''} were found but will not prevent upload.
+                                <Button variant="link" className="h-auto p-0 text-amber-400 underline text-sm" onClick={() => {
+                                  document.getElementById('error-section')?.scrollIntoView({ behavior: 'smooth' });
+                                }}>
+                                  View details
+                                </Button>
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </TabsContent>
                   
                   <TabsContent value="template" className="space-y-6">

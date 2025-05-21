@@ -46,20 +46,31 @@ export const trackPageView = (url: string) => {
   });
 };
 
-// Track events
+// Track events with additional parameters support
+type EventParams = Record<string, any>;
+
 export const trackEvent = (
   action: string, 
   category?: string, 
   label?: string, 
-  value?: number
+  value?: number | EventParams
 ) => {
   if (typeof window === 'undefined' || !window.gtag) return;
   
-  window.gtag('event', action, {
-    event_category: category,
-    event_label: label,
-    value: value,
-  });
+  // Check if value is an object (for additional parameters)
+  if (typeof value === 'object') {
+    window.gtag('event', action, {
+      event_category: category,
+      event_label: label,
+      ...value
+    });
+  } else {
+    window.gtag('event', action, {
+      event_category: category,
+      event_label: label,
+      value: value,
+    });
+  }
 };
 
 // Custom company dashboard events
