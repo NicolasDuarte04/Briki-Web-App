@@ -1,0 +1,45 @@
+// Phase 3 Upload Feature Validation Prompt
+
+/*
+Thanks for the summary! Before proceeding with the next step, please answer the following to validate the robustness and maintainability of the current implementation.
+
+1. Backend Endpoint & Service
+• Confirm the full file path for the /api/company/plans/upload endpoint
+• Where is the plan-upload.ts service located, and is it reused across other routes?
+• What file parser are we using (e.g., csv-parser, xlsx, formidable)?
+• How is the authenticated user's companyId injected or validated during upload?
+• Is there a limit for file size or number of plans per upload?
+
+2. Plan Validation Logic
+• Which fields are required across all insurance categories?
+• Do we have category-specific rules (e.g., travel vs auto vs health)?
+• How are errors returned — per row, per file, or both?
+• Where is the shared schema defined — in shared/schema.ts or elsewhere?
+
+3. Security & Access Control
+• Is the endpoint protected from unauthorized access?
+• Are file extensions and MIME types validated on upload?
+• How is malicious content (e.g., macro-embedded Excel files) mitigated?
+
+4. TypeScript & Error Handling
+• Are we using shared types from shared/types.ts or new ones declared locally?
+• Are null/undefined values checked before saving?
+• Are detailed error logs being written to the console or suppressed?
+
+5. Testing & Fallbacks
+• What happens if an upload fails mid-process — is it transactional or partial?
+• Are invalid rows skipped, or does the whole upload fail?
+• How do we handle plan ID collisions (e.g., duplicates in the same file)?
+
+6. Output & Frontend Support
+• What response shape is returned to the frontend?
+• Does it include success stats, row-level errors, and rejected rows?
+• Have we stubbed a frontend UI component yet, or is that the next task?
+
+Once this checklist is validated, we’ll proceed to:
+• Implement the React upload component
+• Expand validation rules
+• Hook analytics and success toasts
+
+Let us know if anything above needs adjustment.
+*/
