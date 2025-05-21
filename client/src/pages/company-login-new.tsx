@@ -72,9 +72,7 @@ export default function CompanyLoginNew() {
       console.log("Login successful, redirecting to dashboard...");
       
       // Direct navigation to redesigned dashboard
-      setTimeout(() => {
-        navigate("/company-dashboard-redesigned");
-      }, 1000);
+      navigate("/company-dashboard-redesigned");
       
     } catch (error) {
       console.error("Login error:", error);
