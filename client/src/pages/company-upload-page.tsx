@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from "react";
-import { motion } from "framer-motion";
 import { 
   FileUp, 
   Check, 
@@ -7,12 +6,12 @@ import {
   FileText, 
   AlertCircle, 
   Download, 
-  Table as TableIcon,
+  TableIcon,
   Upload,
   FileSpreadsheet,
   Info
 } from "lucide-react";
-import CompanyLayout from "@/components/layout/company-layout";
+import { CompanyLayout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,7 +19,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -45,6 +44,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { trackEvent } from "@/lib/analytics";
+import { EventCategory } from "@/constants/analytics";
 
 // File validation statuses
 type ValidationStatus = "idle" | "validating" | "success" | "error" | "uploading";
@@ -83,13 +83,6 @@ interface PlanPreviewData {
   planId?: string;
   [key: string]: any; // For category-specific fields
 }
-
-// Sample validation errors for initial UI state
-const sampleValidationErrors: ValidationError[] = [
-  { type: "missing", field: "coverageAmount", row: 3, message: "Coverage amount is required" },
-  { type: "format", field: "basePrice", row: 5, message: "Base price must be a number" },
-  { type: "invalid", field: "category", row: 8, message: "Category must be one of: auto, travel, pet, health, home" },
-];
 
 export default function CompanyUploadPage() {
   const { toast } = useToast();
@@ -162,7 +155,7 @@ export default function CompanyUploadPage() {
         setValidationResponse(null);
         
         // Track file selection in analytics
-        trackEvent('file_selected', 'company', 'plan_upload', {
+        trackEvent('file_selected', EventCategory.PlanManagement, 'plan_upload', {
           file_type: file.type || file.name.split('.').pop(),
           file_size: file.size
         });
@@ -174,7 +167,7 @@ export default function CompanyUploadPage() {
         });
         
         // Track invalid file selection
-        trackEvent('invalid_file_selected', 'company', 'plan_upload');
+        trackEvent('invalid_file_selected', EventCategory.PlanManagement, 'plan_upload');
       }
     }
   };
@@ -205,7 +198,7 @@ export default function CompanyUploadPage() {
       formData.append('file', selectedFile);
       
       // Track validation start
-      trackEvent('validate_file', 'company', 'plan_upload');
+      trackEvent('validate_file', EventCategory.PlanManagement, 'plan_upload');
       
       // Call the API to validate and parse the file
       const response = await fetch('/api/company/plans/upload', {
@@ -242,7 +235,7 @@ export default function CompanyUploadPage() {
           });
           
           // Track success
-          trackEvent('file_validated', 'company', 'plan_upload', {
+          trackEvent('file_validated', EventCategory.PlanManagement, 'plan_upload', {
             total_records: data.stats.totalRecords,
             valid_records: data.stats.validRecords,
             invalid_records: data.stats.invalidRecords
@@ -261,7 +254,7 @@ export default function CompanyUploadPage() {
           });
           
           // Track failure
-          trackEvent('file_validation_failed', 'company', 'plan_upload', {
+          trackEvent('file_validation_failed', EventCategory.PlanManagement, 'plan_upload', {
             error_count: data.stats.invalidRecords
           });
         }
@@ -282,7 +275,7 @@ export default function CompanyUploadPage() {
         });
         
         // Track API error
-        trackEvent('api_error', 'company', 'plan_upload', {
+        trackEvent('api_error', EventCategory.PlanManagement, 'plan_upload', {
           status: response.status,
           message: data.message
         });
@@ -306,7 +299,7 @@ export default function CompanyUploadPage() {
       });
       
       // Track exception
-      trackEvent('exception', 'company', 'plan_upload', {
+      trackEvent('exception', EventCategory.PlanManagement, 'plan_upload', {
         message: error instanceof Error ? error.message : 'Unknown error'
       });
     }
@@ -353,7 +346,7 @@ export default function CompanyUploadPage() {
       });
       
       // Track final submission
-      trackEvent('plans_uploaded', 'company', 'plan_upload', {
+      trackEvent('plans_uploaded', EventCategory.PlanManagement, 'plan_upload', {
         count: validationStats?.validRecords || 0,
         category: planCategory || 'all'
       });
@@ -381,7 +374,7 @@ export default function CompanyUploadPage() {
       });
       
       // Track failed submission attempt
-      trackEvent('upload_blocked', 'company', 'plan_upload', {
+      trackEvent('upload_blocked', EventCategory.PlanManagement, 'plan_upload', {
         error_count: validationErrors.length
       });
     } else {
@@ -392,6 +385,8 @@ export default function CompanyUploadPage() {
 
   // Download sample template
   const downloadTemplate = () => {
+    trackEvent('template_downloaded', EventCategory.PlanManagement, 'plan_upload');
+    
     toast({
       title: "Template downloaded",
       description: "The sample template has been downloaded to your device.",
@@ -399,11 +394,14 @@ export default function CompanyUploadPage() {
   };
 
   return (
-    <CompanyLayout>
+    <CompanyLayout
+      pageTitle="Upload Insurance Plans"
+      activeNav="upload"
+    >
       <div className="space-y-6">
         {/* Header */}
         <div className="space-y-1">
-          <h1 className="text-2xl font-semibold text-white">Upload Insurance Plan</h1>
+          <h1 className="text-2xl font-semibold text-white">Upload Insurance Plans</h1>
           <p className="text-gray-400">Import your insurance plan data for competitive analysis</p>
         </div>
         
@@ -470,7 +468,7 @@ export default function CompanyUploadPage() {
                             <div className="text-left">
                               <p className="text-white font-medium">{selectedFile.name}</p>
                               <p className="text-gray-400 text-sm">
-                                {(selectedFile.size / 1024).toFixed(1)} KB • {selectedFile.type.split('/')[1].toUpperCase()}
+                                {(selectedFile.size / 1024).toFixed(1)} KB • {selectedFile.type.split('/')[1]?.toUpperCase() || selectedFile.name.split('.').pop()?.toUpperCase()}
                               </p>
                             </div>
                             <Button 
@@ -510,7 +508,7 @@ export default function CompanyUploadPage() {
                                 </div>
                               </div>
                               
-                              <div className="space-y-2 mt-2 max-h-40 overflow-y-auto">
+                              <div className="space-y-2 mt-2 max-h-40 overflow-y-auto custom-scrollbar">
                                 {validationErrors.map((error, index) => (
                                   <div key={index} className="bg-[#01101F] rounded p-2 text-left flex items-start">
                                     <Badge className="bg-red-500/20 text-red-400 border-red-400/20 mr-2">
@@ -650,7 +648,7 @@ export default function CompanyUploadPage() {
                       
                       <div className="bg-[#01101F] border border-[#1E3A59] rounded-lg p-5">
                         <div className="flex items-start">
-                          <Table className="h-8 w-8 text-[#33BFFF] mr-4 mt-1" />
+                          <TableIcon className="h-8 w-8 text-[#33BFFF] mr-4 mt-1" />
                           <div>
                             <h3 className="text-white font-medium mb-1">Required fields</h3>
                             <p className="text-gray-400 text-sm mb-4">
@@ -674,11 +672,11 @@ export default function CompanyUploadPage() {
                                 <Badge className="bg-[#1570EF]/20 text-[#33BFFF] border-[#1570EF]/20">Required</Badge>
                               </div>
                               <div className="bg-[#0A2540] p-2 rounded-md flex items-center">
-                                <span className="text-white text-sm font-medium mr-2">features</span>
+                                <span className="text-white text-sm font-medium mr-2">provider</span>
                                 <Badge className="bg-gray-500/20 text-gray-400 border-gray-500/20">Optional</Badge>
                               </div>
                               <div className="bg-[#0A2540] p-2 rounded-md flex items-center">
-                                <span className="text-white text-sm font-medium mr-2">pricingTiers</span>
+                                <span className="text-white text-sm font-medium mr-2">features</span>
                                 <Badge className="bg-gray-500/20 text-gray-400 border-gray-500/20">Optional</Badge>
                               </div>
                             </div>
@@ -711,15 +709,12 @@ export default function CompanyUploadPage() {
                     onValueChange={(value) => {
                       setPlanCategory(value);
                       // Track category selection in analytics
-                      trackEvent('category_selected', 'company', 'plan_upload', {
+                      trackEvent('category_selected', EventCategory.PlanManagement, 'plan_upload', {
                         category: value
                       });
                     }}
                   >
-                    <SelectTrigger 
-                      id="category" 
-                      className="bg-[#01101F] border-[#1E3A59] text-white focus:ring-[#33BFFF]"
-                    >
+                    <SelectTrigger className="bg-[#01101F] border-[#1E3A59] text-white">
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
                     <SelectContent className="bg-[#0A2540] border-[#1E3A59] text-white">
@@ -748,7 +743,7 @@ export default function CompanyUploadPage() {
                       onCheckedChange={(checked) => {
                         setIsPublic(checked);
                         // Track visibility toggle in analytics
-                        trackEvent('visibility_toggled', 'company', 'plan_upload', {
+                        trackEvent('visibility_toggled', EventCategory.PlanManagement, 'plan_upload', {
                           public: checked
                         });
                       }}
@@ -839,51 +834,68 @@ export default function CompanyUploadPage() {
               </CardContent>
             </Card>
             
-            {/* Help & Support Card */}
             <Card className="bg-[#0A2540] border-[#1E3A59]">
               <CardHeader>
                 <CardTitle className="text-white">Help & Support</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  <div className="flex items-start">
-                    <div className="bg-[#1570EF]/20 p-1.5 rounded-full mr-3 mt-0.5">
-                      <Check className="h-4 w-4 text-[#33BFFF]" />
-                    </div>
-                    <p className="text-gray-300 text-sm">
-                      Ensure your CSV has headers that match our template.
-                    </p>
+                <div className="flex items-start">
+                  <div className="bg-[#1570EF]/20 p-1.5 rounded-full mr-3 mt-0.5">
+                    <Check className="h-4 w-4 text-[#33BFFF]" />
                   </div>
-                  
-                  <div className="flex items-start">
-                    <div className="bg-[#1570EF]/20 p-1.5 rounded-full mr-3 mt-0.5">
-                      <Check className="h-4 w-4 text-[#33BFFF]" />
-                    </div>
-                    <p className="text-gray-300 text-sm">
-                      For multiple coverage options, separate them with commas within the cell.
-                    </p>
+                  <p className="text-gray-300 text-sm">
+                    Supported file formats: CSV and Excel (.xlsx)
+                  </p>
+                </div>
+                
+                <div className="flex items-start">
+                  <div className="bg-[#1570EF]/20 p-1.5 rounded-full mr-3 mt-0.5">
+                    <Check className="h-4 w-4 text-[#33BFFF]" />
                   </div>
-                  
-                  <div className="flex items-start">
-                    <div className="bg-[#1570EF]/20 p-1.5 rounded-full mr-3 mt-0.5">
-                      <Check className="h-4 w-4 text-[#33BFFF]" />
-                    </div>
-                    <p className="text-gray-300 text-sm">
-                      Use consistent pricing formats across all plans (e.g., USD).
-                    </p>
+                  <p className="text-gray-300 text-sm">
+                    File size limit: 10MB
+                  </p>
+                </div>
+                
+                <div className="flex items-start">
+                  <div className="bg-[#1570EF]/20 p-1.5 rounded-full mr-3 mt-0.5">
+                    <Check className="h-4 w-4 text-[#33BFFF]" />
                   </div>
-                  
-                  <div className="flex items-start">
-                    <div className="bg-[#1570EF]/20 p-1.5 rounded-full mr-3 mt-0.5">
-                      <Check className="h-4 w-4 text-[#33BFFF]" />
-                    </div>
-                    <p className="text-gray-300 text-sm">
-                      Limited to 20 plans per upload. For more, use multiple files.
-                    </p>
-                  </div>
+                  <p className="text-gray-300 text-sm">
+                    Limited to 20 plans per upload. For more, use multiple files.
+                  </p>
+                </div>
+                
+                <div className="pt-3">
+                  <a href="mailto:support@briki.com" className="text-[#33BFFF] text-sm hover:underline flex items-center">
+                    <AlertCircle className="h-4 w-4 mr-1" /> Need help? Contact support
+                  </a>
                 </div>
               </CardContent>
             </Card>
+            
+            {/* Error section with ID for scrolling */}
+            {validationErrors.length > 0 && validationStatus === "success" && (
+              <div id="error-section" className="bg-[#0A2540] border-[#1E3A59] rounded-lg p-5">
+                <h3 className="text-amber-400 font-medium mb-3 flex items-center">
+                  <AlertCircle className="h-4 w-4 mr-2" />
+                  {validationErrors.length} Warning{validationErrors.length !== 1 ? 's' : ''}
+                </h3>
+                <div className="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-2">
+                  {validationErrors.map((error, index) => (
+                    <div key={index} className="bg-[#01101F] rounded p-2 text-left flex items-start">
+                      <Badge className="bg-amber-500/20 text-amber-400 border-amber-400/20 mr-2">
+                        {error.row > 0 ? `Row ${error.row}` : 'File'}
+                      </Badge>
+                      <p className="text-gray-300 text-sm">{error.message}</p>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-gray-400 text-sm mt-3">
+                  These warnings won't prevent upload, but you may want to review your data.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
