@@ -1,43 +1,89 @@
-// Insurance categories
+/**
+ * Application constants for Briki SaaS platform
+ */
+
+// Insurance categories and their display names
 export const INSURANCE_CATEGORIES = {
-  TRAVEL: "travel",
-  AUTO: "auto",
-  PET: "pet",
-  HEALTH: "health"
+  TRAVEL: 'travel',
+  AUTO: 'auto',
+  PET: 'pet',
+  HEALTH: 'health',
 } as const;
 
 export type InsuranceCategory = typeof INSURANCE_CATEGORIES[keyof typeof INSURANCE_CATEGORIES];
 
-// Field labels for different plan categories
+// Plan status options
+export const PLAN_STATUS = {
+  DRAFT: 'draft',
+  ACTIVE: 'active',
+  ARCHIVED: 'archived',
+} as const;
+
+export type PlanStatus = typeof PLAN_STATUS[keyof typeof PLAN_STATUS];
+
+// Plan visibility options
+export const PLAN_VISIBILITY = {
+  PRIVATE: 'private',
+  PUBLIC: 'public',
+} as const;
+
+export type PlanVisibility = typeof PLAN_VISIBILITY[keyof typeof PLAN_VISIBILITY];
+
+// Field labels for each category's specific fields
 export const planFieldLabels: Record<string, Record<string, string>> = {
+  // Travel insurance specific fields
   travel: {
-    basePrice: "Premium",
-    coverageAmount: "Coverage Amount",
-    destinations: "Covered Destinations",
-    coversMedical: "Medical Coverage",
-    coversCancellation: "Cancellation Coverage",
-    coversValuables: "Valuables Coverage",
-    maxTripDuration: "Maximum Trip Duration"
+    coverageDuration: 'Coverage Duration',
+    destinationCoverage: 'Destination Coverage',
+    medicalCoverage: 'Medical Coverage',
+    cancellationCoverage: 'Cancellation Coverage',
+    baggageCoverage: 'Baggage Coverage',
+    emergencyEvacuation: 'Emergency Evacuation',
+    adventureActivities: 'Adventure Activities Coverage',
+    preExistingConditions: 'Pre-existing Conditions',
+    tripDelay: 'Trip Delay Coverage',
+    tripInterruption: 'Trip Interruption Coverage',
   },
+  
+  // Auto insurance specific fields
   auto: {
-    basePrice: "Premium",
-    coverageAmount: "Coverage Amount",
-    vehicleTypes: "Covered Vehicle Types",
-    comprehensive: "Comprehensive Coverage",
-    roadside: "Roadside Assistance"
+    liabilityCoverage: 'Liability Coverage',
+    collisionCoverage: 'Collision Coverage',
+    comprehensiveCoverage: 'Comprehensive Coverage',
+    uninsuredMotoristCoverage: 'Uninsured Motorist Coverage',
+    personalInjuryProtection: 'Personal Injury Protection',
+    deductible: 'Deductible',
+    roadside: 'Roadside Assistance',
+    rentalCar: 'Rental Car Coverage',
+    vehicleReplacementCoverage: 'Vehicle Replacement',
+    gap: 'Gap Insurance',
   },
+  
+  // Pet insurance specific fields
   pet: {
-    basePrice: "Premium",
-    coverageAmount: "Coverage Amount",
-    petTypes: "Covered Pet Types",
-    coversIllness: "Illness Coverage",
-    coversAccident: "Accident Coverage"
+    accidentCoverage: 'Accident Coverage',
+    illnessCoverage: 'Illness Coverage',
+    wellnessCoverage: 'Wellness Coverage',
+    dentalCoverage: 'Dental Coverage',
+    prescriptionCoverage: 'Prescription Coverage',
+    annualLimit: 'Annual Limit',
+    deductible: 'Deductible',
+    reimbursementRate: 'Reimbursement Rate',
+    waitingPeriod: 'Waiting Period',
+    ageLimits: 'Age Limits',
   },
+  
+  // Health insurance specific fields
   health: {
-    basePrice: "Premium",
-    coverageAmount: "Coverage Amount",
-    coversPreventive: "Preventive Care",
-    coversEmergency: "Emergency Care",
-    coversSpecialist: "Specialist Coverage"
-  }
+    annualDeductible: 'Annual Deductible',
+    outOfPocketMax: 'Out of Pocket Maximum',
+    coinsurance: 'Coinsurance',
+    copay: 'Co-pay',
+    primaryCareVisit: 'Primary Care Visit',
+    specialistVisit: 'Specialist Visit',
+    emergencyRoom: 'Emergency Room',
+    hospitalCoverage: 'Hospital Coverage',
+    prescriptionCoverage: 'Prescription Coverage',
+    dentalVision: 'Dental & Vision Coverage',
+  },
 };

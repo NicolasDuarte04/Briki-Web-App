@@ -94,6 +94,8 @@ import CompanySettings from "@/pages/company-settings";
 import CompanyPreviewPage from "@/pages/company-preview-page";
 import CompanyRequestPilotPage from "@/pages/company-request-pilot-page";
 import ContactSalesPage from "@/pages/contact-sales-page";
+import CompanyPlans from "@/pages/company-plans";
+import CompanyPlanEdit from "@/pages/company-plan-edit";
 
 // Removed unused ConditionalAIProvider
 
@@ -188,6 +190,9 @@ function Router() {
         <Route path="/company-dashboard/analysis" component={CompanyAnalysisPage} />
         <Route path="/company-dashboard/marketplace" component={CompanyMarketplacePage} />
         <Route path="/company-dashboard/settings" component={CompanySettings} />
+        {/* Plan management routes */}
+        <Route path="/company-plans" component={CompanyPlans} />
+        <Route path="/company-plans/:id/edit" component={CompanyPlanEdit} />
         {/* Legacy routes */}
         <Route path="/company-dashboard/preview" component={CompanyPreviewPage} />
         <Route path="/company-dashboard/request-pilot" component={CompanyRequestPilotPage} />
