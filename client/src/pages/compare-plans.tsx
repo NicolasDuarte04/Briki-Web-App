@@ -68,12 +68,12 @@ export default function ComparePlansPage() {
           console.error('Analytics error:', error);
         }
         
-        // Calculate best values immediately instead of with setTimeout
+        // Calculate best values with proper async/await handling
         // This prevents potential race conditions and unhandled errors
-        calculateBestValues();
+        await calculateBestValues();
         
-        // Add a small delay just for UX purposes so the transition isn't jarring
-        await new Promise(resolve => setTimeout(resolve, 300));
+        // Rehydrate store to avoid hydration mismatch
+        useCompareStore.persist.rehydrate();
         setIsLoading(false);
         
       } catch (error) {

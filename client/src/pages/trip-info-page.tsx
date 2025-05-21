@@ -8,7 +8,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
 
-import { MainLayout } from "@/components/layout/main-layout";
+// Layout is handled by App.tsx
 import { useLanguage } from "@/components/language-selector";
 import { CountryCombobox } from "@/components/country-combobox";
 import { Input } from "@/components/ui/input";
