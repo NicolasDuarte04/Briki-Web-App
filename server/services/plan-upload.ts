@@ -116,7 +116,7 @@ export async function parseCSVFile(filePath: string, companyId: number): Promise
 
     results.success = results.invalidRecords === 0 && results.validRecords > 0;
     return results;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error parsing CSV file:', error);
     results.errors[-1] = [`Failed to parse file: ${error.message}`];
     return results;
@@ -177,7 +177,7 @@ export async function parseXLSXFile(filePath: string, companyId: number): Promis
 
     results.success = results.invalidRecords === 0 && results.validRecords > 0;
     return results;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error parsing XLSX file:', error);
     results.errors[-1] = [`Failed to parse file: ${error.message}`];
     return results;

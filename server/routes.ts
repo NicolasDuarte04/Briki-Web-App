@@ -359,60 +359,119 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!profile) {
         return res.status(404).json({ message: "Company profile not found" });
       }
-      
-      // Process uploaded file data
-      const { 
-        plans, 
-        category,
-        isPublic = false 
-      } = req.body;
-      
-      if (!plans || !Array.isArray(plans) || !category) {
-        return res.status(400).json({ message: "Invalid request data" });
+
+      // Create upload directory if it doesn't exist
+      const uploadDir = path.join(os.tmpdir(), 'briki-uploads');
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
       }
-      
-      // Validate category
-      const validCategories = Object.values(INSURANCE_CATEGORIES);
-      if (!validCategories.includes(category)) {
-        return res.status(400).json({ message: "Invalid category" });
-      }
-      
-      // Process and validate each plan
-      const createdPlans = [];
-      const errors = [];
-      
-      for (const [index, planData] of plans.entries()) {
-        try {
-          // Add company ID and category to plan data
-          const planToCreate = {
-            ...planData,
-            companyId: profile.id,
-            category,
-            visibility: isPublic ? 'public' : 'private'
-          };
-          
-          // Create the plan
-          const plan = await storage.createCompanyPlan(planToCreate);
-          createdPlans.push(plan);
-        } catch (error: any) {
-          errors.push({
-            row: index + 1,
-            message: error.message || "Unknown error",
-            data: planData
+
+      // Configure formidable
+      const form = formidable({
+        multiples: false,
+        uploadDir,
+        keepExtensions: true,
+        maxFileSize: 10 * 1024 * 1024, // 10MB limit
+        filter: (part: any) => {
+          // Accept only CSV and Excel files
+          if (part.mimetype?.includes('csv') || 
+              part.mimetype?.includes('spreadsheet') ||
+              part.mimetype?.includes('excel') || 
+              part.originalFilename?.endsWith('.csv') || 
+              part.originalFilename?.endsWith('.xlsx')) {
+            return true;
+          }
+          return false;
+        }
+      });
+
+      // Parse the form data
+      form.parse(req, async (err: any, fields: any, files: any) => {
+        if (err) {
+          console.error('Error parsing form data:', err);
+          return res.status(400).json({ message: 'Error uploading file: ' + err.message });
+        }
+
+        // Get the uploaded file
+        const uploadedFile = files.file?.[0];
+        if (!uploadedFile) {
+          return res.status(400).json({ message: 'No file uploaded' });
+        }
+
+        const filePath = uploadedFile.filepath;
+        const fileType = path.extname(uploadedFile.originalFilename || '').toLowerCase();
+
+        let validationResult;
+        // Parse the file based on its type
+        if (fileType === '.csv') {
+          validationResult = await parseCSVFile(filePath, profile.id);
+        } else if (fileType === '.xlsx') {
+          validationResult = await parseXLSXFile(filePath, profile.id);
+        } else {
+          // Clean up the uploaded file
+          fs.unlinkSync(filePath);
+          return res.status(400).json({ message: 'Unsupported file type. Please upload CSV or XLSX file.' });
+        }
+
+        // Clean up the uploaded file regardless of result
+        fs.unlinkSync(filePath);
+
+        // If validation failed completely
+        if (!validationResult.success) {
+          return res.status(400).json({
+            message: 'File validation failed',
+            errors: validationResult.errors,
+            stats: {
+              totalRecords: validationResult.totalRecords,
+              validRecords: validationResult.validRecords,
+              invalidRecords: validationResult.invalidRecords
+            }
           });
         }
-      }
-      
-      // Return created plans and any errors
-      res.status(201).json({
-        success: true,
-        plans: createdPlans,
-        errors,
-        totalCreated: createdPlans.length,
-        totalErrors: errors.length
+
+        // If there are valid plans, insert them into the database
+        if (validationResult.validPlans.length > 0) {
+          try {
+            // Insert each validated plan
+            for (const planData of validationResult.validPlans) {
+              await storage.createCompanyPlan(planData);
+            }
+
+            return res.status(200).json({
+              message: 'Plans uploaded successfully',
+              stats: {
+                totalRecords: validationResult.totalRecords,
+                validRecords: validationResult.validRecords,
+                invalidRecords: validationResult.invalidRecords
+              },
+              warnings: validationResult.invalidRecords > 0 ? validationResult.errors : undefined
+            });
+          } catch (dbError: any) {
+            console.error('Error saving plans to database:', dbError);
+            return res.status(500).json({ 
+              message: 'Failed to save plans to database: ' + dbError.message,
+              errors: validationResult.errors,
+              stats: {
+                totalRecords: validationResult.totalRecords,
+                validRecords: validationResult.validRecords,
+                invalidRecords: validationResult.invalidRecords
+              }
+            });
+          }
+        } else {
+          return res.status(400).json({ 
+            message: 'No valid plans found in the uploaded file',
+            errors: validationResult.errors,
+            stats: {
+              totalRecords: validationResult.totalRecords,
+              validRecords: validationResult.validRecords,
+              invalidRecords: validationResult.invalidRecords
+            }
+          });
+        }
       });
     } catch (error: any) {
-      console.error("Error uploading company plans:", error);
+      console.error("Error handling plan upload:", error);
       res.status(500).json({ message: error.message || "Server error" });
     }
   });
@@ -431,54 +490,70 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Company profile not found" });
       }
       
-      // Get analytics
-      const analytics = await storage.getDashboardAnalytics(profile.id);
+      // Mock analytics data for now
+      // In a real implementation, this would come from aggregations of user interactions and conversions
+      const analyticsData = {
+        totalPlans: 12,
+        planCategoryCounts: {
+          travel: 5,
+          auto: 3,
+          pet: 2,
+          health: 2
+        },
+        marketplaceVisits: 324,
+        planComparisons: 187,
+        quoteRequests: 65,
+        conversionRate: 0.13,
+        topPerformingPlans: [
+          { id: 1, name: "Premium Travel Insurance", category: "travel", views: 124, conversions: 14 },
+          { id: 2, name: "Comprehensive Auto Coverage", category: "auto", views: 95, conversions: 9 },
+          { id: 3, name: "Pet Insurance Plus", category: "pet", views: 67, conversions: 5 }
+        ]
+      };
       
-      res.json(analytics);
+      res.json(analyticsData);
     } catch (error: any) {
-      console.error("Error retrieving company analytics:", error);
+      console.error("Error retrieving analytics:", error);
       res.status(500).json({ message: error.message || "Server error" });
     }
   });
   
-  // AI Assistant endpoints
-  
-  // Chat message endpoint
-  app.post("/api/ai/chat", async (req, res) => {
+  // ChatGPT integration endpoints
+  app.post("/api/chat", async (req, res) => {
     try {
-      const { messages } = req.body;
+      const { message } = req.body;
       
-      if (!messages || !Array.isArray(messages)) {
-        return res.status(400).json({ error: "Invalid request format. 'messages' array is required." });
+      if (!message) {
+        return res.status(400).json({ error: "Invalid request. 'message' is required." });
       }
       
-      const response = await getChatCompletionFromOpenAI(messages);
+      const response = await getChatCompletionFromOpenAI(message);
+      
       res.json({ response });
     } catch (error: any) {
-      console.error("Error in chatbot API:", error);
+      console.error("Error in chat completion:", error);
       res.status(500).json({ error: "Failed to process chat request", message: error.message });
     }
   });
-
-  // Insurance term explanation endpoint
-  app.post("/api/ai/explain-term", async (req, res) => {
+  
+  app.get("/api/insurance/explain/:term", async (req, res) => {
     try {
-      const { term } = req.body;
+      const { term } = req.params;
       
-      if (!term || typeof term !== 'string') {
+      if (!term) {
         return res.status(400).json({ error: "Invalid request. 'term' is required." });
       }
       
       const explanation = await explainInsuranceTerm(term);
+      
       res.json({ explanation });
     } catch (error: any) {
-      console.error("Error explaining term:", error);
+      console.error("Error explaining insurance term:", error);
       res.status(500).json({ error: "Failed to explain insurance term", message: error.message });
     }
   });
-
-  // Insurance recommendation endpoint
-  app.post("/api/ai/recommend", async (req, res) => {
+  
+  app.post("/api/insurance/recommend", async (req, res) => {
     try {
       const { category, criteria } = req.body;
       
@@ -487,15 +562,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const recommendation = await generateInsuranceRecommendation(category, criteria);
+      
       res.json({ recommendation });
     } catch (error: any) {
       console.error("Error generating recommendation:", error);
       res.status(500).json({ error: "Failed to generate recommendation", message: error.message });
     }
   });
-
-  // Plan comparison endpoint
-  app.post("/api/ai/compare-plans", async (req, res) => {
+  
+  app.post("/api/insurance/compare", async (req, res) => {
     try {
       const { plans } = req.body;
       
@@ -504,6 +579,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const comparison = await comparePlans(plans);
+      
       res.json({ comparison });
     } catch (error: any) {
       console.error("Error comparing plans:", error);
