@@ -19,7 +19,6 @@ import { EventCategory } from "@/constants/analytics";
 import { ColorProvider } from "@/contexts/color-context";
 
 import NotFound from "@/pages/not-found";
-// Removed reference to archived home-page-new.tsx
 import LandingPage from "@/pages/landing-page";
 import Dashboard from "@/pages/dashboard-enhanced";
 // Import our new unified authentication screen
@@ -61,7 +60,6 @@ import AIAssistantDemo from "@/pages/ai-assistant-demo";
 import AIAssistantScreen from "@/pages/assistant";
 import CountdownPageNew from "@/pages/countdown-page-new";
 import BrikiPilotPortal from "@/pages/briki-pilot-portal";
-import LandingPage from "@/pages/landing-page";
 
 // New insurance category pages
 import TravelInsurance from "@/pages/insurance/travel";

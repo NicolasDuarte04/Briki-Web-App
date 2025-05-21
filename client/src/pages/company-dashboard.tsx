@@ -12,7 +12,13 @@ import { LineChart, BarChart, PieChart } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { InsurancePlan, CompanyProfile, InsuranceCategory } from "@shared/types";
+import { InsurancePlan as BasePlan, CompanyProfile, InsuranceCategory } from "@shared/types";
+
+// Extended InsurancePlan type that includes our dashboard-specific fields
+interface ExtendedInsurancePlan extends BasePlan {
+  subscribers?: number;
+  trend?: number;
+}
 
 // Mock data for insurance plan analytics
 interface MockPlan {
@@ -43,7 +49,7 @@ export default function CompanyDashboard() {
   });
 
   // Fetch plans data
-  const { data: plansData, isLoading: plansLoading } = useQuery<InsurancePlan[]>({
+  const { data: plansData, isLoading: plansLoading } = useQuery<ExtendedInsurancePlan[]>({
     queryKey: ["/api/company/plans"],
     enabled: !!user?.id,
   });
