@@ -161,13 +161,25 @@ function Router() {
         <Route path="/api-settings" component={ApiSettingsPage} />
         <Route path="/assistant" component={AIAssistantScreen} />
         
-        {/* Company/Partner Routes */}
+        {/* Company/Partner Routes - Updated for consistency */}
         <Route path="/company" component={CompanyPage} />
         <Route path="/briki-pilot" component={BrikiPilotPortal} />
-        <Route path="/company-login" component={CompanyLoginNew} />
-        <Route path="/company-register" component={CompanyRegisterNew} />
+        <Route path="/company-login-new" component={CompanyLoginNew} />
+        <Route path="/company-register-new" component={CompanyRegisterNew} />
+        
+        {/* Backward compatibility redirects */}
+        <Route path="/company-login" component={() => {
+          window.location.replace("/company-login-new");
+          return null;
+        }} />
+        <Route path="/company-register" component={() => {
+          window.location.replace("/company-register-new");
+          return null;
+        }} />
+        
         <Route path="/contact-sales" component={ContactSalesPage} />
         <Route path="/company-dashboard-redesigned" component={CompanyDashboardPageRedesigned} />
+        
         {/* Redirect for legacy routes */}
         <Route path="/company-dashboard" component={() => {
           window.location.replace("/company-dashboard-redesigned");

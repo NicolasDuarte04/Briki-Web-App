@@ -229,7 +229,7 @@ export default function NavbarNew() {
                       <Avatar className="h-8 w-8 border-2 border-white/50 shadow-md">
                         <AvatarImage
                           src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserInitials()}`}
-                          alt={user.username}
+                          alt={user?.email || "User"}
                         />
                         <AvatarFallback>{getUserInitials()}</AvatarFallback>
                       </Avatar>
@@ -402,7 +402,7 @@ export default function NavbarNew() {
                             <Avatar className="border-2 border-white/50 shadow-md">
                               <AvatarImage
                                 src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserInitials()}`}
-                                alt={user.username}
+                                alt={user?.email || "User"}
                               />
                               <AvatarFallback>{getUserInitials()}</AvatarFallback>
                             </Avatar>
