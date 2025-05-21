@@ -694,18 +694,28 @@ export default function CompanyUploadPage() {
           
           {/* Right column (1/3 width) */}
           <div className="space-y-6">
-            {/* Plan Details Card */}
             <Card className="bg-[#0A2540] border-[#1E3A59]">
               <CardHeader>
-                <CardTitle className="text-white">Plan Details</CardTitle>
+                <CardTitle className="text-white">Plan Options</CardTitle>
                 <CardDescription className="text-gray-400">
-                  Additional information about your plan
+                  Set additional options for your insurance plans
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="category" className="text-white">Insurance Category</Label>
-                  <Select value={planCategory} onValueChange={setPlanCategory}>
+              <CardContent className="space-y-5">
+                <div className="space-y-1.5">
+                  <Label className="text-gray-300" htmlFor="category">
+                    Insurance Category
+                  </Label>
+                  <Select 
+                    value={planCategory} 
+                    onValueChange={(value) => {
+                      setPlanCategory(value);
+                      // Track category selection in analytics
+                      trackEvent('category_selected', 'company', 'plan_upload', {
+                        category: value
+                      });
+                    }}
+                  >
                     <SelectTrigger 
                       id="category" 
                       className="bg-[#01101F] border-[#1E3A59] text-white focus:ring-[#33BFFF]"
@@ -713,69 +723,126 @@ export default function CompanyUploadPage() {
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
                     <SelectContent className="bg-[#0A2540] border-[#1E3A59] text-white">
-                      <SelectItem value="auto">Auto Insurance</SelectItem>
                       <SelectItem value="travel">Travel Insurance</SelectItem>
+                      <SelectItem value="auto">Auto Insurance</SelectItem>
                       <SelectItem value="pet">Pet Insurance</SelectItem>
                       <SelectItem value="health">Health Insurance</SelectItem>
                       <SelectItem value="home">Home Insurance</SelectItem>
                     </SelectContent>
                   </Select>
-                  <p className="text-gray-500 text-xs">
-                    This helps us analyze your plan against similar products
+                  <p className="text-sm text-gray-500">
+                    {planCategory 
+                      ? `Plans will be analyzed against other ${planCategory} insurance offerings` 
+                      : "Choose a category to enable competitive analysis"}
                   </p>
                 </div>
                 
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="marketplace-visibility" className="text-white">Marketplace Visibility</Label>
-                    <Switch 
-                      id="marketplace-visibility" 
+                    <Label className="text-gray-300" htmlFor="public">
+                      Make plans public
+                    </Label>
+                    <Switch
+                      id="public"
                       checked={isPublic}
-                      onCheckedChange={setIsPublic}
+                      onCheckedChange={(checked) => {
+                        setIsPublic(checked);
+                        // Track visibility toggle in analytics
+                        trackEvent('visibility_toggled', 'company', 'plan_upload', {
+                          public: checked
+                        });
+                      }}
                     />
                   </div>
-                  <p className="text-gray-500 text-xs">
-                    Allow your plan to be displayed publicly in the Briki marketplace
+                  <p className="text-sm text-gray-500">
+                    {isPublic 
+                      ? "Plans will be visible in the Briki marketplace" 
+                      : "Plans will only be visible to your company"}
                   </p>
                 </div>
-              </CardContent>
-              <CardFooter className="border-t border-[#1E3A59] pt-4 flex flex-col items-stretch">
-                <Button
-                  className="w-full bg-[#1570EF] hover:bg-[#0E63D6] mb-2"
-                  disabled={!selectedFile || (validationStatus === "error")}
-                  onClick={handleSubmit}
-                >
-                  <Upload className="h-4 w-4 mr-2" />
-                  {validationStatus === "success" ? "Upload Plan" : "Validate & Upload"}
-                </Button>
                 
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="w-full">
-                        <Button
-                          variant="outline"
-                          className="w-full border-[#1E3A59] text-white hover:bg-[#01101F] hover:border-[#33BFFF]"
-                          disabled={!selectedFile}
-                          onClick={() => setSelectedFile(null)}
-                        >
-                          <X className="h-4 w-4 mr-2" />
-                          Cancel
-                        </Button>
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Clear the current upload</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </CardFooter>
+                <div className="pt-4">
+                  <Button 
+                    className={`w-full ${validationStatus === "success" 
+                      ? "bg-green-600 hover:bg-green-700" 
+                      : "bg-[#1570EF] hover:bg-[#0E63D6]"}`}
+                    onClick={handleSubmit}
+                    disabled={validationStatus === "validating" || validationStatus === "uploading" || (!selectedFile && uploadMethod === "file")}
+                  >
+                    {validationStatus === "validating" ? (
+                      <>
+                        <span className="mr-2">Validating</span>
+                        <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                          <circle 
+                            className="opacity-25" 
+                            cx="12" cy="12" r="10" 
+                            stroke="currentColor" 
+                            strokeWidth="4"
+                            fill="none"
+                          />
+                          <path 
+                            className="opacity-75" 
+                            fill="currentColor" 
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          />
+                        </svg>
+                      </>
+                    ) : validationStatus === "uploading" ? (
+                      <>
+                        <span className="mr-2">Uploading</span>
+                        <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                          <circle 
+                            className="opacity-25" 
+                            cx="12" cy="12" r="10" 
+                            stroke="currentColor" 
+                            strokeWidth="4"
+                            fill="none"
+                          />
+                          <path 
+                            className="opacity-75" 
+                            fill="currentColor" 
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          />
+                        </svg>
+                      </>
+                    ) : validationStatus === "success" ? (
+                      <>
+                        <Upload className="mr-2 h-4 w-4" />
+                        Upload {validationStats?.validRecords || ""} Plans
+                      </>
+                    ) : validationStatus === "error" ? (
+                      "Fix Errors & Try Again"
+                    ) : (
+                      <>
+                        <FileUp className="mr-2 h-4 w-4" />
+                        Validate File
+                      </>
+                    )}
+                  </Button>
+                  
+                  {/* Show validation stats if available */}
+                  {validationStats && (
+                    <div className="mt-4 text-center">
+                      <p className="text-sm text-gray-400">
+                        {validationStats.validRecords} of {validationStats.totalRecords} plans validated
+                        {validationStats.invalidRecords > 0 && (
+                          <span className="text-amber-400"> ({validationStats.invalidRecords} with issues)</span>
+                        )}
+                      </p>
+                      <Progress 
+                        value={(validationStats.validRecords / validationStats.totalRecords) * 100}
+                        className="h-1.5 mt-2"
+                      />
+                    </div>
+                  )}
+                </div>
+              </CardContent>
             </Card>
             
-            {/* Upload Tips Card */}
+            {/* Help & Support Card */}
             <Card className="bg-[#0A2540] border-[#1E3A59]">
               <CardHeader>
-                <CardTitle className="text-white">Upload Tips</CardTitle>
+                <CardTitle className="text-white">Help & Support</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-3">
