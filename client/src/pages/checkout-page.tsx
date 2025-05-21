@@ -17,7 +17,7 @@ import {
   useElements 
 } from "@stripe/react-stripe-js";
 
-import Navbar from "@/components/navbar";
+import Navbar from "@/components/navbar-new";
 import Footer from "@/components/footer";
 import PaymentSuccess from "@/components/payment-success";
 import { Button } from "@/components/ui/button";
