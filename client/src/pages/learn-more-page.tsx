@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "wouter";
-import Navbar from "@/components/navbar";
+import Navbar from "@/components/navbar-new";
 import Footer from "@/components/footer";
 import { ArrowLeft, Shield, Clock, CheckCircle } from "lucide-react";
 import { useLanguage } from "@/components/language-selector";

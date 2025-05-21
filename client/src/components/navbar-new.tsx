@@ -153,7 +153,7 @@ export default function NavbarNew() {
                 </DropdownMenuItem>
                 <DropdownMenuItem 
                   className="cursor-pointer"
-                  onClick={() => navigate("/company-dashboard")}
+                  onClick={() => navigate("/company-dashboard-redesigned")}
                 >
                   <span>Partner Dashboard</span>
                 </DropdownMenuItem>
