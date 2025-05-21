@@ -86,13 +86,13 @@ export default function CompanyRegisterPage() {
         variant: "default",
       });
       
-      // Add a debugging log to help identify what's happening
-      console.log("Registration successful, redirecting to dashboard...");
+      // Log successful registration
+      console.log("Registration successful, redirecting to redesigned dashboard...");
       
-      // Redirect to dashboard after a short delay to allow the toast to show
+      // Use proper client-side navigation instead of window.location.href
+      // Short timeout to allow toast to display before navigation
       setTimeout(() => {
-        // Force a hard navigation instead of a client-side route change
-        window.location.href = "/company-dashboard";
+        navigate("/company-dashboard-redesigned");
       }, 1500);
       
     } catch (error) {

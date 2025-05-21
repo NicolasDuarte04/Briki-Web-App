@@ -55,7 +55,7 @@ function useLoginMutation() {
       // works consistently for partner logins
       if (data.role === 'company') {
         setTimeout(() => {
-          navigate("/company-dashboard");
+          navigate("/company-dashboard-redesigned");
         }, 500);
       }
       // For regular users, redirection to home is default
@@ -95,9 +95,9 @@ function useRegisterMutation() {
       
       // Handle role-based redirection similar to login
       if (data.role === 'company') {
-        setTimeout(() => {
-          navigate("/company-dashboard");
-        }, 500);
+        // Use the redesigned dashboard for company users
+        // Note: Don't use navigation here as the company-register-page handles this
+        console.log('Company user registered successfully');
       } else {
         // Regular users go to dashboard
         setTimeout(() => {

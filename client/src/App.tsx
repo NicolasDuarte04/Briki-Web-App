@@ -169,6 +169,7 @@ function Router() {
         <Route path="/company-register" component={CompanyRegisterPage} />
         <Route path="/contact-sales" component={ContactSalesPage} />
         <Route path="/company-dashboard" component={CompanyDashboardPage} />
+        <Route path="/company-dashboard-redesigned" component={CompanyDashboardPageRedesigned} />
         <Route path="/company-dashboard/upload" component={CompanyUploadPage} />
         <Route path="/company-dashboard/analysis" component={CompanyAnalysisPage} />
         <Route path="/company-dashboard/marketplace" component={CompanyMarketplacePage} />
