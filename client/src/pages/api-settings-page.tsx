@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ProviderApiSetup from '@/components/provider-api-setup';
 import ProviderStatusDashboard from '@/components/provider-status-dashboard';
-import Navbar from '@/components/navbar';
+import Navbar from '@/components/navbar-new';
 import Footer from '@/components/footer';
 import { FuturisticBackground } from '@/components/ui/futuristic-background';
 import { useInvalidatePlansCache } from '@/services/caching/insurance-cache';
