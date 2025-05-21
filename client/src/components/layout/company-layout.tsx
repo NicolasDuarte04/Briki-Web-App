@@ -4,11 +4,10 @@ import { motion } from "framer-motion";
 import { 
   LayoutDashboard, 
   FileUp,
-  BarChart4, 
-  LineChart,
-  Shield,
+  Eye, 
+  MessageSquareQuote,
   Users, 
-  Zap, 
+  BarChart, 
   Code, 
   CreditCard, 
   HelpCircle,
@@ -17,10 +16,8 @@ import {
   X,
   Bell,
   ChevronDown,
-  Settings,
-  Search,
-  Filter,
-  Download
+  BriefcaseBusiness,
+  Search
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -42,68 +39,82 @@ import {
 
 type CompanyLayoutProps = {
   children: React.ReactNode;
+  pageTitle?: string;
+  activeNav?: string;
 };
 
 const navItems = [
   { 
     name: "Dashboard", 
     path: "/company-dashboard", 
+    id: "dashboard",
     icon: <LayoutDashboard className="w-5 h-5" /> 
   },
   { 
-    name: "Upload Plans", 
+    name: "Upload Quote", 
     path: "/company-dashboard/upload", 
+    id: "upload",
     icon: <FileUp className="w-5 h-5" /> 
   },
   { 
-    name: "Competitive Analysis", 
-    path: "/company-dashboard/analysis", 
-    icon: <BarChart4 className="w-5 h-5" /> 
+    name: "Preview Placement", 
+    path: "/company-dashboard/preview", 
+    id: "preview",
+    icon: <Eye className="w-5 h-5" /> 
   },
   { 
-    name: "Marketplace", 
-    path: "/company-dashboard/marketplace", 
-    icon: <Zap className="w-5 h-5" /> 
+    name: "Request Pilot", 
+    path: "/company-dashboard/request-pilot", 
+    id: "request-pilot",
+    icon: <MessageSquareQuote className="w-5 h-5" /> 
+  },
+  {
+    name: "Settings",
+    path: "/company-dashboard/settings",
+    id: "settings",
+    icon: <HelpCircle className="w-5 h-5" />
   },
   { 
     name: "API Integration", 
     path: "/company-dashboard/api", 
+    id: "api",
     icon: <Code className="w-5 h-5" />,
     comingSoon: true
   },
   { 
-    name: "Billing", 
+    name: "Billing & Invoicing", 
     path: "/company-dashboard/billing", 
+    id: "billing",
     icon: <CreditCard className="w-5 h-5" />,
     comingSoon: true
-  },
-  { 
-    name: "Settings", 
-    path: "/company-dashboard/settings", 
-    icon: <Settings className="w-5 h-5" />,
-  },
+  }
 ];
 
 /**
- * Copilot layout with enterprise SaaS styling for the insurance company portal
+ * Company layout with the futuristic navy-based color palette for the B2B portal
  */
-export default function CompanyLayout({ children }: CompanyLayoutProps) {
+export default function CompanyLayout({ children, pageTitle = "Dashboard", activeNav = "dashboard" }: CompanyLayoutProps) {
   const [location] = useLocation();
   const { user, logoutMutation } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Active path helper
   const isActive = (path: string) => location === path || location.startsWith(path);
+  
+  // Active nav helper
+  const isActiveNav = (id: string) => id === activeNav;
 
   // Get company name or fallback to username
   const getCompanyName = () => {
     if (!user) return "Company";
     
-    if (user.companyProfile?.name) {
-      return user.companyProfile.name;
+    // Access company profile as a property if available
+    const company = (user as any).companyProfile?.name;
+    if (company) {
+      return company;
     }
     
-    return user.username;
+    return user.username || user.email.split('@')[0];
   };
 
   // Get user initials for avatar
@@ -112,117 +123,52 @@ export default function CompanyLayout({ children }: CompanyLayoutProps) {
     return name.charAt(0).toUpperCase();
   };
 
-  // Component for the sidebar - designed to match the mockup
-  const Sidebar = () => (
-    <div className="hidden md:flex fixed top-0 left-0 h-screen w-56 bg-[#01101F] border-r border-[#0A2540]/50 flex-col">
-      {/* Logo area */}
-      <div className="p-5 flex items-center space-x-2">
-        <LineChart className="h-6 w-6 text-[#33BFFF]" />
-        <span className="text-xl font-bold bg-gradient-to-r from-white to-[#33BFFF] bg-clip-text text-transparent">
-          briki<span className="font-normal text-[#33BFFF]">COPILOT</span>
-        </span>
-      </div>
-      
-      {/* Nav items */}
-      <nav className="mt-8 px-3 flex-1">
-        <div className="space-y-1.5">
-          {navItems.map((item) => (
-            <Link 
-              key={item.path} 
-              href={item.comingSoon ? "#" : item.path}
-              className={`
-                flex items-center px-3 py-2.5 rounded text-sm font-medium transition-all relative
-                ${isActive(item.path) 
-                  ? "bg-[#0A2540] text-white" 
-                  : "text-gray-400 hover:bg-[#0A2540]/50 hover:text-white"}
-              `}
-              onClick={(e) => {
-                if (item.comingSoon) {
-                  e.preventDefault();
-                }
-              }}
-            >
-              <span className={`mr-3 ${isActive(item.path) ? 'text-[#33BFFF]' : 'text-gray-500'}`}>{item.icon}</span>
-              {item.name}
-              {item.comingSoon && (
-                <span className="absolute right-2 text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-[#0A2540] text-[#33BFFF] border border-[#0074FF]/30">
-                  Soon
-                </span>
-              )}
-            </Link>
-          ))}
-        </div>
-      </nav>
-      
-      {/* User profile area */}
-      <div className="p-4 border-t border-[#0A2540] mt-auto">
-        <div className="flex items-center">
-          <Avatar className="h-8 w-8 border border-[#0074FF]/30 bg-[#0A2540]">
-            <AvatarImage
-              src={`https://api.dicebear.com/7.x/initials/svg?seed=${getInitials()}`}
-              alt={getCompanyName()}
-            />
-            <AvatarFallback className="text-xs font-medium text-white">
-              {getInitials()}
-            </AvatarFallback>
-          </Avatar>
-          <div className="ml-3 overflow-hidden flex-1">
-            <p className="text-sm font-medium text-white truncate">{getCompanyName()}</p>
-            <p className="text-xs text-gray-500 truncate">{user?.email}</p>
-          </div>
-          <Button 
-            variant="ghost" 
-            size="icon"
-            className="text-gray-400 hover:text-white hover:bg-[#0A2540]"
-            onClick={() => logoutMutation.mutate()}
-          >
-            <LogOut className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-
-  // Component for the top NavBar
+  // Component for the top NavBar - designed to match the one in briki-pilot-portal.tsx
   const NavBar = () => (
-    <header className="w-full bg-[#01101F]/95 backdrop-blur-lg border-b border-[#0A2540] sticky top-0 z-50 pl-0 md:pl-56">
-      <div className="h-16 px-4 md:px-6 flex items-center justify-between">
-        {/* Mobile logo */}
-        <div className="flex items-center md:hidden">
-          <LineChart className="h-5 w-5 text-[#33BFFF]" />
-          <span className="ml-2 text-lg font-bold bg-gradient-to-r from-white to-[#33BFFF] bg-clip-text text-transparent">
-            briki<span className="font-normal text-[#33BFFF]">COPILOT</span>
-          </span>
-        </div>
-        
-        {/* Page title - hidden on mobile */}
-        <div className="hidden md:block">
-          <h1 className="text-lg font-semibold text-white">Dashboard</h1>
-        </div>
-        
-        {/* Actions area */}
-        <div className="flex items-center space-x-3">
-          {/* Upload button - visible on all pages */}
-          <Button
-            className="bg-[#1570EF] hover:bg-[#0E63D6] text-white hidden md:flex items-center"
-            onClick={() => window.location.href = '/company-dashboard/upload'}
-          >
-            <FileUp className="h-4 w-4 mr-2" />
-            Upload
-          </Button>
-          
-          {/* Notification bell */}
-          <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white relative">
-            <Bell className="h-5 w-5" />
-            <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-[#33BFFF] ring-1 ring-[#01101F]"></span>
-          </Button>
-          
-          {/* User dropdown - mobile only */}
-          <div className="md:hidden">
+    <header className="w-full bg-[#001A40]/90 backdrop-blur-lg border-b border-[#002C7A] sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16 items-center">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <div className="flex items-center">
+                <div className="h-8 w-8 bg-gradient-to-r from-[#003087] to-[#0074FF] rounded-md flex items-center justify-center shadow-[0_0_15px_rgba(51,191,255,0.3)]">
+                  <BriefcaseBusiness className="h-5 w-5 text-white" />
+                </div>
+                <span className="ml-2 text-xl font-bold bg-gradient-to-r from-white via-[#33BFFF] to-white bg-clip-text text-transparent">
+                  Briki Pilot
+                </span>
+              </div>
+            </div>
+            <div className="hidden md:block ml-10">
+              <div className="flex items-center space-x-4">
+                <Link href="/company-dashboard" className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${isActive('/company-dashboard') && !isActive('/company-dashboard/') ? 'text-white' : 'text-gray-300 hover:text-white'}`}>
+                  Dashboard
+                </Link>
+                <Link href="/company-dashboard/upload" className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${isActive('/company-dashboard/upload') ? 'text-white' : 'text-gray-300 hover:text-white'}`}>
+                  Upload
+                </Link>
+                <Link href="/company-dashboard/preview" className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${isActive('/company-dashboard/preview') ? 'text-white' : 'text-gray-300 hover:text-white'}`}>
+                  Preview
+                </Link>
+                <Link href="/company-dashboard/settings" className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${isActive('/company-dashboard/settings') ? 'text-white' : 'text-gray-300 hover:text-white'}`}>
+                  Settings
+                </Link>
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center space-x-4">
+            <button className="p-1 rounded-full text-gray-400 hover:text-white transition-colors duration-200">
+              <Search className="h-5 w-5" />
+            </button>
+            <button className="p-1 rounded-full text-gray-400 hover:text-white transition-colors duration-200 relative">
+              <Bell className="h-5 w-5" />
+              <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-[#33BFFF] ring-1 ring-[#001A40]"></span>
+            </button>
+            
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white">
-                  <Avatar className="h-8 w-8 border border-[#0074FF]/30 bg-[#0A2540]">
+                <div className="flex items-center cursor-pointer">
+                  <Avatar className="h-8 w-8 border border-[#0074FF]/30 bg-[#002C7A]">
                     <AvatarImage
                       src={`https://api.dicebear.com/7.x/initials/svg?seed=${getInitials()}`}
                       alt={getCompanyName()}
@@ -231,149 +177,129 @@ export default function CompanyLayout({ children }: CompanyLayoutProps) {
                       {getInitials()}
                     </AvatarFallback>
                   </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-[#01101F] border border-[#0A2540] text-white w-56">
-                <div className="px-4 py-3">
-                  <p className="text-sm font-medium text-white">{getCompanyName()}</p>
-                  <p className="text-xs text-gray-400 truncate">{user?.email}</p>
+                  <span className="ml-2 text-sm font-medium text-gray-300 hidden sm:block">
+                    {getCompanyName()}
+                  </span>
                 </div>
-                <DropdownMenuSeparator className="border-[#0A2540]" />
-                {navItems.map((item) => (
-                  <DropdownMenuItem
-                    key={item.path}
-                    className="cursor-pointer hover:bg-[#0A2540] text-gray-300 hover:text-white"
-                    onClick={() => {
-                      if (!item.comingSoon) {
-                        window.location.href = item.path;
-                      }
-                    }}
-                    disabled={item.comingSoon}
-                  >
-                    <span className="mr-3 text-gray-500">{item.icon}</span>
-                    {item.name}
-                    {item.comingSoon && (
-                      <span className="ml-auto text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-[#0A2540] text-[#33BFFF] border border-[#0074FF]/30">
-                        Soon
-                      </span>
-                    )}
-                  </DropdownMenuItem>
-                ))}
-                <DropdownMenuSeparator className="border-[#0A2540]" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="bg-[#001A40] border border-[#002C7A] text-white">
+                <div className="px-4 py-3">
+                  <p className="text-sm text-gray-400">Signed in as</p>
+                  <p className="text-sm font-medium text-white truncate">{user?.email}</p>
+                </div>
+                <DropdownMenuSeparator className="border-[#002C7A]" />
                 <DropdownMenuItem 
-                  className="cursor-pointer hover:bg-[#0A2540] text-gray-300 hover:text-white"
+                  className="cursor-pointer hover:bg-[#002C7A] text-gray-300 hover:text-white focus:bg-[#002C7A] focus:text-white"
                   onClick={() => logoutMutation.mutate()}
                 >
-                  <LogOut className="h-4 w-4 mr-2 text-gray-500" />
+                  <LogOut className="h-4 w-4 mr-2" />
                   Sign out
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-          
-          {/* Mobile menu button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden text-gray-400 hover:text-white"
-            onClick={() => setIsMobileMenuOpen(true)}
-          >
-            <Menu className="h-5 w-5" />
-          </Button>
         </div>
       </div>
     </header>
   );
 
   return (
-    <div className="min-h-screen bg-[#01101F] text-white">
-      {/* Desktop sidebar */}
-      <Sidebar />
+    <div className="min-h-screen bg-gradient-to-b from-[#001A40] via-[#00142E] to-black text-white">
+      <NavBar />
       
-      {/* Main content wrapper */}
-      <div className="md:pl-56">
-        <NavBar />
-        
-        {/* Mobile menu sheet */}
-        <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-          <SheetContent side="left" className="w-full max-w-xs p-0 bg-[#01101F] border-r border-[#0A2540] text-white">
-            <div className="flex flex-col h-full">
-              <div className="p-5 flex items-center space-x-2 border-b border-[#0A2540]">
-                <LineChart className="h-6 w-6 text-[#33BFFF]" />
-                <span className="text-xl font-bold bg-gradient-to-r from-white to-[#33BFFF] bg-clip-text text-transparent">
-                  briki<span className="font-normal text-[#33BFFF]">COPILOT</span>
+      {/* Mobile menu sheet */}
+      <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+        <SheetTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden fixed bottom-4 right-4 z-50 bg-[#002C7A] text-white shadow-[0_0_15px_rgba(51,191,255,0.3)] hover:bg-[#003087]"
+            onClick={() => setIsMobileMenuOpen(true)}
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="left" className="sm:max-w-md bg-[#001A40] border-r border-[#002C7A] text-white">
+          <SheetHeader className="border-b border-[#002C7A] pb-6 mb-6">
+            <SheetTitle className="text-left">
+              <div className="flex items-center">
+                <div className="h-8 w-8 bg-gradient-to-r from-[#003087] to-[#0074FF] rounded-md flex items-center justify-center shadow-[0_0_15px_rgba(51,191,255,0.3)]">
+                  <BriefcaseBusiness className="h-5 w-5 text-white" />
+                </div>
+                <span className="ml-2 text-xl font-bold bg-gradient-to-r from-white via-[#33BFFF] to-white bg-clip-text text-transparent">
+                  Briki Pilot
                 </span>
               </div>
-              
-              <nav className="flex-1 p-4">
-                <div className="space-y-1">
-                  {navItems.map((item) => (
-                    <Link 
-                      key={item.path} 
-                      href={item.comingSoon ? "#" : item.path}
-                      className={`
-                        flex items-center px-3 py-2.5 rounded text-sm font-medium transition-all relative
-                        ${isActive(item.path) 
-                          ? "bg-[#0A2540] text-white" 
-                          : "text-gray-400 hover:bg-[#0A2540]/50 hover:text-white"}
-                      `}
-                      onClick={(e) => {
-                        if (item.comingSoon) {
-                          e.preventDefault();
-                        } else {
-                          setIsMobileMenuOpen(false);
-                        }
-                      }}
-                    >
-                      <span className={`mr-3 ${isActive(item.path) ? 'text-[#33BFFF]' : 'text-gray-500'}`}>{item.icon}</span>
-                      {item.name}
-                      {item.comingSoon && (
-                        <span className="absolute right-2 text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-[#0A2540] text-[#33BFFF] border border-[#0074FF]/30">
-                          Soon
-                        </span>
-                      )}
-                    </Link>
-                  ))}
-                </div>
-              </nav>
-              
-              <div className="p-4 border-t border-[#0A2540] mt-auto">
-                <div className="flex items-center">
-                  <Avatar className="h-8 w-8 border border-[#0074FF]/30 bg-[#0A2540]">
-                    <AvatarImage
-                      src={`https://api.dicebear.com/7.x/initials/svg?seed=${getInitials()}`}
-                      alt={getCompanyName()}
-                    />
-                    <AvatarFallback className="text-xs font-medium text-white">
-                      {getInitials()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="ml-3 overflow-hidden flex-1">
-                    <p className="text-sm font-medium text-white truncate">{getCompanyName()}</p>
-                    <p className="text-xs text-gray-500 truncate">{user?.email}</p>
-                  </div>
-                  <Button 
-                    variant="ghost" 
-                    size="icon"
-                    className="text-gray-400 hover:text-white hover:bg-[#0A2540]"
-                    onClick={() => {
-                      logoutMutation.mutate();
-                      setIsMobileMenuOpen(false);
-                    }}
-                  >
-                    <LogOut className="h-4 w-4" />
-                  </Button>
-                </div>
+              <p className="text-sm text-gray-400 mt-1">Partner Portal</p>
+            </SheetTitle>
+          </SheetHeader>
+          
+          <nav className="space-y-1">
+            {navItems.map((item) => (
+              <Link 
+                key={item.path} 
+                href={item.comingSoon ? "#" : item.path}
+                className={`
+                  flex items-center px-4 py-3 rounded-lg text-sm font-medium transition-colors relative
+                  ${isActiveNav(item.id) 
+                    ? "bg-[#002C7A] text-white" 
+                    : "text-gray-300 hover:bg-[#001E47] hover:text-white"}
+                `}
+                onClick={(e) => {
+                  if (item.comingSoon) {
+                    e.preventDefault();
+                  } else {
+                    setIsMobileMenuOpen(false);
+                  }
+                }}
+              >
+                <span className="mr-3 text-[#33BFFF]">{item.icon}</span>
+                {item.name}
+                {item.comingSoon && (
+                  <span className="absolute right-4 text-xs font-semibold px-2 py-0.5 rounded-full bg-[#002C7A] text-[#33BFFF] border border-[#0074FF]/30">
+                    Soon
+                  </span>
+                )}
+              </Link>
+            ))}
+          </nav>
+          
+          <div className="pt-6 mt-6 border-t border-[#002C7A]">
+            <div className="flex items-center mb-6">
+              <Avatar className="h-8 w-8 border border-[#0074FF]/30 bg-[#002C7A]">
+                <AvatarImage
+                  src={`https://api.dicebear.com/7.x/initials/svg?seed=${getInitials()}`}
+                  alt={getCompanyName()}
+                />
+                <AvatarFallback className="text-xs font-medium text-white">
+                  {getInitials()}
+                </AvatarFallback>
+              </Avatar>
+              <div className="ml-3 overflow-hidden">
+                <p className="text-sm font-medium text-white truncate">{getCompanyName()}</p>
+                <p className="text-xs text-gray-400 truncate">{user?.email}</p>
               </div>
             </div>
-          </SheetContent>
-        </Sheet>
-        
-        {/* Main content area */}
-        <main className="p-4 md:p-6 max-w-[1600px] mx-auto">
-          {children}
-        </main>
-      </div>
+            
+            <Button 
+              variant="ghost" 
+              className="w-full justify-start text-gray-300 hover:text-white hover:bg-[#002C7A]"
+              onClick={() => {
+                logoutMutation.mutate();
+                setIsMobileMenuOpen(false);
+              }}
+            >
+              <LogOut className="mr-2 h-4 w-4" />
+              Sign out
+            </Button>
+          </div>
+        </SheetContent>
+      </Sheet>
+      
+      {/* Main content area */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {children}
+      </main>
     </div>
   );
 }

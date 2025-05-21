@@ -1,0 +1,52 @@
+// PHASE 2 IMPLEMENTATION PROMPT – Briki App Cleanup
+
+/*
+Now that Phase 1 is complete and confirmed, we're ready to proceed with Phase 2. 
+The goal is to improve layout consistency, normalize naming conventions, and audit any leftover legacy logic or components.
+
+Below are the core tasks to tackle in this next phase:
+
+-----------------------------------------------------
+1. Finalize File Naming & Component Refactoring
+-----------------------------------------------------
+- Rename finalized files from `*-new.tsx` and `*-redesigned.tsx` to their production-ready names:
+  • /company-login-new.tsx        → /company-login.tsx
+  • /company-register-new.tsx     → /company-register.tsx
+  • /company-dashboard-redesigned.tsx → /company-dashboard.tsx
+  • /company-settings-page.tsx    → /company-settings.tsx
+- Update all navigation references and imports accordingly.
+
+-----------------------------------------------------
+2. Consolidate Navigation Bar
+-----------------------------------------------------
+- Fully remove legacy navbar.tsx if no longer used.
+- Confirm that navbar-new.tsx is now the sole navigation component used across all layouts (Public, Authenticated, Company).
+- Ensure proper role-based visibility (i.e. company users don't see consumer-only links, and vice versa).
+
+-----------------------------------------------------
+3. Audit & Archive Unused Pages and Routes
+-----------------------------------------------------
+- Review the `/explore/[category].tsx` files:
+  • Are they still active in any navigation flow?
+  • If not, archive or flag for deletion.
+- Confirm if any legacy Explore, Quote, or Assistant pages are orphaned or not linked via the main UI.
+
+-----------------------------------------------------
+4. Layout Consistency Audit
+-----------------------------------------------------
+- Confirm that every routed page is using the standardized layout wrappers defined in App.tsx:
+  • PublicLayout              → unauthenticated pages
+  • AuthenticatedLayout       → B2C post-login pages
+  • CompanyLayoutRedesigned   → B2B Copilot pages
+- Fix any edge pages still applying layouts manually.
+
+-----------------------------------------------------
+5. Component Audit (Optional, if time allows)
+-----------------------------------------------------
+- Identify any legacy UI components (e.g., buttons, cards, inputs) that are duplicated across old and new systems.
+- Propose a shared component library structure or flag components for deprecation.
+
+Let me know if you’d like visual confirmations before any renaming, or if a commit plan is preferred before deployment.
+
+Let’s polish and solidify Briki’s structure before we fully scale the platform.
+*/

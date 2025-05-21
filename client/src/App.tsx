@@ -85,13 +85,13 @@ import ExploreHealthInsurance from "@/pages/explore/health";
 
 // Company pages
 import CompanyPage from "@/pages/company-page";
-import CompanyLoginNew from "@/pages/company-login-new";
-import CompanyRegisterNew from "@/pages/company-register-new";
-import CompanyDashboardPageRedesigned from "@/pages/company-dashboard-page-redesigned";
+import CompanyLogin from "@/pages/company-login";
+import CompanyRegister from "@/pages/company-register";
+import CompanyDashboard from "@/pages/company-dashboard";
 import CompanyUploadPage from "@/pages/company-upload-page";
 import CompanyAnalysisPage from "@/pages/company-analysis-page";
 import CompanyMarketplacePage from "@/pages/company-marketplace-page";
-import CompanySettingsPage from "@/pages/company-settings-page";
+import CompanySettings from "@/pages/company-settings";
 import CompanyPreviewPage from "@/pages/company-preview-page";
 import CompanyRequestPilotPage from "@/pages/company-request-pilot-page";
 import ContactSalesPage from "@/pages/contact-sales-page";
@@ -164,31 +164,31 @@ function Router() {
         {/* Company/Partner Routes - Updated for consistency */}
         <Route path="/company" component={CompanyPage} />
         <Route path="/briki-pilot" component={BrikiPilotPortal} />
-        <Route path="/company-login-new" component={CompanyLoginNew} />
-        <Route path="/company-register-new" component={CompanyRegisterNew} />
+        <Route path="/company-login" component={CompanyLogin} />
+        <Route path="/company-register" component={CompanyRegister} />
         
         {/* Backward compatibility redirects */}
-        <Route path="/company-login" component={() => {
-          window.location.replace("/company-login-new");
+        <Route path="/company-login-new" component={() => {
+          window.location.replace("/company-login");
           return null;
         }} />
-        <Route path="/company-register" component={() => {
-          window.location.replace("/company-register-new");
+        <Route path="/company-register-new" component={() => {
+          window.location.replace("/company-register");
           return null;
         }} />
         
         <Route path="/contact-sales" component={ContactSalesPage} />
-        <Route path="/company-dashboard-redesigned" component={CompanyDashboardPageRedesigned} />
+        <Route path="/company-dashboard" component={CompanyDashboard} />
         
         {/* Redirect for legacy routes */}
-        <Route path="/company-dashboard" component={() => {
-          window.location.replace("/company-dashboard-redesigned");
+        <Route path="/company-dashboard-redesigned" component={() => {
+          window.location.replace("/company-dashboard");
           return null;
         }} />
         <Route path="/company-dashboard/upload" component={CompanyUploadPage} />
         <Route path="/company-dashboard/analysis" component={CompanyAnalysisPage} />
         <Route path="/company-dashboard/marketplace" component={CompanyMarketplacePage} />
-        <Route path="/company-dashboard/settings" component={CompanySettingsPage} />
+        <Route path="/company-dashboard/settings" component={CompanySettings} />
         {/* Legacy routes */}
         <Route path="/company-dashboard/preview" component={CompanyPreviewPage} />
         <Route path="/company-dashboard/request-pilot" component={CompanyRequestPilotPage} />

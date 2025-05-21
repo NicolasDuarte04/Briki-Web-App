@@ -7,6 +7,10 @@ export { AuthenticatedLayout } from './authenticated/authenticated-layout';
 // Original ExploreLayout (deprecated but kept for backward compatibility)
 export { ExploreLayout as OriginalExploreLayout } from './explore-layout';
 
+// Re-export company layout components
+import CompanyLayout from './company-layout';
+export { CompanyLayout as CompanyLayoutRedesigned };
+
 // Re-export other layout components
 export { AIAssistantProvider, useAIAssistant } from './ai-assistant-provider';
 export { AIAssistantButton } from './ai-assistant-button';
