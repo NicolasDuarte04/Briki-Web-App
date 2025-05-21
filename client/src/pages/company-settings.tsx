@@ -223,7 +223,7 @@ export default function CompanySettings() {
   };
 
   return (
-    <CompanyLayoutRedesigned
+    <CompanyLayout
       pageTitle="Company Settings"
       activeNav="settings"
     >
@@ -761,6 +761,6 @@ export default function CompanySettings() {
           </TabsContent>
         </Tabs>
       </div>
-    </CompanyLayoutRedesigned>
+    </CompanyLayout>
   );
 }
