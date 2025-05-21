@@ -54,11 +54,12 @@ function useLoginMutation() {
       // Handle company role automatically - this ensures the routing
       // works consistently for partner logins
       if (data.role === 'company') {
-        setTimeout(() => {
-          navigate("/company-dashboard-redesigned");
-        }, 500);
+        // Direct navigation without setTimeout for better reliability
+        navigate("/company-dashboard-redesigned");
+      } else {
+        // For regular users, redirect to trip-info page
+        navigate("/trip-info");
       }
-      // For regular users, redirection to home is default
     },
     onError: (error: Error) => {
       console.error('Login mutation error:', error);
@@ -96,13 +97,11 @@ function useRegisterMutation() {
       // Handle role-based redirection similar to login
       if (data.role === 'company') {
         // Use the redesigned dashboard for company users
-        // Note: Don't use navigation here as the company-register-page handles this
+        // Note: company-register-new component already handles this navigation
         console.log('Company user registered successfully');
       } else {
-        // Regular users go to dashboard
-        setTimeout(() => {
-          navigate("/dashboard");
-        }, 500);
+        // Regular users go directly to trip-info
+        navigate("/trip-info");
       }
     },
     onError: (error: Error) => {
