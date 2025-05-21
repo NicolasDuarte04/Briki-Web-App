@@ -2,10 +2,11 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { CompanyLayoutRedesigned } from "@/components/layout";
+import { CompanyLayout } from "@/components/layout";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { CompanyProfile, CompanyFeatures } from "@shared/types";
 
 import {
   Card,
@@ -58,7 +59,7 @@ export default function CompanySettings() {
   const [isUploading, setIsUploading] = useState(false);
 
   // Fetch company profile data
-  const { data: companyData, isLoading } = useQuery({
+  const { data: companyData, isLoading } = useQuery<CompanyProfile>({
     queryKey: ["/api/company/profile"],
     enabled: !!user?.id,
   });
@@ -70,17 +71,28 @@ export default function CompanySettings() {
     reset,
   } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
-    defaultValues: {
-      name: companyData?.name || "",
-      email: companyData?.email || user?.email || "",
-      phone: companyData?.phone || "",
-      website: companyData?.website || "",
-      description: companyData?.description || "",
-      address: companyData?.address || "",
-      city: companyData?.city || "",
-      state: companyData?.state || "",
-      zipCode: companyData?.zipCode || "",
-      country: companyData?.country || "",
+    defaultValues: companyData ? {
+      name: companyData.name || "",
+      email: companyData.email || user?.email || "",
+      phone: companyData.phone || "",
+      website: companyData.website || "",
+      description: companyData.description || "",
+      address: companyData.address || "",
+      city: companyData.city || "",
+      state: companyData.state || "",
+      zipCode: companyData.zipCode || "",
+      country: companyData.country || "",
+    } : {
+      name: "",
+      email: user?.email || "",
+      phone: "",
+      website: "",
+      description: "",
+      address: "",
+      city: "",
+      state: "",
+      zipCode: "",
+      country: "",
     },
   });
 

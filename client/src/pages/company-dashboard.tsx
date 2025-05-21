@@ -94,15 +94,20 @@ export default function CompanyDashboard() {
             <div>
               <h3 className="text-lg font-medium text-white">{plan.name}</h3>
               <div className="text-sm text-slate-400 mt-1 capitalize">
-                {plan.category} Insurance • {plan.subscribers.toLocaleString()} subscribers
+                {plan.category} Insurance 
+                {plan.subscribers !== undefined && (
+                  <> • {plan.subscribers.toLocaleString()} subscribers</>
+                )}
               </div>
             </div>
-            <Badge 
-              variant={plan.trend > 0 ? "success" : "destructive"}
-              className={`mt-1 ${plan.trend > 0 ? 'bg-emerald-500/20 text-emerald-300' : 'bg-red-500/20 text-red-300'}`}
-            >
-              {plan.trend > 0 ? '+' : ''}{plan.trend}%
-            </Badge>
+            {plan.trend !== undefined && (
+              <Badge 
+                variant={(plan.trend > 0) ? "success" : "destructive"}
+                className={`mt-1 ${(plan.trend > 0) ? 'bg-emerald-500/20 text-emerald-300' : 'bg-red-500/20 text-red-300'}`}
+              >
+                {(plan.trend > 0) ? '+' : ''}{plan.trend}%
+              </Badge>
+            )}
           </div>
           <div className="mt-4 space-y-1">
             <div className="flex justify-between text-xs text-slate-400">
