@@ -5,6 +5,10 @@ import { isAuthenticated } from "./auth/local-auth";
 import { storage } from "./storage";
 import { pool } from "./db";
 import Stripe from "stripe";
+import path from "path";
+import fs from "fs";
+import os from "os";
+import formidable from "formidable";
 import { 
   users, 
   companyProfiles,
@@ -21,6 +25,7 @@ import {
   explainInsuranceTerm, 
   comparePlans 
 } from "./services/openai";
+import { parseCSVFile, parseXLSXFile } from "./services/plan-upload";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   console.warn('Warning: Missing STRIPE_SECRET_KEY environment variable');
