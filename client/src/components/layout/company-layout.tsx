@@ -57,6 +57,12 @@ const navItems = [
     icon: <FileUp className="w-5 h-5" /> 
   },
   { 
+    name: "Plan Management", 
+    path: "/company-plans", 
+    id: "plans",
+    icon: <BarChart className="w-5 h-5" /> 
+  },
+  { 
     name: "Preview Placement", 
     path: "/company-dashboard/preview", 
     id: "preview",
@@ -146,6 +152,9 @@ export default function CompanyLayout({ children, pageTitle = "Dashboard", activ
                 </Link>
                 <Link href="/company-dashboard/upload" className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${isActive('/company-dashboard/upload') ? 'text-white' : 'text-gray-300 hover:text-white'}`}>
                   Upload
+                </Link>
+                <Link href="/company-plans" className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${isActive('/company-plans') ? 'text-white' : 'text-gray-300 hover:text-white'}`}>
+                  Plans
                 </Link>
                 <Link href="/company-dashboard/preview" className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${isActive('/company-dashboard/preview') ? 'text-white' : 'text-gray-300 hover:text-white'}`}>
                   Preview
