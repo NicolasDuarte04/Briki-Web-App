@@ -6,6 +6,26 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Custom scrollbar styles for the data tables and preview */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(1, 16, 31, 0.5);
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(21, 112, 239, 0.3);
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(21, 112, 239, 0.5);
+}
+
 /* Briki Design System - Inspired by Stripe, Apple, and AI-first products */
 
 :root {
