@@ -229,19 +229,17 @@ export class DatabaseStorage implements IStorage {
       const userId = userData.id || `user_${Date.now().toString()}`;
       
       // Use proper Drizzle ORM insert syntax matching our updated schema
+      // Only include fields that exist in the database schema
       const [user] = await db
         .insert(users)
         .values({
           id: userId,
           email: userData.email,
-          username: userData.username || username,
-          password: userData.password,
-          role: userData.role || 'user',
-          name: userData.name || username, // Use provided name or default
           firstName: userData.firstName || null,
           lastName: userData.lastName || null,
           profileImageUrl: userData.profileImageUrl || null,
-          company_profile: userData.company_profile || {} // Use provided company_profile or empty object
+          role: userData.role || 'user'
+          // No updatedAt field - it's handled by the database default
         })
         .returning();
       
