@@ -1,0 +1,30 @@
+We're experiencing a critical issue with the company registration screen. After submitting the form and clicking “Create Partner Account,” the loading state appears (“Creating account…”), but the user remains stuck on the same screen. There's no redirection, success confirmation, or error feedback.
+
+In addition to validating the form submission and backend handling, we suspect this may be a navigation/directory issue. Please investigate and confirm the following:
+
+### 1. **Navigation Logic Post-Registration**
+- Is the form submission triggering a router push or redirect after successful registration?
+- Could the navigation be targeting an incorrect route (e.g., `/home` instead of `/company-dashboard`)?
+- Are company users being treated as general users by mistake, based on their role?
+
+### 2. **Directory & Route Mapping**
+- Does the `/company-register` page have a proper `useRouter()` hook with redirection logic on success?
+- Are there conditional redirects in `App.tsx`, `AuthPage`, or `CompanyLayout` that may be conflicting with company login/registration?
+- Could the registered user be routed to `/auth` or another page intended for consumers instead of `/company-dashboard`?
+
+### 3. **Session Storage & Role Detection**
+- Is the `role: 'company'` field being stored properly after registration in both local/session storage and context?
+- Is `useAuth` or `AuthProvider` resolving the role correctly and triggering the expected route logic?
+
+### 4. **Silent Failures**
+- Could the form submission be failing silently due to a missing `catch` block or `setIsLoading(false)` in the UI logic?
+- Is there any uncaught promise that would block redirection?
+
+### 5. **Debug Suggestions**
+- Please check browser dev tools (Network + Console) for clues on what’s happening after form submission.
+- Let us know what route the user is *supposed* to be taken to, and whether it’s being invoked or blocked.
+
+Please run a full trace of the company registration submission through to redirection, and let us know:
+- If the route is being triggered correctly
+- If the navigation logic is flawed
+- If the route destination is wrong or unresolved
