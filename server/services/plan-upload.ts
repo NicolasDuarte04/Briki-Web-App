@@ -206,7 +206,7 @@ function validatePlanRecord(record: any): ValidationResult {
       valid: true,
       data: parseResult.data
     };
-  } catch (error) {
+  } catch (error: any) {
     return {
       valid: false,
       errors: [`Unexpected error: ${error.message}`]
@@ -221,7 +221,7 @@ function extractCategoryFields(record: any, category: InsuranceCategory): any {
   switch (category) {
     case INSURANCE_CATEGORIES.TRAVEL:
       return {
-        destinations: record.destinations ? record.destinations.split(',').map(s => s.trim()) : [],
+        destinations: record.destinations ? record.destinations.split(',').map((s: string) => s.trim()) : [],
         coversMedical: record.coversMedical === 'true' || record.coversMedical === true,
         coversCancellation: record.coversCancellation === 'true' || record.coversCancellation === true,
         coversValuables: record.coversValuables === 'true' || record.coversValuables === true,
@@ -230,14 +230,14 @@ function extractCategoryFields(record: any, category: InsuranceCategory): any {
     
     case INSURANCE_CATEGORIES.AUTO:
       return {
-        vehicleTypes: record.vehicleTypes ? record.vehicleTypes.split(',').map(s => s.trim()) : [],
+        vehicleTypes: record.vehicleTypes ? record.vehicleTypes.split(',').map((s: string) => s.trim()) : [],
         comprehensive: record.comprehensive === 'true' || record.comprehensive === true,
         roadside: record.roadside === 'true' || record.roadside === true,
       };
     
     case INSURANCE_CATEGORIES.PET:
       return {
-        petTypes: record.petTypes ? record.petTypes.split(',').map(s => s.trim()) : [],
+        petTypes: record.petTypes ? record.petTypes.split(',').map((s: string) => s.trim()) : [],
         coversIllness: record.coversIllness === 'true' || record.coversIllness === true,
         coversAccident: record.coversAccident === 'true' || record.coversAccident === true,
       };
