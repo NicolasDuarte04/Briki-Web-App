@@ -71,6 +71,7 @@ export interface IStorage {
   getCompanyPlansByCategory(companyId: number, category: InsuranceCategory): Promise<CompanyPlan[]>;
   updateCompanyPlan(id: number, updates: Partial<InsertCompanyPlan>): Promise<CompanyPlan>;
   deleteCompanyPlan(id: number): Promise<boolean>;
+  updatePlanVisibility(id: number, marketplaceEnabled: boolean): Promise<CompanyPlan>;
   
   // Analytics operations
   getPlanAnalytics(planId: number): Promise<PlanAnalytic[]>;
@@ -620,6 +621,28 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error("Error deleting company plan:", error);
       return false;
+    }
+  }
+  
+  async updatePlanVisibility(id: number, marketplaceEnabled: boolean): Promise<CompanyPlan> {
+    try {
+      const [updatedPlan] = await db
+        .update(companyPlans)
+        .set({
+          marketplaceEnabled,
+          updatedAt: new Date()
+        })
+        .where(eq(companyPlans.id, id))
+        .returning();
+      
+      if (!updatedPlan) {
+        throw new Error(`Plan with ID ${id} not found`);
+      }
+      
+      return updatedPlan;
+    } catch (error) {
+      console.error("Error updating plan visibility:", error);
+      throw error;
     }
   }
 
