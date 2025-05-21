@@ -86,7 +86,9 @@ import ExploreHealthInsurance from "@/pages/explore/health";
 // Company pages
 import CompanyPage from "@/pages/company-page";
 import CompanyLoginPage from "@/pages/company-login-page";
+import CompanyLoginNew from "@/pages/company-login-new";
 import CompanyRegisterPage from "@/pages/company-register-page";
+import CompanyRegisterNew from "@/pages/company-register-new";
 import CompanyDashboardPage from "@/pages/company-dashboard-page";
 import CompanyDashboardPageRedesigned from "@/pages/company-dashboard-page-redesigned";
 import CompanyUploadPage from "@/pages/company-upload-page";
@@ -166,7 +168,9 @@ function Router() {
         <Route path="/company" component={CompanyPage} />
         <Route path="/briki-pilot" component={BrikiPilotPortal} />
         <Route path="/company-login" component={CompanyLoginPage} />
+        <Route path="/company-login-new" component={CompanyLoginNew} />
         <Route path="/company-register" component={CompanyRegisterPage} />
+        <Route path="/company-register-new" component={CompanyRegisterNew} />
         <Route path="/contact-sales" component={ContactSalesPage} />
         <Route path="/company-dashboard" component={CompanyDashboardPage} />
         <Route path="/company-dashboard-redesigned" component={CompanyDashboardPageRedesigned} />

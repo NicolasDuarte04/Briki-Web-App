@@ -109,7 +109,7 @@ export default function CompanyPage() {
               <Button 
                 size="lg" 
                 className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 shadow-lg shadow-indigo-900/30 border border-indigo-500/30"
-                onClick={() => navigate("/company-login")}
+                onClick={() => navigate("/company-login-new")}
               >
                 Partner Login
               </Button>
@@ -117,7 +117,7 @@ export default function CompanyPage() {
                 size="lg" 
                 variant="outline" 
                 className="border-indigo-500/50 text-indigo-200 hover:bg-indigo-900/50 px-8 backdrop-blur-sm"
-                onClick={() => navigate("/company-register")}
+                onClick={() => navigate("/company-register-new")}
               >
                 Register as Partner
               </Button>
