@@ -88,6 +88,7 @@ import CompanyPage from "@/pages/company-page";
 import CompanyLoginPage from "@/pages/company-login-page";
 import CompanyRegisterPage from "@/pages/company-register-page";
 import CompanyDashboardPage from "@/pages/company-dashboard-page";
+import CompanyDashboardPageRedesigned from "@/pages/company-dashboard-page-redesigned";
 import CompanyUploadPage from "@/pages/company-upload-page";
 import CompanyAnalysisPage from "@/pages/company-analysis-page";
 import CompanyMarketplacePage from "@/pages/company-marketplace-page";
