@@ -9,6 +9,13 @@ export interface User {
   name?: string | null;
   role?: string | null;
   profileImageUrl?: string | null; // Extracted from company_profile in API response
+  companyProfile?: {
+    name?: string;
+    country?: string;
+    logo?: string;
+    description?: string;
+    website?: string;
+  };
 }
 
 // Auth context type definition
