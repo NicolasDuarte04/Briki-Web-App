@@ -2,12 +2,13 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/use-auth";
-import { Loader2, Bell, Menu, User, Settings, LogOut, Bot, SparklesIcon, ChevronDown, FileText } from "lucide-react";
+import { Loader2, Bell, Menu, User as UserIcon, Settings, LogOut, Bot, SparklesIcon, ChevronDown, FileText } from "lucide-react";
 import { useLanguage, LanguageSelector } from "@/components/language-selector";
 import { AIAssistantButton, useAIAssistant } from "@/components/layout";
 import GlassCard from "@/components/glass-card";
 import GradientButton from "@/components/gradient-button";
 import { useNavigation } from "@/lib/navigation";
+import type { User } from "@shared/schema";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -63,7 +64,8 @@ export default function NavbarNew() {
       return user.firstName[0].toUpperCase();
     }
     
-    return user.username[0].toUpperCase();
+    // Fall back to email if username not available
+    return user.email ? user.email[0].toUpperCase() : "U";
   };
   
   // Use isActivePath from navigation service
