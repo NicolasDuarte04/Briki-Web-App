@@ -1,0 +1,46 @@
+// Prompt: Implement Briki Copilot Plan Upload API Integration
+
+/*
+Now that Phase 3 TypeScript cleanup is complete, let's begin the backend integration for one of the core Briki Copilot features: **plan uploads** for insurance companies.
+
+Goal:
+Enable insurance partners to upload plans via the Briki Copilot dashboard, validate their contents, and store them in the database.
+
+This should include:
+1. Backend Endpoint Implementation:
+   - Create POST /api/copilot/plans/upload
+   - Accept multipart form data with a .csv or .xlsx file
+   - Use `formidable` or a similar package to handle file parsing
+   - Perform server-side validation:
+     • Required fields: name, category, basePrice, coverageDetails
+     • Optional fields: pricingFactors, targetDemographic, etc.
+   - Parse and transform valid plans into the `InsurancePlan` model (see `shared/types.ts`)
+   - Store validated plans in the appropriate database table (e.g., `plans` or `company_plans`)
+
+2. File Validation Logic:
+   - Reject uploads missing required fields
+   - Provide feedback on invalid rows (e.g., show errors per line if parsing fails)
+   - Ensure uploaded plans are tied to the authenticated `companyId`
+
+3. Client-Side Hook and Upload Function:
+   - Create a React Query mutation in `client/src/hooks/usePlanUpload.ts`
+   - Use `axios` or `fetch` to POST the file from the dashboard upload UI
+   - Show progress indicator and success/failure toasts
+
+4. UI Integration:
+   - Update the Upload page at `client/src/pages/company-upload-page.tsx`
+   - Replace placeholder upload logic with a drag-and-drop component or file picker
+   - Show validation errors in a summary table if applicable
+   - Allow retrying upload if validation fails
+
+5. Analytics Event Tracking:
+   - Trigger GA4 event on upload success/failure
+   - Suggested event: `trackEvent(EventCategory.PlanManagement, 'upload_attempt', { status: 'success/failure', planCount: X })`
+
+Notes:
+• The endpoint must be protected — only authenticated company users should be able to upload
+• Use shared types and validation logic from `shared/schema.ts` or `shared/types.ts`
+• Stub storage can be used for now — we'll optimize performance later
+
+Let me know when it's ready for QA or if any frontend/backend handoff is required along the way.
+*/
