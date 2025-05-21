@@ -8,7 +8,7 @@ import { AIAssistantButton, useAIAssistant } from "@/components/layout";
 import GlassCard from "@/components/glass-card";
 import GradientButton from "@/components/gradient-button";
 import { useNavigation } from "@/lib/navigation";
-import { User as UserType, UserRole, EventCategory } from "@shared/types";
+import { UserRole, EventCategory } from "@shared/types";
 import { trackEvent } from "@/lib/analytics";
 
 import { Button } from "@/components/ui/button";
@@ -61,12 +61,12 @@ export default function NavbarNew() {
   const getUserInitials = () => {
     if (!user) return "U";
     
-    // First try firstName if available
-    if (user.firstName && user.firstName.length > 0) {
-      return user.firstName[0].toUpperCase();
+    // First try name (which corresponds to firstName)
+    if (user.name && user.name.length > 0) {
+      return user.name[0].toUpperCase();
     }
     
-    // Fall back to email if firstName not available
+    // Fall back to email if name not available
     return user.email ? user.email[0].toUpperCase() : "U";
   };
   
@@ -250,7 +250,7 @@ export default function NavbarNew() {
                       className="cursor-pointer hover:bg-primary/5 focus:bg-primary/5"
                       onClick={() => navigate("/profile")}
                     >
-                      <User className="mr-2 h-4 w-4 text-primary/70" />
+                      <UserIcon className="mr-2 h-4 w-4 text-primary/70" />
                       <span>Profile</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem 
@@ -431,7 +431,7 @@ export default function NavbarNew() {
                         
                         <div className="mt-5 space-y-2">
                           {[
-                            { name: 'Your Profile', icon: User, path: '/profile' },
+                            { name: 'Your Profile', icon: UserIcon, path: '/profile' },
                             { name: 'Settings', icon: Settings, path: '/settings' },
                             ...(showAIAssistant ? [{ name: 'AI Assistant', icon: Bot, path: '/assistant' }] : []),
                           ].map((item) => (
