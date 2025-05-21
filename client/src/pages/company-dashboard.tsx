@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuery } from "@tanstack/react-query";
-import { CompanyLayoutRedesigned } from "@/components/layout";
+import { CompanyLayout } from "@/components/layout";
 import { LineChart, BarChart, PieChart } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
@@ -112,7 +112,7 @@ export default function CompanyDashboard() {
   };
 
   return (
-    <CompanyLayoutRedesigned
+    <CompanyLayout
       pageTitle="Dashboard"
       activeNav="dashboard"
     >
@@ -402,6 +402,6 @@ export default function CompanyDashboard() {
           </CardContent>
         </Card>
       </div>
-    </CompanyLayoutRedesigned>
+    </CompanyLayout>
   );
 }
