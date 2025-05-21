@@ -286,7 +286,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Get company plans by category
-  app.get("/api/company/plans/:category", isAuthenticated, async (req: AuthenticatedRequest, res) => {
+  app.get("/api/company/plans/category/:category", isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
       if (!req.user?.id) {
         return res.status(401).json({ message: "Unauthorized" });
@@ -312,6 +312,220 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(plans);
     } catch (error: any) {
       console.error("Error retrieving company plans by category:", error);
+      res.status(500).json({ message: error.message || "Server error" });
+    }
+  });
+  
+  // Get a specific plan by ID
+  app.get("/api/company/plans/:id", isAuthenticated, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (!req.user?.id) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      const planId = parseInt(req.params.id, 10);
+      
+      if (isNaN(planId)) {
+        return res.status(400).json({ message: "Invalid plan ID format" });
+      }
+      
+      // Get company profile to get company ID (for authorization)
+      const profile = await storage.getCompanyProfile(req.user.id);
+      
+      if (!profile) {
+        return res.status(404).json({ message: "Company profile not found" });
+      }
+      
+      // Get the requested plan
+      const plan = await storage.getCompanyPlan(planId);
+      
+      if (!plan) {
+        return res.status(404).json({ message: "Plan not found" });
+      }
+      
+      // Ensure the requesting user belongs to the company that owns this plan
+      if (plan.companyId !== profile.id) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      res.json(plan);
+    } catch (error: any) {
+      console.error("Error retrieving company plan:", error);
+      res.status(500).json({ message: error.message || "Server error" });
+    }
+  });
+
+  // Update a specific plan by ID
+  app.put("/api/company/plans/:id", isAuthenticated, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (!req.user?.id) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      const planId = parseInt(req.params.id, 10);
+      
+      if (isNaN(planId)) {
+        return res.status(400).json({ message: "Invalid plan ID format" });
+      }
+      
+      // Get company profile to get company ID (for authorization)
+      const profile = await storage.getCompanyProfile(req.user.id);
+      
+      if (!profile) {
+        return res.status(404).json({ message: "Company profile not found" });
+      }
+      
+      // Get the existing plan to verify ownership
+      const existingPlan = await storage.getCompanyPlan(planId);
+      
+      if (!existingPlan) {
+        return res.status(404).json({ message: "Plan not found" });
+      }
+      
+      // Ensure the requesting user belongs to the company that owns this plan
+      if (existingPlan.companyId !== profile.id) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      // Validate the update data with a schema
+      const updateSchema = z.object({
+        name: z.string().min(2).optional(),
+        description: z.string().optional(),
+        basePrice: z.number().min(0).optional(),
+        coverageAmount: z.number().min(0).optional(),
+        status: z.enum(['draft', 'active', 'archived']).optional(),
+        features: z.array(z.string()).optional(),
+        provider: z.string().optional(),
+        category: z.enum(Object.values(INSURANCE_CATEGORIES) as [string, ...string[]]).optional(),
+        categoryFields: z.record(z.any()).optional()
+      });
+      
+      const validationResult = updateSchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Invalid plan data", 
+          errors: validationResult.error.errors 
+        });
+      }
+      
+      // Prevent changing the company ID
+      const updateData = validationResult.data;
+      delete updateData.companyId;
+      
+      // Update the plan
+      const updatedPlan = await storage.updateCompanyPlan(planId, updateData);
+      
+      res.json(updatedPlan);
+    } catch (error: any) {
+      console.error("Error updating company plan:", error);
+      res.status(500).json({ message: error.message || "Server error" });
+    }
+  });
+  
+  // Delete a plan (mark as archived)
+  app.delete("/api/company/plans/:id", isAuthenticated, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (!req.user?.id) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      const planId = parseInt(req.params.id, 10);
+      
+      if (isNaN(planId)) {
+        return res.status(400).json({ message: "Invalid plan ID format" });
+      }
+      
+      // Get company profile to get company ID (for authorization)
+      const profile = await storage.getCompanyProfile(req.user.id);
+      
+      if (!profile) {
+        return res.status(404).json({ message: "Company profile not found" });
+      }
+      
+      // Get the existing plan to verify ownership
+      const existingPlan = await storage.getCompanyPlan(planId);
+      
+      if (!existingPlan) {
+        return res.status(404).json({ message: "Plan not found" });
+      }
+      
+      // Ensure the requesting user belongs to the company that owns this plan
+      if (existingPlan.companyId !== profile.id) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      // Delete/archive the plan
+      const success = await storage.deleteCompanyPlan(planId);
+      
+      if (!success) {
+        return res.status(500).json({ message: "Failed to delete plan" });
+      }
+      
+      res.json({ success: true, message: "Plan successfully archived" });
+    } catch (error: any) {
+      console.error("Error deleting company plan:", error);
+      res.status(500).json({ message: error.message || "Server error" });
+    }
+  });
+  
+  // Update plan marketplace visibility
+  app.patch("/api/company/plans/:id/visibility", isAuthenticated, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (!req.user?.id) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      const planId = parseInt(req.params.id, 10);
+      
+      if (isNaN(planId)) {
+        return res.status(400).json({ message: "Invalid plan ID format" });
+      }
+      
+      // Validate the request body
+      const visibilitySchema = z.object({
+        marketplaceEnabled: z.boolean()
+      });
+      
+      const validationResult = visibilitySchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Invalid visibility data", 
+          errors: validationResult.error.errors 
+        });
+      }
+      
+      // Get company profile to get company ID (for authorization)
+      const profile = await storage.getCompanyProfile(req.user.id);
+      
+      if (!profile) {
+        return res.status(404).json({ message: "Company profile not found" });
+      }
+      
+      // Get the existing plan to verify ownership
+      const existingPlan = await storage.getCompanyPlan(planId);
+      
+      if (!existingPlan) {
+        return res.status(404).json({ message: "Plan not found" });
+      }
+      
+      // Ensure the requesting user belongs to the company that owns this plan
+      if (existingPlan.companyId !== profile.id) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      // Update plan visibility
+      const { marketplaceEnabled } = validationResult.data;
+      const updatedPlan = await storage.updatePlanVisibility(planId, marketplaceEnabled);
+      
+      res.json({
+        success: true,
+        message: `Plan ${marketplaceEnabled ? 'added to' : 'removed from'} marketplace`,
+        plan: updatedPlan
+      });
+    } catch (error: any) {
+      console.error("Error updating plan visibility:", error);
       res.status(500).json({ message: error.message || "Server error" });
     }
   });
