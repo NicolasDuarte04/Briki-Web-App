@@ -42,7 +42,7 @@ import {
   ListChecks,
   ShieldCheck,
 } from "lucide-react";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest } from "@/lib/api";
 import { planFieldLabels, INSURANCE_CATEGORIES } from "@/lib/constants";
 
 // Plan interface matching our schema
@@ -164,15 +164,15 @@ export default function CompanyPlanEdit() {
         data: { marketplaceEnabled },
       });
     },
-    onSuccess: (data) => {
-      const action = data.plan.marketplaceEnabled ? 'enabled' : 'disabled';
+    onSuccess: (response: any) => {
+      const action = response.plan?.marketplaceEnabled ? 'enabled' : 'disabled';
       toast({
         title: `Marketplace visibility ${action}`,
-        description: `The plan is now ${data.plan.marketplaceEnabled ? 'visible' : 'hidden'} in the marketplace`,
+        description: `The plan is now ${response.plan?.marketplaceEnabled ? 'visible' : 'hidden'} in the marketplace`,
         variant: "default",
       });
       trackEvent('marketplace_visibility_changed', 'company', 'plan_management');
-      form.setValue('marketplaceEnabled', data.plan.marketplaceEnabled);
+      form.setValue('marketplaceEnabled', response.plan?.marketplaceEnabled);
       queryClient.invalidateQueries({ queryKey: [`/api/company/plans/${planId}`] });
     },
     onError: (error) => {

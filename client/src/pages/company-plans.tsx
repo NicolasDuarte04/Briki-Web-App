@@ -47,7 +47,7 @@ import {
   HelpCircle,
   Clock,
 } from "lucide-react";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest } from "@/lib/api";
 
 // Plan types matching our schema
 interface InsurancePlan {
@@ -119,11 +119,11 @@ export default function CompanyPlans() {
         data: { marketplaceEnabled },
       });
     },
-    onSuccess: (data) => {
-      const action = data.plan.marketplaceEnabled ? 'enabled' : 'disabled';
+    onSuccess: (response: any) => {
+      const action = response.plan?.marketplaceEnabled ? 'enabled' : 'disabled';
       toast({
         title: `Marketplace visibility ${action}`,
-        description: `The plan is now ${data.plan.marketplaceEnabled ? 'visible' : 'hidden'} in the marketplace`,
+        description: `The plan is now ${response.plan?.marketplaceEnabled ? 'visible' : 'hidden'} in the marketplace`,
         variant: "default",
       });
       trackEvent('marketplace_visibility_changed', 'company', 'plan_management');
@@ -147,7 +147,9 @@ export default function CompanyPlans() {
   });
 
   // Get unique categories for filter
-  const categories = [...new Set(plans?.map(plan => plan.category))];
+  const categories = plans?.reduce<string[]>((unique, plan) => {
+    return unique.includes(plan.category) ? unique : [...unique, plan.category];
+  }, []) || [];
 
   // Render status badges
   const renderStatusBadge = (status: string) => {
