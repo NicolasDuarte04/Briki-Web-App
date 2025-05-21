@@ -626,10 +626,12 @@ export class DatabaseStorage implements IStorage {
   
   async updatePlanVisibility(id: number, marketplaceEnabled: boolean): Promise<CompanyPlan> {
     try {
+      // Update both the marketplace enabled flag and set visibility to public/private accordingly
       const [updatedPlan] = await db
         .update(companyPlans)
         .set({
           marketplaceEnabled,
+          visibility: marketplaceEnabled ? 'public' : 'private',
           updatedAt: new Date()
         })
         .where(eq(companyPlans.id, id))

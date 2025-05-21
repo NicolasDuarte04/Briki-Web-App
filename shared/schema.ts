@@ -187,6 +187,7 @@ export const companyPlans = pgTable("company_plans", {
   categoryFields: jsonb("category_fields").notNull(),
   status: planStatusEnum("status").default('draft'),
   visibility: planVisibilityEnum("visibility").default('private'),
+  marketplaceEnabled: boolean("marketplace_enabled").default(false),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => {
