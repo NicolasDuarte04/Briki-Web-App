@@ -8,7 +8,8 @@ import { AIAssistantButton, useAIAssistant } from "@/components/layout";
 import GlassCard from "@/components/glass-card";
 import GradientButton from "@/components/gradient-button";
 import { useNavigation } from "@/lib/navigation";
-import type { User } from "@shared/schema";
+import { User as UserType, UserRole, EventCategory } from "@shared/types";
+import { trackEvent } from "@/lib/analytics";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -60,11 +61,12 @@ export default function NavbarNew() {
   const getUserInitials = () => {
     if (!user) return "U";
     
-    if (user.firstName) {
+    // First try firstName if available
+    if (user.firstName && user.firstName.length > 0) {
       return user.firstName[0].toUpperCase();
     }
     
-    // Fall back to email if username not available
+    // Fall back to email if firstName not available
     return user.email ? user.email[0].toUpperCase() : "U";
   };
   

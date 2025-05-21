@@ -1,0 +1,91 @@
+// Phase 3 – Briki Platform Cleanup & SaaS Enablement
+
+/*
+Objective:
+Phase 3 focuses on polishing the UI, resolving lingering type and routing issues, and expanding Briki Copilot into a working SaaS intelligence tool for insurance companies.
+
+You’ve successfully completed Phase 1 (routing/layouts) and Phase 2 (navbar/auth cleanup). Now, implement the following structured tasks, referencing only the current live files (not legacy ones). Avoid editing anything in `/archive`.
+
+———————————————
+1. Type Consistency & TS Cleanup
+———————————————
+• Define a shared `User` and `CompanyProfile` type in `shared/types.ts`
+• Update `navbar-new.tsx`, `company-layout.tsx`, and `/company-dashboard` to rely on these strict types
+• Eliminate all `as any`, casting hacks, and untyped `user?.field` references
+• Fix prop and state typings in components like `GradientButton`, `GlassCard`, and any Copilot charts
+
+———————————————
+2. Routing Imports & 404 Handling
+———————————————
+• Audit `App.tsx` and remove:
+  – `home-page-new.tsx`
+  – `company-dashboard-page-redesigned.tsx`
+  – Any references to /pages/archive/*
+• Ensure all routes point to the latest cleaned-up files only
+• Add a fallback route (`*`) that renders a 404 screen (or friendly redirect)
+
+———————————————
+3. UI Polish & Mobile Spacing
+———————————————
+• Unify button hover/active styles (especially in `/trip-info` and `/company-dashboard`)
+• Add top/bottom padding and spacing to mobile layouts in:
+  – `/compare-plans`
+  – `/auth`
+  – `/company-settings`
+• Improve empty states in `/company-analysis-page` and loading indicators
+
+———————————————
+4. Authentication UX Improvements
+———————————————
+• Add toast notifications for:
+  – Login success/failure
+  – Registration success/failure
+• Ensure that “Already have an account?” and “Create account” links route properly based on user role
+• Add Google auth fallback handler (e.g. if email exists but isn’t linked)
+
+———————————————
+5. Briki Copilot – Functional MVP
+———————————————
+• Implement:
+  – `POST /api/company/plans/upload`: Parse CSV, validate schema, store in DB
+  – `GET /api/company/plans`: Return uploaded plans (companyId filtered)
+  – Replace mock charts in `/company-dashboard` with real DB data
+• Implement static “insight cards”:
+  – Flag high-price plans
+  – Suggest missing features
+  – Alert incomplete coverage
+• Wire up `/company-settings` marketplace toggles:
+  – `PATCH /api/company/profile`
+  – Public profile enable/disable
+
+———————————————
+6. Global Analytics & Event Tracking
+———————————————
+• Use the enum `EventCategory` from `client/src/constants/analytics.ts`
+• Update all `trackEvent(...)` calls to use structured format:
+  – category, action, label (optional payload)
+• Ensure tracking exists for:
+  – Auth events
+  – Plan uploads
+  – Insight views
+  – Navigation actions (e.g., /compare-plans load)
+
+———————————————
+7. Dev Tools & Docs
+———————————————
+• Create `/docs/README.dev.md` explaining:
+  – Layout system (PublicLayout, AuthenticatedLayout, CompanyLayout)
+  – Route structure for B2C and B2B
+  – Auth context and role logic
+• Add JSDoc comments to `use-auth.ts`, `App.tsx`, and `/components/layout/company-layout.tsx`
+
+———————————————
+Wrap-Up
+———————————————
+Once these tasks are completed:
+→ Send a new navigation table (like in Phase 1/2) confirming all updates
+→ Share the updated `App.tsx` route map
+→ Let us know if any blockers appear (especially with database fields, auth state, or Google login fallback)
+
+Let’s continue building Briki into a polished SaaS-grade platform.
+*/
