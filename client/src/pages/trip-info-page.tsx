@@ -236,7 +236,7 @@ export default function TripInfoPage() {
   }
 
   return (
-    <MainLayout>
+    <div className="min-h-screen bg-gradient-to-b from-blue-950 to-indigo-950">
       {/* Background elements */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         <FuturisticBackground particleCount={50} />
@@ -379,6 +379,6 @@ export default function TripInfoPage() {
           />
         </motion.div>
       </div>
-    </MainLayout>
+    </div>
   );
 }
