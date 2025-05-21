@@ -87,7 +87,6 @@ import ExploreHealthInsurance from "@/pages/explore/health";
 import CompanyPage from "@/pages/company-page";
 import CompanyLoginNew from "@/pages/company-login-new";
 import CompanyRegisterNew from "@/pages/company-register-new";
-import CompanyDashboardPage from "@/pages/company-dashboard-page";
 import CompanyDashboardPageRedesigned from "@/pages/company-dashboard-page-redesigned";
 import CompanyUploadPage from "@/pages/company-upload-page";
 import CompanyAnalysisPage from "@/pages/company-analysis-page";
@@ -168,8 +167,12 @@ function Router() {
         <Route path="/company-login" component={CompanyLoginNew} />
         <Route path="/company-register" component={CompanyRegisterNew} />
         <Route path="/contact-sales" component={ContactSalesPage} />
-        <Route path="/company-dashboard" component={CompanyDashboardPage} />
         <Route path="/company-dashboard-redesigned" component={CompanyDashboardPageRedesigned} />
+        {/* Redirect for legacy routes */}
+        <Route path="/company-dashboard" component={() => {
+          window.location.replace("/company-dashboard-redesigned");
+          return null;
+        }} />
         <Route path="/company-dashboard/upload" component={CompanyUploadPage} />
         <Route path="/company-dashboard/analysis" component={CompanyAnalysisPage} />
         <Route path="/company-dashboard/marketplace" component={CompanyMarketplacePage} />
