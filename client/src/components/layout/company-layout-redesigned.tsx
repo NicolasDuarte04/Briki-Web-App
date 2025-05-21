@@ -44,7 +44,7 @@ type CompanyLayoutProps = {
 const navItems = [
   { 
     name: "Dashboard", 
-    path: "/company-dashboard", 
+    path: "/company-dashboard-redesigned", 
     icon: <LayoutDashboard className="w-5 h-5" /> 
   },
   { 
@@ -97,11 +97,13 @@ export default function CompanyLayout({ children }: CompanyLayoutProps) {
   const getCompanyName = () => {
     if (!user) return "Company";
     
-    if (user.companyProfile?.name) {
-      return user.companyProfile.name;
+    // Access company profile as a property if available
+    const company = (user as any).companyProfile?.name;
+    if (company) {
+      return company;
     }
     
-    return user.username;
+    return user.username || user.email.split('@')[0];
   };
 
   // Get user initials for avatar
