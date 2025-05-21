@@ -7,10 +7,10 @@ export { AuthenticatedLayout } from './authenticated/authenticated-layout';
 // Original ExploreLayout (deprecated but kept for backward compatibility)
 export { ExploreLayout as OriginalExploreLayout } from './explore-layout';
 
-// Re-export company layout component - use the standardized version
+// Re-export company layout component - standardized version
 import CompanyLayout from './company-layout';
 export { CompanyLayout };
-// For backward compatibility, export CompanyLayout as CompanyLayoutRedesigned
+// For backward compatibility during transition
 export { CompanyLayout as CompanyLayoutRedesigned };
 
 // Re-export other layout components
