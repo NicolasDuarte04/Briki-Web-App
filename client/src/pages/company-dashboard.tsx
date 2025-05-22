@@ -353,6 +353,6 @@ export default function CompanyDashboard() {
           </Tabs>
         </div>
       </div>
-    </AuthenticatedLayout>
+    </CompanyLayout>
   );
 }

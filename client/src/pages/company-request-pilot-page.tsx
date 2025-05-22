@@ -15,7 +15,7 @@ import {
   ArrowUp,
   ArrowDown
 } from "lucide-react";
-import { AuthenticatedLayout } from "@/components/layout";
+import CompanyLayout from "@/components/layout/company-layout";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -254,7 +254,7 @@ export default function CompanyAnalysisPage() {
   };
 
   return (
-    <AuthenticatedLayout>
+    <CompanyLayout activeNav="request-pilot">
       <div className="bg-gradient-to-b from-[#001A40] via-[#00142E] to-black text-white flex-grow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
           <div className="space-y-6">
@@ -392,6 +392,6 @@ export default function CompanyAnalysisPage() {
           </div>
         </div>
       </div>
-    </AuthenticatedLayout>
+    </CompanyLayout>
   );
 }

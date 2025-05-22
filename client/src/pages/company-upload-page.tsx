@@ -11,7 +11,7 @@ import {
   FileSpreadsheet,
   Info
 } from "lucide-react";
-import { CompanyLayout } from "@/components/layout";
+import CompanyLayout from "@/components/layout/company-layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
