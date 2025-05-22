@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
 import { useLanguage } from "@/components/language-selector";
 import { BriefcaseIcon, LineChart, Shield, Lightbulb, ArrowRight, Building2 } from "lucide-react";
-import Navbar from "@/components/navbar-new";
+import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 
 export default function CompanyPage() {
