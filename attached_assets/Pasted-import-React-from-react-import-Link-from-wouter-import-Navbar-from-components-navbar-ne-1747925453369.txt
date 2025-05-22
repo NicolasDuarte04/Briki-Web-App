@@ -1,17 +1,17 @@
 import React from "react";
 import { Link } from "wouter";
-import Navbar from "@/components/navbar";
+import Navbar from "@/components/navbar-new";
 import Footer from "@/components/footer";
 import { ArrowLeft } from "lucide-react";
 import { useLanguage } from "@/components/language-selector";
 
 export default function TermsPage() {
   const { t } = useLanguage();
-
+  
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-
+      
       <div className="flex-grow">
         <div className="briki-mobile-container">
           <div className="mb-8">
@@ -25,7 +25,7 @@ export default function TermsPage() {
               {t('lastUpdated')}: April 25, 2025
             </p>
           </div>
-
+          
           <div className="space-y-8 mb-10">
             <section>
               <h2 className="text-xl font-semibold mb-3">{t('introduction')}</h2>
@@ -33,7 +33,7 @@ export default function TermsPage() {
                 {t('termsIntro')}
               </p>
             </section>
-
+            
             <section>
               <h2 className="text-xl font-semibold mb-3">{t('userObligations')}</h2>
               <p className="text-gray-700 mb-4">
@@ -43,7 +43,7 @@ export default function TermsPage() {
                 {t('userObligationsText2')}
               </p>
             </section>
-
+            
             <section>
               <h2 className="text-xl font-semibold mb-3">{t('limitationOfLiability')}</h2>
               <p className="text-gray-700 mb-4">
@@ -53,14 +53,14 @@ export default function TermsPage() {
                 {t('limitationOfLiabilityText2')}
               </p>
             </section>
-
+            
             <section>
               <h2 className="text-xl font-semibold mb-3">{t('noWarranty')}</h2>
               <p className="text-gray-700 mb-4">
                 {t('noWarrantyText')}
               </p>
             </section>
-
+            
             <section>
               <h2 className="text-xl font-semibold mb-3">{t('purchaseAgreements')}</h2>
               <p className="text-gray-700 mb-4">
@@ -70,28 +70,28 @@ export default function TermsPage() {
                 {t('purchaseAgreementsText2')}
               </p>
             </section>
-
+            
             <section>
               <h2 className="text-xl font-semibold mb-3">{t('refundPolicy')}</h2>
               <p className="text-gray-700 mb-4">
                 {t('refundPolicyText')}
               </p>
             </section>
-
+            
             <section>
               <h2 className="text-xl font-semibold mb-3">{t('intellectualProperty')}</h2>
               <p className="text-gray-700 mb-4">
                 {t('intellectualPropertyText')}
               </p>
             </section>
-
+            
             <section>
               <h2 className="text-xl font-semibold mb-3">{t('governingLaw')}</h2>
               <p className="text-gray-700 mb-4">
                 {t('governingLawText')}
               </p>
             </section>
-
+            
             <section>
               <h2 className="text-xl font-semibold mb-3">{t('contactUs')}</h2>
               <p className="text-gray-700 mb-4">
@@ -104,7 +104,7 @@ export default function TermsPage() {
           </div>
         </div>
       </div>
-
+      
       <Footer />
     </div>
   );

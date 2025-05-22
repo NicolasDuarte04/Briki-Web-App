@@ -1,23 +1,23 @@
 import React from 'react';
 import { useLocation } from 'wouter';
 import { FloatingAssistantButton } from './floating-assistant-button';
-import NavbarNew from '@/components/navbar-new';
+import Navbar from "@/components/navbar";
 
 interface AuthenticatedLayoutProps {
   children: React.ReactNode;
 }
 
 /**
- * Layout component that wraps the app content and includes the AI Assistant button and Navbar
- * Note: The FloatingAssistantButton handles its own visibility logic
+ * Layout component that wraps authenticated B2C pages.
+ * Includes the new universal Navbar and AI Assistant button.
  */
 export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
   const [location] = useLocation();
-  
+
   return (
     <>
-      {/* Don't show navbar on auth page */}
-      {location !== '/auth' && <NavbarNew />}
+      {/* Show navbar on all pages except the auth screen */}
+      {location !== '/auth' && <Navbar />}
       {children}
       <FloatingAssistantButton />
     </>
