@@ -7,12 +7,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuery } from "@tanstack/react-query";
+import Navbar from "@/components/navbar";
 import { LineChart, BarChart, PieChart } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { InsurancePlan as BasePlan, CompanyProfile, InsuranceCategory } from "@shared/types";
-import { AuthenticatedLayout } from "@/components/layout";
 
 // Extended InsurancePlan type that includes our dashboard-specific fields
 interface ExtendedInsurancePlan extends BasePlan {
@@ -132,8 +132,10 @@ export default function CompanyDashboard() {
   };
 
   return (
-    <AuthenticatedLayout>
-      <div className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full bg-gradient-to-b from-slate-900 to-black text-white">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-slate-900 to-black text-white">
+      <Navbar />
+
+      <div className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
         <div className="p-4 md:p-6 space-y-6">
           {/* Welcome section */}
           <Card className="bg-gradient-to-r from-blue-900/80 to-indigo-900/80 border-0 shadow-xl">
@@ -293,7 +295,7 @@ export default function CompanyDashboard() {
                         <PieChart className="h-16 w-16 text-slate-500 mx-auto mb-3" />
                         <p className="text-slate-400">Interactive chart rendered here</p>
                         <Button variant="link" className="text-blue-400 hover:text-blue-300 text-sm mt-2">
-                          View detailed report
+                          View breakdown
                         </Button>
                       </div>
                     </div>
@@ -303,56 +305,124 @@ export default function CompanyDashboard() {
             </TabsContent>
 
             <TabsContent value="plans" className="space-y-5 mt-5">
-              <div className="flex justify-between">
-                <h2 className="text-xl font-semibold text-white">Your Insurance Plans</h2>
-                <Button
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
-                  onClick={() => navigate("/company-plans")}
-                >
-                  Manage Plans
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold text-white">Your Insurance Plans</h2>
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                  Add New Plan
                 </Button>
               </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {renderPlanList()}
+              </div>
+
+              <div className="flex justify-center mt-6">
+                <Button variant="outline" className="bg-transparent border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white">
+                  View All Plans
+                </Button>
               </div>
             </TabsContent>
 
             <TabsContent value="marketplace" className="space-y-5 mt-5">
-              <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-6 text-center">
-                <div className="max-w-md mx-auto">
-                  <h3 className="text-xl font-semibold text-white mb-3">Marketplace Insights</h3>
-                  <p className="text-slate-400 mb-6">
-                    View competitive analysis and positioning of your insurance plans in the global marketplace
-                  </p>
-                  <Button 
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
-                    onClick={() => navigate("/company-dashboard/marketplace")}
-                  >
-                    View Marketplace
-                  </Button>
-                </div>
-              </div>
+              <Card className="bg-slate-800/50 border-slate-700/50">
+                <CardContent className="p-8 text-center">
+                  <div className="mx-auto max-w-md">
+                    <h3 className="text-xl font-bold text-white mb-3">Marketplace Profile</h3>
+                    <p className="text-slate-300 mb-6">
+                      Create a public marketplace profile to showcase your company and plans to potential customers.
+                    </p>
+                    <Button 
+                      className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/20"
+                      onClick={() => navigate("/company-dashboard/marketplace")}
+                    >
+                      Set Up Marketplace Profile
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
 
             <TabsContent value="reports" className="space-y-5 mt-5">
-              <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-6 text-center">
-                <div className="max-w-md mx-auto">
-                  <h3 className="text-xl font-semibold text-white mb-3">Analytics & Reports</h3>
-                  <p className="text-slate-400 mb-6">
-                    Detailed reports and analytics about your plans, subscribers, and market performance
-                  </p>
-                  <Button 
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
-                    onClick={() => navigate("/company-dashboard/reports")}
-                  >
-                    Generate Reports
-                  </Button>
-                </div>
-              </div>
+              <Card className="bg-slate-800/50 border-slate-700/50">
+                <CardContent className="p-8 text-center">
+                  <div className="mx-auto max-w-md">
+                    <h3 className="text-xl font-bold text-white mb-3">Advanced Analytics</h3>
+                    <p className="text-slate-300 mb-6">
+                      Get detailed reports and analysis about your insurance plans and market performance.
+                    </p>
+                    <Button 
+                      className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/20"
+                      onClick={() => navigate("/company-dashboard/analysis")}
+                    >
+                      Generate Reports
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
           </Tabs>
+
+          {/* Recent activities section */}
+          <Card className="bg-slate-800/50 border-slate-700/50">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg font-medium text-slate-300">Recent Activities</CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              <ul className="space-y-3">
+                {isLoading ? (
+                  Array(3).fill(0).map((_, i) => (
+                    <li key={i} className="flex items-start gap-4">
+                      <Skeleton className="h-10 w-10 rounded-full bg-slate-700" />
+                      <div className="space-y-1 flex-1">
+                        <Skeleton className="h-4 w-3/4 bg-slate-700" />
+                        <Skeleton className="h-3 w-1/2 bg-slate-700" />
+                      </div>
+                    </li>
+                  ))
+                ) : (
+                  <>
+                    <li className="flex gap-4 items-start border-b border-slate-700/50 pb-3">
+                      <div className="bg-blue-500/20 p-2 rounded-full">
+                        <LineChart className="h-5 w-5 text-blue-400" />
+                      </div>
+                      <div>
+                        <p className="text-white font-medium">Plan analysis completed</p>
+                        <p className="text-sm text-slate-400">Travel Protect Plus showed 92% competitiveness score</p>
+                        <p className="text-xs text-slate-500 mt-1">2 hours ago</p>
+                      </div>
+                    </li>
+                    <li className="flex gap-4 items-start border-b border-slate-700/50 pb-3">
+                      <div className="bg-emerald-500/20 p-2 rounded-full">
+                        <LineChart className="h-5 w-5 text-emerald-400" />
+                      </div>
+                      <div>
+                        <p className="text-white font-medium">New plan uploaded</p>
+                        <p className="text-sm text-slate-400">Auto Comprehensive Elite added to your portfolio</p>
+                        <p className="text-xs text-slate-500 mt-1">Yesterday</p>
+                      </div>
+                    </li>
+                    <li className="flex gap-4 items-start">
+                      <div className="bg-amber-500/20 p-2 rounded-full">
+                        <LineChart className="h-5 w-5 text-amber-400" />
+                      </div>
+                      <div>
+                        <p className="text-white font-medium">Marketplace profile updated</p>
+                        <p className="text-sm text-slate-400">Your company description and logo were updated</p>
+                        <p className="text-xs text-slate-500 mt-1">3 days ago</p>
+                      </div>
+                    </li>
+                  </>
+                )}
+              </ul>
+              <div className="mt-4 text-center">
+                <Button variant="link" className="text-blue-400 hover:text-blue-300">
+                  View all activities
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
-    </AuthenticatedLayout>
+    </div>
   );
 }

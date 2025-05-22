@@ -7,7 +7,7 @@ import { InsuranceCategory } from "@shared/schema";
 import AnimatedBackground from "@/components/animated-background";
 import GlassCard from "@/components/glass-card";
 import GradientButton from "@/components/gradient-button";
-import Navbar from "@/components/navbar";
+import { PublicLayout } from "@/components/layout/public-layout";
 
 // Icons
 import { Plane, Car, Heart, Cat, HelpCircle, ChevronRight } from "lucide-react";
@@ -58,7 +58,7 @@ export default function InsuranceCategoriesPage() {
   // Handle category selection
   const handleCategoryClick = (category: InsuranceCategory) => {
     const isActive = categories.find(c => c.id === category)?.active;
-    
+
     if (isActive) {
       // Route standardization - all insurance types use the same pattern
       navigate(`/insurance/${category}`);
@@ -68,112 +68,112 @@ export default function InsuranceCategoriesPage() {
   };
 
   return (
-    <AnimatedBackground variant="consumer" className="min-h-screen flex flex-col">
-      <Navbar />
-      
-      <main className="flex-grow flex items-center justify-center px-4 py-12">
-        <div className="max-w-4xl w-full mx-auto">
-          {/* Header with animation */}
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: [0.21, 0.61, 0.35, 1] }}
-            className="text-center mb-12"
-          >
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tighter text-white drop-shadow-md">
-              Choose Insurance Category
-            </h1>
-            <p className="mt-4 text-xl text-white/80 max-w-2xl mx-auto">
-              Select the type of insurance you'd like to explore with Briki's AI-powered recommendation engine
-            </p>
-          </motion.div>
-          
-          {/* Category cards grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {categories.map((category, index) => (
-              <motion.div
-                key={category.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ 
-                  duration: 0.5, 
-                  delay: 0.2 + index * 0.1,
-                  ease: [0.21, 0.61, 0.35, 1]
-                }}
-                whileHover={{ 
-                  scale: 1.02,
-                  transition: { duration: 0.2 }
-                }}
-                onMouseEnter={() => setHoveredCategory(category.id)}
-                onMouseLeave={() => setHoveredCategory(null)}
-              >
-                <GlassCard 
-                  onClick={() => handleCategoryClick(category.id)}
-                  className={`p-6 cursor-pointer transition-all overflow-hidden relative ${!category.active ? 'opacity-80' : ''}`}
+    <PublicLayout>
+      <AnimatedBackground variant="consumer" className="min-h-screen flex flex-col">
+        <main className="flex-grow flex items-center justify-center px-4 py-12">
+          <div className="max-w-4xl w-full mx-auto">
+            {/* Header with animation */}
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: [0.21, 0.61, 0.35, 1] }}
+              className="text-center mb-12"
+            >
+              <h1 className="text-4xl md:text-5xl font-bold tracking-tighter text-white drop-shadow-md">
+                Choose Insurance Category
+              </h1>
+              <p className="mt-4 text-xl text-white/80 max-w-2xl mx-auto">
+                Select the type of insurance you'd like to explore with Briki's AI-powered recommendation engine
+              </p>
+            </motion.div>
+
+            {/* Category cards grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {categories.map((category, index) => (
+                <motion.div
+                  key={category.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ 
+                    duration: 0.5, 
+                    delay: 0.2 + index * 0.1,
+                    ease: [0.21, 0.61, 0.35, 1]
+                  }}
+                  whileHover={{ 
+                    scale: 1.02,
+                    transition: { duration: 0.2 }
+                  }}
+                  onMouseEnter={() => setHoveredCategory(category.id)}
+                  onMouseLeave={() => setHoveredCategory(null)}
                 >
-                  {/* Gradient background that appears on hover */}
-                  <div
-                    className={`
-                      absolute inset-0 opacity-0 transition-opacity duration-300
-                      ${hoveredCategory === category.id ? 'opacity-10' : ''}
-                      bg-gradient-to-r ${category.gradient}
-                    `}
-                  />
-                  
-                  <div className="flex items-start">
-                    {/* Icon with gradient background */}
-                    <div className={`
-                      flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center
-                      bg-gradient-to-r ${category.gradient} text-white
-                    `}>
-                      {category.icon}
-                    </div>
-                    
-                    <div className="ml-4 flex-grow">
-                      <h3 className="text-xl font-semibold text-white">{category.name}</h3>
-                      <p className="mt-1 text-white/70">{category.description}</p>
-                    </div>
-                    
-                    <div className="ml-2 flex-shrink-0">
+                  <GlassCard 
+                    onClick={() => handleCategoryClick(category.id)}
+                    className={`p-6 cursor-pointer transition-all overflow-hidden relative ${!category.active ? 'opacity-80' : ''}`}
+                  >
+                    {/* Gradient background that appears on hover */}
+                    <div
+                      className={`
+                        absolute inset-0 opacity-0 transition-opacity duration-300
+                        ${hoveredCategory === category.id ? 'opacity-10' : ''}
+                        bg-gradient-to-r ${category.gradient}
+                      `}
+                    />
+
+                    <div className="flex items-start">
+                      {/* Icon with gradient background */}
                       <div className={`
-                        w-8 h-8 rounded-full flex items-center justify-center
-                        bg-white/10 text-white transition-transform duration-300
-                        ${hoveredCategory === category.id ? 'transform translate-x-1' : ''}
+                        flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center
+                        bg-gradient-to-r ${category.gradient} text-white
                       `}>
-                        <ChevronRight size={16} />
+                        {category.icon}
+                      </div>
+
+                      <div className="ml-4 flex-grow">
+                        <h3 className="text-xl font-semibold text-white">{category.name}</h3>
+                        <p className="mt-1 text-white/70">{category.description}</p>
+                      </div>
+
+                      <div className="ml-2 flex-shrink-0">
+                        <div className={`
+                          w-8 h-8 rounded-full flex items-center justify-center
+                          bg-white/10 text-white transition-transform duration-300
+                          ${hoveredCategory === category.id ? 'transform translate-x-1' : ''}
+                        `}>
+                          <ChevronRight size={16} />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  
-                  {!category.active && (
-                    <div className="mt-3 py-1 px-3 bg-white/20 rounded-full inline-flex items-center">
-                      <span className="text-xs font-medium text-white">Coming Soon</span>
-                    </div>
-                  )}
-                </GlassCard>
-              </motion.div>
-            ))}
-          </div>
-          
-          {/* Help button */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.6 }}
-            className="mt-12 text-center"
-          >
-            <GradientButton
-              variant="outline"
-              size="lg"
-              onClick={() => console.log("Need help clicked")}
-              className="gap-2"
+
+                    {!category.active && (
+                      <div className="mt-3 py-1 px-3 bg-white/20 rounded-full inline-flex items-center">
+                        <span className="text-xs font-medium text-white">Coming Soon</span>
+                      </div>
+                    )}
+                  </GlassCard>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Help button */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.6 }}
+              className="mt-12 text-center"
             >
-              <HelpCircle size={18} />
-              Need help choosing? Talk to our AI
-            </GradientButton>
-          </motion.div>
-        </div>
-      </main>
-    </AnimatedBackground>
+              <GradientButton
+                variant="outline"
+                size="lg"
+                onClick={() => console.log("Need help clicked")}
+                className="gap-2"
+              >
+                <HelpCircle size={18} />
+                Need help choosing? Talk to our AI
+              </GradientButton>
+            </motion.div>
+          </div>
+        </main>
+      </AnimatedBackground>
+    </PublicLayout>
   );
 }

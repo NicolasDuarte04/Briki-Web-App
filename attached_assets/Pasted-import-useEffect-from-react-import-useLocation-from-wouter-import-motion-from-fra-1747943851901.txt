@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import GradientButton from "@/components/gradient-button";
 import { trackEvent } from "@/lib/analytics";
-import { AuthenticatedLayout } from "@/components/layout";
+import Navbar from "@/components/navbar";
 
 export default function Dashboard() {
   const [, navigate] = useLocation();
@@ -117,7 +117,9 @@ export default function Dashboard() {
   ];
 
   return (
-    <AuthenticatedLayout>
+    <div className="min-h-screen flex flex-col">
+      <Navbar />
+
       {/* Main content */}
       <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Welcome section */}
@@ -274,6 +276,6 @@ export default function Dashboard() {
           </div>
         </motion.div>
       </main>
-    </AuthenticatedLayout>
+    </div>
   );
 }
