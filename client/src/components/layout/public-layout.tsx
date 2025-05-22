@@ -1,5 +1,5 @@
 import React from 'react';
-import NavbarNew from '@/components/navbar-new';
+import Navbar from '@/components/navbar';
 import { useNavigation } from '@/lib/navigation';
 import { Link } from 'wouter';
 import { motion } from 'framer-motion';
@@ -14,7 +14,7 @@ export function PublicLayout({ children }: PublicLayoutProps) {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Standardized navbar component */}
-      {location !== '/auth' && <NavbarNew />}
+      {location !== '/auth' && <Navbar />}
       
       {/* Main content */}
       <main className="flex-1">
