@@ -1,6 +1,6 @@
 import React from 'react';
 import { FloatingAssistantButton } from '../floating-assistant-button';
-import NavbarNew from '@/components/navbar-new';
+import Navbar from '@/components/navbar';
 import { useNavigation } from '@/lib/navigation';
 
 interface AuthenticatedLayoutProps {
@@ -17,7 +17,7 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
   return (
     <>
       {/* Don't show navbar on auth page */}
-      {location !== '/auth' && <NavbarNew />}
+      {location !== '/auth' && <Navbar />}
       <FloatingAssistantButton />
       {children}
     </>
