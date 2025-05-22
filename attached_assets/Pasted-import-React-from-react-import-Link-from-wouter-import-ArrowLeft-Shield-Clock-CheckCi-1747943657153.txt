@@ -6,7 +6,7 @@ import { PublicLayout } from "@/components/layout/public-layout";
 
 export default function LearnMorePage() {
   const { t } = useLanguage();
-
+  
   return (
     <PublicLayout>
       <div className="flex-grow">
@@ -19,7 +19,7 @@ export default function LearnMorePage() {
             </div>
             <h1 className="text-3xl font-bold text-primary mb-6">{t('aboutBriki')}</h1>
           </div>
-
+          
           <div className="space-y-8">
             <section className="bg-white p-6 rounded-xl shadow-sm">
               <h2 className="text-xl font-semibold mb-4">{t('ourMission')}</h2>
@@ -31,7 +31,7 @@ export default function LearnMorePage() {
                 <span>{t('travelConfidence')}</span>
               </div>
             </section>
-
+            
             <section className="space-y-6">
               <div className="bg-white p-6 rounded-xl shadow-sm">
                 <div className="flex items-start">
@@ -44,7 +44,7 @@ export default function LearnMorePage() {
                   </div>
                 </div>
               </div>
-
+              
               <div className="bg-white p-6 rounded-xl shadow-sm">
                 <div className="flex items-start">
                   <Shield className="h-8 w-8 text-primary mr-4 mt-1 flex-shrink-0" />
@@ -56,7 +56,7 @@ export default function LearnMorePage() {
                   </div>
                 </div>
               </div>
-
+              
               <div className="bg-white p-6 rounded-xl shadow-sm">
                 <div className="flex items-start">
                   <div className="rounded-full bg-primary/10 p-2 mr-4 mt-1 flex-shrink-0">
@@ -74,7 +74,7 @@ export default function LearnMorePage() {
                 </div>
               </div>
             </section>
-
+            
             <section className="bg-white p-6 rounded-xl shadow-sm">
               <h2 className="text-xl font-semibold mb-4">{t('whyChooseBriki')}</h2>
               <ul className="space-y-3">
@@ -96,7 +96,7 @@ export default function LearnMorePage() {
                 </li>
               </ul>
             </section>
-
+            
             <section className="bg-primary/10 p-6 rounded-xl">
               <h2 className="text-xl font-semibold mb-4">{t('startYourJourney')}</h2>
               <p className="text-gray-700 mb-6">

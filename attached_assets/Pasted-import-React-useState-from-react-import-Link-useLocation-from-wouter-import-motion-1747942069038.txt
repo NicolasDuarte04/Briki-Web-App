@@ -7,10 +7,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ProviderApiSetup from '@/components/provider-api-setup';
 import ProviderStatusDashboard from '@/components/provider-status-dashboard';
+import Navbar from '@/components/navbar';
+import Footer from '@/components/footer';
 import { FuturisticBackground } from '@/components/ui/futuristic-background';
 import { useInvalidatePlansCache } from '@/services/caching/insurance-cache';
 import { useToast } from '@/hooks/use-toast';
-import { AuthenticatedLayout } from '@/components/layout';
 
 export default function ApiSettingsPage() {
   const [, navigate] = useLocation();
@@ -18,29 +19,31 @@ export default function ApiSettingsPage() {
   const invalidateCacheMutation = useInvalidatePlansCache();
   const isPending = invalidateCacheMutation.isPending;
   const { toast } = useToast();
-
+  
   // Create a local function to safely call the mutation
   const invalidateCache = () => {
     invalidateCacheMutation.mutate({});
   };
-
+  
   const handleRefreshData = () => {
     // Invalidate all plans cache
     invalidateCache();
-
+    
     toast({
       title: 'Cache Refreshed',
       description: 'Insurance data cache has been cleared. Fresh data will be loaded on your next search.',
     });
   };
-
+  
   return (
-    <AuthenticatedLayout>
+    <div className="min-h-screen flex flex-col bg-background">
+      <Navbar />
+      
       {/* Background elements */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         <FuturisticBackground particleCount={40} interactive={false} />
       </div>
-
+      
       <div className="flex-grow relative z-10">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10">
           <div className="flex items-center mb-6">
@@ -54,7 +57,7 @@ export default function ApiSettingsPage() {
               </p>
             </div>
           </div>
-
+          
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             {/* Sidebar */}
             <motion.div
@@ -97,7 +100,7 @@ export default function ApiSettingsPage() {
                   </Button>
                 </CardContent>
               </Card>
-
+              
               <Card className="bg-background/80 backdrop-blur-sm border-primary/20 shadow-glow-sm">
                 <CardHeader className="pb-4">
                   <CardTitle className="text-sm">Actions</CardTitle>
@@ -125,7 +128,7 @@ export default function ApiSettingsPage() {
                 </CardContent>
               </Card>
             </motion.div>
-
+            
             {/* Main content */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -155,15 +158,15 @@ export default function ApiSettingsPage() {
                       Cache Management
                     </TabsTrigger>
                   </TabsList>
-
+                  
                   <TabsContent value="connections" className="p-6">
                     <ProviderApiSetup />
                   </TabsContent>
-
+                  
                   <TabsContent value="status" className="p-6">
                     <ProviderStatusDashboard refreshInterval={20000} />
                   </TabsContent>
-
+                  
                   <TabsContent value="cache" className="p-6">
                     <div className="space-y-6">
                       <div>
@@ -171,7 +174,7 @@ export default function ApiSettingsPage() {
                         <p className="text-sm text-foreground/70 mb-4">
                           Manage how insurance data is cached and refreshed across the application.
                         </p>
-
+                        
                         <div className="grid gap-4 mt-6">
                           <Card>
                             <CardHeader className="pb-2">
@@ -213,7 +216,7 @@ export default function ApiSettingsPage() {
                               </div>
                             </CardContent>
                           </Card>
-
+                          
                           <Card>
                             <CardHeader className="pb-2">
                               <CardTitle className="text-base">Cache Maintenance</CardTitle>
@@ -247,6 +250,8 @@ export default function ApiSettingsPage() {
           </div>
         </div>
       </div>
-    </AuthenticatedLayout>
+      
+      <Footer />
+    </div>
   );
 }

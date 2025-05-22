@@ -15,7 +15,7 @@ import {
   ArrowUp,
   ArrowDown
 } from "lucide-react";
-import { AuthenticatedLayout } from "@/components/layout";
+import Navbar from "@/components/navbar";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -254,144 +254,144 @@ export default function CompanyAnalysisPage() {
   };
 
   return (
-    <AuthenticatedLayout>
-      <div className="bg-gradient-to-b from-[#001A40] via-[#00142E] to-black text-white flex-grow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
-          <div className="space-y-6">
-            {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <div className="space-y-1">
-                <h1 className="text-2xl font-semibold text-white">Competitive Analysis</h1>
-                <p className="text-gray-400">Benchmark your insurance plans against the market</p>
-              </div>
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#001A40] via-[#00142E] to-black text-white">
+      <Navbar />
 
-              <div className="flex flex-wrap items-center gap-3">
-                <Button 
-                  variant="outline" 
-                  className="border-[#1E3A59] text-white hover:bg-[#01101F] hover:border-[#33BFFF]"
-                  onClick={exportReport}
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  Export
-                </Button>
-                <Button 
-                  className="bg-[#1570EF] hover:bg-[#0E63D6] text-white"
-                  onClick={generateInsights}
-                >
-                  <Sparkles className="h-4 w-4 mr-2" />
-                  Generate Insights
-                </Button>
-              </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex-grow">
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="space-y-1">
+              <h1 className="text-2xl font-semibold text-white">Competitive Analysis</h1>
+              <p className="text-gray-400">Benchmark your insurance plans against the market</p>
             </div>
 
-            {/* Plan Selection & Analysis Options */}
-            <Card className="bg-[#0A2540] border-[#1E3A59]">
-              <CardHeader>
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0">
-                  <CardTitle className="text-white">Insurance Plan Analysis</CardTitle>
-
-                  <div className="flex flex-wrap items-center gap-3">
-                    <Select 
-                      value={selectedPlan.toString()} 
-                      onValueChange={(value) => setSelectedPlan(parseInt(value))}
-                    >
-                      <SelectTrigger className="bg-[#01101F] border-[#1E3A59] w-[180px] text-white">
-                        <SelectValue placeholder="Select plan" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-[#0A2540] border-[#1E3A59] text-white">
-                        {insurancePlans.map((plan) => (
-                          <SelectItem key={plan.id} value={plan.id.toString()}>
-                            {plan.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-
-                    <Tabs 
-                      value={viewMode} 
-                      onValueChange={setViewMode}
-                      className="hidden md:block"
-                    >
-                      <TabsList className="bg-[#01101F]">
-                        <TabsTrigger value="chart">
-                          <BarChart4 className="h-4 w-4 mr-2" />
-                          Charts
-                        </TabsTrigger>
-                        <TabsTrigger value="table">
-                          <FileSpreadsheet className="h-4 w-4 mr-2" />
-                          Tables
-                        </TabsTrigger>
-                      </TabsList>
-                    </Tabs>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between bg-[#01101F] rounded-md p-4 border border-[#1E3A59]">
-                  <div className="flex items-center space-x-4">
-                    <div className="h-12 w-12 flex items-center justify-center rounded-md bg-gradient-to-r from-[#1570EF] to-[#33BFFF]">
-                      <Shield className="h-6 w-6 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-white font-medium text-lg">{planData.name}</h3>
-                      <div className="flex items-center mt-1 space-x-3">
-                        <Badge className="bg-[#1570EF]/20 text-[#33BFFF] border-[#1570EF]/20">
-                          {planData.type}
-                        </Badge>
-                        <span className="text-gray-400 text-sm">{planData.coverage} Coverage</span>
-                        <span className="text-gray-400 text-sm">{planData.price}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="hidden md:flex items-center">
-                    <div className="pr-6 border-r border-[#1E3A59]">
-                      <div className="text-sm text-gray-400">Competitive Score</div>
-                      <div className="text-2xl font-bold text-white">{planData.competitiveScore}%</div>
-                    </div>
-                    <div className="pl-6">
-                      <div className="text-sm text-gray-400">Status</div>
-                      <Badge
-                        className={
-                          planData.status === "Active" 
-                            ? "bg-emerald-600/10 text-emerald-500 hover:bg-emerald-600/20 border-emerald-500/20" 
-                            : "bg-amber-600/10 text-amber-500 hover:bg-amber-600/20 border-amber-500/20"
-                        }
-                      >
-                        {planData.status}
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-
-                <Tabs 
-                  defaultValue="general" 
-                  className="mt-6"
-                  onValueChange={setAnalysisType}
-                >
-                  <TabsList className="bg-[#01101F] w-full justify-start overflow-auto">
-                    <TabsTrigger value="general">General</TabsTrigger>
-                    <TabsTrigger value="pricing">Pricing</TabsTrigger>
-                    <TabsTrigger value="features">Features</TabsTrigger>
-                    <TabsTrigger value="swot">SWOT Analysis</TabsTrigger>
-                    <TabsTrigger value="trends">Market Trends</TabsTrigger>
-                  </TabsList>
-                </Tabs>
-              </CardContent>
-            </Card>
-
-            {/* Analysis Content */}
-            {analysisType === "general" && (
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Continue with the rest of your components */}
-                {/* For brevity, I'm omitting the rest of the components since they don't change */}
-              </div>
-            )}
-
-            {/* The rest of your specific analysis tabs would go here */}
+            <div className="flex flex-wrap items-center gap-3">
+              <Button 
+                variant="outline" 
+                className="border-[#1E3A59] text-white hover:bg-[#01101F] hover:border-[#33BFFF]"
+                onClick={exportReport}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Export
+              </Button>
+              <Button 
+                className="bg-[#1570EF] hover:bg-[#0E63D6] text-white"
+                onClick={generateInsights}
+              >
+                <Sparkles className="h-4 w-4 mr-2" />
+                Generate Insights
+              </Button>
+            </div>
           </div>
+
+          {/* Plan Selection & Analysis Options */}
+          <Card className="bg-[#0A2540] border-[#1E3A59]">
+            <CardHeader>
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0">
+                <CardTitle className="text-white">Insurance Plan Analysis</CardTitle>
+
+                <div className="flex flex-wrap items-center gap-3">
+                  <Select 
+                    value={selectedPlan.toString()} 
+                    onValueChange={(value) => setSelectedPlan(parseInt(value))}
+                  >
+                    <SelectTrigger className="bg-[#01101F] border-[#1E3A59] w-[180px] text-white">
+                      <SelectValue placeholder="Select plan" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#0A2540] border-[#1E3A59] text-white">
+                      {insurancePlans.map((plan) => (
+                        <SelectItem key={plan.id} value={plan.id.toString()}>
+                          {plan.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  <Tabs 
+                    value={viewMode} 
+                    onValueChange={setViewMode}
+                    className="hidden md:block"
+                  >
+                    <TabsList className="bg-[#01101F]">
+                      <TabsTrigger value="chart">
+                        <BarChart4 className="h-4 w-4 mr-2" />
+                        Charts
+                      </TabsTrigger>
+                      <TabsTrigger value="table">
+                        <FileSpreadsheet className="h-4 w-4 mr-2" />
+                        Tables
+                      </TabsTrigger>
+                    </TabsList>
+                  </Tabs>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between bg-[#01101F] rounded-md p-4 border border-[#1E3A59]">
+                <div className="flex items-center space-x-4">
+                  <div className="h-12 w-12 flex items-center justify-center rounded-md bg-gradient-to-r from-[#1570EF] to-[#33BFFF]">
+                    <Shield className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-white font-medium text-lg">{planData.name}</h3>
+                    <div className="flex items-center mt-1 space-x-3">
+                      <Badge className="bg-[#1570EF]/20 text-[#33BFFF] border-[#1570EF]/20">
+                        {planData.type}
+                      </Badge>
+                      <span className="text-gray-400 text-sm">{planData.coverage} Coverage</span>
+                      <span className="text-gray-400 text-sm">{planData.price}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="hidden md:flex items-center">
+                  <div className="pr-6 border-r border-[#1E3A59]">
+                    <div className="text-sm text-gray-400">Competitive Score</div>
+                    <div className="text-2xl font-bold text-white">{planData.competitiveScore}%</div>
+                  </div>
+                  <div className="pl-6">
+                    <div className="text-sm text-gray-400">Status</div>
+                    <Badge
+                      className={
+                        planData.status === "Active" 
+                          ? "bg-emerald-600/10 text-emerald-500 hover:bg-emerald-600/20 border-emerald-500/20" 
+                          : "bg-amber-600/10 text-amber-500 hover:bg-amber-600/20 border-amber-500/20"
+                      }
+                    >
+                      {planData.status}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+
+              <Tabs 
+                defaultValue="general" 
+                className="mt-6"
+                onValueChange={setAnalysisType}
+              >
+                <TabsList className="bg-[#01101F] w-full justify-start overflow-auto">
+                  <TabsTrigger value="general">General</TabsTrigger>
+                  <TabsTrigger value="pricing">Pricing</TabsTrigger>
+                  <TabsTrigger value="features">Features</TabsTrigger>
+                  <TabsTrigger value="swot">SWOT Analysis</TabsTrigger>
+                  <TabsTrigger value="trends">Market Trends</TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </CardContent>
+          </Card>
+
+          {/* Analysis Content */}
+          {analysisType === "general" && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Continue with the rest of your components */}
+              {/* For brevity, I'm omitting the rest of the components since they don't change */}
+            </div>
+          )}
+
+          {/* The rest of your specific analysis tabs would go here */}
         </div>
       </div>
-    </AuthenticatedLayout>
+    </div>
   );
 }
