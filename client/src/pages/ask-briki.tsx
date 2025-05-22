@@ -8,6 +8,7 @@ import { Helmet } from 'react-helmet';
 import { ArrowRight, Send as SendIcon, Bot, Shield, MessageCircle } from 'lucide-react';
 import PlanRecommendationCard, { PlanRecommendations } from '@/components/PlanRecommendationCard';
 import { ChatMessage } from '@/types/chat';
+import BrikiAIChat from '@/components/BrikiAIChat';
 
 export default function AskBrikiPage() {
   const { navigate } = useNavigation();
@@ -171,90 +172,16 @@ export default function AskBrikiPage() {
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 id="chat-demo-heading" className="sr-only">Chat with Briki AI Assistant</h2>
             
-            {/* Chat Container */}
-            <motion.div 
-              className="bg-white dark:bg-gray-800 rounded-xl shadow-xl overflow-hidden border border-gray-200 dark:border-gray-700"
+            {/* Interactive AI Chat Component */}
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
             >
-              {/* Chat Header */}
-              <div className="px-5 py-4 bg-gradient-to-r from-blue-600 to-cyan-500">
-                <div className="flex items-center">
-                  <Bot className="h-6 w-6 mr-2 text-white" />
-                  <h3 className="font-semibold text-white">Briki AI Assistant</h3>
-                </div>
-              </div>
-
-              {/* Chat Messages */}
-              <div className="p-5 bg-gray-50 dark:bg-gray-900 h-[600px] overflow-y-auto">
-                <div className="space-y-8">
-                  {messages.map((message, index) => (
-                    <motion.div 
-                      key={message.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.2, duration: 0.4 }}
-                    >
-                      {message.sender === 'user' ? (
-                        <div className="flex justify-end mb-4">
-                          <div className="bg-blue-600 rounded-2xl py-3 px-4 shadow-sm max-w-xs md:max-w-md">
-                            <p className="text-white leading-relaxed">{message.content}</p>
-                          </div>
-                          <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center ml-3 flex-shrink-0 border-2 border-white dark:border-gray-800 shadow-sm">
-                            <MessageCircle className="h-5 w-5 text-gray-600" />
-                          </div>
-                        </div>
-                      ) : (
-                        <>
-                          <div className="flex mb-2">
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center mr-3 flex-shrink-0 border-2 border-white dark:border-gray-800 shadow-sm">
-                              <span className="text-white font-bold text-xs">B</span>
-                            </div>
-                            <div className="bg-white dark:bg-gray-800 rounded-2xl py-3 px-4 shadow-sm max-w-xs md:max-w-md border border-gray-100 dark:border-gray-700">
-                              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{message.content}</p>
-                            </div>
-                          </div>
-                          
-                          {/* Plan recommendation widget */}
-                          {message.widget?.type === 'plans' && (
-                            <div className="ml-[54px] space-y-4">
-                              {message.widget.plans.map((plan, planIndex) => (
-                                <PlanRecommendationCard
-                                  key={planIndex}
-                                  {...plan}
-                                  delay={0.3 + (planIndex * 0.2)}
-                                />
-                              ))}
-                            </div>
-                          )}
-                        </>
-                      )}
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Chat Input */}
-              <div className="p-4 border-t dark:border-gray-700 bg-white dark:bg-gray-800">
-                <div className="bg-gray-100 dark:bg-gray-700 rounded-full flex items-center px-4 py-3 shadow-inner">
-                  <input 
-                    type="text" 
-                    className="bg-transparent flex-1 outline-none text-gray-700 dark:text-gray-300 text-sm" 
-                    placeholder="Type your insurance question..." 
-                    disabled 
-                  />
-                  <button 
-                    className="ml-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white p-2 rounded-full"
-                    disabled
-                  >
-                    <ArrowRight className="h-4 w-4" />
-                  </button>
-                </div>
-                <p className="text-sm text-center mt-4 text-gray-500 dark:text-gray-400">
-                  Sign in to ask your own insurance questions and get personalized recommendations.
-                </p>
-              </div>
+              <BrikiAIChat 
+                initialMessages={initialMessages}
+                demoMode={true}
+              />
             </motion.div>
 
             {/* Questions People Ask */}
@@ -263,37 +190,41 @@ export default function AskBrikiPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6, delay: 0.5 }}
-              aria-labelledby="popular-questions-heading"
+              aria-labelledby="sample-questions-heading"
             >
-              <h2 id="popular-questions-heading" className="text-2xl font-bold text-gray-900 dark:text-white mb-8">Questions People Actually Ask</h2>
+              <h2 id="sample-questions-heading" className="text-2xl font-bold text-gray-900 dark:text-white mb-8">Prueba con estas preguntas</h2>
               <div className="grid md:grid-cols-2 gap-4">
                 <motion.div 
-                  className="bg-white dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow backdrop-blur-sm"
+                  className="bg-white dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow backdrop-blur-sm cursor-pointer"
                   whileHover={{ y: -3 }}
                   transition={{ type: "spring", stiffness: 300 }}
+                  onClick={() => navigate('/auth')} 
                 >
-                  <h3 className="font-medium text-gray-900 dark:text-gray-100">"Why is my premium so high when I've never had an accident?"</h3>
+                  <h3 className="font-medium text-gray-900 dark:text-gray-100">"¿Necesito un seguro especial para mi cámara costosa mientras viajo?"</h3>
                 </motion.div>
                 <motion.div 
-                  className="bg-white dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow backdrop-blur-sm"
+                  className="bg-white dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow backdrop-blur-sm cursor-pointer"
                   whileHover={{ y: -3 }}
                   transition={{ type: "spring", stiffness: 300 }}
+                  onClick={() => navigate('/auth')}
                 >
-                  <h3 className="font-medium text-gray-900 dark:text-gray-100">"Do I need special insurance for my expensive camera while traveling?"</h3>
+                  <h3 className="font-medium text-gray-900 dark:text-gray-100">"Mi perro tiene alergias. ¿El seguro para mascotas cubrirá su comida especial?"</h3>
                 </motion.div>
                 <motion.div 
-                  className="bg-white dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow backdrop-blur-sm"
+                  className="bg-white dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow backdrop-blur-sm cursor-pointer"
                   whileHover={{ y: -3 }}
                   transition={{ type: "spring", stiffness: 300 }}
+                  onClick={() => navigate('/auth')}
                 >
-                  <h3 className="font-medium text-gray-900 dark:text-gray-100">"My dog has allergies. Will pet insurance cover his special food?"</h3>
+                  <h3 className="font-medium text-gray-900 dark:text-gray-100">"¿Por qué mi prima es tan alta cuando nunca he tenido un accidente?"</h3>
                 </motion.div>
                 <motion.div 
-                  className="bg-white dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow backdrop-blur-sm"
+                  className="bg-white dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow backdrop-blur-sm cursor-pointer"
                   whileHover={{ y: -3 }}
                   transition={{ type: "spring", stiffness: 300 }}
+                  onClick={() => navigate('/auth')}
                 >
-                  <h3 className="font-medium text-gray-900 dark:text-gray-100">"If I rent a car abroad, is it covered by my regular policy?"</h3>
+                  <h3 className="font-medium text-gray-900 dark:text-gray-100">"¿Si alquilo un auto en el extranjero, está cubierto por mi póliza regular?"</h3>
                 </motion.div>
               </div>
             </motion.div>
