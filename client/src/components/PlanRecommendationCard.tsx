@@ -15,7 +15,7 @@ export interface PlanProps {
   price: number; 
   priceUnit: string; // e.g. '/mo', '/yr', etc.
   features: PlanFeature[];
-  category: 'health' | 'travel' | 'auto' | 'pet'; // Used for tag colors and navigation
+  category: 'health' | 'travel' | 'auto' | 'pet' | 'home'; // Used for tag colors and navigation
   badge?: string; // Optional badge text like "Freelancer Friendly"
   delay?: number; // Animation delay in seconds
 }
@@ -37,7 +37,8 @@ export default function PlanRecommendationCard({
     health: "from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 border-blue-100 dark:border-blue-800/30",
     travel: "from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 border-indigo-100 dark:border-indigo-800/30",
     auto: "from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 border-cyan-100 dark:border-cyan-800/30",
-    pet: "from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-purple-100 dark:border-purple-800/30"
+    pet: "from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-purple-100 dark:border-purple-800/30",
+    home: "from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border-emerald-100 dark:border-emerald-800/30"
   };
 
   // Different badge color schemes
@@ -45,7 +46,8 @@ export default function PlanRecommendationCard({
     health: "bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-400",
     travel: "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-800 dark:text-indigo-400",
     auto: "bg-cyan-100 dark:bg-cyan-900/40 text-cyan-800 dark:text-cyan-400",
-    pet: "bg-purple-100 dark:bg-purple-900/40 text-purple-800 dark:text-purple-400"
+    pet: "bg-purple-100 dark:bg-purple-900/40 text-purple-800 dark:text-purple-400",
+    home: "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-400"
   };
 
   // Shield icon colors for different categories
@@ -53,7 +55,8 @@ export default function PlanRecommendationCard({
     health: "text-blue-600 dark:text-blue-400",
     travel: "text-indigo-600 dark:text-indigo-400",
     auto: "text-cyan-600 dark:text-cyan-400",
-    pet: "text-purple-600 dark:text-purple-400"
+    pet: "text-purple-600 dark:text-purple-400",
+    home: "text-emerald-600 dark:text-emerald-400"
   };
 
   // Navigation links for different categories
@@ -61,7 +64,8 @@ export default function PlanRecommendationCard({
     health: "/health/plans",
     travel: "/travel/plans",
     auto: "/auto/plans",
-    pet: "/pet/plans"
+    pet: "/pet/plans",
+    home: "/home/plans"
   };
 
   return (

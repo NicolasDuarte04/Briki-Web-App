@@ -5,156 +5,73 @@ import { useNavigation } from '@/lib/navigation';
 import { Button } from '@/components/ui/button';
 import GradientButton from '@/components/gradient-button';
 import { Helmet } from 'react-helmet';
-import { ArrowRight, Send as SendIcon, Bot, Shield } from 'lucide-react';
+import { ArrowRight, Send as SendIcon, Bot, Shield, MessageCircle } from 'lucide-react';
 import PlanRecommendationCard, { PlanRecommendations } from '@/components/PlanRecommendationCard';
 import { ChatMessage } from '@/types/chat';
 
 export default function AskBrikiPage() {
   const { navigate } = useNavigation();
-
-  // Predefined Q&A messages for the static display
-  const messages: ChatMessage[] = [
+  
+  // Create initial messages, including the Vespa example from the prompt
+  const initialMessages: ChatMessage[] = [
     {
       id: '1',
       sender: 'user',
-      content: "I'm freelance and need health insurance that covers emergencies and checkups."
+      content: "I just bought a Vespa and need insurance in Colombia."
     },
     {
       id: '2',
       sender: 'assistant',
-      content: "Great — I found two flexible plans that include ER visits, virtual care, and no long-term contracts. Here are my recommendations:",
+      content: "Para tu Vespa, te recomendaría un seguro que incluya responsabilidad civil, cobertura por robo, y asistencia en carretera. He encontrado estas opciones que se ajustan a tus necesidades:",
+      detectedIntent: 'auto_insurance',
       widget: {
         type: 'plans',
         plans: [
           {
-            name: "FlexHealth Basic",
-            description: "Flexible coverage with no annual commitment",
-            price: 195,
+            name: "Scooter Basic",
+            description: "Cobertura esencial para tu Vespa",
+            price: 28,
             priceUnit: "/mo",
-            badge: "Freelancer Friendly",
-            category: "health",
+            badge: "Recomendado",
+            category: "auto",
             features: [
-              { text: "Unlimited virtual visits", color: "blue-500" },
-              { text: "Emergency room coverage", color: "cyan-500" },
-              { text: "4 preventive checkups/year", color: "indigo-500" },
-              { text: "Monthly billing option", color: "purple-500" }
+              { text: "Responsabilidad civil obligatoria", color: "blue-500" },
+              { text: "Asistencia básica en vía", color: "cyan-500" },
+              { text: "Cobertura por robo", color: "indigo-500" },
+              { text: "Daños a terceros", color: "purple-500" }
             ]
           },
           {
-            name: "FlexHealth Plus",
-            description: "Enhanced coverage for active lifestyles",
-            price: 275,
+            name: "Scooter Plus",
+            description: "Protección ampliada para motocicletas y scooters",
+            price: 42,
             priceUnit: "/mo",
-            badge: "Most Popular",
-            category: "health",
+            badge: "Más popular",
+            category: "auto",
             features: [
-              { text: "Unlimited virtual & in-person visits", color: "blue-500" },
-              { text: "Full emergency coverage", color: "cyan-500" },
-              { text: "Specialist referrals included", color: "indigo-500" },
-              { text: "Prescription discount program", color: "purple-500" }
-            ]
-          }
-        ]
-      }
-    },
-    {
-      id: '3',
-      sender: 'user',
-      content: "We're traveling to Portugal for 2 weeks. What travel insurance should we get?"
-    },
-    {
-      id: '4',
-      sender: 'assistant',
-      content: "For a 2-week trip to Portugal, I recommend these plans that offer comprehensive coverage for European travel with strong emergency medical benefits and trip protection:",
-      widget: {
-        type: 'plans',
-        plans: [
-          {
-            name: "TravelGuard Premium",
-            description: "Comprehensive coverage for European travel",
-            price: 88,
-            priceUnit: "/person",
-            badge: "Best Overall",
-            category: "travel",
-            features: [
-              { text: "$100,000 emergency medical coverage", color: "indigo-500" },
-              { text: "Trip cancellation up to $5,000", color: "purple-500" },
-              { text: "Lost baggage compensation", color: "blue-500" },
-              { text: "24/7 emergency assistance", color: "cyan-500" }
+              { text: "Todo lo del plan Basic", color: "blue-500" },
+              { text: "Daños por accidente", color: "cyan-500" },
+              { text: "Asistencia 24/7 premium", color: "indigo-500" },
+              { text: "Accesorios cubiertos hasta $500", color: "purple-500" }
             ]
           },
           {
-            name: "EuroTraveler Plus",
-            description: "Specialized European coverage",
-            price: 75,
-            priceUnit: "/person",
-            badge: "EU Optimized",
-            category: "travel",
-            features: [
-              { text: "€75,000 medical coverage", color: "indigo-500" },
-              { text: "Schengen visa compliant", color: "purple-500" },
-              { text: "Adventure activities covered", color: "blue-500" },
-              { text: "COVID-19 coverage included", color: "cyan-500" }
-            ]
-          },
-          {
-            name: "WorldTrip Basic",
-            description: "Budget-friendly essential coverage",
-            price: 58,
-            priceUnit: "/person",
-            badge: "Economy Pick",
-            category: "travel",
-            features: [
-              { text: "$50,000 emergency medical", color: "indigo-500" },
-              { text: "Trip delay protection", color: "purple-500" },
-              { text: "Emergency evacuation included", color: "blue-500" },
-              { text: "Basic baggage coverage", color: "cyan-500" }
-            ]
-          }
-        ]
-      }
-    },
-    {
-      id: '5',
-      sender: 'user',
-      content: "I got a new Labrador puppy. What pet insurance options do you recommend?"
-    },
-    {
-      id: '6',
-      sender: 'assistant',
-      content: "Congratulations on your new Labrador puppy! Here are some pet insurance plans that are particularly good for young Labs, with coverage for breed-specific conditions and preventive care:",
-      widget: {
-        type: 'plans',
-        plans: [
-          {
-            name: "PawProtect Complete",
-            description: "Comprehensive coverage for puppies",
-            price: 48,
-            priceUnit: "/mo",
-            badge: "Best for Puppies",
-            category: "pet",
-            features: [
-              { text: "Accidents & illnesses covered", color: "purple-500" },
-              { text: "Breed-specific condition coverage", color: "pink-500" },
-              { text: "Wellness visits & vaccinations", color: "indigo-500" },
-              { text: "Microchipping & dental included", color: "blue-500" }
-            ]
-          },
-          {
-            name: "FurGuard Plus",
-            description: "Premium care for active breeds",
+            name: "Scooter Premium",
+            description: "Cobertura total para tu Vespa con beneficios exclusivos",
             price: 65,
             priceUnit: "/mo",
-            badge: "Lab Recommended",
-            category: "pet",
+            badge: "Todo incluido",
+            category: "auto",
             features: [
-              { text: "Joint & hip dysplasia coverage", color: "purple-500" },
-              { text: "Hereditary condition coverage", color: "pink-500" },
-              { text: "Prescription food & supplements", color: "indigo-500" },
-              { text: "Alternative therapies included", color: "blue-500" }
+              { text: "Cobertura todo riesgo", color: "blue-500" },
+              { text: "Vespa de reemplazo por 15 días", color: "cyan-500" },
+              { text: "Valor a nuevo durante 2 años", color: "indigo-500" },
+              { text: "Accesorios cubiertos sin límite", color: "purple-500" }
             ]
           }
-        ]
+        ],
+        ctaText: "Ver todos los planes de auto",
+        ctaLink: "/auto/plans"
       }
     }
   ];
