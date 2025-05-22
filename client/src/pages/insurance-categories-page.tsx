@@ -7,7 +7,7 @@ import { InsuranceCategory } from "@shared/schema";
 import AnimatedBackground from "@/components/animated-background";
 import GlassCard from "@/components/glass-card";
 import GradientButton from "@/components/gradient-button";
-import Navbar from "@/components/navbar-new";
+import Navbar from "@/components/navbar";
 
 // Icons
 import { Plane, Car, Heart, Cat, HelpCircle, ChevronRight } from "lucide-react";

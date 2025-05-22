@@ -16,18 +16,17 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import GradientButton from "@/components/gradient-button";
 import { trackEvent } from "@/lib/analytics";
-import Navbar from "@/components/navbar";
 
 export default function Dashboard() {
   const [, navigate] = useLocation();
   const { user, isLoading } = useAuth();
   const { t } = useLanguage();
-
+  
   // Track page view
   useEffect(() => {
     trackEvent("view_dashboard", "navigation", "home");
   }, []);
-
+  
   // Animation variants
   const container = {
     hidden: { opacity: 0 },
@@ -39,7 +38,7 @@ export default function Dashboard() {
       }
     }
   };
-
+  
   const item = {
     hidden: { opacity: 0, y: 20 },
     show: { 
@@ -52,10 +51,10 @@ export default function Dashboard() {
       }
     }
   };
-
+  
   // Get user's first name for personalized greeting
   const firstName = user?.firstName || user?.name?.split(' ')[0] || "there";
-
+  
   // Action cards
   const actionCards = [
     {
@@ -91,7 +90,7 @@ export default function Dashboard() {
       color: "amber"
     }
   ];
-
+  
   // Insurance categories
   const categories = [
     {
@@ -117,11 +116,9 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
-
+    <div className="min-h-screen bg-background">
       {/* Main content */}
-      <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Welcome section */}
         <motion.div
           variants={item}
@@ -187,7 +184,7 @@ export default function Dashboard() {
             <div className="relative">
               <div className="absolute right-0 top-0 w-32 h-32 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 blur-3xl rounded-full -mr-16 -mt-16"></div>
               <div className="absolute left-0 bottom-0 w-24 h-24 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 blur-3xl rounded-full -ml-12 -mb-12"></div>
-
+              
               <CardHeader>
                 <div className="flex items-center space-x-2">
                   <Sparkles className="h-5 w-5 text-blue-500" />
@@ -197,7 +194,7 @@ export default function Dashboard() {
                   Based on your profile and preferences
                 </CardDescription>
               </CardHeader>
-
+              
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
                   <div className="md:col-span-2 space-y-4">
@@ -229,7 +226,7 @@ export default function Dashboard() {
                       </div>
                     </div>
                   </div>
-
+                  
                   <div className="flex flex-col items-center md:items-end space-y-3">
                     <div className="text-2xl font-bold text-gray-900 dark:text-white">$89<span className="text-sm font-normal text-gray-500">/trip</span></div>
                     <GradientButton 
@@ -261,7 +258,7 @@ export default function Dashboard() {
               <ArrowRight className="ml-1 h-4 w-4" />
             </Button>
           </div>
-
+          
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {categories.map((category) => (
               <Button
@@ -276,6 +273,33 @@ export default function Dashboard() {
           </div>
         </motion.div>
       </main>
+      
+      {/* Footer section that matches landing page style */}
+      <footer className="border-t border-gray-200 dark:border-gray-800 mt-auto">
+        <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="mb-4 md:mb-0">
+              <h2 className="text-xl font-bold tracking-tighter bg-gradient-to-r from-indigo-600 to-blue-500 bg-clip-text text-transparent">Briki</h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Your AI-powered insurance companion</p>
+            </div>
+            
+            <div className="flex space-x-6">
+              <Button variant="ghost" className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white" onClick={() => navigate('/terms')}>
+                Terms
+              </Button>
+              <Button variant="ghost" className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white" onClick={() => navigate('/learn-more')}>
+                About
+              </Button>
+              <Button variant="ghost" className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white" onClick={() => navigate('/contact')}>
+                Contact
+              </Button>
+            </div>
+          </div>
+          <div className="mt-4 text-center md:text-left">
+            <p className="text-xs text-gray-500 dark:text-gray-500">© {new Date().getFullYear()} Briki. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
