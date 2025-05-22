@@ -12,7 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { InsurancePlan as BasePlan, CompanyProfile, InsuranceCategory } from "@shared/types";
-import { AuthenticatedLayout } from "@/components/layout";
+import CompanyLayout from "@/components/layout/company-layout";
 
 // Extended InsurancePlan type that includes our dashboard-specific fields
 interface ExtendedInsurancePlan extends BasePlan {
@@ -132,7 +132,7 @@ export default function CompanyDashboard() {
   };
 
   return (
-    <AuthenticatedLayout>
+    <CompanyLayout activeNav="dashboard">
       <div className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full bg-gradient-to-b from-slate-900 to-black text-white">
         <div className="p-4 md:p-6 space-y-6">
           {/* Welcome section */}
