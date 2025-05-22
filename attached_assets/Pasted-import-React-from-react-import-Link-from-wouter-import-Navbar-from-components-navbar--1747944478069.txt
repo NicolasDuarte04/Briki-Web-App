@@ -1,14 +1,17 @@
 import React from "react";
 import { Link } from "wouter";
+import Navbar from "@/components/navbar";
+import Footer from "@/components/footer";
 import { ArrowLeft } from "lucide-react";
 import { useLanguage } from "@/components/language-selector";
-import { PublicLayout } from "@/components/layout/public-layout";
 
 export default function TermsPage() {
   const { t } = useLanguage();
 
   return (
-    <PublicLayout>
+    <div className="min-h-screen flex flex-col">
+      <Navbar />
+
       <div className="flex-grow">
         <div className="briki-mobile-container">
           <div className="mb-8">
@@ -101,6 +104,8 @@ export default function TermsPage() {
           </div>
         </div>
       </div>
-    </PublicLayout>
+
+      <Footer />
+    </div>
   );
 }

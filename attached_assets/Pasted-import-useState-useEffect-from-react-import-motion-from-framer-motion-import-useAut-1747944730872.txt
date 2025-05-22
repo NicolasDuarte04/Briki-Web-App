@@ -10,7 +10,7 @@ import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
 // Import layout components
-import { PublicLayout } from "@/components/layout/public-layout";
+import Navbar from "@/components/navbar";
 
 // Import our enhanced components
 import AnimatedBackground from "@/components/animated-background";
@@ -202,7 +202,10 @@ export default function AuthPageEnhanced() {
   }, [registerMutation.isError, toast]);
 
   return (
-    <PublicLayout>
+    <div className="min-h-screen flex flex-col">
+      {/* Use the shared Navbar component */}
+      <Navbar />
+
       {/* Auth content area */}
       <AnimatedBackground variant="auth" className="flex flex-1 items-center justify-center px-4 py-12">
         {/* Floating decorative elements with subtle gradient overlay */}
@@ -530,6 +533,6 @@ export default function AuthPageEnhanced() {
           </div>
         </div>
       </AnimatedBackground>
-    </PublicLayout>
+    </div>
   );
 }

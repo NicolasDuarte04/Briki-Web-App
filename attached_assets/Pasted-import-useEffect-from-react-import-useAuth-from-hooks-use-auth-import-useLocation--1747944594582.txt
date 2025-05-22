@@ -11,12 +11,12 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { AuthenticatedLayout } from "@/components/layout";
+import Footer from "@/components/footer";
 
 export default function SettingsPage() {
   const { user, isLoading } = useAuth();
   const [, navigate] = useLocation();
-
+  
   useEffect(() => {
     if (!isLoading && !user) {
       navigate("/auth");
@@ -49,12 +49,12 @@ export default function SettingsPage() {
   ];
 
   return (
-    <AuthenticatedLayout>
-      <main className="flex-1 bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <main className="flex-1">
         <div className="container px-4 py-8 mx-auto max-w-6xl">
           <motion.div {...containerAnimationProps}>
             <h1 className="text-3xl font-bold mb-6">Settings</h1>
-
+            
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
               {/* Sidebar */}
               <div className="md:col-span-3">
@@ -78,7 +78,7 @@ export default function SettingsPage() {
                   </CardContent>
                 </Card>
               </div>
-
+              
               {/* Main content */}
               <div className="md:col-span-9">
                 <Tabs defaultValue="account" className="w-full">
@@ -90,7 +90,7 @@ export default function SettingsPage() {
                       </TabsTrigger>
                     ))}
                   </TabsList>
-
+                  
                   {/* Account Settings */}
                   <TabsContent value="account">
                     <Card>
@@ -117,7 +117,7 @@ export default function SettingsPage() {
                             <Input id="phone" type="tel" placeholder="Enter your phone number" />
                           </div>
                         </div>
-
+                        
                         <div className="border-t pt-6">
                           <h3 className="text-lg font-medium mb-4">Profile Picture</h3>
                           <div className="flex items-center gap-4">
@@ -132,7 +132,7 @@ export default function SettingsPage() {
                             </div>
                           </div>
                         </div>
-
+                        
                         <div className="border-t pt-6">
                           <h3 className="text-lg font-medium mb-4">Delete Account</h3>
                           <p className="text-sm text-gray-500 mb-4">
@@ -142,7 +142,7 @@ export default function SettingsPage() {
                             Delete Account
                           </AnimatedButton>
                         </div>
-
+                        
                         <div className="flex justify-end space-x-4 pt-4 border-t">
                           <AnimatedButton variant="outline">
                             Cancel
@@ -154,7 +154,7 @@ export default function SettingsPage() {
                       </CardContent>
                     </Card>
                   </TabsContent>
-
+                  
                   {/* Notifications Settings */}
                   <TabsContent value="notifications">
                     <Card>
@@ -189,7 +189,7 @@ export default function SettingsPage() {
                             </div>
                           </div>
                         </div>
-
+                        
                         <div className="border-t pt-6">
                           <h3 className="text-lg font-medium mb-4">SMS Notifications</h3>
                           <div className="space-y-4">
@@ -209,7 +209,7 @@ export default function SettingsPage() {
                             </div>
                           </div>
                         </div>
-
+                        
                         <div className="border-t pt-6">
                           <h3 className="text-lg font-medium mb-4">In-App Notifications</h3>
                           <div className="space-y-4">
@@ -222,7 +222,7 @@ export default function SettingsPage() {
                             </div>
                           </div>
                         </div>
-
+                        
                         <div className="flex justify-end space-x-4 pt-4 border-t">
                           <AnimatedButton variant="outline">
                             Cancel
@@ -234,7 +234,7 @@ export default function SettingsPage() {
                       </CardContent>
                     </Card>
                   </TabsContent>
-
+                  
                   {/* Payment Methods Settings */}
                   <TabsContent value="payment">
                     <Card>
@@ -262,12 +262,12 @@ export default function SettingsPage() {
                               </div>
                             </div>
                           </div>
-
+                          
                           <AnimatedButton className="mt-4">
                             Add Payment Method
                           </AnimatedButton>
                         </div>
-
+                        
                         <div className="border-t pt-6">
                           <h3 className="text-lg font-medium mb-4">Billing Address</h3>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -293,7 +293,7 @@ export default function SettingsPage() {
                             </div>
                           </div>
                         </div>
-
+                        
                         <div className="flex justify-end space-x-4 pt-4 border-t">
                           <AnimatedButton variant="outline">
                             Cancel
@@ -305,7 +305,7 @@ export default function SettingsPage() {
                       </CardContent>
                     </Card>
                   </TabsContent>
-
+                  
                   {/* Insurance Settings */}
                   <TabsContent value="insurance">
                     <Card>
@@ -340,7 +340,7 @@ export default function SettingsPage() {
                             </div>
                           </div>
                         </div>
-
+                        
                         <div className="border-t pt-6">
                           <h3 className="text-lg font-medium mb-4">Medical Information</h3>
                           <div className="space-y-4">
@@ -359,7 +359,7 @@ export default function SettingsPage() {
                             </div>
                           </div>
                         </div>
-
+                        
                         <div className="border-t pt-6">
                           <h3 className="text-lg font-medium mb-4">Preferred Providers</h3>
                           <div className="space-y-4">
@@ -400,7 +400,7 @@ export default function SettingsPage() {
                             </div>
                           </div>
                         </div>
-
+                        
                         <div className="flex justify-end space-x-4 pt-4 border-t">
                           <AnimatedButton variant="outline">
                             Cancel
@@ -412,7 +412,7 @@ export default function SettingsPage() {
                       </CardContent>
                     </Card>
                   </TabsContent>
-
+                  
                   {/* Region Settings */}
                   <TabsContent value="region">
                     <Card>
@@ -434,7 +434,7 @@ export default function SettingsPage() {
                             </div>
                           </div>
                         </div>
-
+                        
                         <div className="border-t pt-6">
                           <h3 className="text-lg font-medium mb-4">Regional Settings</h3>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -462,7 +462,7 @@ export default function SettingsPage() {
                             </div>
                           </div>
                         </div>
-
+                        
                         <div className="border-t pt-6">
                           <h3 className="text-lg font-medium mb-4">Date & Time Format</h3>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -483,7 +483,7 @@ export default function SettingsPage() {
                             </div>
                           </div>
                         </div>
-
+                        
                         <div className="flex justify-end space-x-4 pt-4 border-t">
                           <AnimatedButton variant="outline">
                             Cancel
@@ -495,7 +495,7 @@ export default function SettingsPage() {
                       </CardContent>
                     </Card>
                   </TabsContent>
-
+                  
                   {/* Security Settings */}
                   <TabsContent value="security">
                     <Card>
@@ -526,7 +526,7 @@ export default function SettingsPage() {
                             </AnimatedButton>
                           </div>
                         </div>
-
+                        
                         <div className="border-t pt-6">
                           <h3 className="text-lg font-medium mb-4">Two-Factor Authentication</h3>
                           <div className="flex items-center justify-between mb-4">
@@ -540,7 +540,7 @@ export default function SettingsPage() {
                             Two-factor authentication adds an extra layer of security to your account by requiring more than just a password to sign in.
                           </div>
                         </div>
-
+                        
                         <div className="border-t pt-6">
                           <h3 className="text-lg font-medium mb-4">Session Management</h3>
                           <div className="space-y-4">
@@ -563,7 +563,7 @@ export default function SettingsPage() {
                             </AnimatedButton>
                           </div>
                         </div>
-
+                        
                         <div className="border-t pt-6">
                           <h3 className="text-lg font-medium mb-4">Privacy Settings</h3>
                           <div className="space-y-4">
@@ -583,7 +583,7 @@ export default function SettingsPage() {
                             </div>
                           </div>
                         </div>
-
+                        
                         <div className="flex justify-end space-x-4 pt-4 border-t">
                           <AnimatedButton variant="outline">
                             Cancel
@@ -601,6 +601,7 @@ export default function SettingsPage() {
           </motion.div>
         </div>
       </main>
-    </AuthenticatedLayout>
+      <Footer />
+    </div>
   );
 }
