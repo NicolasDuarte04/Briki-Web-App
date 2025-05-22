@@ -29,8 +29,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import Navbar from "@/components/navbar";
-import { FloatingAssistantButton } from "@/components/layout/floating-assistant-button";
+import { AuthenticatedLayout } from "@/components/layout";
 import { Link } from "wouter";
 
 type CompanyLayoutProps = {
@@ -94,7 +93,7 @@ const navItems = [
 
 /**
  * Company layout with the futuristic navy-based color palette for the B2B portal
- * Now using the shared Navbar component
+ * Wrapped in AuthenticatedLayout to maintain consistent layout hierarchy
  */
 export default function CompanyLayout({ children, pageTitle = "Dashboard", activeNav = "dashboard" }: CompanyLayoutProps) {
   const [location] = useLocation();
@@ -124,103 +123,99 @@ export default function CompanyLayout({ children, pageTitle = "Dashboard", activ
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#001A40] via-[#00142E] to-black text-white">
-      {/* Use the shared Navbar component */}
-      <Navbar />
+    <AuthenticatedLayout>
+      <div className="min-h-screen bg-gradient-to-b from-[#001A40] via-[#00142E] to-black text-white">
+        {/* Mobile menu sheet for B2B-specific navigation */}
+        <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+          <SheetTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden fixed bottom-4 right-4 z-50 bg-[#002C7A] text-white shadow-[0_0_15px_rgba(51,191,255,0.3)] hover:bg-[#003087]"
+              onClick={() => setIsMobileMenuOpen(true)}
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="sm:max-w-md bg-[#001A40] border-r border-[#002C7A] text-white">
+            <SheetHeader className="border-b border-[#002C7A] pb-6 mb-6">
+              <SheetTitle className="text-left">
+                <div className="flex items-center">
+                  <span className="text-xl font-bold">
+                    Briki Pilot
+                  </span>
+                </div>
+                <p className="text-sm text-gray-400 mt-1">Partner Portal</p>
+              </SheetTitle>
+            </SheetHeader>
 
-      {/* Mobile menu sheet for B2B-specific navigation */}
-      <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-        <SheetTrigger asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden fixed bottom-4 right-4 z-50 bg-[#002C7A] text-white shadow-[0_0_15px_rgba(51,191,255,0.3)] hover:bg-[#003087]"
-            onClick={() => setIsMobileMenuOpen(true)}
-          >
-            <Menu className="h-5 w-5" />
-          </Button>
-        </SheetTrigger>
-        <SheetContent side="left" className="sm:max-w-md bg-[#001A40] border-r border-[#002C7A] text-white">
-          <SheetHeader className="border-b border-[#002C7A] pb-6 mb-6">
-            <SheetTitle className="text-left">
-              <div className="flex items-center">
-                <span className="text-xl font-bold">
-                  Briki Pilot
-                </span>
+            <nav className="space-y-1">
+              {navItems.map((item) => (
+                <Link 
+                  key={item.path} 
+                  href={item.comingSoon ? "#" : item.path}
+                  className={`
+                    flex items-center px-4 py-3 rounded-lg text-sm font-medium transition-colors relative
+                    ${isActiveNav(item.id) 
+                      ? "bg-[#002C7A] text-white" 
+                      : "text-gray-300 hover:bg-[#001E47] hover:text-white"}
+                  `}
+                  onClick={(e) => {
+                    if (item.comingSoon) {
+                      e.preventDefault();
+                    } else {
+                      setIsMobileMenuOpen(false);
+                    }
+                  }}
+                >
+                  <span className="mr-3 text-[#33BFFF]">{item.icon}</span>
+                  {item.name}
+                  {item.comingSoon && (
+                    <span className="absolute right-4 text-xs font-semibold px-2 py-0.5 rounded-full bg-[#002C7A] text-[#33BFFF] border border-[#0074FF]/30">
+                      Soon
+                    </span>
+                  )}
+                </Link>
+              ))}
+            </nav>
+
+            <div className="pt-6 mt-6 border-t border-[#002C7A]">
+              <div className="flex items-center mb-6">
+                <Avatar className="h-8 w-8 border border-[#0074FF]/30 bg-[#002C7A]">
+                  <AvatarImage
+                    src={`https://api.dicebear.com/7.x/initials/svg?seed=${getInitials()}`}
+                    alt={getCompanyName()}
+                  />
+                  <AvatarFallback className="text-xs font-medium text-white">
+                    {getInitials()}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="ml-3 overflow-hidden">
+                  <p className="text-sm font-medium text-white truncate">{getCompanyName()}</p>
+                  <p className="text-xs text-gray-400 truncate">{user?.email}</p>
+                </div>
               </div>
-              <p className="text-sm text-gray-400 mt-1">Partner Portal</p>
-            </SheetTitle>
-          </SheetHeader>
 
-          <nav className="space-y-1">
-            {navItems.map((item) => (
-              <Link 
-                key={item.path} 
-                href={item.comingSoon ? "#" : item.path}
-                className={`
-                  flex items-center px-4 py-3 rounded-lg text-sm font-medium transition-colors relative
-                  ${isActiveNav(item.id) 
-                    ? "bg-[#002C7A] text-white" 
-                    : "text-gray-300 hover:bg-[#001E47] hover:text-white"}
-                `}
-                onClick={(e) => {
-                  if (item.comingSoon) {
-                    e.preventDefault();
-                  } else {
-                    setIsMobileMenuOpen(false);
-                  }
+              <Button 
+                variant="ghost" 
+                className="w-full justify-start text-gray-300 hover:text-white hover:bg-[#002C7A]"
+                onClick={() => {
+                  logoutMutation.mutate();
+                  setIsMobileMenuOpen(false);
                 }}
               >
-                <span className="mr-3 text-[#33BFFF]">{item.icon}</span>
-                {item.name}
-                {item.comingSoon && (
-                  <span className="absolute right-4 text-xs font-semibold px-2 py-0.5 rounded-full bg-[#002C7A] text-[#33BFFF] border border-[#0074FF]/30">
-                    Soon
-                  </span>
-                )}
-              </Link>
-            ))}
-          </nav>
-
-          <div className="pt-6 mt-6 border-t border-[#002C7A]">
-            <div className="flex items-center mb-6">
-              <Avatar className="h-8 w-8 border border-[#0074FF]/30 bg-[#002C7A]">
-                <AvatarImage
-                  src={`https://api.dicebear.com/7.x/initials/svg?seed=${getInitials()}`}
-                  alt={getCompanyName()}
-                />
-                <AvatarFallback className="text-xs font-medium text-white">
-                  {getInitials()}
-                </AvatarFallback>
-              </Avatar>
-              <div className="ml-3 overflow-hidden">
-                <p className="text-sm font-medium text-white truncate">{getCompanyName()}</p>
-                <p className="text-xs text-gray-400 truncate">{user?.email}</p>
-              </div>
+                <LogOut className="mr-2 h-4 w-4" />
+                Sign out
+              </Button>
             </div>
+          </SheetContent>
+        </Sheet>
 
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start text-gray-300 hover:text-white hover:bg-[#002C7A]"
-              onClick={() => {
-                logoutMutation.mutate();
-                setIsMobileMenuOpen(false);
-              }}
-            >
-              <LogOut className="mr-2 h-4 w-4" />
-              Sign out
-            </Button>
-          </div>
-        </SheetContent>
-      </Sheet>
-
-      {/* Main content area */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {children}
-      </main>
-
-      {/* Optional floating assistant button */}
-      <FloatingAssistantButton />
-    </div>
+        {/* Main content area */}
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {children}
+        </main>
+      </div>
+    </AuthenticatedLayout>
   );
 }
