@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { useEffect } from "react";
+import Footer from "@/components/footer";
 import { 
   Hero, 
   AiAssistantSection,
@@ -13,7 +14,7 @@ import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/components/language-selector";
-import { PublicLayout } from "@/components/layout/public-layout";
+import Navbar from "@/components/navbar";
 
 /**
  * The new dual-audience landing page for Briki
@@ -55,26 +56,29 @@ export default function LandingPage() {
   };
 
   return (
-    <PublicLayout>
+    <div className="min-h-screen flex flex-col">
+      {/* Custom navbar - sticky with backdrop blur */}
+      <Navbar />
+      
       <main className="flex-grow">
         {/* Hero Section - Consumer Section */}
         <Hero />
-
+        
         {/* AI Assistant Section - Highlight New Feature */}
         <AiAssistantSection />
-
+        
         {/* Features Section - Consumer Benefits */}
         <Features />
-
+        
         {/* Partner Section - B2B focused */}
         <PartnerSection />
-
+        
         {/* Testimonials from both consumers and partners */}
         <Testimonials />
-
+        
         {/* CTA with Countdown */}
         {FEATURES.SHOW_COUNTDOWN && <CTASection />}
-
+        
         {/* SEO and Accessibility Enhancements */}
         <motion.section
           initial="hidden"
@@ -108,6 +112,8 @@ export default function LandingPage() {
           </div>
         </motion.section>
       </main>
-    </PublicLayout>
+      
+      <Footer />
+    </div>
   );
 }
