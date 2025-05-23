@@ -411,7 +411,7 @@ export default function TripInfoPage() {
                   <AnimatedButton
                     type="submit"
                     disabled={formState.isSubmitting}
-                    loading={createTripMutation.isPending}
+                    isLoading={createTripMutation.isPending}
                     animationType="pulse"
                     className="w-full md:w-auto text-lg px-8 py-6"
                   >
