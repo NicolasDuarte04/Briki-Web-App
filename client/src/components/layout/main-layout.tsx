@@ -55,8 +55,14 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
   const { toggleAssistant } = useAIAssistant();
   
   // Check if current page should show AI Assistant
+  // Now we show AI Assistant on app pages regardless of auth status
   const excludedPaths = ['/', '/auth', '/countdown', '/login', '/register', '/terms', '/learn-more', '/landing'];
-  const showAIAssistant = user && !excludedPaths.some(path => location === path || location.startsWith(`${path}/`));
+  const publicAppRoutes = ['/trip-info', '/get-quote', '/dashboard', '/insurance'];
+  const isPublicAppRoute = publicAppRoutes.some(path => 
+    location === path || location.startsWith(path)
+  );
+  const showAIAssistant = (user || isPublicAppRoute) && 
+    !excludedPaths.some(path => location === path || location.startsWith(`${path}/`));
   
   // Handle scroll effect for transparent-to-solid transition
   useEffect(() => {
