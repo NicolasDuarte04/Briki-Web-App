@@ -57,10 +57,7 @@ export default function LandingPage() {
   return (
     <PublicLayout>
       <main className="flex-grow">
-        {/* Hero Section - Consumer Section */}
-        <Hero />
-
-        {/* AI Assistant Section - Highlight New Feature */}
+        {/* AI Assistant Section - Our main value proposition */}
         <AiAssistantSection />
 
         {/* Features Section - Consumer Benefits */}

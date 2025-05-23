@@ -12,6 +12,10 @@ export default function AiAssistantSection() {
   const handleTryAssistant = () => {
     navigate('/assistant');
   };
+  
+  const handlePreTestClick = () => {
+    navigate('/auth');
+  };
 
   return (
     <section className="w-full py-16 md:py-24 bg-gradient-to-br from-blue-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900 overflow-hidden relative">
@@ -141,23 +145,43 @@ export default function AiAssistantSection() {
               </motion.div>
             </div>
             
-            {/* CTA button */}
+            {/* CTA buttons - now featuring both options */}
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.6 }}
+              className="flex flex-col sm:flex-row gap-4 justify-center mt-4"
             >
               <GradientButton
                 onClick={handleTryAssistant}
-                className="mt-2 text-base py-6 px-8 font-medium shadow-lg"
+                className="text-base py-6 px-8 font-medium shadow-lg"
                 gradientFrom="from-blue-600"
                 gradientTo="to-cyan-500"
                 icon={<ArrowRight className="ml-2 h-5 w-5" />}
               >
                 Try the AI Assistant
               </GradientButton>
+              
+              <GradientButton
+                onClick={handlePreTestClick}
+                className="text-base py-6 px-8 font-medium shadow-lg"
+                gradientFrom="from-indigo-600"
+                gradientTo="to-blue-500"
+                icon={<ArrowRight className="ml-2 h-5 w-5" />}
+              >
+                Pre-Test the App
+              </GradientButton>
             </motion.div>
+            <motion.p 
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.8 }}
+              className="mt-3 text-sm text-center text-slate-600 dark:text-slate-400"
+            >
+              Beta access now open.
+            </motion.p>
           </motion.div>
           
           {/* Assistant preview mockup */}
