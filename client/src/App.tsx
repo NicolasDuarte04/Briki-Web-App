@@ -220,7 +220,7 @@ function AppContent() {
   const { user } = useAuth();
   
   // List of paths where AI Assistant should NOT be provided
-  const excludedPaths = ['/', '/auth', '/countdown', '/login', '/register', '/terms', '/learn-more', '/landing'];
+  const excludedPaths = ['/', '/auth', '/countdown', '/login', '/register', '/terms', '/learn-more', '/landing', '/ask-briki'];
   const isExcludedPath = excludedPaths.some(path => 
     location === path || location.startsWith(`${path}/`)
   );
