@@ -94,7 +94,12 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
       return user.name[0].toUpperCase();
     }
     
-    return user.username[0].toUpperCase();
+    if (user.username) {
+      return user.username[0].toUpperCase();
+    }
+    
+    // Fallback to email or generic avatar
+    return user.email ? user.email[0].toUpperCase() : "U";
   };
   
   // Active path helper
@@ -193,7 +198,7 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
                       <Avatar className="h-8 w-8">
                         <AvatarImage
                           src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserInitials()}`}
-                          alt={user.username}
+                          alt={(user.username as string) || user.email || 'User'}
                         />
                         <AvatarFallback>{getUserInitials()}</AvatarFallback>
                       </Avatar>
@@ -256,6 +261,20 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
                   <span>For Insurance Companies</span>
                   <span className="ml-2 text-xs opacity-70">→</span>
                 </Button>
+                
+                {/* AI Assistant Button for anonymous users on public app routes */}
+                {!user && showAIAssistant && (
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="relative p-2 rounded-full text-blue-500 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/10"
+                    onClick={toggleAssistant}
+                  >
+                    <span className="sr-only">Open AI Assistant</span>
+                    <Bot className="h-5 w-5" />
+                    <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-blue-500 ring-2 ring-white dark:ring-gray-900"></span>
+                  </Button>
+                )}
                 
                 {/* Auth Buttons */}
                 <Button 
@@ -355,13 +374,13 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
                               <Avatar>
                                 <AvatarImage
                                   src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserInitials()}`}
-                                  alt={user.username}
+                                  alt={(user.username as string) || user.email || 'User'}
                                 />
                                 <AvatarFallback>{getUserInitials()}</AvatarFallback>
                               </Avatar>
                             </div>
                             <div className="ml-3">
-                              <div className="text-base font-medium text-gray-800">{user.username}</div>
+                              <div className="text-base font-medium text-gray-800">{user.username || user.name || 'User'}</div>
                               <div className="text-sm font-medium text-gray-500">{user.email}</div>
                             </div>
                           </div>
