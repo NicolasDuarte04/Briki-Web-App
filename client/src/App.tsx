@@ -17,6 +17,7 @@ import { useEffect } from "react";
 import { initGA, trackEvent } from "@/lib/analytics";
 import { EventCategory } from "@/constants/analytics";
 import { ColorProvider } from "@/contexts/color-context";
+import { AnonymousUserProvider } from "@/contexts/anonymous-user-context";
 
 import NotFound from "@/pages/not-found";
 import LandingPage from "@/pages/landing-page";
@@ -219,21 +220,28 @@ function AppContent() {
   const { location } = useNavigation();
   const { user } = useAuth();
   
+  // Public app routes that don't require authentication
+  const publicAppRoutes = ['/trip-info', '/get-quote', '/dashboard', '/insurance'];
+  const isPublicAppRoute = publicAppRoutes.some(path => 
+    location === path || location.startsWith(path)
+  );
+  
   // List of paths where AI Assistant should NOT be provided
   const excludedPaths = ['/', '/auth', '/countdown', '/login', '/register', '/terms', '/learn-more', '/landing', '/ask-briki'];
   const isExcludedPath = excludedPaths.some(path => 
     location === path || location.startsWith(`${path}/`)
   );
   
-  // Debug logging for AI assistant visibility
-  console.log("App render - AI Assistant visibility:", { 
+  // Debug logging for app render
+  console.log("App render - Layout selection:", { 
     path: location, 
     isAuthenticated: !!user, 
     isExcludedPath,
-    shouldShowAI: !!user && !isExcludedPath
+    isPublicAppRoute,
+    shouldShowAI: (!!user || isPublicAppRoute) && !isExcludedPath
   });
   
-  // Only show AI Assistant if user is logged in AND not on excluded paths
+  // For authenticated users on app pages - use AuthenticatedLayout with assistant
   if (user && !isExcludedPath) {
     return (
       <AIAssistantProvider>
@@ -255,7 +263,18 @@ function AppContent() {
     return <Router />;
   }
   
-  // Use MainLayout for B2C routes but not for auth pages (they have their own optimized layout)
+  // For public app routes - use MainLayout with limited assistant
+  if (isPublicAppRoute) {
+    return (
+      <AIAssistantProvider>
+        <MainLayout>
+          <Router />
+        </MainLayout>
+      </AIAssistantProvider>
+    );
+  }
+  
+  // Use MainLayout for other B2C routes but not for auth pages
   if (location !== '/auth' && !location.startsWith('/company') && !location.startsWith('/briki-pilot')) {
     return (
       <AIAssistantProvider>
@@ -283,16 +302,18 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <ColorProvider>
-          <LanguageProvider>
-            <RecentlyViewedProvider>
-              <TooltipProvider>
-                <Toaster />
-                <AppContent />
-              </TooltipProvider>
-            </RecentlyViewedProvider>
-          </LanguageProvider>
-        </ColorProvider>
+        <AnonymousUserProvider>
+          <ColorProvider>
+            <LanguageProvider>
+              <RecentlyViewedProvider>
+                <TooltipProvider>
+                  <Toaster />
+                  <AppContent />
+                </TooltipProvider>
+              </RecentlyViewedProvider>
+            </LanguageProvider>
+          </ColorProvider>
+        </AnonymousUserProvider>
       </AuthProvider>
     </QueryClientProvider>
   );

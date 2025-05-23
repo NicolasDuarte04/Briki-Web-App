@@ -1,6 +1,5 @@
 import { AnonymousUserData } from '@/contexts/anonymous-user-context';
 import { User } from '@/contexts/AuthContext';
-import { apiRequest } from '@/lib/queryClient';
 
 /**
  * Handles migration of anonymous user data to authenticated user account
@@ -29,12 +28,21 @@ export async function migrateAnonymousDataToUser(
     };
     
     // Send data to API
-    const response = await apiRequest('/api/users/migrate-anonymous-data', {
+    const response = await fetch('/api/users/migrate-anonymous-data', {
       method: 'POST',
-      body: JSON.stringify(migrationPayload)
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(migrationPayload),
+      credentials: 'include'
     });
     
-    return response.success === true;
+    if (!response.ok) {
+      throw new Error(`API request failed: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data.success === true;
   } catch (error) {
     console.error('Failed to migrate anonymous data:', error);
     return false;
@@ -72,11 +80,20 @@ export function clearAnonymousData(): void {
  */
 export async function retrievePublicQuote(quoteTrackingId: string): Promise<any> {
   try {
-    const response = await apiRequest(`/api/quotes/public/${quoteTrackingId}`, {
-      method: 'GET'
+    const response = await fetch(`/api/quotes/public/${quoteTrackingId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include'
     });
     
-    return response.quote || null;
+    if (!response.ok) {
+      throw new Error(`API request failed: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data.quote || null;
   } catch (error) {
     console.error('Failed to retrieve public quote:', error);
     return null;
