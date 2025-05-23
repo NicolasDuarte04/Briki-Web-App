@@ -1,0 +1,117 @@
+Here’s the complete, polished prompt you can copy-paste and send directly to your dev agent. It’s structured, clear, and ready to execute:
+
+⸻
+
+Tarea: Implementar un flujo simulado del Asistente de Briki (Mock UI + Respuestas)
+
+Estamos en etapa de validación con inversionistas y equipo de producto. Como el asistente aún no está conectado a OpenAI (por temas de billing), necesitamos mostrar el flujo como si estuviera funcionando, usando respuestas prefabricadas en el frontend para ciertos prompts.
+
+⸻
+
+Objetivo del flujo
+	•	Simular una conversación realista en la pantalla /ask-briki (o TryTheAssistant desde el landing).
+	•	Mostrar respuestas útiles y visualmente pulidas cuando el usuario escribe ciertas preguntas clave.
+	•	Evitar el mensaje de error (“no puedo responder ahora”) y reemplazarlo con contenido atractivo.
+	•	El resto de preguntas que no coincidan mostrarán un mensaje genérico y amigable.
+
+⸻
+
+¿Qué debe hacer el asistente?
+	1.	Interceptar la entrada del usuario antes de enviarla a OpenAI.
+	2.	Comparar el input con una lista de mock prompts.
+	3.	Si coincide con alguno:
+	•	Mostrar un texto explicativo.
+	•	Renderizar 3 tarjetas de planes (con el estilo de AiAssistantSection.tsx).
+	•	Mostrar un botón de llamada a la acción que dirija al listado completo de planes.
+	4.	Si no coincide:
+	•	Mostrar: "Briki está en mantenimiento, pero pronto volveré con respuestas personalizadas."
+
+⸻
+
+Pregunta mock implementada
+
+// utils/mockAssistantResponses.ts
+export const mockPrompts = [
+  {
+    match: "compré una Vespa y quiero asegurarla",
+    response: {
+      text: "¡Buena elección! Asegurar tu Vespa en Colombia es clave para protegerte ante robos, accidentes o daños. Aquí tienes tres opciones ideales para ti:",
+      plans: [
+        {
+          name: "MotoProtect Plus",
+          price: "$52.000/mes",
+          features: [
+            "Cobertura contra robo total",
+            "Asistencia en carretera 24/7",
+            "Protección de daños a terceros"
+          ],
+          badge: "Recomendado para motos nuevas"
+        },
+        {
+          name: "Plan Básico Vespa",
+          price: "$39.000/mes",
+          features: [
+            "Cobertura por accidentes",
+            "Defensa jurídica incluida",
+            "Revisión técnica anual gratis"
+          ],
+          badge: "Económico"
+        },
+        {
+          name: "MotoTotal VIP",
+          price: "$74.000/mes",
+          features: [
+            "Cobertura total con deducible bajo",
+            "Reemplazo por daño total",
+            "Asistencia médica y grúa premium"
+          ],
+          badge: "Cobertura total"
+        }
+      ],
+      cta: {
+        label: "Ver todos los planes de moto",
+        href: "/insurance/auto"
+      }
+    }
+  }
+];
+
+
+⸻
+
+Lógica de manejo
+
+const matchedPrompt = mockPrompts.find(p =>
+  userMessage.toLowerCase().includes(p.match.toLowerCase())
+);
+
+if (matchedPrompt) {
+  displayAssistantMessage(matchedPrompt.response.text);
+  displayPlanCards(matchedPrompt.response.plans);
+  displayCTAButton(matchedPrompt.response.cta);
+} else {
+  displayAssistantMessage("Briki está en mantenimiento, pero pronto volveré con respuestas personalizadas.");
+}
+
+
+⸻
+
+Detalles visuales
+	•	Utilizar los componentes y estilos del archivo AiAssistantSection.tsx para:
+	•	Burbujas de usuario y asistente (rounded-xl, shadow-sm, bg-blue-600, etc.)
+	•	Animaciones con Framer Motion si es posible
+	•	Estilo de tarjetas de plan con badges, color-coding y precio visible
+	•	Reutilizar o extraer un componente PlanRecommendationCard para mostrar los planes
+
+⸻
+
+Consideraciones
+	•	No se debe enviar nada al backend por ahora
+	•	Este flujo es puramente visual e interactivo para demo purposes
+	•	Prioridad: Funcionalidad limpia, coherente con el diseño actual y buena experiencia de usuario
+
+⸻
+
+¿Puedes implementar esto en la vista /ask-briki y conectar el botón del landing page (Try the AI Assistant) a esta vista como primera entrada del flujo?
+
+Avísame si necesitas más prompts de ejemplo para otros ramos de seguro (viajes, salud, hogar).

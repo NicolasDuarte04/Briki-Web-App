@@ -41,6 +41,7 @@ import ComparePlansFixed from "@/pages/compare-plans-fixed";  // Fixed version o
 import FeaturesPage from "@/pages/features";
 import PricingPage from "@/pages/pricing";
 import AskBrikiPage from "@/pages/ask-briki";
+import AskBrikiMockPage from "@/pages/ask-briki-mock";
 import BlogPage from "@/pages/blog";
 import ForumPage from "@/pages/forum";
 import CareersPage from "@/pages/careers";
@@ -202,6 +203,7 @@ function Router() {
         <Route path="/features" component={FeaturesPage} />
         <Route path="/pricing" component={PricingPage} />
         <Route path="/ask-briki" component={AskBrikiPage} />
+        <Route path="/ask-briki-mock" component={AskBrikiMockPage} />
         <Route path="/blog" component={BlogPage} />
         <Route path="/forum" component={ForumPage} />
         <Route path="/careers" component={CareersPage} />
