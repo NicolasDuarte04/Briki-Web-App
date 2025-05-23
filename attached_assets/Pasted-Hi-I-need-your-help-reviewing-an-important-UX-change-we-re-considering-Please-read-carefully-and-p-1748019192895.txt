@@ -1,0 +1,38 @@
+Hi, I need your help reviewing an important UX change we’re considering. Please read carefully and provide a diagnosis of the current architecture, answer the following questions, and propose a clean strategy for implementation — but do not make any changes yet until we give the go-ahead.
+
+⸻
+
+Context:
+
+We want to allow new users to experience the app without requiring authentication first. Specifically:
+	•	When a user clicks “Pre-Test the App” on the landing page, they should go directly to a public quote flow or assistant interaction (e.g. /dashboard, /get-quote, or /trip-info) without logging in.
+	•	Login should only be required when the user takes a critical action like saving a plan, buying a policy, or viewing quote history.
+	•	The experience should feel fun, low-friction, and guided by curiosity — not gated by login walls.
+
+⸻
+
+Questions to Answer:
+	1.	Current Structure
+	•	Which routes in the app currently require authentication?
+	•	Is the /trip-info, /dashboard, or /get-quote route protected by default?
+	•	Is the AI Assistant currently public or behind login?
+	2.	Quote Flow Accessibility
+	•	What’s the technical logic currently triggering redirects to /auth?
+	•	Is there a wrapper or hook (e.g. useAuthRedirect) responsible for forcing authentication?
+	3.	Session Management
+	•	How are we currently managing session state for logged-in users?
+	•	Is it possible to track anonymous activity (e.g. sessionStorage or localStorage) until the user logs in?
+	4.	What’s Working
+	•	What parts of the current flow already support unauthenticated users?
+	•	Can users reach any interactive flow without logging in today?
+	5.	What Needs to Change
+	•	Which components or routes would need to be unguarded?
+	•	Where should conditional login prompts be implemented (e.g. “Log in to buy this plan”)?
+	6.	Your Proposal
+	•	How would you implement this public-first flow while preserving security and personalization?
+	•	Would you use feature flags, conditional redirects, or public route guards?
+	•	Are there any risks or caveats we should know before proceeding?
+
+⸻
+
+Again, please don’t edit anything yet. Just give us a comprehensive diagnosis + proposal so we can make a final call.
