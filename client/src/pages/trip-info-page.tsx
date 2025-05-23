@@ -101,6 +101,44 @@ export default function TripInfoPage() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
   const { t } = useLanguage();
+  const { user, isLoading: authLoading } = useAuth();
+  const { 
+    updateTempData, 
+    tempUserData, 
+    anonymousId
+  } = useAnonymousUser();
+  
+  // Load previous data from anonymous storage if available
+  useEffect(() => {
+    if (!authLoading && !user) {
+      if (tempUserData.tempQuoteData?.tripInfo) {
+        // Restore previous trip info data from anonymous storage
+        const savedData = tempUserData.tempQuoteData.tripInfo;
+        
+        try {
+          // Only set values if they exist in the previous data
+          const formValues: Partial<z.infer<typeof tripFormInputSchema>> = {};
+          
+          if (savedData.destination) formValues.destination = savedData.destination;
+          if (savedData.countryOfOrigin) formValues.countryOfOrigin = savedData.countryOfOrigin;
+          if (savedData.departureDate) formValues.departureDate = new Date(savedData.departureDate);
+          if (savedData.returnDate) formValues.returnDate = new Date(savedData.returnDate);
+          if (savedData.travelers) formValues.travelers = String(savedData.travelers);
+          if (savedData.primaryAge) formValues.primaryAge = String(savedData.primaryAge);
+          if (savedData.hasMedicalConditions !== undefined) {
+            formValues.hasMedicalConditions = savedData.hasMedicalConditions ? 'yes' : 'no';
+          }
+          if (savedData.priorities) {
+            formValues.priorities = savedData.priorities;
+          }
+          
+          form.reset(formValues);
+        } catch (error) {
+          console.error("Error restoring anonymous trip data:", error);
+        }
+      }
+    }
+  }, [authLoading, user, tempUserData]);
   
   const form = useForm<z.infer<typeof tripFormInputSchema>>({
     resolver: zodResolver(tripFormInputSchema),
@@ -120,58 +158,38 @@ export default function TripInfoPage() {
   
   const createTripMutation = useMutation({
     mutationFn: async (tripData: TripFormValues) => {
-      // Check if the user is logged in first via a quick auth check
       try {
-        const token = localStorage.getItem('auth_token');
-        
-        if (!token) {
-          console.log("No auth token found, user needs to log in");
-          throw new Error("Authentication required. Please log in to save trip details.");
-        }
-        
-        const authCheck = await fetch("/api/user", { 
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Cache-Control": "no-cache"
-          }
-        });
-        
-        if (authCheck.status === 401) {
-          console.log("Auth token invalid or expired");
-          localStorage.removeItem('auth_token'); // Clear invalid token
-          throw new Error("Authentication required. Please log in to save trip details.");
-        }
-        
-        // Map the form data to match the updated schema
-        const apiData = {
+        // Format the data for storage
+        const formattedTripData = {
           destination: tripData.destination,
-          countryOfOrigin: tripData.countryOfOrigin, // Use actual country of origin
+          countryOfOrigin: tripData.countryOfOrigin,
           departureDate: format(tripData.departureDate, "yyyy-MM-dd"),
           returnDate: format(tripData.returnDate, "yyyy-MM-dd"),
-          travelers: tripData.travelers, // Already transformed by schema
+          travelers: tripData.travelers,
+          primaryAge: tripData.primaryAge,
+          hasMedicalConditions: tripData.hasMedicalConditions,
+          priorities: tripData.priorities,
+          quoteTrackingId: generateQuoteTrackingId(), // Generate a unique ID for this quote
+          createdAt: new Date().toISOString()
         };
         
-        console.log("Sending trip data to API:", apiData);
-        // Get token again to make sure it's the latest
-        const currentToken = localStorage.getItem('auth_token');
-        if (!currentToken) {
-          throw new Error("Authentication token missing");
-        }
-        
-        // Use the token in the request
-        const res = await fetch("/api/trips", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${currentToken}`,
-            "Cache-Control": "no-cache"
-          },
-          body: JSON.stringify(apiData)
-        });
-        
-        console.log("Trip API response status:", res.status);
-        
-        if (!res.ok) {
+        // If user is authenticated, save trip to their account
+        if (user) {
+          console.log("Saving trip data for authenticated user:", user.id);
+          
+          const res = await fetch("/api/trips", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Cache-Control": "no-cache"
+            },
+            credentials: 'include',
+            body: JSON.stringify(formattedTripData)
+          });
+          
+          console.log("Trip API response status:", res.status);
+          
+          if (!res.ok) {
           // Try to get a detailed error message from the server
           let errorMessage = "Failed to save trip information";
           try {
