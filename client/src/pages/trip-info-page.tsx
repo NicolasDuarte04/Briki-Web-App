@@ -7,6 +7,9 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "@/hooks/use-auth";
+import { useAnonymousUser } from "@/hooks/use-anonymous-user";
+import { generateQuoteTrackingId } from "@/lib/anonymous-data-migration";
 
 // Layout is handled by App.tsx
 import { useLanguage } from "@/components/language-selector";
