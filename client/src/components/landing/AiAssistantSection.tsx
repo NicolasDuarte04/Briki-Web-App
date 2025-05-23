@@ -14,7 +14,7 @@ export default function AiAssistantSection() {
   };
   
   const handlePreTestClick = () => {
-    navigate('/dashboard');
+    navigate('/home');
   };
 
   return (
