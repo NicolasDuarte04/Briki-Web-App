@@ -1,0 +1,25 @@
+Hola. Queremos modificar el comportamiento actual del botón “Pre-test the app” en la landing page. Actualmente, cuando se presiona, el botón redirige al usuario a la pantalla de autenticación (/auth). Sin embargo, queremos que funcione de la siguiente manera:
+
+Nuevo Comportamiento Deseado:
+	•	Al presionar “Pre-test the app”, el usuario debe ser llevado directamente a la página /trip-info o al flujo de generación de cotización sin necesidad de autenticarse.
+	•	La autenticación debe ser opcional, y solo pedirse más adelante, si el usuario desea guardar una cotización, continuar con una compra o acceder a funcionalidades personalizadas.
+
+Por favor responde a las siguientes preguntas para que podamos implementar esto correctamente:
+	1.	¿Dónde se encuentra actualmente la lógica de redirección del botón “Pre-test the app”?
+	•	¿Está en el componente de landing (LandingPage.tsx)?
+	•	¿O está definido en otro archivo/contexto?
+	2.	¿Qué condiciones o verificaciones de autenticación están activando la redirección al login (/auth) cuando se hace clic en ese botón?
+	•	¿Se usa algún useAuth() o ProtectedRoute?
+	•	¿Está ese flujo ligado a un navigate('/auth') directo?
+	3.	¿Qué ruta debemos usar para enviar al usuario como “guest”?
+	•	¿Existe una ruta funcional como /trip-info que ya soporte usuarios anónimos?
+	•	Si no existe, ¿cuál deberíamos usar?
+	4.	¿Hay alguna limitación técnica actual que impida navegar como usuario anónimo?
+	•	¿Es necesario agregar soporte a esa ruta para AnonymousUserContext?
+	•	¿El estado del usuario se controla vía contextos o se bloquea desde el servidor?
+	5.	¿Qué archivos deberíamos revisar o modificar para permitir esta navegación sin login?
+	•	Por favor sugiere los archivos exactos (ej. LandingPage.tsx, App.tsx, useAuth.ts, etc.)
+	6.	¿Tienes alguna recomendación para mantener este flujo seguro, rastreable y listo para conversión?
+	•	Por ejemplo: ¿es posible trackear esta navegación anónima con trackEvent()?
+
+Nota: No implementes aún ningún cambio. Solo necesitamos el diagnóstico completo para preparar la nueva experiencia de usuario.
