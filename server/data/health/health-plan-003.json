@@ -1,0 +1,48 @@
+{
+  "id": "plan-health-003",
+  "category": "health",
+  "provider": "Global Health",
+  "name": "Plan Premium Internacional",
+  "description": "Cobertura de salud exclusiva con acceso a red internacional de hospitales y clínicas de primer nivel.",
+  "basePrice": 299.99,
+  "currency": "USD",
+  "duration": "mensual",
+  "coverageAmount": 1000000,
+  "coverage": {
+    "hospitalization": 500000,
+    "emergency": 100000,
+    "consultation": "sin límite",
+    "specialistConsultation": "sin límite",
+    "medication": 50000,
+    "laboratory": "cobertura total",
+    "imaging": "cobertura total",
+    "maternityBenefits": 50000,
+    "chronicConditions": 200000,
+    "transplants": 250000
+  },
+  "features": [
+    "Acceso a red internacional de hospitales",
+    "Habitación privada con alojamiento para acompañante",
+    "Segunda opinión médica internacional",
+    "Evacuación médica de emergencia",
+    "Tratamiento para enfermedades crónicas y congénitas",
+    "Cobertura de trasplantes y procedimientos complejos",
+    "Chequeos ejecutivos completos anuales",
+    "Acceso a medicamentos de última generación",
+    "Repatriación médica"
+  ],
+  "deductible": 0,
+  "exclusions": [
+    "Tratamientos experimentales no aprobados",
+    "Lesiones en actividades de alto riesgo"
+  ],
+  "addOns": [
+    "Programa de bienestar y nutrición",
+    "Cobertura dental y visión premium",
+    "Medicina alternativa y complementaria",
+    "Psicoterapia y salud mental"
+  ],
+  "tags": ["premium", "internacional", "ejecutivo", "sin deducible", "trasplantes"],
+  "rating": 4.9,
+  "status": "active"
+}

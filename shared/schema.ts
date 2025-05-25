@@ -106,11 +106,19 @@ export interface BasePlanFields {
   coverageAmount: number;
   provider?: string;
   category?: InsuranceCategory;
-  rating?: string;
+  rating?: number;
   reviews?: number;
   badge?: string;
   features?: string[];
   description?: string;
+  currency?: string;
+  duration?: string;
+  deductible?: number;
+  exclusions?: string[];
+  addOns?: string[];
+  tags?: string[];
+  coverage?: Record<string, any>;
+  status?: 'draft' | 'active' | 'archived';
 }
 
 export interface TravelPlan extends BasePlanFields {
@@ -123,7 +131,6 @@ export interface TravelPlan extends BasePlanFields {
   provider: string;
   description?: string;
   features: string[];
-  rating?: string;
 }
 
 export interface AutoPlan extends BasePlanFields {
@@ -134,7 +141,6 @@ export interface AutoPlan extends BasePlanFields {
   provider: string;
   description?: string;
   features: string[];
-  rating?: string;
 }
 
 export interface PetPlan extends BasePlanFields {
@@ -145,7 +151,6 @@ export interface PetPlan extends BasePlanFields {
   provider: string;
   description?: string;
   features: string[];
-  rating?: string;
 }
 
 export interface HealthPlan extends BasePlanFields {
@@ -156,7 +161,6 @@ export interface HealthPlan extends BasePlanFields {
   provider: string;
   description?: string;
   features: string[];
-  rating?: string;
 }
 
 // Field type definitions for category-specific fields
@@ -182,9 +186,16 @@ export const companyPlans = pgTable("company_plans", {
   provider: varchar("provider"),
   description: text("description"),
   features: jsonb("features"),
-  rating: varchar("rating"),
+  rating: integer("rating"),
   badge: varchar("badge"),
   categoryFields: jsonb("category_fields").notNull(),
+  deductible: integer("deductible"),
+  exclusions: jsonb("exclusions"),
+  addOns: jsonb("add_ons"),
+  tags: jsonb("tags"),
+  coverage: jsonb("coverage"),
+  currency: varchar("currency"),
+  duration: varchar("duration"),
   status: planStatusEnum("status").default('draft'),
   visibility: planVisibilityEnum("visibility").default('private'),
   marketplaceEnabled: boolean("marketplace_enabled").default(false),

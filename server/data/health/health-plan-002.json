@@ -1,0 +1,44 @@
+{
+  "id": "plan-health-002",
+  "category": "health",
+  "provider": "MediProtect",
+  "name": "Plan Familiar Completo",
+  "description": "Cobertura integral de salud para toda la familia con amplia red de especialistas y centros médicos.",
+  "basePrice": 159.99,
+  "currency": "USD",
+  "duration": "mensual",
+  "coverageAmount": 150000,
+  "coverage": {
+    "hospitalization": 75000,
+    "emergency": 25000,
+    "consultation": 100,
+    "specialistConsultation": 150,
+    "medication": 5000,
+    "laboratory": 2000,
+    "imaging": 3000,
+    "maternityBenefits": 10000
+  },
+  "features": [
+    "Consultas médicas generales y especialistas",
+    "Atención de emergencias nacional",
+    "Hospitalización en habitación semiprivada",
+    "Cobertura de medicamentos de marca y genéricos",
+    "Exámenes de laboratorio y diagnóstico",
+    "Maternidad y cuidados del recién nacido",
+    "Chequeos preventivos anuales"
+  ],
+  "deductible": 100,
+  "exclusions": [
+    "Tratamientos experimentales",
+    "Cirugías estéticas no reconstructivas",
+    "Lesiones autoinfligidas"
+  ],
+  "addOns": [
+    "Cobertura dental familiar",
+    "Plan de visión completo",
+    "Cobertura para deportes recreativos"
+  ],
+  "tags": ["familiar", "completo", "maternidad"],
+  "rating": 4.7,
+  "status": "active"
+}

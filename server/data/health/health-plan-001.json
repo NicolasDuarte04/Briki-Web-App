@@ -1,0 +1,39 @@
+{
+  "id": "plan-health-001",
+  "category": "health",
+  "provider": "Salud Esencial",
+  "name": "Plan Básico Salud",
+  "description": "Cobertura de salud esencial para individuos con acceso a red básica de médicos y hospitales.",
+  "basePrice": 79.99,
+  "currency": "USD",
+  "duration": "mensual",
+  "coverageAmount": 50000,
+  "coverage": {
+    "hospitalization": 20000,
+    "emergency": 10000,
+    "consultation": 50,
+    "medication": 1000,
+    "laboratory": 500
+  },
+  "features": [
+    "Consultas médicas generales",
+    "Atención de emergencias",
+    "Hospitalización básica",
+    "Medicamentos genéricos",
+    "Exámenes de laboratorio básicos"
+  ],
+  "deductible": 150,
+  "exclusions": [
+    "Condiciones preexistentes",
+    "Tratamientos estéticos",
+    "Tratamientos dentales",
+    "Embarazo y maternidad"
+  ],
+  "addOns": [
+    "Cobertura dental básica",
+    "Cobertura de visión básica"
+  ],
+  "tags": ["económico", "básico", "individual"],
+  "rating": 4.0,
+  "status": "active"
+}

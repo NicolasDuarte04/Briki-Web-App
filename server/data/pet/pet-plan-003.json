@@ -1,0 +1,45 @@
+{
+  "id": "plan-pet-003",
+  "category": "pet",
+  "provider": "MascotaPlus",
+  "name": "Plan Premium Mascotas",
+  "description": "La protección más completa para tu mascota con cobertura de tratamientos especializados y emergencias.",
+  "basePrice": 49.99,
+  "currency": "USD",
+  "duration": "mensual",
+  "coverageAmount": 10000,
+  "coverage": {
+    "accidents": 10000,
+    "illness": 8000,
+    "emergencies": 5000,
+    "surgeries": 5000,
+    "vaccines": "cobertura total",
+    "annualCheckup": 500,
+    "medications": 2000,
+    "specialistVisits": 1500
+  },
+  "features": [
+    "Cobertura total para emergencias",
+    "Tratamientos y cirugías especializadas",
+    "Vacunas y chequeos ilimitados",
+    "Medicamentos de por vida",
+    "Consultas con especialistas",
+    "Atención domiciliaria de emergencia",
+    "Cobertura para tratamientos crónicos",
+    "Servicios de hospedaje en caso de hospitalización del dueño"
+  ],
+  "deductible": 0,
+  "exclusions": [
+    "Tratamientos experimentales no aprobados",
+    "Gastos de entrenamiento conductual"
+  ],
+  "addOns": [
+    "Cobertura internacional",
+    "Terapias alternativas",
+    "Tratamientos para mascotas senior",
+    "Servicios funerarios"
+  ],
+  "tags": ["premium", "completo", "perros", "gatos", "exóticos", "sin deducible"],
+  "rating": 4.9,
+  "status": "active"
+}
