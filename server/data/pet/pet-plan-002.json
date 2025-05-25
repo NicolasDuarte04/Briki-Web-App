@@ -1,0 +1,40 @@
+{
+  "id": "plan-pet-002",
+  "category": "pet",
+  "provider": "VetProtect",
+  "name": "Plan Integral Mascotas",
+  "description": "Cobertura completa para el bienestar de tu mascota con servicios veterinarios ampliados.",
+  "basePrice": 29.99,
+  "currency": "USD",
+  "duration": "mensual",
+  "coverageAmount": 5000,
+  "coverage": {
+    "accidents": 5000,
+    "illness": 3000,
+    "vaccines": 200,
+    "annualCheckup": 250,
+    "medications": 1000
+  },
+  "features": [
+    "Consultas por accidentes y enfermedades",
+    "Vacunas completas anuales",
+    "Chequeos preventivos semestrales",
+    "Cobertura de medicamentos recetados",
+    "Cirugías menores",
+    "Línea de consulta veterinaria 24/7"
+  ],
+  "deductible": 20,
+  "exclusions": [
+    "Enfermedades hereditarias",
+    "Cirugías estéticas",
+    "Tratamientos experimentales"
+  ],
+  "addOns": [
+    "Tratamientos oncológicos",
+    "Terapia física y rehabilitación",
+    "Cobertura dental completa"
+  ],
+  "tags": ["completo", "perros", "gatos", "medicamentos"],
+  "rating": 4.6,
+  "status": "active"
+}

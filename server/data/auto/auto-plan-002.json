@@ -1,0 +1,40 @@
+{
+  "id": "plan-auto-002",
+  "category": "auto",
+  "provider": "ProtecAuto",
+  "name": "Cobertura Amplia",
+  "description": "Seguro completo con protección para tu vehículo y responsabilidad civil extendida.",
+  "basePrice": 59.99,
+  "currency": "USD",
+  "duration": "mensual",
+  "coverageAmount": 150000,
+  "coverage": {
+    "thirdParty": 150000,
+    "ownDamage": 25000,
+    "theft": 25000,
+    "medicalExpenses": 10000,
+    "legalDefense": 5000
+  },
+  "features": [
+    "Responsabilidad civil extendida",
+    "Daños materiales al vehículo",
+    "Robo total y parcial",
+    "Asistencia en carretera 24/7",
+    "Gastos médicos para ocupantes",
+    "Auto sustituto por 15 días"
+  ],
+  "deductible": 100,
+  "exclusions": [
+    "Conducción bajo influencia de sustancias",
+    "Competencias automovilísticas",
+    "Daños por guerra o terrorismo"
+  ],
+  "addOns": [
+    "Extensión de cobertura en el extranjero",
+    "Seguro para accesorios especiales",
+    "Pérdida de uso"
+  ],
+  "tags": ["completo", "amplio", "daños materiales"],
+  "rating": 4.5,
+  "status": "active"
+}

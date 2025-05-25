@@ -1,0 +1,35 @@
+{
+  "id": "plan-pet-001",
+  "category": "pet",
+  "provider": "PetCare Seguros",
+  "name": "Plan Básico Mascotas",
+  "description": "Cobertura esencial para el cuidado básico de tu mascota con acceso a red de veterinarios.",
+  "basePrice": 15.99,
+  "currency": "USD",
+  "duration": "mensual",
+  "coverageAmount": 2000,
+  "coverage": {
+    "accidents": 2000,
+    "vaccines": 100,
+    "annualCheckup": 150
+  },
+  "features": [
+    "Consultas por accidentes",
+    "Vacunas básicas anuales",
+    "Chequeo anual preventivo",
+    "Descuentos en alimentos"
+  ],
+  "deductible": 30,
+  "exclusions": [
+    "Condiciones preexistentes",
+    "Tratamientos estéticos",
+    "Mascotas mayores de 10 años"
+  ],
+  "addOns": [
+    "Cobertura dental básica",
+    "Identificación con microchip"
+  ],
+  "tags": ["económico", "básico", "perros", "gatos"],
+  "rating": 4.1,
+  "status": "active"
+}

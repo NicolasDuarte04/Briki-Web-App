@@ -1,0 +1,39 @@
+{
+  "id": "plan-travel-003",
+  "category": "travel",
+  "provider": "Protección Total",
+  "name": "Plan Familiar",
+  "description": "Cobertura integral para toda la familia con beneficios especiales para niños y adultos mayores.",
+  "basePrice": 59.99,
+  "currency": "USD",
+  "duration": "por viaje",
+  "coverageAmount": 100000,
+  "coverage": {
+    "medical": 100000,
+    "luggage": 3000,
+    "cancellation": 7500,
+    "delay": 800,
+    "emergencyDental": 1000
+  },
+  "features": [
+    "Cobertura médica para toda la familia",
+    "Atención pediátrica especializada",
+    "Asistencia para adultos mayores",
+    "Reembolso por cancelación",
+    "Protección completa de equipaje",
+    "Seguro de emergencias dentales"
+  ],
+  "deductible": 0,
+  "exclusions": [
+    "Deportes profesionales",
+    "Enfermedades mentales no diagnosticadas"
+  ],
+  "addOns": [
+    "Protección de dispositivos electrónicos",
+    "Cobertura para mascotas en viaje",
+    "Asistencia escolar para niños"
+  ],
+  "tags": ["familia", "viajes internacionales", "completo"],
+  "rating": 4.9,
+  "status": "active"
+}
