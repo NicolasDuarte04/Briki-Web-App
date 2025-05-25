@@ -1,6 +1,8 @@
 import express from 'express';
 import { generateAssistantResponse, analyzeImageForInsurance } from '../services/openai-service';
 import { loadMockInsurancePlans, filterPlansByCategory, filterPlansByTags } from '../data-loader';
+import { generateMockResponse } from '../services/mock-assistant-responses';
+import { semanticSearch } from '../services/semantic-search';
 
 const router = express.Router();
 
@@ -34,39 +36,22 @@ router.post('/ask', async (req, res) => {
       }
     } 
     
-    // Usar respuestas prefabricadas (para desarrollo/pruebas o como fallback)
+    // Usar respuestas avanzadas del asistente para desarrollo/pruebas o como fallback
     {
-      // Respuestas mock para desarrollo
-      const mockResponses: Record<string, string> = {
-        default: "Hola, soy Briki, tu asistente de seguros. ¿En qué puedo ayudarte hoy?",
-        travel: "Para viajes internacionales, te recomiendo nuestro Plan Premium Internacional que ofrece cobertura médica amplia y asistencia en más de 190 países.",
-        auto: "Tenemos excelentes opciones de seguros para tu vehículo, desde la Cobertura Básica hasta la Protección Total Plus.",
-        pet: "Para tu mascota, nuestro Plan Integral ofrece cobertura veterinaria, vacunas y medicamentos.",
-        health: "En seguros de salud, el Plan Familiar Completo es ideal para proteger a toda tu familia con cobertura hospitalaria y de medicamentos."
-      };
-
-      // Determinar qué respuesta enviar basado en palabras clave
-      let responseType: 'default' | 'travel' | 'auto' | 'pet' | 'health' = 'default';
-      const lowerMessage = message.toLowerCase();
+      // Determinar la categoría para el mensaje
+      let categoryToUse = category;
       
-      if (lowerMessage.includes('viaje') || lowerMessage.includes('viajar') || lowerMessage.includes('vacaciones')) {
-        responseType = 'travel';
-      } else if (lowerMessage.includes('auto') || lowerMessage.includes('carro') || lowerMessage.includes('coche')) {
-        responseType = 'auto';
-      } else if (lowerMessage.includes('mascota') || lowerMessage.includes('perro') || lowerMessage.includes('gato')) {
-        responseType = 'pet';
-      } else if (lowerMessage.includes('salud') || lowerMessage.includes('médico') || lowerMessage.includes('hospital')) {
-        responseType = 'health';
-      }
-
-      // Devolver planes relacionados con la categoría
-      const matchingPlans = responseType !== 'default' 
-        ? filterPlansByCategory(allPlans, responseType)
-        : [];
-
+      // Si no se especificó una categoría, intentar usar la búsqueda semántica para encontrar planes relevantes
+      const relevantPlans = category 
+        ? plans 
+        : semanticSearch(message, allPlans, 5);
+      
+      // Generar una respuesta personalizada basada en el mensaje y los planes relevantes
+      const mockResponse = generateMockResponse(categoryToUse, message, relevantPlans);
+      
       return res.json({
-        message: mockResponses[responseType],
-        suggestedPlans: matchingPlans.length > 0 ? matchingPlans : undefined
+        message: mockResponse.message,
+        suggestedPlans: mockResponse.suggestedPlans
       });
     }
   } catch (error: any) {
