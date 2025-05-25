@@ -20,7 +20,16 @@ import {
   InsertPlanAnalytic,
   INSURANCE_CATEGORIES
 } from "@shared/schema";
-import { loadMockInsurancePlans, MockInsurancePlan, filterPlansByCategory, filterPlansByTags, filterPlansByUserNeed } from "./data-loader";
+import { 
+  loadMockInsurancePlans, 
+  MockInsurancePlan, 
+  filterPlansByCategory, 
+  filterPlansByTags, 
+  filterPlansByUserNeed,
+  filterPlansByAttributes,
+  PlanFilters
+} from "./data-loader";
+import { semanticSearch } from "./services/semantic-search";
 
 // Updated user input schema to match our enhanced DB schema
 export const userAuthSchema = z.object({
@@ -1010,6 +1019,14 @@ export class MockDataStorage implements IStorage {
 
   getInsurancePlansByUserNeed(need: string): Promise<MockInsurancePlan[]> {
     return Promise.resolve(filterPlansByUserNeed(this.mockInsurancePlans, need));
+  }
+  
+  getInsurancePlansByAttributes(filters: PlanFilters): Promise<MockInsurancePlan[]> {
+    return Promise.resolve(filterPlansByAttributes(this.mockInsurancePlans, filters));
+  }
+  
+  semanticSearchPlans(query: string, limit: number = 5): Promise<MockInsurancePlan[]> {
+    return Promise.resolve(semanticSearch(query, this.mockInsurancePlans, limit));
   }
 
   // Implementaciones vacías o mínimas para otros métodos requeridos
