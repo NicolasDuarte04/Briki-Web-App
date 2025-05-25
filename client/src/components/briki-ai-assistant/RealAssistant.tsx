@@ -5,10 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Loader2, Send, Bot } from 'lucide-react';
+import { Loader2, Send, Bot, X } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Card } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
+import SuggestedPlans from './SuggestedPlans';
+import { InsurancePlan } from './PlanCard';
 
 // Tipos para los mensajes
 interface Message {
@@ -17,6 +18,7 @@ interface Message {
   content: string;
   timestamp: Date;
   isLoading?: boolean;
+  suggestedPlans?: InsurancePlan[];
 }
 
 const RealAssistant: React.FC = () => {
@@ -99,7 +101,8 @@ const RealAssistant: React.FC = () => {
             ? {
                 ...msg,
                 id: Date.now().toString(),
-                content: response.response,
+                content: response.message || response.response || "No se pudo obtener una respuesta",
+                suggestedPlans: response.suggestedPlans || undefined,
                 isLoading: false,
               }
             : msg
@@ -109,6 +112,11 @@ const RealAssistant: React.FC = () => {
       // Mostrar información sobre el modelo y tokens usados (si existe)
       if (response.usage) {
         console.log(`Modelo: ${response.model}, Tokens: ${response.usage.total_tokens}`);
+      }
+      
+      // Si hay planes sugeridos, mostrar en consola para depuración
+      if (response.suggestedPlans && response.suggestedPlans.length > 0) {
+        console.log(`Planes sugeridos: ${response.suggestedPlans.length}`);
       }
     } catch (error) {
       console.error('Error al obtener respuesta:', error);
@@ -147,7 +155,7 @@ const RealAssistant: React.FC = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}
+        className={`flex flex-col ${isUser ? 'items-end' : 'items-start'} mb-4 w-full`}
       >
         <div
           className={`
@@ -164,6 +172,13 @@ const RealAssistant: React.FC = () => {
             <div className="whitespace-pre-wrap">{message.content}</div>
           )}
         </div>
+        
+        {/* Mostrar planes sugeridos si existen y no es un mensaje del usuario */}
+        {!isUser && message.suggestedPlans && message.suggestedPlans.length > 0 && (
+          <div className="w-full mt-2">
+            <SuggestedPlans plans={message.suggestedPlans} />
+          </div>
+        )}
       </motion.div>
     );
   };
