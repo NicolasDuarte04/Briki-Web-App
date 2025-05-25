@@ -23,13 +23,19 @@ router.post('/ask', async (req, res) => {
       ? filterPlansByCategory(allPlans, category) 
       : allPlans;
 
-    // Si el modo OpenAI está activado, usar la API
+    // Si el modo OpenAI está activado, intentar usar la API
     if (useOpenAI) {
-      const response = await generateAssistantResponse(message, history, plans);
-      return res.json(response);
+      try {
+        const response = await generateAssistantResponse(message, history, plans);
+        return res.json(response);
+      } catch (error: any) {
+        console.warn("Error al usar OpenAI, usando respuestas mock como fallback:", error.message);
+        // Si hay un error con OpenAI, usar las respuestas mock como fallback
+      }
     } 
-    // Si no, usar respuestas prefabricadas (para desarrollo/pruebas)
-    else {
+    
+    // Usar respuestas prefabricadas (para desarrollo/pruebas o como fallback)
+    {
       // Respuestas mock para desarrollo
       const mockResponses: Record<string, string> = {
         default: "Hola, soy Briki, tu asistente de seguros. ¿En qué puedo ayudarte hoy?",
@@ -89,9 +95,17 @@ router.post('/analyze-image', async (req, res) => {
       : image;
 
     if (useOpenAI) {
-      const response = await analyzeImageForInsurance(base64Data, prompt);
-      return res.json(response);
-    } else {
+      try {
+        const response = await analyzeImageForInsurance(base64Data, prompt);
+        return res.json(response);
+      } catch (error: any) {
+        console.warn("Error al usar OpenAI para análisis de imagen, usando respuesta mock como fallback:", error.message);
+        // Si hay error con OpenAI, usar respuesta mock como fallback
+      }
+    } 
+    
+    // Usar respuesta mock para desarrollo o como fallback
+    {
       // Respuesta mock para desarrollo
       return res.json({
         message: "He analizado la imagen y parece que podrías necesitar un seguro de viaje para tus próximas vacaciones. Considera nuestro Plan Básico de Viaje que ofrece cobertura médica y protección de equipaje."
