@@ -1,294 +1,216 @@
-import React, { useState, useRef, useEffect } from "react";
-import { motion } from "framer-motion";
-import { v4 as uuidv4 } from "uuid";
-import { 
-  Bot, 
-  User, 
-  Loader2,
-  Send as SendIcon
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Textarea } from "@/components/ui/textarea";
-import { Card } from "@/components/ui/card";
-import MockPlansCard from "@/components/assistant/MockPlansCard";
-import { trackEvent } from "@/lib/analytics";
-import { EventCategory } from "@/constants/analytics";
-import { processUserMessage, AssistantResponse } from "@/services/openai-service";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import React, { useState, useEffect, useRef } from 'react';
+import { sendMessageToAI, getMockResponse } from '@/services/openai-service';
+import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Loader2, Send, Bot } from 'lucide-react';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Card } from '@/components/ui/card';
+import { useToast } from '@/hooks/use-toast';
 
-// Definición de interfaces
+// Tipos para los mensajes
 interface Message {
   id: string;
-  sender: "user" | "assistant";
+  role: 'user' | 'assistant';
   content: string;
-  timestamp: string;
+  timestamp: Date;
   isLoading?: boolean;
-  mockResponse?: any;
 }
 
-// Componente de burbuja de mensaje
-const MessageBubble: React.FC<{ message: Message }> = ({ message }) => {
-  const isUser = message.sender === "user";
-  
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="mb-5"
-    >
-      <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
-        <div className={`flex items-start gap-2 max-w-[80%] ${isUser ? "flex-row-reverse" : ""}`}>
-          {/* Avatar */}
-          {message.sender === "assistant" ? (
-            <Avatar className="h-8 w-8 bg-primary/5 shrink-0">
-              <AvatarImage src="/briki-avatar.svg" alt="Briki Assistant" />
-              <AvatarFallback>
-                <Bot className="h-4 w-4 text-primary" />
-              </AvatarFallback>
-            </Avatar>
-          ) : (
-            <Avatar className="h-8 w-8 bg-gray-100 shrink-0">
-              <AvatarFallback>
-                <User className="h-4 w-4 text-gray-600" />
-              </AvatarFallback>
-            </Avatar>
-          )}
-          
-          {/* Message bubble */}
-          <div 
-            className={`rounded-2xl px-4 py-3 ${
-              isUser 
-                ? "bg-primary/10 text-gray-800" 
-                : "bg-gray-100 text-gray-800"
-            }`}
-          >
-            {message.isLoading ? (
-              <div className="flex items-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin text-gray-500" />
-                <p className="text-sm">Pensando...</p>
-              </div>
-            ) : (
-              <div>
-                <p className="text-sm">{message.content}</p>
-                {message.mockResponse && (
-                  <div className="mt-3">
-                    <MockPlansCard response={message.mockResponse} />
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  );
-};
+const RealAssistant: React.FC = () => {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [useRealAI, setUseRealAI] = useState(true);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
 
-interface RealAssistantProps {
-  suggestedQuestions?: string[];
-  initialUseAI?: boolean;
-}
+  // Mensajes iniciales
+  useEffect(() => {
+    const initialMessage: Message = {
+      id: Date.now().toString(),
+      role: 'assistant',
+      content: '¡Hola! Soy Briki, tu asistente de seguros. ¿En qué puedo ayudarte hoy? Puedo darte información sobre seguros de viaje, auto, mascotas y salud.',
+      timestamp: new Date(),
+    };
+    setMessages([initialMessage]);
+  }, []);
 
-// Componente principal del asistente real
-export default function RealAssistant({ 
-  suggestedQuestions = [
-    "¿Qué seguro de viaje me recomiendas para Europa?",
-    "¿Necesito un seguro especial para mi mascota?",
-    "¿Cuáles son las mejores coberturas para mi auto?",
-    "¿Qué seguro de salud cubre condiciones preexistentes?"
-  ],
-  initialUseAI = true
-}: RealAssistantProps) {
-  const [inputMessage, setInputMessage] = useState("");
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: uuidv4(),
-      sender: "assistant",
-      content: "¡Hola! Soy Briki, tu asistente personal para seguros. ¿En qué puedo ayudarte hoy?",
-      timestamp: new Date().toISOString()
-    }
-  ]);
-  const [isSending, setIsSending] = useState(false);
-  const [useAI, setUseAI] = useState(initialUseAI);
-  
-  const messageEndRef = useRef<HTMLDivElement>(null);
-  const messagesContainerRef = useRef<HTMLDivElement>(null);
-  
-  // Auto-scroll to the bottom of messages
+  // Auto scroll cuando hay nuevos mensajes
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
-  
+
   const scrollToBottom = () => {
-    messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
-  
-  // Procesamiento de mensajes con IA real o respuestas prefabricadas
-  const handleSendMessage = async () => {
-    if (!inputMessage.trim() || isSending) return;
+
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
     
-    setIsSending(true);
-    
-    // Añadir mensaje del usuario
+    if (!input.trim()) return;
+
+    // Agregar mensaje del usuario
     const userMessage: Message = {
-      id: uuidv4(),
-      sender: "user",
-      content: inputMessage.trim(),
-      timestamp: new Date().toISOString()
+      id: Date.now().toString(),
+      role: 'user',
+      content: input,
+      timestamp: new Date(),
     };
-    
-    // Track evento de mensaje de usuario
-    trackEvent(
-      'assistant_user_message',
-      EventCategory.Assistant,
-      'real_assistant'
-    );
-    
-    // Limpiar input y mostrar mensaje del usuario
-    setInputMessage("");
-    setMessages(prev => [...prev, userMessage]);
-    
-    // Mostrar indicador de carga
-    const loadingMessageId = uuidv4();
+
+    // Mensaje temporal de carga para el asistente
     const loadingMessage: Message = {
-      id: loadingMessageId,
-      sender: "assistant",
-      content: "",
-      timestamp: new Date().toISOString(),
-      isLoading: true
+      id: (Date.now() + 1).toString(),
+      role: 'assistant',
+      content: '',
+      timestamp: new Date(),
+      isLoading: true,
     };
-    
-    setMessages(prev => [...prev, loadingMessage]);
-    
+
+    setMessages(prev => [...prev, userMessage, loadingMessage]);
+    setInput('');
+    setIsLoading(true);
+
     try {
-      // Procesar el mensaje del usuario con OpenAI o respuestas prefabricadas
-      const response: AssistantResponse = await processUserMessage(userMessage.content, useAI);
+      let response;
       
-      // Crear mensaje de respuesta del asistente
-      const assistantMessage: Message = {
-        id: uuidv4(),
-        sender: "assistant",
-        content: response.content,
-        timestamp: new Date().toISOString(),
-        mockResponse: response.sourceType === 'mock' ? response.mockResponseData : null
-      };
-      
-      // Reemplazar mensaje de carga con respuesta real
+      // Dependiendo del toggle, usar IA real o respuestas simuladas
+      if (useRealAI) {
+        // Convertir mensajes para enviar al backend
+        const conversationHistory = messages
+          .filter(msg => !msg.isLoading)
+          .map(msg => ({
+            role: msg.role,
+            content: msg.content,
+          }));
+        
+        response = await sendMessageToAI(input, conversationHistory);
+      } else {
+        // Usar respuestas simuladas
+        response = getMockResponse(input);
+      }
+
+      // Reemplazar el mensaje de carga con la respuesta real
       setMessages(prev => 
-        prev.filter(msg => msg.id !== loadingMessageId).concat(assistantMessage)
+        prev.map(msg => 
+          msg.isLoading 
+            ? {
+                ...msg,
+                id: Date.now().toString(),
+                content: response.response,
+                isLoading: false,
+              }
+            : msg
+        )
       );
+
+      // Mostrar información sobre el modelo y tokens usados (si existe)
+      if (response.usage) {
+        console.log(`Modelo: ${response.model}, Tokens: ${response.usage.total_tokens}`);
+      }
     } catch (error) {
-      console.error("Error al procesar mensaje:", error);
+      console.error('Error al obtener respuesta:', error);
       
-      // En caso de error, mostrar mensaje de error amigable
-      const errorMessage: Message = {
-        id: uuidv4(),
-        sender: "assistant",
-        content: "Estoy teniendo problemas para responder. Por favor, intenta con otra pregunta o prueba más tarde.",
-        timestamp: new Date().toISOString()
-      };
-      
+      // Actualizar mensaje de error
       setMessages(prev => 
-        prev.filter(msg => msg.id !== loadingMessageId).concat(errorMessage)
+        prev.map(msg => 
+          msg.isLoading 
+            ? {
+                ...msg,
+                id: Date.now().toString(),
+                content: "Lo siento, hubo un problema al procesar tu mensaje. Por favor, intenta de nuevo más tarde.",
+                isLoading: false,
+              }
+            : msg
+        )
       );
+      
+      toast({
+        title: "Error de conexión",
+        description: "No se pudo conectar con el asistente. Verifica tu conexión a internet.",
+        variant: "destructive",
+      });
     } finally {
-      setIsSending(false);
+      setIsLoading(false);
     }
   };
-  
-  // Insertar una pregunta sugerida en el input
-  const handleSuggestedQuestion = (question: string) => {
-    setInputMessage(question);
-  };
-  
-  return (
-    <Card className="border border-gray-200 dark:border-gray-800 shadow-md rounded-xl overflow-hidden">
-      {/* Chat Messages Container */}
-      <div 
-        ref={messagesContainerRef} 
-        className="h-[500px] p-4 overflow-y-auto bg-gray-50 dark:bg-gray-900"
+
+  // Renderizar cada mensaje
+  const renderMessage = (message: Message) => {
+    const isUser = message.role === 'user';
+
+    return (
+      <motion.div
+        key={message.id}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}
       >
-        {messages.map((message) => (
-          <MessageBubble key={message.id} message={message} />
-        ))}
-        <div ref={messageEndRef} />
+        <div
+          className={`
+            max-w-[80%] rounded-lg p-3 
+            ${isUser ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'}
+          `}
+        >
+          {message.isLoading ? (
+            <div className="flex items-center">
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              <span>Pensando...</span>
+            </div>
+          ) : (
+            <div className="whitespace-pre-wrap">{message.content}</div>
+          )}
+        </div>
+      </motion.div>
+    );
+  };
+
+  return (
+    <div className="flex flex-col bg-background rounded-lg shadow-md h-[600px] max-w-2xl mx-auto">
+      {/* Cabecera */}
+      <div className="flex items-center justify-between p-4 border-b">
+        <div className="flex items-center">
+          <Bot className="h-6 w-6 mr-2 text-primary" />
+          <h2 className="text-lg font-semibold">Briki AI Assistant</h2>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="ai-mode"
+            checked={useRealAI}
+            onCheckedChange={setUseRealAI}
+          />
+          <Label htmlFor="ai-mode">Modo IA {useRealAI ? 'Activado' : 'Desactivado'}</Label>
+        </div>
       </div>
       
-      {/* Message Input */}
-      <div className="p-4 border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800">
-        <form 
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSendMessage();
-          }}
-          className="flex items-end gap-2"
-        >
-          <Textarea
-            value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
-            placeholder="Escribe tu pregunta aquí..."
-            className="flex-grow min-h-[60px] resize-none"
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                handleSendMessage();
-              }
-            }}
+      {/* Área de mensajes */}
+      <ScrollArea className="flex-grow p-4">
+        <div className="space-y-4">
+          {messages.map(renderMessage)}
+          <div ref={messagesEndRef} />
+        </div>
+      </ScrollArea>
+      
+      {/* Formulario de entrada */}
+      <form onSubmit={handleSendMessage} className="p-4 border-t">
+        <div className="flex space-x-2">
+          <Input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Escribe tu mensaje aquí..."
+            disabled={isLoading}
+            className="flex-grow"
           />
-          <Button 
-            type="submit" 
-            disabled={isSending || !inputMessage.trim()}
-            className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white h-[60px] px-4"
-          >
-            {isSending ? (
-              <Loader2 className="h-5 w-5 animate-spin" />
-            ) : (
-              <SendIcon className="h-5 w-5" />
-            )}
-            <span className="sr-only">Enviar</span>
+          <Button type="submit" disabled={isLoading || !input.trim()}>
+            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
           </Button>
-        </form>
-        
-        {/* Mode toggle */}
-        <div className="flex items-center justify-between mt-4 mb-2">
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="ai-mode"
-              checked={useAI}
-              onCheckedChange={setUseAI}
-            />
-            <Label htmlFor="ai-mode" className="text-sm">
-              {useAI ? "Modo IA activado" : "Modo simulado"}
-            </Label>
-          </div>
-          <p className="text-xs text-gray-500 dark:text-gray-400">
-            {useAI 
-              ? "Usando OpenAI para respuestas en tiempo real" 
-              : "Usando respuestas predefinidas"}
-          </p>
         </div>
-        
-        {/* Suggested Questions */}
-        <div className="mt-2">
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Prueba estas preguntas:</p>
-          <div className="flex flex-wrap gap-2">
-            {suggestedQuestions.map((question, index) => (
-              <Button
-                key={index}
-                variant="outline"
-                size="sm"
-                className="text-xs text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800"
-                onClick={() => handleSuggestedQuestion(question)}
-              >
-                {question}
-              </Button>
-            ))}
-          </div>
-        </div>
-      </div>
-    </Card>
+      </form>
+    </div>
   );
-}
+};
+
+export default RealAssistant;

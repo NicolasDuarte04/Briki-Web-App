@@ -1,81 +1,92 @@
-import OpenAI from "openai";
-import { mockPrompts, defaultAssistantMessage } from "@/utils/mockAssistantResponses";
+/**
+ * Servicio para interactuar con la API de OpenAI a través del backend
+ * Esta implementación segura evita exponer la clave de API en el frontend
+ */
 
-// Inicializar el cliente de OpenAI con la clave de API
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-  dangerouslyAllowBrowser: true // Solo para desarrollo, en producción usa el backend
-});
+// Tipos para las respuestas de la API
+interface OpenAIResponse {
+  response: string;
+  usage?: {
+    prompt_tokens: number;
+    completion_tokens: number;
+    total_tokens: number;
+  };
+  model: string;
+}
 
-// Interfaz para la respuesta del asistente
-export interface AssistantResponse {
+interface OpenAIErrorResponse {
+  error: string;
+  details?: string;
+}
+
+interface Message {
+  role: "user" | "assistant" | "system";
   content: string;
-  sourceType: 'ai' | 'mock';
-  mockResponseData?: any;
 }
 
 /**
- * Procesa un mensaje de usuario y devuelve una respuesta del asistente
- * Primero verifica si hay una respuesta prefabricada, si no, consulta a OpenAI
+ * Envía un mensaje al asistente AI a través del backend
+ * @param message Mensaje del usuario
+ * @param conversationHistory Historial de conversación opcional
+ * @returns Respuesta de la API
  */
-export async function processUserMessage(
+export async function sendMessageToAI(
   message: string,
-  useAI: boolean = true
-): Promise<AssistantResponse> {
+  conversationHistory: Message[] = []
+): Promise<OpenAIResponse> {
   try {
-    // Comprobar si hay una respuesta prefabricada para este mensaje
-    const matchedPrompt = mockPrompts.find(p =>
-      message.toLowerCase().includes(p.match.toLowerCase())
-    );
-    
-    // Si hay una coincidencia, devuelve la respuesta prefabricada
-    if (matchedPrompt) {
-      return {
-        content: matchedPrompt.response.text,
-        sourceType: 'mock',
-        mockResponseData: matchedPrompt.response
-      };
-    }
-    
-    // Si useAI es false o no hay una clave de API, devuelve un mensaje predeterminado
-    if (!useAI || !process.env.OPENAI_API_KEY) {
-      return {
-        content: defaultAssistantMessage,
-        sourceType: 'mock'
-      };
-    }
-    
-    // Consultar a la API de OpenAI
-    // el modelo gpt-4o es el más reciente, lanzado el 13 de mayo de 2024, no cambiar a menos que el usuario lo solicite explícitamente
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "system",
-          content: "Eres Briki, un asistente especializado en seguros. Proporciona respuestas claras, concisas y útiles sobre seguros de auto, viaje, salud y mascotas. Evita tecnicismos y usa un lenguaje sencillo. Limita tus respuestas a 3-4 oraciones. No menciones que eres una IA. Habla en español."
-        },
-        {
-          role: "user",
-          content: message
-        }
-      ],
-      temperature: 0.7,
-      max_tokens: 300,
+    const response = await fetch("/api/ai/ask", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        message,
+        conversationHistory,
+      }),
     });
-    
-    const aiResponse = completion.choices[0].message.content || "Lo siento, no pude generar una respuesta en este momento.";
-    
-    return {
-      content: aiResponse,
-      sourceType: 'ai'
-    };
+
+    if (!response.ok) {
+      const errorData: OpenAIErrorResponse = await response.json();
+      throw new Error(errorData.error || "Error al comunicarse con el asistente");
+    }
+
+    const data: OpenAIResponse = await response.json();
+    return data;
   } catch (error) {
-    console.error("Error procesando mensaje:", error);
-    
-    // En caso de error, devuelve un mensaje de error amigable
-    return {
-      content: "Estoy teniendo problemas para conectarme. Por favor, intenta con otra pregunta o prueba más tarde.",
-      sourceType: 'mock'
-    };
+    console.error("Error en el servicio de OpenAI:", error);
+    throw error;
   }
+}
+
+/**
+ * Obtiene respuestas simuladas para situaciones en las que no se puede usar la API
+ * @param message Mensaje del usuario
+ * @returns Respuesta simulada
+ */
+export function getMockResponse(message: string): OpenAIResponse {
+  // Respuestas básicas para demostración
+  const lowercaseMessage = message.toLowerCase();
+  
+  let response = "Lo siento, no entiendo tu pregunta. ¿Puedes ser más específico sobre el tipo de seguro que te interesa?";
+  
+  if (lowercaseMessage.includes("viaje") || lowercaseMessage.includes("viajes") || lowercaseMessage.includes("viajar")) {
+    response = "Briki ofrece excelentes seguros de viaje que cubren cancelaciones, asistencia médica internacional y pérdida de equipaje. Te recomiendo nuestro plan Premium para mayor tranquilidad.";
+  } else if (lowercaseMessage.includes("auto") || lowercaseMessage.includes("coche") || lowercaseMessage.includes("carro")) {
+    response = "Nuestros seguros de auto te ofrecen protección completa con cobertura de daños a terceros, asistencia en carretera y talleres certificados. El plan Completo Plus es muy popular.";
+  } else if (lowercaseMessage.includes("mascota") || lowercaseMessage.includes("perro") || lowercaseMessage.includes("gato")) {
+    response = "Para tu mascota tenemos planes que cubren consultas veterinarias, vacunas y tratamientos por accidentes. El plan Mascota Protegida cubre hasta 80% de gastos médicos.";
+  } else if (lowercaseMessage.includes("salud") || lowercaseMessage.includes("médico") || lowercaseMessage.includes("hospital")) {
+    response = "Nuestros seguros de salud incluyen consultas, hospitalización y medicamentos. El plan Familia Saludable es ideal con cobertura amplia y acceso a una red de especialistas.";
+  }
+  
+  return {
+    response,
+    model: "mock-gpt",
+    usage: {
+      prompt_tokens: 0,
+      completion_tokens: 0,
+      total_tokens: 0
+    }
+  };
 }
