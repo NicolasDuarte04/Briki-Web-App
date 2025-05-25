@@ -1,66 +1,107 @@
-import { Router } from 'express';
-import OpenAI from 'openai';
+import express from 'express';
+import { generateAssistantResponse, analyzeImageForInsurance } from '../services/openai-service';
+import { loadMockInsurancePlans, filterPlansByCategory, filterPlansByTags } from '../data-loader';
 
-const router = Router();
+const router = express.Router();
 
-// Inicializar el cliente de OpenAI con la clave de API del servidor
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
-
-// Obtener el modelo de OpenAI de las variables de entorno o usar uno por defecto
-const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-4o';
-
-// Endpoint para procesar mensajes a través de OpenAI
+/**
+ * Endpoint para generar respuestas del asistente IA
+ */
 router.post('/ask', async (req, res) => {
   try {
-    const { message, conversationHistory = [] } = req.body;
+    const { message, history, useOpenAI = true, category } = req.body;
 
     if (!message) {
-      return res.status(400).json({ error: 'El mensaje es requerido' });
+      return res.status(400).json({ error: 'Se requiere un mensaje' });
     }
 
-    // Preparar mensajes para OpenAI
-    const messages = [
-      {
-        role: "system",
-        content: "Eres Briki, un asistente especializado en seguros. Proporciona respuestas claras, concisas y útiles sobre seguros de auto, viaje, salud y mascotas. Evita tecnicismos y usa un lenguaje sencillo. Limita tus respuestas a 3-4 oraciones. No menciones que eres una IA. Habla en español."
-      },
-      // Incluir historial de conversación si existe
-      ...conversationHistory,
-      {
-        role: "user",
-        content: message
+    // Cargar planes de seguro
+    const allPlans = loadMockInsurancePlans();
+    
+    // Filtrar planes por categoría si se especifica
+    const plans = category 
+      ? filterPlansByCategory(allPlans, category) 
+      : allPlans;
+
+    // Si el modo OpenAI está activado, usar la API
+    if (useOpenAI) {
+      const response = await generateAssistantResponse(message, history, plans);
+      return res.json(response);
+    } 
+    // Si no, usar respuestas prefabricadas (para desarrollo/pruebas)
+    else {
+      // Respuestas mock para desarrollo
+      const mockResponses: Record<string, string> = {
+        default: "Hola, soy Briki, tu asistente de seguros. ¿En qué puedo ayudarte hoy?",
+        travel: "Para viajes internacionales, te recomiendo nuestro Plan Premium Internacional que ofrece cobertura médica amplia y asistencia en más de 190 países.",
+        auto: "Tenemos excelentes opciones de seguros para tu vehículo, desde la Cobertura Básica hasta la Protección Total Plus.",
+        pet: "Para tu mascota, nuestro Plan Integral ofrece cobertura veterinaria, vacunas y medicamentos.",
+        health: "En seguros de salud, el Plan Familiar Completo es ideal para proteger a toda tu familia con cobertura hospitalaria y de medicamentos."
+      };
+
+      // Determinar qué respuesta enviar basado en palabras clave
+      let responseType: 'default' | 'travel' | 'auto' | 'pet' | 'health' = 'default';
+      const lowerMessage = message.toLowerCase();
+      
+      if (lowerMessage.includes('viaje') || lowerMessage.includes('viajar') || lowerMessage.includes('vacaciones')) {
+        responseType = 'travel';
+      } else if (lowerMessage.includes('auto') || lowerMessage.includes('carro') || lowerMessage.includes('coche')) {
+        responseType = 'auto';
+      } else if (lowerMessage.includes('mascota') || lowerMessage.includes('perro') || lowerMessage.includes('gato')) {
+        responseType = 'pet';
+      } else if (lowerMessage.includes('salud') || lowerMessage.includes('médico') || lowerMessage.includes('hospital')) {
+        responseType = 'health';
       }
-    ];
 
-    console.log(`AI Request - Model: ${OPENAI_MODEL}, Message: ${message.substring(0, 50)}...`);
-    
-    // Realizar la llamada a la API de OpenAI
-    const completion = await openai.chat.completions.create({
-      model: OPENAI_MODEL,
-      messages,
-      temperature: 0.7,
-      max_tokens: 300,
-    });
+      // Devolver planes relacionados con la categoría
+      const matchingPlans = responseType !== 'default' 
+        ? filterPlansByCategory(allPlans, responseType)
+        : [];
 
-    // Obtener y enviar la respuesta
-    const aiResponse = completion.choices[0].message.content || 
-                      "Lo siento, no pude generar una respuesta en este momento.";
-    
-    console.log(`AI Response (${completion.usage?.total_tokens || 'unknown'} tokens): ${aiResponse.substring(0, 50)}...`);
-    
-    return res.json({ 
-      response: aiResponse,
-      usage: completion.usage,
-      model: OPENAI_MODEL
-    });
+      return res.json({
+        message: mockResponses[responseType],
+        suggestedPlans: matchingPlans.length > 0 ? matchingPlans : undefined
+      });
+    }
   } catch (error: any) {
-    console.error('Error procesando mensaje en OpenAI:', error);
-    
-    return res.status(500).json({ 
+    console.error('Error en el asistente IA:', error);
+    res.status(500).json({ 
       error: 'Error al procesar la solicitud',
-      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      details: error.message || 'Error desconocido'
+    });
+  }
+});
+
+/**
+ * Endpoint para analizar imágenes con IA para recomendaciones de seguros
+ */
+router.post('/analyze-image', async (req, res) => {
+  try {
+    const { image, prompt, useOpenAI = true } = req.body;
+
+    if (!image) {
+      return res.status(400).json({ error: 'Se requiere una imagen' });
+    }
+
+    // Extraer datos de base64 (eliminar prefijo si existe)
+    const base64Data = image.includes('base64,') 
+      ? image.split('base64,')[1] 
+      : image;
+
+    if (useOpenAI) {
+      const response = await analyzeImageForInsurance(base64Data, prompt);
+      return res.json(response);
+    } else {
+      // Respuesta mock para desarrollo
+      return res.json({
+        message: "He analizado la imagen y parece que podrías necesitar un seguro de viaje para tus próximas vacaciones. Considera nuestro Plan Básico de Viaje que ofrece cobertura médica y protección de equipaje."
+      });
+    }
+  } catch (error: any) {
+    console.error('Error al analizar imagen:', error);
+    res.status(500).json({ 
+      error: 'Error al analizar la imagen',
+      details: error.message || 'Error desconocido'
     });
   }
 });
