@@ -1,0 +1,103 @@
+[
+  {
+    "id": "sura-esencial",
+    "name": "Plan Esencial",
+    "insurer": "Seguros SURA",
+    "type": "travel",
+    "country": "Colombia",
+    "priceCOP": 197000,
+    "durationDays": 7,
+    "coverageUSD": 35000,
+    "benefits": [
+      "Cobertura médica de emergencia hasta USD 35,000",
+      "Alojamiento para acompañante hasta USD 8,000",
+      "Indemnización por muerte accidental hasta USD 10,000",
+      "Cobertura por pérdida de equipaje y documentos"
+    ],
+    "exclusions": [
+      "Condiciones preexistentes limitadas a USD 10,000",
+      "Deportes extremos no cubiertos (a menos que se agregue adicional)"
+    ],
+    "addOns": [
+      "Cobertura para deportes extremos (20% adicional)"
+    ],
+    "claimProcess": "Atención 24/7 por WhatsApp y teléfono",
+    "recommendedFor": [
+      "Viajes cortos",
+      "Viajeros primerizos"
+    ],
+    "tags": [
+      "seguro económico",
+      "cobertura médica básica"
+    ]
+  },
+  {
+    "id": "falabella-plus",
+    "name": "Protección Total Plus",
+    "insurer": "Seguros Falabella",
+    "type": "travel",
+    "country": "Colombia",
+    "priceCOP": 312000,
+    "durationDays": 10,
+    "coverageUSD": 50000,
+    "benefits": [
+      "Asistencia médica de emergencia hasta USD 50,000",
+      "Indemnización por cancelación de viaje",
+      "Reembolso por demora de equipaje",
+      "Cobertura odontológica de urgencia hasta USD 500"
+    ],
+    "exclusions": [
+      "No incluye enfermedades preexistentes",
+      "No cubre actividades de alto riesgo"
+    ],
+    "addOns": [
+      "Extensión de días de cobertura",
+      "Cobertura para gadgets electrónicos"
+    ],
+    "claimProcess": "Portal en línea y app móvil",
+    "recommendedFor": [
+      "Viajes internacionales",
+      "Viajeros frecuentes"
+    ],
+    "tags": [
+      "amplia cobertura",
+      "viajes internacionales",
+      "plus"
+    ]
+  },
+  {
+    "id": "axa-viaje-premium",
+    "name": "AXA Viaje Premium",
+    "insurer": "AXA Colpatria",
+    "type": "travel",
+    "country": "Colombia",
+    "priceCOP": 450000,
+    "durationDays": 14,
+    "coverageUSD": 100000,
+    "benefits": [
+      "Atención médica y hospitalaria hasta USD 100,000",
+      "Reembolso de gastos por pérdida total de equipaje",
+      "Traslado sanitario en caso de emergencia",
+      "Asistencia jurídica en el exterior"
+    ],
+    "exclusions": [
+      "Enfermedades crónicas sin notificación previa",
+      "Tratamientos estéticos o voluntarios"
+    ],
+    "addOns": [
+      "Cobertura para familiares adicionales",
+      "Asistencia VIP aeropuerto"
+    ],
+    "claimProcess": "Atención telefónica internacional 24/7",
+    "recommendedFor": [
+      "Viajes largos",
+      "Viajes familiares",
+      "Viajes de negocios"
+    ],
+    "tags": [
+      "premium",
+      "viajes largos",
+      "mayor cobertura"
+    ]
+  }
+]

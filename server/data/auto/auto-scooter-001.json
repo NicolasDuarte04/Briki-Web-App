@@ -1,0 +1,37 @@
+{
+  "id": "auto-scooter-001",
+  "category": "auto",
+  "provider": "Liberty Seguros",
+  "name": "Protección para Scooters y Motos Ligeras",
+  "description": "Seguro diseñado específicamente para propietarios de scooters tipo Vespa y motos ligeras, con cobertura ajustada a tus necesidades urbanas.",
+  "basePrice": 45.99,
+  "currency": "USD",
+  "duration": "mensual",
+  "coverageAmount": 8000,
+  "coverage": {
+    "thirdParty": 6000,
+    "personalAccident": 5000,
+    "theft": 8000,
+    "urbanAssistance": 500
+  },
+  "features": [
+    "Asistencia en vías urbanas 24/7",
+    "Cobertura por daños en estacionamiento",
+    "Protección contra robo de accesorios",
+    "Grúa hasta 50km"
+  ],
+  "deductible": 150,
+  "exclusions": [
+    "Uso para delivery o servicios comerciales",
+    "Modificaciones no homologadas",
+    "Conducción fuera de vías pavimentadas"
+  ],
+  "addOns": [
+    "Seguro de casco y equipamiento",
+    "Asistencia mecánica especializada",
+    "Cobertura internacional"
+  ],
+  "tags": ["scooter", "vespa", "moto ligera", "urbano", "económico"],
+  "rating": 4.5,
+  "status": "active"
+}
