@@ -5,11 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Loader2, Send, Bot, X } from 'lucide-react';
+import { Loader2, Send, Bot, X, Info } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import SuggestedPlans from './SuggestedPlans';
 import { InsurancePlan } from './PlanCard';
+import memoryService from '@/services/memory-service';
 
 // Tipos para los mensajes
 interface Message {
@@ -19,6 +20,12 @@ interface Message {
   timestamp: Date;
   isLoading?: boolean;
   suggestedPlans?: InsurancePlan[];
+}
+
+// Para la comunicación con el backend
+interface APIMessage {
+  role: 'user' | 'assistant' | 'system';
+  content: string;
 }
 
 const RealAssistant: React.FC = () => {
@@ -49,10 +56,44 @@ const RealAssistant: React.FC = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const [contextVisible, setContextVisible] = useState(false);
+  
+  // Formatear el contexto del usuario para mostrarlo
+  const formatUserContext = () => {
+    const context = memoryService.getContext();
+    let formattedContext = [];
+    
+    if (context.location?.country) {
+      formattedContext.push(`Ubicación: ${context.location.country}`);
+    }
+    
+    if (context.auto?.type) {
+      const vehicleType = context.auto.type === 'motorcycle' ? 'Moto/Scooter' : 'Auto';
+      const vehicleMake = context.auto.make ? ` (${context.auto.make})` : '';
+      formattedContext.push(`Vehículo: ${vehicleType}${vehicleMake}`);
+    }
+    
+    if (context.travel?.destination) {
+      const duration = context.travel.duration ? ` por ${context.travel.duration}` : '';
+      formattedContext.push(`Viaje: ${context.travel.destination}${duration}`);
+    }
+    
+    if (context.pet?.type) {
+      const petType = context.pet.type === 'dog' ? 'Perro' : context.pet.type === 'cat' ? 'Gato' : 'Mascota';
+      const petAge = context.pet.age ? ` de ${context.pet.age} años` : '';
+      formattedContext.push(`Mascota: ${petType}${petAge}`);
+    }
+    
+    return formattedContext;
+  };
+  
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!input.trim()) return;
+    
+    // Extraer información del mensaje para el contexto
+    memoryService.extractContextFromMessage(input);
 
     // Agregar mensaje del usuario
     const userMessage: Message = {
@@ -81,17 +122,36 @@ const RealAssistant: React.FC = () => {
       // Dependiendo del toggle, usar IA real o respuestas simuladas
       if (useRealAI) {
         // Convertir mensajes para enviar al backend
-        const conversationHistory = messages
+        const conversationHistory: APIMessage[] = messages
           .filter(msg => !msg.isLoading)
           .map(msg => ({
             role: msg.role,
             content: msg.content,
           }));
         
+        // Obtener el contexto del usuario para añadirlo al historial
+        const userContext = memoryService.getContext();
+        let contextText = '';
+        
+        // Construir un mensaje de sistema con el contexto si existe
+        if (Object.keys(userContext).length > 0) {
+          const contextItems = formatUserContext();
+          if (contextItems.length > 0) {
+            contextText = 'Contexto del usuario: ' + contextItems.join(', ');
+            
+            // Añadir el contexto como un mensaje de sistema al principio de la conversación
+            conversationHistory.unshift({
+              role: 'system' as 'system' | 'user' | 'assistant',
+              content: contextText
+            });
+          }
+        }
+        
         response = await sendMessageToAI(input, conversationHistory);
       } else {
-        // Usar respuestas simuladas
-        response = getMockResponse(input);
+        // Usar respuestas simuladas (también considerando el contexto)
+        const userContext = memoryService.getContext();
+        response = getMockResponse(input, userContext);
       }
 
       // Reemplazar el mensaje de carga con la respuesta real
@@ -191,15 +251,57 @@ const RealAssistant: React.FC = () => {
           <Bot className="h-6 w-6 mr-2 text-primary" />
           <h2 className="text-lg font-semibold">Briki AI Assistant</h2>
         </div>
-        <div className="flex items-center space-x-2">
-          <Switch
-            id="ai-mode"
-            checked={useRealAI}
-            onCheckedChange={setUseRealAI}
-          />
-          <Label htmlFor="ai-mode">Modo IA {useRealAI ? 'Activado' : 'Desactivado'}</Label>
+        <div className="flex items-center space-x-3">
+          <Button 
+            variant="ghost" 
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => setContextVisible(!contextVisible)}
+            title="Ver contexto de la conversación"
+          >
+            <Info className={`h-4 w-4 ${contextVisible ? 'text-primary' : 'text-muted-foreground'}`} />
+          </Button>
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="ai-mode"
+              checked={useRealAI}
+              onCheckedChange={setUseRealAI}
+            />
+            <Label htmlFor="ai-mode">Modo IA {useRealAI ? 'Activado' : 'Desactivado'}</Label>
+          </div>
         </div>
       </div>
+      
+      {/* Panel de contexto */}
+      {contextVisible && (
+        <div className="bg-muted/50 p-3 text-sm border-b">
+          <div className="flex justify-between items-center mb-2">
+            <h3 className="font-medium text-sm">Contexto de la conversación</h3>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-6 w-6" 
+              onClick={() => memoryService.clearContext()}
+              title="Limpiar contexto"
+            >
+              <X className="h-3 w-3" />
+            </Button>
+          </div>
+          
+          {formatUserContext().length > 0 ? (
+            <ul className="space-y-1 text-xs">
+              {formatUserContext().map((item, index) => (
+                <li key={index} className="flex items-center">
+                  <span className="block h-1.5 w-1.5 rounded-full bg-primary mr-2"></span>
+                  {item}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-xs text-muted-foreground">No hay información de contexto todavía. A medida que converses, el asistente recordará detalles importantes.</p>
+          )}
+        </div>
+      )}
       
       {/* Área de mensajes */}
       <ScrollArea className="flex-grow p-4">
