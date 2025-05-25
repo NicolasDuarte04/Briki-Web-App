@@ -1,0 +1,19 @@
+[
+  {
+    "id": "auto-col-001",
+    "name": "Protección Vehicular Clásica",
+    "provider": "SURA",
+    "price": 89.99,
+    "currency": "USD",
+    "coverage": "Daños a terceros, asistencia en carretera, cobertura por robo y pérdida total",
+    "deductible": 300,
+    "features": [
+      "Vehículo de reemplazo",
+      "Cobertura en todo el país",
+      "App móvil de gestión"
+    ],
+    "region": "Colombia",
+    "category": "auto",
+    "language": "es"
+  }
+]

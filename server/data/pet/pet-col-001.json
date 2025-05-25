@@ -1,0 +1,41 @@
+{
+  "id": "pet-col-001",
+  "category": "pet",
+  "provider": "MascotaSegura",
+  "name": "Plan Protección Integral Mascota",
+  "description": "Seguro completo para perros y gatos con cobertura veterinaria amplia, medicamentos y procedimientos médicos en clínicas asociadas.",
+  "basePrice": 35.99,
+  "currency": "USD",
+  "duration": "mensual",
+  "coverageAmount": 4000,
+  "coverage": {
+    "veterinaryCare": 2500,
+    "medications": 1000,
+    "surgeries": 3000,
+    "emergencies": 1500,
+    "vaccines": 300
+  },
+  "features": [
+    "Red de clínicas veterinarias en toda Colombia",
+    "Cobertura para emergencias 24/7",
+    "Plan de vacunación incluido",
+    "Consultas de control sin costo adicional",
+    "Descuentos en alimentos y accesorios"
+  ],
+  "deductible": 25,
+  "exclusions": [
+    "Condiciones preexistentes no declaradas",
+    "Razas consideradas de alto riesgo según listado",
+    "Mascotas mayores de 9 años para primer ingreso",
+    "Tratamientos estéticos"
+  ],
+  "addOns": [
+    "Seguro de responsabilidad civil por daños a terceros",
+    "Servicios de peluquería y estética",
+    "Cobertura para terapias alternativas",
+    "Localización por microchip"
+  ],
+  "tags": ["perros", "gatos", "Colombia", "cobertura completa", "vacunas"],
+  "rating": 4.7,
+  "status": "active"
+}

@@ -1,0 +1,39 @@
+{
+  "id": "travel-latam-001",
+  "category": "travel",
+  "provider": "Assist Card",
+  "name": "Plan Viajero Latinoamérica",
+  "description": "Cobertura especializada para viajeros dentro de América Latina con asistencia médica en español y protecciones específicas para la región.",
+  "basePrice": 25.99,
+  "currency": "USD",
+  "duration": "por viaje",
+  "coverageAmount": 15000,
+  "coverage": {
+    "medical": 15000,
+    "luggage": 800,
+    "cancellation": 1500,
+    "repatriation": 3000,
+    "medication": 500
+  },
+  "features": [
+    "Asistencia médica con médicos locales",
+    "Central de emergencias en español 24/7",
+    "Compensación por pérdida de equipaje",
+    "Gastos por demora o cancelación",
+    "Cobertura para actividades turísticas comunes"
+  ],
+  "deductible": 40,
+  "exclusions": [
+    "Enfermedades preexistentes no declaradas",
+    "Deportes de alto riesgo",
+    "Viajes a zonas no recomendadas oficialmente"
+  ],
+  "addOns": [
+    "Cobertura para dispositivos electrónicos",
+    "Protección para equipamiento deportivo",
+    "Seguro para actividades de aventura moderada"
+  ],
+  "tags": ["latinoamérica", "español", "viajes regionales", "económico"],
+  "rating": 4.4,
+  "status": "active"
+}

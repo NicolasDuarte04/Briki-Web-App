@@ -1,0 +1,44 @@
+{
+  "id": "health-col-001",
+  "category": "health",
+  "provider": "Sanitas Internacional",
+  "name": "Plan Salud Integral Plus",
+  "description": "Seguro médico completo con amplia cobertura hospitalaria, consultas con especialistas y acceso preferencial a la red de clínicas premium en Colombia.",
+  "basePrice": 120.99,
+  "currency": "USD",
+  "duration": "mensual",
+  "coverageAmount": 100000,
+  "coverage": {
+    "hospitalization": 50000,
+    "surgeries": 40000,
+    "specialists": 3000,
+    "medications": 5000,
+    "emergencies": 10000,
+    "laboratory": 3000,
+    "imageDiagnostics": 8000
+  },
+  "features": [
+    "Acceso directo a especialistas sin remisión",
+    "Habitación individual durante hospitalización",
+    "Cobertura de medicamentos de alto costo",
+    "Chequeo ejecutivo anual",
+    "Telemedicina 24/7",
+    "Odontología básica incluida"
+  ],
+  "deductible": 100,
+  "exclusions": [
+    "Condiciones preexistentes no declaradas",
+    "Tratamientos estéticos no reconstructivos",
+    "Lesiones autoinfligidas",
+    "Tratamientos experimentales"
+  ],
+  "addOns": [
+    "Cobertura internacional de emergencias",
+    "Plan odontológico avanzado",
+    "Medicina alternativa y terapias complementarias",
+    "Seguro de vida asociado"
+  ],
+  "tags": ["salud", "Colombia", "hospitalización", "especialistas", "completo"],
+  "rating": 4.8,
+  "status": "active"
+}

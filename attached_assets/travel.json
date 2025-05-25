@@ -1,0 +1,85 @@
+[
+  {
+    "id": "travel_001",
+    "name": "Viaja Protegido Plus",
+    "company": "Assist Card",
+    "country": "Colombia",
+    "price_usd": 25.5,
+    "coverage": {
+      "medical_emergency": "USD 50,000",
+      "trip_cancellation": "USD 2,000",
+      "lost_luggage": "USD 1,200",
+      "covid_coverage": true
+    },
+    "deductible": "USD 100",
+    "exclusions": [
+      "Extreme sports",
+      "Pre-existing conditions (unless stabilized)"
+    ],
+    "features": [
+      "24/7 multilingual support",
+      "Digital claim processing",
+      "Telemedicine access"
+    ],
+    "tags": [
+      "short-term",
+      "covid",
+      "budget"
+    ]
+  },
+  {
+    "id": "travel_002",
+    "name": "Protecci\u00f3n Total Am\u00e9rica Latina",
+    "company": "Assist Seguro",
+    "country": "M\u00e9xico",
+    "price_usd": 39.99,
+    "coverage": {
+      "medical_emergency": "USD 80,000",
+      "trip_cancellation": "USD 5,000",
+      "lost_luggage": "USD 1,500",
+      "covid_coverage": true
+    },
+    "deductible": "USD 0",
+    "exclusions": [
+      "High-risk travel areas",
+      "War zones"
+    ],
+    "features": [
+      "Full refund on visa rejection",
+      "Personal liability coverage",
+      "Medical evacuation included"
+    ],
+    "tags": [
+      "premium",
+      "family",
+      "no-deductible"
+    ]
+  },
+  {
+    "id": "travel_003",
+    "name": "Eco Travel Light",
+    "company": "Seguralia",
+    "country": "Argentina",
+    "price_usd": 18.75,
+    "coverage": {
+      "medical_emergency": "USD 20,000",
+      "trip_cancellation": "USD 1,000",
+      "lost_luggage": "USD 500",
+      "covid_coverage": false
+    },
+    "deductible": "USD 150",
+    "exclusions": [
+      "Sports injuries",
+      "Natural disasters"
+    ],
+    "features": [
+      "Eco-friendly travel support",
+      "Basic claim assistance"
+    ],
+    "tags": [
+      "budget",
+      "eco",
+      "minimal"
+    ]
+  }
+]

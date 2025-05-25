@@ -1,0 +1,36 @@
+{
+  "id": "auto-col-001",
+  "category": "auto",
+  "provider": "SURA",
+  "name": "Protección Vehicular Clásica",
+  "description": "Seguro esencial para tu vehículo con cobertura de daños a terceros, asistencia en carretera y protección en caso de robo o pérdida total.",
+  "basePrice": 89.99,
+  "currency": "USD",
+  "duration": "mensual",
+  "coverageAmount": 20000,
+  "coverage": {
+    "thirdParty": 15000,
+    "roadAssistance": 1000,
+    "theft": 20000,
+    "totalLoss": 20000
+  },
+  "features": [
+    "Vehículo de reemplazo",
+    "Cobertura en todo el país",
+    "App móvil de gestión"
+  ],
+  "deductible": 300,
+  "exclusions": [
+    "Daños por conducción bajo influencia de alcohol",
+    "Uso para fines comerciales no declarados",
+    "Carreras o competencias"
+  ],
+  "addOns": [
+    "Asistencia mecánica extendida",
+    "Protección de llantas",
+    "Cobertura de conductor designado"
+  ],
+  "tags": ["económico", "Colombia", "cobertura básica"],
+  "rating": 4.3,
+  "status": "active"
+}
