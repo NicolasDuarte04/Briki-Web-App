@@ -149,10 +149,14 @@ export function filterPlansByUserNeed(
     'familia': ['familia', 'familiar'],
     'premium': ['premium', 'exclusivo'],
     'básico': ['básico', 'económico'],
-    'viaje': ['viajes internacionales', 'viaje'],
-    'auto': ['auto', 'coche'],
-    'mascota': ['perros', 'gatos', 'mascotas'],
-    'salud': ['salud', 'médico']
+    'viaje': ['viajes internacionales', 'viaje', 'vacaciones', 'turismo'],
+    'auto': ['auto', 'coche', 'vehículo', 'carro'],
+    'moto': ['moto', 'scooter', 'vespa', 'motocicleta'],
+    'mascota': ['perros', 'gatos', 'mascotas', 'animal', 'veterinario'],
+    'salud': ['salud', 'médico', 'hospital', 'clínica', 'hospitalización'],
+    'colombia': ['colombia', 'colombiano'],
+    'latinoamérica': ['latinoamérica', 'latam', 'américa latina'],
+    'sin deducible': ['sin deducible', 'cero deducible']
   };
   
   const tagsToSearch = needToTags[lowercaseNeed] || [lowercaseNeed];
@@ -162,6 +166,99 @@ export function filterPlansByUserNeed(
     return tagsToSearch.some(tag => 
       plan.tags.some(planTag => planTag.toLowerCase().includes(tag))
     );
+  });
+}
+
+/**
+ * Interfaz para los filtros avanzados de planes
+ */
+export interface PlanFilters {
+  minPrice?: number;
+  maxPrice?: number;
+  minCoverage?: number;
+  maxCoverage?: number;
+  minDeductible?: number;
+  maxDeductible?: number;
+  region?: string;
+  currency?: string;
+  providers?: string[];
+  minRating?: number;
+  status?: 'draft' | 'active' | 'archived';
+}
+
+/**
+ * Filtra planes por atributos específicos como precio, cobertura, deducible, etc.
+ * @param plans Array de planes a filtrar
+ * @param filters Criterios de filtrado
+ * @returns Array de planes filtrados
+ */
+export function filterPlansByAttributes(
+  plans: MockInsurancePlan[],
+  filters: PlanFilters
+): MockInsurancePlan[] {
+  if (!filters || Object.keys(filters).length === 0) return plans;
+
+  return plans.filter(plan => {
+    // Filtrar por rango de precio
+    if (filters.minPrice !== undefined && plan.basePrice < filters.minPrice) {
+      return false;
+    }
+    if (filters.maxPrice !== undefined && plan.basePrice > filters.maxPrice) {
+      return false;
+    }
+
+    // Filtrar por rango de cobertura
+    if (filters.minCoverage !== undefined && plan.coverageAmount < filters.minCoverage) {
+      return false;
+    }
+    if (filters.maxCoverage !== undefined && plan.coverageAmount > filters.maxCoverage) {
+      return false;
+    }
+
+    // Filtrar por rango de deducible
+    if (filters.minDeductible !== undefined && plan.deductible < filters.minDeductible) {
+      return false;
+    }
+    if (filters.maxDeductible !== undefined && plan.deductible > filters.maxDeductible) {
+      return false;
+    }
+
+    // Filtrar por moneda
+    if (filters.currency && plan.currency !== filters.currency) {
+      return false;
+    }
+
+    // Filtrar por proveedor
+    if (filters.providers && filters.providers.length > 0) {
+      if (!filters.providers.includes(plan.provider)) {
+        return false;
+      }
+    }
+
+    // Filtrar por calificación mínima
+    if (filters.minRating !== undefined && plan.rating < filters.minRating) {
+      return false;
+    }
+
+    // Filtrar por estado del plan
+    if (filters.status && plan.status !== filters.status) {
+      return false;
+    }
+
+    // Filtrar por región/país
+    if (filters.region) {
+      const regionLower = filters.region.toLowerCase();
+      // Buscar la región en tags
+      const hasRegionTag = plan.tags.some(tag => 
+        tag.toLowerCase().includes(regionLower)
+      );
+      
+      if (!hasRegionTag) {
+        return false;
+      }
+    }
+
+    return true;
   });
 }
 
