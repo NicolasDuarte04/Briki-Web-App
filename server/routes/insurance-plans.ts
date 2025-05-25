@@ -47,6 +47,17 @@ router.get('/tags', async (req, res) => {
     }
     
     const tags = tagsParam.split(',').map(tag => tag.trim());
+    console.log(`Buscando planes con tags: ${tags.join(', ')}`);
+    
+    // Obtener todos los planes para verificar qué tags existen
+    const allPlans = await mockStorage.getAllInsurancePlans();
+    console.log(`Tags disponibles en los planes:`);
+    allPlans.forEach(plan => {
+      if (plan.tags && plan.tags.length > 0) {
+        console.log(`- Plan ${plan.id}: ${plan.tags.join(', ')}`);
+      }
+    });
+    
     const plans = await mockStorage.getInsurancePlansByTags(tags);
     
     res.json(plans);

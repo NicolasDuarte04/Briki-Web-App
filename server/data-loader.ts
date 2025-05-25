@@ -105,9 +105,26 @@ export function filterPlansByTags(
 ): MockInsurancePlan[] {
   if (!tags || tags.length === 0) return plans;
   
+  // Convertir los acentos a caracteres normales para manejar 'económico' vs 'economico'
+  const normalizeString = (str: string): string => {
+    return str.toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+  };
+  
+  // Normalizar los tags de búsqueda
+  const normalizedSearchTags = tags.map(tag => normalizeString(tag));
+  
   return plans.filter(plan => {
     if (!plan.tags) return false;
-    return tags.some(tag => plan.tags.includes(tag));
+    
+    // Normalizar los tags del plan
+    const normalizedPlanTags = plan.tags.map(tag => normalizeString(tag));
+    
+    // Buscar coincidencias entre los tags normalizados
+    return normalizedSearchTags.some(searchTag => 
+      normalizedPlanTags.some(planTag => planTag.includes(searchTag))
+    );
   });
 }
 
