@@ -1,6 +1,11 @@
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import { InsuranceCategory, INSURANCE_CATEGORIES } from '@shared/schema';
+
+// Para ESM, necesitamos calcular __dirname ya que no está disponible por defecto
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /**
  * Interfaz para los planes de seguro mock
@@ -35,7 +40,10 @@ export function loadMockInsurancePlans(): MockInsurancePlan[] {
   
   for (const category of categories) {
     try {
+      // Construir la ruta a la carpeta de datos
       const categoryPath = path.join(__dirname, 'data', category);
+      
+      console.log(`Checking directory: ${categoryPath}`);
       
       // Verificar si la carpeta existe
       if (!fs.existsSync(categoryPath)) {
@@ -45,6 +53,7 @@ export function loadMockInsurancePlans(): MockInsurancePlan[] {
       
       // Leer todos los archivos JSON en la carpeta
       const files = fs.readdirSync(categoryPath).filter(file => file.endsWith('.json'));
+      console.log(`Found ${files.length} files in ${category} category`);
       
       for (const file of files) {
         try {
@@ -55,6 +64,7 @@ export function loadMockInsurancePlans(): MockInsurancePlan[] {
           // Validar que el plan tiene la categoría correcta
           if (plan.category === category) {
             plans.push(plan);
+            console.log(`Loaded plan: ${plan.name} (${plan.category})`);
           } else {
             console.warn(`Plan in file ${file} has incorrect category: ${plan.category}, expected: ${category}`);
           }
