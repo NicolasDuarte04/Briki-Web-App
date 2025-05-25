@@ -20,6 +20,7 @@ import {
   InsertPlanAnalytic,
   INSURANCE_CATEGORIES
 } from "@shared/schema";
+import { loadMockInsurancePlans, MockInsurancePlan, filterPlansByCategory, filterPlansByTags, filterPlansByUserNeed } from "./data-loader";
 
 // Updated user input schema to match our enhanced DB schema
 export const userAuthSchema = z.object({
@@ -914,5 +915,168 @@ export class DatabaseStorage implements IStorage {
   }
 }
 
+// Clase que implementa IStorage con datos cargados desde archivos JSON
+export class MockDataStorage implements IStorage {
+  private users: Map<string, User> = new Map();
+  private emails: Map<string, string> = new Map(); // email -> userId
+  private usernames: Map<string, string> = new Map(); // username -> userId
+  private googleIds: Map<string, string> = new Map(); // googleId -> userId
+  private quotes: Map<string, Quote> = new Map();
+  private companyProfiles: Map<string, CompanyProfile> = new Map(); // userId -> CompanyProfile
+  private companyPlans: Map<number, CompanyPlan> = new Map(); // planId -> CompanyPlan
+  private planAnalytics: Map<string, PlanAnalytic[]> = new Map(); // planId -> PlanAnalytic[]
+  private mockInsurancePlans: MockInsurancePlan[] = [];
+  
+  constructor() {
+    console.log("Initializing mock data storage...");
+    
+    // Cargar los planes de seguro mock
+    try {
+      this.mockInsurancePlans = loadMockInsurancePlans();
+      console.log(`Loaded ${this.mockInsurancePlans.length} mock insurance plans`);
+    } catch (error) {
+      console.error("Error loading mock insurance plans:", error);
+    }
+  }
+
+  // Métodos de usuario (implementaciones mínimas requeridas)
+  async getUser(id: string): Promise<User | undefined> {
+    return this.users.get(id);
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const userId = this.usernames.get(username);
+    if (!userId) return undefined;
+    return this.users.get(userId);
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const userId = this.emails.get(email);
+    if (!userId) return undefined;
+    return this.users.get(userId);
+  }
+
+  async getUserByGoogleId(googleId: string): Promise<User | undefined> {
+    const userId = this.googleIds.get(googleId);
+    if (!userId) return undefined;
+    return this.users.get(userId);
+  }
+
+  async createUser(user: UserAuth): Promise<User> {
+    const userId = user.id || nanoid();
+    const newUser: User = {
+      id: userId,
+      email: user.email,
+      firstName: user.firstName || null,
+      lastName: user.lastName || null,
+      profileImageUrl: user.profileImageUrl || null,
+      role: user.role || "user",
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    
+    this.users.set(userId, newUser);
+    this.emails.set(user.email, userId);
+    
+    if (user.username) {
+      this.usernames.set(user.username, userId);
+    }
+    
+    return newUser;
+  }
+
+  async updateUser(id: string, updates: UserUpdate): Promise<User | undefined> {
+    const user = this.users.get(id);
+    if (!user) return undefined;
+    
+    const updatedUser = { ...user, ...updates, updatedAt: new Date() };
+    this.users.set(id, updatedUser);
+    
+    return updatedUser;
+  }
+
+  // Métodos específicos para planes de seguro mock
+  getAllInsurancePlans(): Promise<MockInsurancePlan[]> {
+    return Promise.resolve(this.mockInsurancePlans);
+  }
+
+  getInsurancePlansByCategory(category: InsuranceCategory): Promise<MockInsurancePlan[]> {
+    return Promise.resolve(filterPlansByCategory(this.mockInsurancePlans, category));
+  }
+
+  getInsurancePlansByTags(tags: string[]): Promise<MockInsurancePlan[]> {
+    return Promise.resolve(filterPlansByTags(this.mockInsurancePlans, tags));
+  }
+
+  getInsurancePlansByUserNeed(need: string): Promise<MockInsurancePlan[]> {
+    return Promise.resolve(filterPlansByUserNeed(this.mockInsurancePlans, need));
+  }
+
+  // Implementaciones vacías o mínimas para otros métodos requeridos
+  async createQuote(quoteData: InsertQuote): Promise<Quote> {
+    const id = Date.now();
+    const quote = {
+      id,
+      ...quoteData,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    
+    this.quotes.set(id.toString(), quote);
+    return quote;
+  }
+
+  async getQuoteById(id: number): Promise<Quote | undefined> {
+    return this.quotes.get(id.toString());
+  }
+
+  async getQuoteByReference(reference: string): Promise<Quote | undefined> {
+    return Array.from(this.quotes.values()).find(q => q.quoteReference === reference);
+  }
+
+  async getUserQuotes(userId: string): Promise<Quote[]> {
+    return Array.from(this.quotes.values()).filter(q => q.userId === userId);
+  }
+
+  // Métodos restantes con implementaciones vacías o placeholder
+  // ...
+
+  // Implementaciones para las demás funciones requeridas
+  // Para mantener la interface compatible, implementa todos los métodos de IStorage
+  
+  async resetUsers(): Promise<boolean> { return true; }
+  async deleteUser(id: string): Promise<boolean> { return true; }
+  async getAllUsers(): Promise<User[]> { return []; }
+  async getUsersByEmail(email: string): Promise<User[]> { return []; }
+  async getUsersByRole(role: string): Promise<User[]> { return []; }
+  async setUserResetToken(userId: string, token: string): Promise<boolean> { return true; }
+  async getUserByResetToken(token: string): Promise<User | undefined> { return undefined; }
+  async clearUserResetToken(userId: string): Promise<boolean> { return true; }
+  async updateQuote(id: number, updates: Partial<InsertQuote>): Promise<Quote | undefined> { return undefined; }
+  async deleteQuote(id: number): Promise<boolean> { return true; }
+  async getCompanyProfile(userId: string): Promise<CompanyProfile | undefined> { return undefined; }
+  async createCompanyProfile(profile: InsertCompanyProfile): Promise<CompanyProfile> { return {} as CompanyProfile; }
+  async updateCompanyProfile(id: number, updates: Partial<InsertCompanyProfile>): Promise<CompanyProfile | undefined> { return undefined; }
+  async deleteCompanyProfile(id: number): Promise<boolean> { return true; }
+  async getAllCompanyProfiles(): Promise<CompanyProfile[]> { return []; }
+  async getCompanyPlans(companyId: number): Promise<CompanyPlan[]> { return []; }
+  async getCompanyPlansByCategory(companyId: number, category: InsuranceCategory): Promise<CompanyPlan[]> { return []; }
+  async getCompanyPlan(planId: number): Promise<CompanyPlan | undefined> { return undefined; }
+  async createCompanyPlan(plan: InsertCompanyPlan): Promise<CompanyPlan> { return {} as CompanyPlan; }
+  async updateCompanyPlan(planId: number, updates: Partial<InsertCompanyPlan>): Promise<CompanyPlan | undefined> { return undefined; }
+  async deleteCompanyPlan(planId: number): Promise<boolean> { return true; }
+  async updatePlanAnalytics(planId: number, analyticsType: 'view' | 'comparison' | 'conversion'): Promise<boolean> { return true; }
+  async getPlanAnalytics(planId: number): Promise<PlanAnalytic[]> { return []; }
+  async getPlanRankingByViews(limit: number = 5): Promise<{planId: number, views: number}[]> { return []; }
+  async getPlanRankingByConversions(limit: number = 5): Promise<{planId: number, conversions: number}[]> { return []; }
+  async getTotalUsers(): Promise<number> { return 0; }
+  async getRecentPlanActivity(limit: number = 5): Promise<PlanAnalytic[]> { return []; }
+  async getDashboardAnalytics(companyId: number): Promise<any> { return {}; }
+}
+
 // Export a singleton instance of the storage
+// Puedes cambiar entre DatabaseStorage y MockDataStorage según necesites
 export const storage = new DatabaseStorage();
+
+// También exportamos la versión de datos mock para poder usarla en rutas específicas
+export const mockStorage = new MockDataStorage();

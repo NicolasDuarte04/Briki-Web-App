@@ -2,7 +2,7 @@ import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { isAuthenticated } from "./auth/local-auth";
-import { storage } from "./storage";
+import { storage, mockStorage } from "./storage";
 import { pool } from "./db";
 import Stripe from "stripe";
 import path from "path";
@@ -52,6 +52,7 @@ const tripSchema = z.object({
 import googleAuthRoutes from './routes/google-auth';
 import quotesRoutes from './routes/quotes';
 import aiRouter from './routes/ai';
+import insurancePlansRouter from './routes/insurance-plans';
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup Replit authentication
@@ -61,6 +62,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use('/api/auth', googleAuthRoutes);
   app.use('/api/quotes', quotesRoutes);
   app.use('/api/ai', aiRouter);
+  app.use('/api/insurance-plans', insurancePlansRouter);
 
   // Initialize database - using a more resilient approach
   try {
