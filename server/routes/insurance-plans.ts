@@ -1,7 +1,13 @@
 import { Router } from 'express';
 import { INSURANCE_CATEGORIES, InsuranceCategory } from '@shared/schema';
 import { mockStorage } from '../storage';
-import { prepareAIContext, PlanFilters } from '../data-loader';
+import { 
+  prepareAIContext, 
+  PlanFilters, 
+  filterPlansByAttributes, 
+  filterPlansByTags,
+  filterPlansByUserNeed
+} from '../data-loader';
 import { semanticSearch } from '../services/semantic-search';
 
 const router = Router();
