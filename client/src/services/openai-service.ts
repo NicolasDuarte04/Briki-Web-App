@@ -66,9 +66,10 @@ export async function sendMessageToAI(
 /**
  * Obtiene respuestas simuladas para situaciones en las que no se puede usar la API
  * @param message Mensaje del usuario
+ * @param userContext Contexto opcional del usuario
  * @returns Respuesta simulada con mensaje y planes sugeridos
  */
-export function getMockResponse(message: string): OpenAIResponse {
+export function getMockResponse(message: string, userContext?: any): OpenAIResponse {
   // Respuestas básicas para demostración
   const lowercaseMessage = message.toLowerCase();
   
