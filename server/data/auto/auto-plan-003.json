@@ -1,0 +1,41 @@
+{
+  "id": "plan-auto-003",
+  "category": "auto",
+  "provider": "MaxiSeguro",
+  "name": "Protección Total Plus",
+  "description": "La cobertura más completa del mercado con beneficios exclusivos y servicio premium.",
+  "basePrice": 89.99,
+  "currency": "USD",
+  "duration": "mensual",
+  "coverageAmount": 300000,
+  "coverage": {
+    "thirdParty": 300000,
+    "ownDamage": "valor comercial",
+    "theft": "valor comercial",
+    "medicalExpenses": 20000,
+    "legalDefense": 10000,
+    "personalEffects": 2000
+  },
+  "features": [
+    "Cobertura a valor comercial sin depreciación",
+    "Responsabilidad civil ilimitada",
+    "Servicio de chofer sustituto",
+    "Asistencia VIP en siniestros",
+    "Auto sustituto premium por 30 días",
+    "Servicio de grúa sin límite de eventos",
+    "Cobertura de efectos personales"
+  ],
+  "deductible": 0,
+  "exclusions": [
+    "Daños intencionales",
+    "Uso del vehículo para fines ilícitos"
+  ],
+  "addOns": [
+    "Protección patrimonial extendida",
+    "Cobertura para conductor designado",
+    "Indemnización garantizada en 48 horas"
+  ],
+  "tags": ["premium", "completo", "sin deducible", "exclusivo"],
+  "rating": 4.9,
+  "status": "active"
+}

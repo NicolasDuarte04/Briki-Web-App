@@ -1,0 +1,33 @@
+{
+  "id": "plan-travel-001",
+  "category": "travel",
+  "provider": "Seguros El Cóndor",
+  "name": "Plan Básico de Viaje",
+  "description": "Cobertura médica básica para viajes internacionales con atención las 24 horas.",
+  "basePrice": 19.99,
+  "currency": "USD",
+  "duration": "por viaje",
+  "coverageAmount": 10000,
+  "coverage": {
+    "medical": 10000,
+    "luggage": 500,
+    "cancellation": 1000
+  },
+  "features": [
+    "Atención médica 24/7",
+    "Cobertura por cancelación de viaje",
+    "Protección de equipaje perdido"
+  ],
+  "deductible": 50,
+  "exclusions": [
+    "Deportes extremos",
+    "Condiciones médicas preexistentes"
+  ],
+  "addOns": [
+    "Extensión por COVID-19",
+    "Repatriación médica"
+  ],
+  "tags": ["económico", "viajes internacionales", "popular"],
+  "rating": 4.2,
+  "status": "active"
+}

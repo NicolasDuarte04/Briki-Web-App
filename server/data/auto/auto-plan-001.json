@@ -1,0 +1,34 @@
+{
+  "id": "plan-auto-001",
+  "category": "auto",
+  "provider": "Seguros Automotriz",
+  "name": "Cobertura Básica",
+  "description": "Seguro obligatorio con responsabilidad civil básica para conductores económicos.",
+  "basePrice": 29.99,
+  "currency": "USD",
+  "duration": "mensual",
+  "coverageAmount": 50000,
+  "coverage": {
+    "thirdParty": 50000,
+    "medicalExpenses": 5000,
+    "legalDefense": 2000
+  },
+  "features": [
+    "Responsabilidad civil obligatoria",
+    "Asistencia en carretera básica",
+    "Asesoría legal telefónica"
+  ],
+  "deductible": 200,
+  "exclusions": [
+    "Daños al propio vehículo",
+    "Conductores menores de 25 años",
+    "Uso comercial del vehículo"
+  ],
+  "addOns": [
+    "Asistencia en carretera extendida",
+    "Cobertura por vandalismo"
+  ],
+  "tags": ["económico", "básico", "obligatorio"],
+  "rating": 3.9,
+  "status": "active"
+}

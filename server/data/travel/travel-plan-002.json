@@ -1,0 +1,37 @@
+{
+  "id": "plan-travel-002",
+  "category": "travel",
+  "provider": "Global Assistance",
+  "name": "Plan Premium Internacional",
+  "description": "Cobertura completa para viajeros exigentes con asistencia VIP en más de 190 países.",
+  "basePrice": 39.99,
+  "currency": "USD",
+  "duration": "por viaje",
+  "coverageAmount": 50000,
+  "coverage": {
+    "medical": 50000,
+    "luggage": 2000,
+    "cancellation": 5000,
+    "delay": 500
+  },
+  "features": [
+    "Asistencia médica premium en todo el mundo",
+    "Traslado y repatriación sanitaria",
+    "Compensación por pérdida de equipaje",
+    "Cancelación e interrupción de viaje",
+    "Responsabilidad civil en viaje"
+  ],
+  "deductible": 0,
+  "exclusions": [
+    "Enfermedades crónicas no estables",
+    "Embarazo después de la semana 24"
+  ],
+  "addOns": [
+    "Seguro de dispositivos electrónicos",
+    "Cobertura para deportes de aventura",
+    "Asistencia legal internacional"
+  ],
+  "tags": ["premium", "viajes internacionales", "sin deducible"],
+  "rating": 4.8,
+  "status": "active"
+}
