@@ -23,7 +23,7 @@ interface OpenAIErrorResponse {
   details?: string;
 }
 
-interface Message {
+export interface APIMessage {
   role: "user" | "assistant" | "system";
   content: string;
 }
@@ -36,7 +36,7 @@ interface Message {
  */
 export async function sendMessageToAI(
   message: string,
-  conversationHistory: Message[] = []
+  conversationHistory: APIMessage[] = []
 ): Promise<OpenAIResponse> {
   try {
     const response = await fetch("/api/ai/ask", {

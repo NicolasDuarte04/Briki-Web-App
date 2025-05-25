@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { sendMessageToAI, getMockResponse } from '@/services/openai-service';
+import { sendMessageToAI, getMockResponse, APIMessage } from '@/services/openai-service';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
