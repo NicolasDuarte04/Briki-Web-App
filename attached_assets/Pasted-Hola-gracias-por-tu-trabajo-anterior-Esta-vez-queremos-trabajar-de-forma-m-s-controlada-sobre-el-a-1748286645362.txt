@@ -1,0 +1,37 @@
+Hola, gracias por tu trabajo anterior. Esta vez queremos trabajar de forma más controlada sobre el archivo `RealAssistant.tsx`, por lo tanto, por favor NO edites archivos directamente. Queremos que nos respondas compartiendo únicamente fragmentos de código sugeridos por este chat, basados en las siguientes preguntas y observaciones técnicas:
+
+—
+
+**1. Scroll automático no deseado**
+Actualmente, el scroll se dispara al fondo del chat cada vez que se actualizan los mensajes (`useEffect([messages])`), lo cual genera:
+
+- Al abrir la página, el usuario ve el fondo de la conversación (sin haber escrito nada).
+- Al recibir una respuesta larga del asistente, se ve el final del mensaje sin mostrar el inicio (especialmente cuando hay tarjetas de plan).
+
+**Preguntas técnicas sobre este punto:**
+
+a) ¿Podrías modular `scrollToBottom` para que **solo se active cuando el asistente responda**, pero **no cuando se carga la página o al enviar un saludo genérico**?
+
+b) ¿Qué te parece separar este comportamiento con un estado adicional, por ejemplo `shouldScroll`, que se active solo después de respuestas válidas?
+
+c) ¿Podrías mostrar cómo usar un `setTimeout` para retrasar el `scrollToBottom` 200–300ms después de renderizar el mensaje, de modo que no se corte la parte superior del mensaje?
+
+d) ¿Podrías incluir una validación simple que **detecte si el mensaje es solo "hola", "¿cómo estás?" u otro saludo genérico**, para evitar hacer scroll innecesario en ese caso?
+
+—
+
+**2. UI/UX — Sugerencias de estilo**
+
+Además del tema de scroll, hemos notado algunas mejoras potenciales de UI que podríamos aplicar:
+
+e) ¿Qué te parece aplicar un pequeño fondo degradado sutil al área de mensajes (`ScrollArea`) para reforzar la estética visual sin afectar la legibilidad?
+
+f) Actualmente, el `Input` y el botón están un poco "duros" visualmente. ¿Podrías proponer un pequeño cambio de padding o border-radius en el formulario para que se sienta más integrado al diseño general?
+
+g) ¿Es posible mostrar un **mensaje de bienvenida o tarjeta interactiva** antes de que el usuario envíe su primer mensaje, como una mini introducción o instrucciones tipo "¿Qué necesitas hoy?"?
+
+h) Si tienes otra sugerencia para mejorar el ritmo visual o la jerarquía de los elementos, también bienvenida.
+
+—
+
+**Importante:** Por favor no edites ningún archivo. Comparte tus sugerencias y fragmentos de código en este chat. Una vez que revisemos y validemos tu enfoque, podremos aprobar su implementación final. Muchas gracias.
