@@ -1,0 +1,63 @@
+Objetivo: Necesitamos eliminar por completo el archivo RealAssistant.tsx y reemplazarlo con una nueva versión llamada NewBrikiAssistant.tsx, más limpia, modular y funcional. El comportamiento actual tiene múltiples fallos (scroll forzado, contexto mal gestionado, estructura poco clara) y ya no cumple con los estándares de producto.
+
+⸻
+
+Acciones requeridas:
+
+1. Eliminar el componente actual RealAssistant.tsx
+	•	Este archivo debe eliminarse completamente del proyecto.
+	•	Asegúrate de remover cualquier referencia, importación o dependencia a este archivo en otras rutas como /ask-briki-ai, layouts o componentes.
+	•	Verifica que pages/ask-briki-ai.tsx ya no importe RealAssistant.tsx, sino la nueva versión que vas a crear (NewBrikiAssistant.tsx).
+
+⸻
+
+2. Crear un nuevo archivo llamado NewBrikiAssistant.tsx
+
+Este archivo debe ser un reemplazo completo, con lógica y UI mejoradas. Las características que debe incluir:
+
+⸻
+
+A. Estructura de la pantalla:
+	•	Componente principal con <ScrollArea> para mostrar mensajes.
+	•	Encabezado: Briki AI Assistant + subtítulo explicativo.
+	•	Área central para mostrar el historial de conversación.
+	•	Tarjeta de bienvenida (como componente separado) que desaparece al primer mensaje.
+	•	Campo de entrada de texto con botón de envío fijo en la parte inferior.
+	•	Indicador visual si el usuario ha hecho scroll hacia arriba (ej: “↑ Hay mensajes anteriores”).
+
+⸻
+
+B. Lógica de conversación:
+	•	useState para manejar: messages, input, isLoading, userContext.
+	•	El scroll debe solo ejecutarse si hay una respuesta larga o planes sugeridos, no cada vez que llega un mensaje.
+	•	Detectar saludos genéricos y en esos casos no mostrar planes.
+	•	Mostrar solo 1–2 líneas de introducción antes de presentar los planes.
+	•	Evitar scroll forzado hacia el fondo al cargar la página.
+
+⸻
+
+C. Modularización:
+	•	Crear o reutilizar componente SuggestedPlans.tsx para mostrar planes.
+	•	Crear nuevo componente WelcomeCard.tsx para mostrar la tarjeta inicial.
+	•	Mover la lógica de formato de contexto y detección de intención a un archivo de servicios (context-utils.ts o similar).
+
+⸻
+
+D. Conexión de rutas:
+	•	La página /ask-briki-ai debe importar exclusivamente NewBrikiAssistant.tsx.
+	•	Verifica que no haya importaciones residuales de RealAssistant.tsx.
+
+⸻
+
+E. Requisitos de UI y UX:
+	•	Estética premium y accesible: padding generoso, colores suaves, íconos amigables.
+	•	Diferenciación clara entre mensajes del usuario y del asistente.
+	•	Formulario de entrada grande y moderno con botón llamativo.
+	•	Timestamps visibles, texto con formato limpio (whitespace-pre-wrap, negritas, listas, etc).
+
+⸻
+
+Importante:
+
+Por favor NO edites directamente los archivos aún.
+Envía el nuevo archivo NewBrikiAssistant.tsx completo a través del chat para poder revisarlo y aprobarlo antes de integrarlo.

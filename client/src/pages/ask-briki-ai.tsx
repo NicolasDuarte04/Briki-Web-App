@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet';
 import { Bot, MessageCircle, Sparkles, ArrowRight } from 'lucide-react';
-import RealAssistant from '@/components/briki-ai-assistant/RealAssistant';
+import NewBrikiAssistant from '@/components/briki-ai-assistant/NewBrikiAssistant';
 import { PublicLayout } from '@/components/layout/public-layout';
 import { Button } from '@/components/ui/button';
 
@@ -56,66 +56,14 @@ export default function AskBrikiAIPage() {
             </div>
           </motion.div>
 
-          {/* Suggested Questions */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="mb-8"
-          >
-            <h3 className="text-lg font-semibold text-center mb-4 text-gray-700 dark:text-gray-300">
-              💡 Prueba preguntando:
-            </h3>
-            <div className="flex flex-wrap justify-center gap-3 max-w-4xl mx-auto">
-              {suggestedQuestions.map((question, index) => (
-                <Button
-                  key={index}
-                  variant="outline"
-                  size="sm"
-                  className="text-left bg-white/80 hover:bg-blue-50 border-blue-200 hover:border-blue-300 transition-all duration-200 group"
-                  onClick={() => {
-                    // Disparar evento personalizado para que RealAssistant capture la pregunta
-                    window.dispatchEvent(new CustomEvent('suggestedQuestion', { 
-                      detail: { question } 
-                    }));
-                  }}
-                >
-                  <span className="text-xs text-gray-600 group-hover:text-blue-700 leading-relaxed">
-                    {question}
-                  </span>
-                  <ArrowRight className="h-3 w-3 ml-2 opacity-0 group-hover:opacity-100 transition-opacity" />
-                </Button>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Assistant Container */}
+          {/* New Assistant - Full Screen */}
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.5 }}
-            className="max-w-4xl mx-auto"
+            className="w-full h-[80vh]"
           >
-            <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-2xl border border-white/20 dark:border-gray-700/50 overflow-hidden">
-              {/* Chat Header */}
-              <div className="bg-gradient-to-r from-blue-600 to-cyan-500 px-6 py-4">
-                <div className="flex items-center">
-                  <Bot className="h-6 w-6 mr-3 text-white" />
-                  <div>
-                    <h3 className="font-semibold text-white">Briki AI Assistant</h3>
-                    <p className="text-blue-100 text-sm">Tu experto en seguros disponible 24/7</p>
-                  </div>
-                  <div className="ml-auto">
-                    <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Assistant Component */}
-              <div className="p-0">
-                <RealAssistant />
-              </div>
-            </div>
+            <NewBrikiAssistant />
           </motion.div>
 
           {/* Footer Info */}
