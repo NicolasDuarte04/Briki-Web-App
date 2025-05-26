@@ -48,6 +48,22 @@ const RealAssistant: React.FC = () => {
     scrollToBottom();
   }, [messages]);
 
+  // Escuchar eventos de preguntas sugeridas
+  useEffect(() => {
+    const handleSuggestedQuestion = (event: CustomEvent) => {
+      const { question } = event.detail;
+      setInput(question);
+      // Enviar automáticamente la pregunta
+      handleSendMessage(question);
+    };
+
+    window.addEventListener('suggestedQuestion', handleSuggestedQuestion as EventListener);
+    
+    return () => {
+      window.removeEventListener('suggestedQuestion', handleSuggestedQuestion as EventListener);
+    };
+  }, []);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
