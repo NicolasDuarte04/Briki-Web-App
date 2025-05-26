@@ -136,7 +136,7 @@ const NewBrikiAssistant: React.FC = () => {
 
       // Smart scroll: only if response has plans or is long, and not a greeting
       if (!isGenericGreeting(messageToSend) && 
-          ((response.suggestedPlans && response.suggestedPlans.length > 0) || (response.message?.length || 0) > 200)) {
+          ((response.suggestedPlans?.length || 0) > 0 || (response.message?.length || 0) > 200)) {
         scrollToBottom(true);
       }
 
