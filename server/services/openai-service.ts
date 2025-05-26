@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-import { MockInsurancePlan } from "../data-loader";
+import { MockInsurancePlan, createEnrichedContext } from "../data-loader";
 
 // Initialize the OpenAI client with API key from environment variables
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -34,7 +34,7 @@ export async function generateAssistantResponse(
   // Prepare system message with context and instructions
   const systemMessage: AssistantMessage = {
     role: "system",
-    content: createSystemPrompt(insurancePlans)
+    content: createSystemPrompt(insurancePlans, userMessage)
   };
   
   // Combine history with current message
@@ -98,7 +98,7 @@ export async function generateAssistantResponse(
  * Create a system prompt with context about available insurance plans
  * @param insurancePlans Plans to include in the context
  */
-function createSystemPrompt(insurancePlans: MockInsurancePlan[]): string {
+function createSystemPrompt(insurancePlans: MockInsurancePlan[], userMessage: string = ''): string {
   // Start with base instructions
   let prompt = `Eres Briki, un asistente de seguros amigable y profesional. Tu objetivo es ayudar a los usuarios a encontrar el mejor seguro para sus necesidades.
 
@@ -110,6 +110,14 @@ IMPORTANTE: Solo recomienda planes de seguros cuando:
 Si el usuario solo saluda o hace conversación general, responde amigablemente pero NO recomiendes planes. En su lugar, pregunta qué tipo de seguro le interesa o qué situación quiere proteger.
 
 Mantén tus respuestas concisas y directas. Si recomiendas planes, da una introducción breve (máximo 2 líneas) antes de mencionarlos.`;
+
+  // Add enriched context from knowledge base
+  if (userMessage) {
+    const enrichedContext = createEnrichedContext(userMessage, insurancePlans);
+    if (enrichedContext.trim()) {
+      prompt += `\n\nInformación contextual relevante:${enrichedContext}`;
+    }
+  }
 
   // Add context about available plans if provided
   if (insurancePlans.length > 0) {

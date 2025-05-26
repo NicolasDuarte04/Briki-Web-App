@@ -300,3 +300,223 @@ export function prepareAIContext(
   
   return context;
 }
+
+/**
+ * Interfaces para la base de conocimiento
+ */
+export interface InsuranceTerm {
+  id: string;
+  term: string;
+  definition: string;
+  example: string;
+  category: string;
+  related_terms: string[];
+}
+
+export interface FAQ {
+  id: string;
+  question: string;
+  answer: string;
+  category: string;
+  keywords: string[];
+}
+
+export interface TravelDestination {
+  id: string;
+  region: string;
+  countries: string[];
+  insurance_requirements: Record<string, any>;
+  common_risks: string[];
+  recommended_activities_coverage: string[];
+  currency: string;
+  emergency_numbers: string;
+  medical_costs: string;
+}
+
+export interface MedicalCondition {
+  id: string;
+  name: string;
+  type: string;
+  insurance_impact: Record<string, string>;
+  declaration_required: boolean;
+  common_exclusions: string[];
+  tips: string;
+}
+
+export interface KnowledgeBase {
+  terms: InsuranceTerm[];
+  faqs: FAQ[];
+  destinations: TravelDestination[];
+  conditions: MedicalCondition[];
+  regulations: Record<string, any>;
+}
+
+// Variable global para almacenar la base de conocimiento
+let knowledgeBase: KnowledgeBase = {
+  terms: [],
+  faqs: [],
+  destinations: [],
+  conditions: [],
+  regulations: {}
+};
+
+/**
+ * Carga la base de conocimiento desde archivos JSON
+ */
+export function loadKnowledgeBase(): void {
+  try {
+    const knowledgePath = path.join(__dirname, 'data', 'knowledge');
+    const regulationsPath = path.join(__dirname, 'data', 'regulations');
+    
+    // Cargar términos de seguros
+    try {
+      const termsPath = path.join(knowledgePath, 'insurance-terms.json');
+      if (fs.existsSync(termsPath)) {
+        const termsData = JSON.parse(fs.readFileSync(termsPath, 'utf-8'));
+        knowledgeBase.terms = termsData.terms || [];
+        console.log(`Loaded ${knowledgeBase.terms.length} insurance terms`);
+      }
+    } catch (error) {
+      console.warn('Error loading insurance terms:', error);
+    }
+
+    // Cargar FAQs
+    try {
+      const faqPath = path.join(knowledgePath, 'faq.json');
+      if (fs.existsSync(faqPath)) {
+        const faqData = JSON.parse(fs.readFileSync(faqPath, 'utf-8'));
+        knowledgeBase.faqs = faqData.faqs || [];
+        console.log(`Loaded ${knowledgeBase.faqs.length} FAQs`);
+      }
+    } catch (error) {
+      console.warn('Error loading FAQs:', error);
+    }
+
+    // Cargar destinos de viaje
+    try {
+      const destinationsPath = path.join(knowledgePath, 'travel-destinations.json');
+      if (fs.existsSync(destinationsPath)) {
+        const destinationsData = JSON.parse(fs.readFileSync(destinationsPath, 'utf-8'));
+        knowledgeBase.destinations = destinationsData.destinations || [];
+        console.log(`Loaded ${knowledgeBase.destinations.length} travel destinations`);
+      }
+    } catch (error) {
+      console.warn('Error loading travel destinations:', error);
+    }
+
+    // Cargar condiciones médicas
+    try {
+      const conditionsPath = path.join(knowledgePath, 'medical-conditions.json');
+      if (fs.existsSync(conditionsPath)) {
+        const conditionsData = JSON.parse(fs.readFileSync(conditionsPath, 'utf-8'));
+        knowledgeBase.conditions = conditionsData.conditions || [];
+        console.log(`Loaded ${knowledgeBase.conditions.length} medical conditions`);
+      }
+    } catch (error) {
+      console.warn('Error loading medical conditions:', error);
+    }
+
+    // Cargar regulaciones por país
+    try {
+      if (fs.existsSync(regulationsPath)) {
+        const regulationFiles = fs.readdirSync(regulationsPath).filter(file => file.endsWith('.json'));
+        
+        for (const file of regulationFiles) {
+          const country = path.basename(file, '.json');
+          const regulationData = JSON.parse(fs.readFileSync(path.join(regulationsPath, file), 'utf-8'));
+          knowledgeBase.regulations[country] = regulationData;
+        }
+        console.log(`Loaded regulations for ${Object.keys(knowledgeBase.regulations).length} countries`);
+      }
+    } catch (error) {
+      console.warn('Error loading regulations:', error);
+    }
+
+    console.log('Knowledge base loaded successfully');
+  } catch (error) {
+    console.error('Error loading knowledge base:', error);
+  }
+}
+
+/**
+ * Obtiene la base de conocimiento completa
+ */
+export function getKnowledgeBase(): KnowledgeBase {
+  return knowledgeBase;
+}
+
+/**
+ * Busca términos de seguros por palabra clave
+ */
+export function searchInsuranceTerms(query: string): InsuranceTerm[] {
+  const normalizedQuery = query.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  
+  return knowledgeBase.terms.filter(term => {
+    const normalizedTerm = term.term.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const normalizedDefinition = term.definition.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    
+    return normalizedTerm.includes(normalizedQuery) || 
+           normalizedDefinition.includes(normalizedQuery) ||
+           term.related_terms.some(related => 
+             related.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(normalizedQuery)
+           );
+  });
+}
+
+/**
+ * Busca FAQs por palabra clave
+ */
+export function searchFAQs(query: string): FAQ[] {
+  const normalizedQuery = query.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  
+  return knowledgeBase.faqs.filter(faq => {
+    return faq.keywords.some(keyword => 
+      keyword.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(normalizedQuery)
+    ) || faq.question.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(normalizedQuery);
+  });
+}
+
+/**
+ * Crea contexto enriquecido para el asistente IA incluyendo conocimiento relevante
+ */
+export function createEnrichedContext(userMessage: string, plans: MockInsurancePlan[]): string {
+  let context = '';
+  
+  // Buscar términos relevantes
+  const relevantTerms = searchInsuranceTerms(userMessage);
+  if (relevantTerms.length > 0) {
+    context += `\nTérminos de seguros relevantes:\n`;
+    relevantTerms.slice(0, 3).forEach(term => {
+      context += `- ${term.term}: ${term.definition}\n`;
+    });
+  }
+  
+  // Buscar FAQs relevantes
+  const relevantFAQs = searchFAQs(userMessage);
+  if (relevantFAQs.length > 0) {
+    context += `\nPreguntas frecuentes relacionadas:\n`;
+    relevantFAQs.slice(0, 2).forEach(faq => {
+      context += `- ${faq.question}: ${faq.answer}\n`;
+    });
+  }
+  
+  // Agregar información de destinos si es relevante para viajes
+  const travelKeywords = ['viaje', 'viajar', 'europa', 'estados unidos', 'canada', 'latinoamerica'];
+  if (travelKeywords.some(keyword => userMessage.toLowerCase().includes(keyword))) {
+    const relevantDestination = knowledgeBase.destinations.find(dest => 
+      dest.countries.some(country => 
+        userMessage.toLowerCase().includes(country.toLowerCase())
+      ) || userMessage.toLowerCase().includes(dest.region.toLowerCase())
+    );
+    
+    if (relevantDestination) {
+      context += `\nInformación de destino:\n`;
+      context += `- ${relevantDestination.region}: ${relevantDestination.medical_costs}\n`;
+      if (relevantDestination.insurance_requirements.schengen_visa) {
+        context += `- Requisito: ${relevantDestination.insurance_requirements.schengen_visa}\n`;
+      }
+    }
+  }
+  
+  return context;
+}
