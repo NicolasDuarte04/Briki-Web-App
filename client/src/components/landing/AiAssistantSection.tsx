@@ -10,7 +10,7 @@ export default function AiAssistantSection() {
   const [, navigate] = useLocation();
 
   const handleTryAssistant = () => {
-    navigate('/ask-briki-mock');
+    navigate('/ask-briki-ai');
   };
   
   const handlePreTestClick = () => {

@@ -41,7 +41,7 @@ import ComparePlansFixed from "@/pages/compare-plans-fixed";  // Fixed version o
 import FeaturesPage from "@/pages/features";
 import PricingPage from "@/pages/pricing";
 import AskBrikiPage from "@/pages/ask-briki";
-import AskBrikiMockPage from "@/pages/ask-briki-mock";
+
 import AskBrikiAIPage from "@/pages/ask-briki-ai";
 import BlogPage from "@/pages/blog";
 import ForumPage from "@/pages/forum";
@@ -204,7 +204,7 @@ function Router() {
         <Route path="/features" component={FeaturesPage} />
         <Route path="/pricing" component={PricingPage} />
         <Route path="/ask-briki" component={AskBrikiPage} />
-        <Route path="/ask-briki-mock" component={AskBrikiMockPage} />
+
         <Route path="/ask-briki-ai" component={AskBrikiAIPage} />
         <Route path="/blog" component={BlogPage} />
         <Route path="/forum" component={ForumPage} />
@@ -231,7 +231,7 @@ function AppContent() {
   );
   
   // List of paths where AI Assistant should NOT be provided
-  const excludedPaths = ['/', '/auth', '/countdown', '/login', '/register', '/terms', '/learn-more', '/landing', '/ask-briki', '/ask-briki-ai', '/ask-briki-mock'];
+  const excludedPaths = ['/', '/auth', '/countdown', '/login', '/register', '/terms', '/learn-more', '/landing', '/ask-briki', '/ask-briki-ai'];
   const isExcludedPath = excludedPaths.some(path => 
     location === path || location.startsWith(`${path}/`)
   );
