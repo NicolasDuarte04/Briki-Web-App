@@ -5,7 +5,7 @@ import { MockInsurancePlan } from "../data-loader";
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-const DEFAULT_MODEL = "gpt-4o";
+const DEFAULT_MODEL = process.env.OPENAI_MODEL || "gpt-4o";
 
 /**
  * Interfaces for AI Assistant
@@ -45,12 +45,28 @@ export async function generateAssistantResponse(
   ];
   
   try {
+    const startTime = Date.now();
+    
     // Call OpenAI API
     const response = await openai.chat.completions.create({
       model: DEFAULT_MODEL,
       messages: messages as any,
       temperature: 0.7,
       max_tokens: 800,
+    });
+    
+    const endTime = Date.now();
+    const responseTime = endTime - startTime;
+    
+    // Log metrics for monitoring
+    console.log(`[OpenAI] Response generated successfully:`, {
+      model: DEFAULT_MODEL,
+      responseTime: `${responseTime}ms`,
+      tokensUsed: response.usage?.total_tokens || 0,
+      promptTokens: response.usage?.prompt_tokens || 0,
+      completionTokens: response.usage?.completion_tokens || 0,
+      messageLength: userMessage.length,
+      timestamp: new Date().toISOString()
     });
     
     // Extract and return response
@@ -64,7 +80,13 @@ export async function generateAssistantResponse(
       suggestedPlans: suggestedPlans.length > 0 ? suggestedPlans : undefined
     };
   } catch (error: any) {
-    console.error("Error generando respuesta del asistente:", error);
+    console.error(`[OpenAI] Error generating response:`, {
+      error: error.message,
+      type: error.type || 'unknown',
+      code: error.code || 'unknown',
+      timestamp: new Date().toISOString(),
+      model: DEFAULT_MODEL
+    });
     throw new Error(`Error al generar respuesta: ${error.message || 'Error desconocido'}`);
   }
 }

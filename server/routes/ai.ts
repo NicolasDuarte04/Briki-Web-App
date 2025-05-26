@@ -12,6 +12,14 @@ const router = express.Router();
 router.post('/ask', async (req, res) => {
   try {
     const { message, history, useOpenAI = true, category } = req.body;
+    
+    console.log(`[AI Route] Request received:`, {
+      messageLength: message?.length || 0,
+      hasHistory: !!history,
+      useOpenAI,
+      category: category || 'not specified',
+      timestamp: new Date().toISOString()
+    });
 
     if (!message) {
       return res.status(400).json({ error: 'Se requiere un mensaje' });
@@ -28,7 +36,15 @@ router.post('/ask', async (req, res) => {
     // Si el modo OpenAI está activado, intentar usar la API
     if (useOpenAI) {
       try {
-        const response = await generateAssistantResponse(message, history, plans);
+        const response = await generateAssistantResponse(message, history || [], plans);
+        
+        console.log(`[AI Route] OpenAI response generated successfully:`, {
+          responseLength: response.message?.length || 0,
+          hasSuggestedPlans: !!response.suggestedPlans,
+          planCount: response.suggestedPlans?.length || 0,
+          timestamp: new Date().toISOString()
+        });
+        
         return res.json(response);
       } catch (error: any) {
         console.warn(`[AI Service] OpenAI API error - falling back to mock responses: ${error.message}`);
