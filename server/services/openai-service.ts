@@ -72,8 +72,11 @@ export async function generateAssistantResponse(
     // Extract and return response
     const assistantMessage = response.choices[0].message.content || "Lo siento, no pude generar una respuesta.";
     
-    // Basic logic to identify relevant plans (in a real system, this would be more sophisticated)
-    const suggestedPlans = findRelevantPlans(userMessage, insurancePlans);
+    // Only suggest plans if the user message indicates they want insurance recommendations
+    let suggestedPlans: MockInsurancePlan[] = [];
+    if (shouldShowInsurancePlans(userMessage)) {
+      suggestedPlans = findRelevantPlans(userMessage, insurancePlans);
+    }
     
     return {
       message: assistantMessage,
@@ -98,10 +101,15 @@ export async function generateAssistantResponse(
 function createSystemPrompt(insurancePlans: MockInsurancePlan[]): string {
   // Start with base instructions
   let prompt = `Eres Briki, un asistente de seguros amigable y profesional. Tu objetivo es ayudar a los usuarios a encontrar el mejor seguro para sus necesidades.
-  
-Debes responder de manera conversacional, cercana y empática. Usa un tono amigable pero profesional.
 
-Tus respuestas deben ser concisas y directas, pero también detalladas cuando sea necesario.`;
+IMPORTANTE: Solo recomienda planes de seguros cuando:
+1. El usuario mencione claramente que necesita un seguro específico
+2. El usuario mencione un objeto/situación que requiere seguro (ej: "compré una Vespa", "mi perro", "viajo a Europa")
+3. El usuario preguntare directamente por opciones de seguros
+
+Si el usuario solo saluda o hace conversación general, responde amigablemente pero NO recomiendes planes. En su lugar, pregunta qué tipo de seguro le interesa o qué situación quiere proteger.
+
+Mantén tus respuestas concisas y directas. Si recomiendas planes, da una introducción breve (máximo 2 líneas) antes de mencionarlos.`;
 
   // Add context about available plans if provided
   if (insurancePlans.length > 0) {
@@ -125,7 +133,12 @@ Tus respuestas deben ser concisas y directas, pero también detalladas cuando se
       });
     });
     
-    prompt += `\n\nSi el usuario pregunta por un plan específico, proporciona detalles sobre ese plan. Si pregunta por una categoría, menciona los planes disponibles en esa categoría. Si no especifica, intenta entender sus necesidades para recomendar un plan adecuado.`;
+    prompt += `\n\nCuando recomiendes planes:
+- Da una introducción breve (1-2 líneas máximo)
+- Menciona los planes más relevantes
+- Si el usuario quiere más detalles, los puedes proporcionar después
+
+Evita explicaciones largas antes de mostrar los planes. Sé directo y útil.`;
   }
 
   return prompt;
@@ -143,6 +156,29 @@ function getCategoryName(category: string): string {
   };
   
   return categoryNames[category] || category;
+}
+
+/**
+ * Analyze if the user message indicates they want insurance recommendations
+ */
+function shouldShowInsurancePlans(userMessage: string): boolean {
+  const message = userMessage.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  
+  // Saludos y conversación general - NO mostrar planes
+  const greetings = ['hola', 'hello', 'hi', 'buenas', 'buenos dias', 'buenas tardes', 'como estas', 'que tal', 'saludos'];
+  if (greetings.some(greeting => message.includes(greeting)) && message.length < 50) {
+    return false;
+  }
+  
+  // Palabras que indican necesidad de seguro - SÍ mostrar planes
+  const insuranceIntentKeywords = [
+    'seguro', 'seguros', 'asegurar', 'proteger', 'cobertura', 'proteccion',
+    'compre', 'tengo un', 'tengo una', 'mi carro', 'mi auto', 'mi perro', 'mi gato',
+    'viajo', 'viaje', 'viajar', 'vacaciones', 'mascota', 'vespa', 'moto', 'vehiculo',
+    'necesito', 'busco', 'quiero', 'recomienda', 'opciones', 'planes'
+  ];
+  
+  return insuranceIntentKeywords.some(keyword => message.includes(keyword));
 }
 
 /**

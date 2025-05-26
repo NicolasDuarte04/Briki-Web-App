@@ -9,10 +9,10 @@ import { Button } from '@/components/ui/button';
 export default function AskBrikiAIPage() {
   // Preguntas sugeridas para empezar la conversación
   const suggestedQuestions = [
-    "¿Compré una Vespa y quiero asegurarla, qué me recomiendas?",
-    "Necesito un seguro de viaje para mi vacación a Europa",
-    "¿Qué seguro de salud me recomiendas para mi familia?",
-    "Busco un seguro para mi mascota, ¿qué opciones hay?"
+    "Compré una Vespa en Bogotá, ¿qué seguro me recomiendas?",
+    "Viajo a Europa en julio por 2 semanas, necesito seguro de viaje",
+    "Mi perro Golden Retriever necesita seguro veterinario",
+    "Busco seguro de salud familiar para 4 personas en Colombia"
   ];
 
   return (
