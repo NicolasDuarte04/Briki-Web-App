@@ -22,11 +22,7 @@ interface Message {
   suggestedPlans?: InsurancePlan[];
 }
 
-// Para la comunicación con el backend
-interface APIMessage {
-  role: 'user' | 'assistant' | 'system';
-  content: string;
-}
+
 
 const RealAssistant: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -141,9 +137,9 @@ const RealAssistant: React.FC = () => {
             
             // Añadir el contexto como un mensaje de sistema al principio de la conversación
             conversationHistory.unshift({
-              role: 'system' as 'system' | 'user' | 'assistant',
+              role: 'system',
               content: contextText
-            });
+            } as APIMessage);
           }
         }
         

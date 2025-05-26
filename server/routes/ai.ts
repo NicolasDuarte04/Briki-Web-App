@@ -31,7 +31,7 @@ router.post('/ask', async (req, res) => {
         const response = await generateAssistantResponse(message, history, plans);
         return res.json(response);
       } catch (error: any) {
-        console.warn("Error al usar OpenAI, usando respuestas mock como fallback:", error.message);
+        console.warn(`[AI Service] OpenAI API error - falling back to mock responses: ${error.message}`);
         // Si hay un error con OpenAI, usar las respuestas mock como fallback
       }
     } 
