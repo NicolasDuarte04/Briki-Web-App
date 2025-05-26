@@ -9,6 +9,29 @@ export interface MockAssistantResponse {
 }
 
 /**
+ * Analyze if the user message indicates they want insurance recommendations
+ */
+function shouldShowInsurancePlans(userMessage: string): boolean {
+  const message = userMessage.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  
+  // Saludos y conversación general - NO mostrar planes
+  const greetings = ['hola', 'hello', 'hi', 'buenas', 'buenos dias', 'buenas tardes', 'como estas', 'que tal', 'saludos'];
+  if (greetings.some(greeting => message.includes(greeting)) && message.length < 50) {
+    return false;
+  }
+  
+  // Palabras que indican necesidad de seguro - SÍ mostrar planes
+  const insuranceIntentKeywords = [
+    'seguro', 'seguros', 'asegurar', 'proteger', 'cobertura', 'proteccion',
+    'compre', 'tengo un', 'tengo una', 'mi carro', 'mi auto', 'mi perro', 'mi gato',
+    'viajo', 'viaje', 'viajar', 'vacaciones', 'mascota', 'vespa', 'moto', 'vehiculo',
+    'necesito', 'busco', 'quiero', 'recomienda', 'opciones', 'planes'
+  ];
+  
+  return insuranceIntentKeywords.some(keyword => message.includes(keyword));
+}
+
+/**
  * Genera respuestas mock según el tipo de seguro y la consulta
  * @param category Categoría de seguro
  * @param query Consulta del usuario
@@ -20,6 +43,13 @@ export function generateMockResponse(
   query: string,
   plans: MockInsurancePlan[]
 ): MockAssistantResponse {
+  // Primero verificar si el usuario realmente quiere recomendaciones de seguros
+  if (!shouldShowInsurancePlans(query)) {
+    return {
+      message: "¡Hola! 👋 Soy Briki, tu asistente de seguros. Estoy aquí para ayudarte a encontrar la protección perfecta para lo que más te importa. ¿En qué puedo ayudarte? ¿Tienes algo específico que te gustaría asegurar?"
+    };
+  }
+
   // Si no hay categoría específica, intentar identificarla por la consulta
   if (!category) {
     const lowerQuery = query.toLowerCase();
