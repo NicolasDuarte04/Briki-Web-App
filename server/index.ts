@@ -6,6 +6,7 @@ import passport from "passport";
 import { configureSession } from "./auth/session";
 import { configureGoogleAuth } from "./auth/google-auth";
 import authRoutes from "./routes/auth";
+import { loadKnowledgeBase } from "./data-loader";
 
 const app = express();
 
@@ -115,6 +116,10 @@ app.use((req, res, next) => {
 app.use('/api/auth', authRoutes);
 
 (async () => {
+  // Load knowledge base at startup
+  console.log("Initializing knowledge base...");
+  loadKnowledgeBase();
+  
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
