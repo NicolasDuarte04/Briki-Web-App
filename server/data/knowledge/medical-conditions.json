@@ -1,0 +1,43 @@
+{
+  "conditions": [
+    {
+      "id": "diabetes",
+      "name": "Diabetes",
+      "type": "chronic",
+      "insurance_impact": {
+        "health_insurance": "Puede requerir período de espera de 6-12 meses para cobertura completa",
+        "travel_insurance": "Debe ser declarada; cobertura disponible con prima ajustada",
+        "life_insurance": "Requiere exámenes médicos adicionales"
+      },
+      "declaration_required": true,
+      "common_exclusions": ["complicaciones no controladas", "emergencias por mal manejo"],
+      "tips": "Mantén control médico documentado para mejores condiciones"
+    },
+    {
+      "id": "hypertension",
+      "name": "Hipertensión",
+      "type": "chronic",
+      "insurance_impact": {
+        "health_insurance": "Generalmente cubierta después de período de espera",
+        "travel_insurance": "Cobertura disponible si está controlada",
+        "life_insurance": "Prima puede incrementar según severidad"
+      },
+      "declaration_required": true,
+      "common_exclusions": ["crisis hipertensivas por no medicación"],
+      "tips": "Documenta control médico regular y medicación"
+    },
+    {
+      "id": "asthma",
+      "name": "Asma",
+      "type": "chronic",
+      "insurance_impact": {
+        "health_insurance": "Cobertura estándar si está controlada",
+        "travel_insurance": "Requiere declaración; cobertura disponible",
+        "life_insurance": "Impacto mínimo si está bien controlada"
+      },
+      "declaration_required": true,
+      "common_exclusions": ["crisis asmáticas por no usar medicación"],
+      "tips": "Lleva siempre medicación de emergencia al viajar"
+    }
+  ]
+}

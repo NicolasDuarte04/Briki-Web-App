@@ -1,0 +1,33 @@
+{
+  "country": "Colombia",
+  "insurance_regulations": {
+    "auto": {
+      "mandatory": true,
+      "minimum_coverage": {
+        "bodily_injury": "20 SMMLV por víctima",
+        "property_damage": "10 SMMLV por evento",
+        "legal_requirement": "SOAT obligatorio para todos los vehículos"
+      },
+      "regulatory_body": "Superintendencia Financiera de Colombia (SFC)",
+      "penalties": "Multas de 15 SMMLV por circular sin SOAT"
+    },
+    "health": {
+      "public_system": "Sistema General de Seguridad Social en Salud (SGSSS)",
+      "private_insurance": "Complementaria al sistema público",
+      "regulatory_body": "Ministerio de Salud y Protección Social"
+    },
+    "travel": {
+      "mandatory": false,
+      "recommendations": "Altamente recomendado para viajes internacionales",
+      "visa_requirements": "Algunos países exigen seguro médico para visa"
+    }
+  },
+  "common_requirements": {
+    "identification": "Cédula de ciudadanía colombiana o documento equivalente",
+    "age_restrictions": {
+      "minimum_age": 18,
+      "parental_consent": "Requerido para menores de edad"
+    },
+    "documentation": ["cédula", "RUT para personas jurídicas", "certificado médico según el seguro"]
+  }
+}

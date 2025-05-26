@@ -1,0 +1,46 @@
+{
+  "faqs": [
+    {
+      "id": "what-is-insurance",
+      "question": "¿Qué es un seguro?",
+      "answer": "Un seguro es un contrato donde pagas una cantidad regular (prima) para que una compañía te proteja financieramente contra riesgos específicos como accidentes, enfermedades o daños a tu propiedad.",
+      "category": "basics",
+      "keywords": ["seguro", "que es", "definicion", "basico"]
+    },
+    {
+      "id": "how-much-coverage",
+      "question": "¿Cuánta cobertura necesito?",
+      "answer": "La cantidad de cobertura depende de tu situación personal, ingresos, deudas y el valor de lo que quieres proteger. Como regla general, tu cobertura debería ser suficiente para cubrir tus gastos y obligaciones financieras.",
+      "category": "coverage",
+      "keywords": ["cuanta", "cobertura", "necesito", "cantidad"]
+    },
+    {
+      "id": "preexisting-conditions",
+      "question": "¿Qué pasa si tengo una condición médica preexistente?",
+      "answer": "Las condiciones preexistentes pueden afectar tu prima o cobertura. Debes declararlas al contratar el seguro. Algunas compañías las cubren después de un período de espera, otras las excluyen permanentemente.",
+      "category": "health",
+      "keywords": ["condicion", "preexistente", "medica", "enfermedad"]
+    },
+    {
+      "id": "claim-process",
+      "question": "¿Cómo hago un reclamo?",
+      "answer": "Para hacer un reclamo: 1) Reporta el incidente inmediatamente a tu aseguradora, 2) Reúne toda la documentación necesaria, 3) Llena los formularios requeridos, 4) Coopera con la investigación si es necesaria.",
+      "category": "claims",
+      "keywords": ["reclamo", "como", "proceso", "siniestro"]
+    },
+    {
+      "id": "why-premiums-increase",
+      "question": "¿Por qué suben las primas?",
+      "answer": "Las primas pueden subir por varios factores: reclamos previos, cambios en tu perfil de riesgo, inflación, cambios en regulaciones, o aumento general de costos en el sector.",
+      "category": "pricing",
+      "keywords": ["prima", "sube", "aumenta", "precio"]
+    },
+    {
+      "id": "cancel-policy",
+      "question": "¿Puedo cancelar mi póliza en cualquier momento?",
+      "answer": "Generalmente sí puedes cancelar tu póliza, pero revisa los términos de tu contrato. Algunas pólizas tienen penalidades por cancelación temprana o períodos mínimos de vigencia.",
+      "category": "policy-management",
+      "keywords": ["cancelar", "poliza", "terminar", "contrato"]
+    }
+  ]
+}
