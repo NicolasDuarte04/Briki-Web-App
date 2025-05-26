@@ -231,18 +231,33 @@ const RealAssistant: React.FC = () => {
       >
         <div
           className={`
-            max-w-[80%] rounded-lg p-3 
-            ${isUser ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'}
+            max-w-[80%] rounded-2xl p-4 shadow-sm
+            ${isUser 
+              ? 'bg-gradient-to-r from-blue-600 to-cyan-500 text-white ml-4' 
+              : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700 mr-4'
+            }
           `}
         >
+          {!isUser && (
+            <div className="flex items-center mb-2">
+              <Bot className="h-4 w-4 mr-2 text-blue-600 dark:text-blue-400" />
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Briki</span>
+            </div>
+          )}
+          
           {message.isLoading ? (
             <div className="flex items-center">
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              <span>Pensando...</span>
+              <Loader2 className="h-4 w-4 mr-2 animate-spin text-blue-600" />
+              <span className="text-gray-600 dark:text-gray-400">Pensando...</span>
             </div>
           ) : (
-            <div className="whitespace-pre-wrap">{message.content}</div>
+            <div className="whitespace-pre-wrap leading-relaxed">{message.content}</div>
           )}
+        </div>
+        
+        {/* Timestamp */}
+        <div className={`text-xs text-gray-400 mt-1 px-2 ${isUser ? 'text-right' : 'text-left'}`}>
+          {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
         </div>
         
         {/* Mostrar planes sugeridos si existen y no es un mensaje del usuario */}
@@ -256,88 +271,44 @@ const RealAssistant: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col bg-background rounded-lg shadow-md h-[600px] max-w-2xl mx-auto">
-      {/* Cabecera */}
-      <div className="flex items-center justify-between p-4 border-b">
-        <div className="flex items-center">
-          <Bot className="h-6 w-6 mr-2 text-primary" />
-          <h2 className="text-lg font-semibold">Briki AI Assistant</h2>
-        </div>
-        <div className="flex items-center space-x-3">
-          <Button 
-            variant="ghost" 
-            size="icon"
-            className="h-8 w-8"
-            onClick={() => setContextVisible(!contextVisible)}
-            title="Ver contexto de la conversación"
-          >
-            <Info className={`h-4 w-4 ${contextVisible ? 'text-primary' : 'text-muted-foreground'}`} />
-          </Button>
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="ai-mode"
-              checked={useRealAI}
-              onCheckedChange={setUseRealAI}
-            />
-            <Label htmlFor="ai-mode">Modo IA {useRealAI ? 'Activado' : 'Desactivado'}</Label>
-          </div>
-        </div>
-      </div>
-      
-      {/* Panel de contexto */}
-      {contextVisible && (
-        <div className="bg-muted/50 p-3 text-sm border-b">
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="font-medium text-sm">Contexto de la conversación</h3>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="h-6 w-6" 
-              onClick={() => memoryService.clearContext()}
-              title="Limpiar contexto"
-            >
-              <X className="h-3 w-3" />
-            </Button>
-          </div>
-          
-          {formatUserContext().length > 0 ? (
-            <ul className="space-y-1 text-xs">
-              {formatUserContext().map((item, index) => (
-                <li key={index} className="flex items-center">
-                  <span className="block h-1.5 w-1.5 rounded-full bg-primary mr-2"></span>
-                  {item}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-xs text-muted-foreground">No hay información de contexto todavía. A medida que converses, el asistente recordará detalles importantes.</p>
-          )}
-        </div>
-      )}
-      
+    <div className="flex flex-col h-[500px] w-full">
       {/* Área de mensajes */}
-      <ScrollArea className="flex-grow p-4">
-        <div className="space-y-4">
+      <ScrollArea className="flex-grow p-6 bg-gray-50 dark:bg-gray-900">
+        <div className="space-y-6 max-w-3xl mx-auto">
           {messages.map(renderMessage)}
           <div ref={messagesEndRef} />
         </div>
       </ScrollArea>
       
       {/* Formulario de entrada */}
-      <form onSubmit={handleSendMessage} className="p-4 border-t">
-        <div className="flex space-x-2">
-          <Input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Escribe tu mensaje aquí..."
-            disabled={isLoading}
-            className="flex-grow"
-          />
-          <Button type="submit" disabled={isLoading || !input.trim()}>
-            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-          </Button>
-        </div>
-      </form>
+      <div className="p-6 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+        <form onSubmit={handleSendMessage} className="max-w-3xl mx-auto">
+          <div className="flex space-x-3">
+            <Input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Pregúntame sobre seguros de viaje, auto, mascotas o salud..."
+              disabled={isLoading}
+              className="flex-grow text-base py-3 px-4 rounded-xl border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-700"
+            />
+            <Button 
+              type="submit" 
+              disabled={isLoading || !input.trim()}
+              className="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-medium transition-all duration-200 disabled:opacity-50"
+            >
+              {isLoading ? (
+                <Loader2 className="h-5 w-5 animate-spin" />
+              ) : (
+                <Send className="h-5 w-5" />
+              )}
+            </Button>
+          </div>
+          
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">
+            💡 Tip: Menciona tu ubicación, tipo de vehículo o necesidades específicas para mejores recomendaciones
+          </p>
+        </form>
+      </div>
     </div>
   );
 };
