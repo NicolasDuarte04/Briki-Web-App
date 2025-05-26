@@ -1,0 +1,52 @@
+{
+  "terms": [
+    {
+      "id": "deducible",
+      "term": "Deducible",
+      "definition": "Cantidad de dinero que el asegurado debe pagar de su bolsillo antes de que la compañía de seguros cubra el resto de los gastos del siniestro.",
+      "example": "Si tienes un deducible de $500 y un siniestro de $2000, pagas $500 y el seguro cubre $1500.",
+      "category": "financial",
+      "related_terms": ["prima", "cobertura", "franquicia"]
+    },
+    {
+      "id": "prima",
+      "term": "Prima",
+      "definition": "Pago periódico (mensual, trimestral o anual) que hace el asegurado a la compañía de seguros para mantener activa su póliza.",
+      "example": "Una prima mensual de $50 significa que pagas $600 al año por tu seguro.",
+      "category": "financial",
+      "related_terms": ["deducible", "poliza", "cobertura"]
+    },
+    {
+      "id": "cobertura",
+      "term": "Cobertura",
+      "definition": "Protección que brinda la póliza de seguros contra riesgos específicos, definiendo qué eventos están incluidos y cuáles excluidos.",
+      "example": "La cobertura de responsabilidad civil cubre daños a terceros, pero no daños a tu propio vehículo.",
+      "category": "protection",
+      "related_terms": ["exclusiones", "poliza", "beneficiario"]
+    },
+    {
+      "id": "exclusiones",
+      "term": "Exclusiones",
+      "definition": "Situaciones, eventos o circunstancias que NO están cubiertas por la póliza de seguros.",
+      "example": "Las exclusiones típicas incluyen daños intencionales, guerras, o uso del vehículo para fines comerciales no declarados.",
+      "category": "limitations",
+      "related_terms": ["cobertura", "poliza", "condiciones"]
+    },
+    {
+      "id": "beneficiario",
+      "term": "Beneficiario",
+      "definition": "Persona o entidad designada para recibir el pago del seguro en caso de que ocurra el evento cubierto.",
+      "example": "En un seguro de vida, el beneficiario es quien recibirá el dinero si el asegurado fallece.",
+      "category": "participants",
+      "related_terms": ["asegurado", "poliza", "indemnizacion"]
+    },
+    {
+      "id": "franquicia",
+      "term": "Franquicia",
+      "definition": "Monto mínimo de pérdida que debe ocurrir antes de que el seguro comience a pagar. Similar al deducible pero aplicado de manera diferente.",
+      "example": "Con una franquicia de $1000, solo se activa el seguro si el daño supera esa cantidad.",
+      "category": "financial",
+      "related_terms": ["deducible", "cobertura"]
+    }
+  ]
+}

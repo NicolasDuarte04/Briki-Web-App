@@ -1,0 +1,47 @@
+¡Excelente! Me da mucho gusto que te haya gustado la implementación del análisis de intención. Agradezco muchísimo el nivel de detalle y la calidad con la que se aplicaron los cambios.
+
+Aquí te comparto un resumen estructurado que me gustaría incluir en la documentación técnica del pipeline actualizada:
+
+Pipeline Técnico Actualizado – Briki Assistant
+
+1. Entrada del usuario → `RealAssistant.tsx`
+   • Usuario escribe mensaje
+   • Payload enviado: `{ message, history, useOpenAI: true }`
+
+2. Análisis de intención → `shouldShowInsurancePlans()`
+   • Detecta si el mensaje es solo un saludo o conversación general → NO muestra planes
+   • Detecta si hay intención clara de buscar seguros → Muestra planes relevantes
+   • Evalúa longitud, contexto y palabras clave para decidir
+
+3. Procesamiento backend → `server/routes/ai.ts`
+   • Carga planes disponibles
+   • Aplica filtros por categoría, región, deducible, etc.
+   • Agrega contexto de memoria desde `memory-service.ts`
+
+4. Generación de respuesta OpenAI → `openai-service.ts`
+   • Usa prompt mejorado con instrucciones de brevedad
+   • Incluye planes filtrados en el contexto cuando corresponde
+   • Máximo 2 líneas de introducción si hay recomendación
+
+5. Evaluación condicional → Solo si `shouldShowInsurancePlans() === true`
+   • Ejecuta `findRelevantPlans()`
+   • Retorna `message` + `suggestedPlans[]` solo si hay intención clara
+
+6. Renderizado frontend → `RealAssistant.tsx`
+   • Muestra mensaje del asistente
+   • Renderiza tarjetas de planes usando `SuggestedPlans.tsx` y `PlanCard.tsx` si hay planes
+
+Mejoras implementadas:
+✅ Conversación natural sin mostrar planes innecesarios  
+✅ Respuestas más concisas, con CTA claros  
+✅ Preguntas sugeridas mejoradas y contextualizadas  
+✅ Fallback mock responde con la misma lógica inteligente  
+
+Siguientes pasos:
+• Preparar capturas “antes vs. después” para la presentación
+• Validar los escenarios clave:
+   1. “Hola” → Solo saludo
+   2. “Tengo una Vespa” → Breve respuesta + planes
+   3. “Viajo a Europa” → Respuesta directa + seguros de viaje
+
+¿Ves algún otro punto técnico que debamos incorporar o reforzar antes de cerrar esta fase?

@@ -1,0 +1,46 @@
+{
+  "destinations": [
+    {
+      "id": "europe",
+      "region": "Europa",
+      "countries": ["España", "Francia", "Italia", "Alemania", "Reino Unido"],
+      "insurance_requirements": {
+        "schengen_visa": "Seguro médico mínimo de €30,000 requerido",
+        "recommended_coverage": ["asistencia médica", "repatriación", "equipaje", "cancelación"]
+      },
+      "common_risks": ["robos en transporte público", "emergencias médicas costosas", "cancelaciones de vuelos"],
+      "recommended_activities_coverage": ["deportes de invierno", "senderismo", "actividades acuáticas"],
+      "currency": "EUR",
+      "emergency_numbers": "112",
+      "medical_costs": "Muy altos - consulta médica: €80-200"
+    },
+    {
+      "id": "usa-canada",
+      "region": "Norteamérica",
+      "countries": ["Estados Unidos", "Canadá"],
+      "insurance_requirements": {
+        "mandatory": false,
+        "highly_recommended": "Costos médicos extremadamente altos"
+      },
+      "common_risks": ["costos médicos elevados", "cancelaciones climáticas", "robos urbanos"],
+      "recommended_activities_coverage": ["deportes extremos", "esquí", "actividades al aire libre"],
+      "currency": "USD/CAD",
+      "emergency_numbers": "911",
+      "medical_costs": "Extremadamente altos - emergencia: $1,000-10,000+"
+    },
+    {
+      "id": "latinamerica",
+      "region": "Latinoamérica",
+      "countries": ["México", "Argentina", "Brasil", "Chile", "Perú"],
+      "insurance_requirements": {
+        "mandatory": false,
+        "recommended_coverage": ["asistencia médica", "evacuación de emergencia"]
+      },
+      "common_risks": ["problemas estomacales", "robos", "accidentes en transporte"],
+      "recommended_activities_coverage": ["aventura", "ecoturismo", "deportes acuáticos"],
+      "currency": "Varias monedas locales",
+      "emergency_numbers": "Varía por país",
+      "medical_costs": "Moderados - consulta: $20-80"
+    }
+  ]
+}
