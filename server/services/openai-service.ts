@@ -22,10 +22,6 @@ export interface AssistantResponse {
 
 /**
  * Generate a response from the AI assistant based on user input and conversation history
- * @param userMessage Current user message
- * @param conversationHistory Previous messages in the conversation
- * @param insurancePlans Available insurance plans to consider in the response
- * @param userCountry User's country for plan filtering (default: Colombia)
  */
 export async function generateAssistantResponse(
   userMessage: string,
@@ -72,10 +68,13 @@ export async function generateAssistantResponse(
     // Extract and return response
     const assistantMessage = response.choices[0].message.content || "Lo siento, no pude generar una respuesta.";
 
-    // Only suggest plans if the user message indicates they want insurance recommendations
+    // FIXED: Enhanced insurance intent detection
     let suggestedPlans: MockInsurancePlan[] = [];
     if (shouldShowInsurancePlans(userMessage)) {
       suggestedPlans = findRelevantPlans(userMessage, relevantPlans);
+      console.log(`[OpenAI][${requestId}] Insurance intent detected, found ${suggestedPlans.length} relevant plans`);
+    } else {
+      console.log(`[OpenAI][${requestId}] No insurance intent detected for message: "${userMessage}"`);
     }
 
     // Log success with detailed metrics
@@ -173,22 +172,33 @@ function getTopRelevantPlans(userMessage: string, plans: MockInsurancePlan[], li
 }
 
 /**
- * Calculate relevance score for a plan based on user message
+ * FIXED: Enhanced relevance scoring system
  */
 function calculateRelevanceScore(userMessage: string, plan: MockInsurancePlan): number {
   let score = 0;
   const message = userMessage.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-  // Category matching (+30 points)
+  // Category matching (+40 points) - INCREASED WEIGHT
   const categoryMatches: Record<string, string[]> = {
-    travel: ['viaje', 'viajar', 'vacaciones', 'internacional', 'turismo'],
-    auto: ['carro', 'auto', 'vehiculo', 'conducir', 'automovil', 'vespa', 'moto'],
-    pet: ['mascota', 'perro', 'gato', 'veterinario', 'animal'],
-    health: ['salud', 'medico', 'hospital', 'consulta', 'enfermedad']
+    travel: ['viaje', 'viajar', 'vacaciones', 'internacional', 'turismo', 'travel', 'trip'],
+    auto: ['carro', 'auto', 'vehiculo', 'conducir', 'automovil', 'vespa', 'moto', 'car', 'vehicle'],
+    pet: ['mascota', 'perro', 'gato', 'veterinario', 'animal', 'pet', 'dog', 'cat'],
+    health: ['salud', 'medico', 'hospital', 'consulta', 'enfermedad', 'health', 'medical']
   };
 
   if (categoryMatches[plan.category]?.some(keyword => message.includes(keyword))) {
+    score += 40;
+  }
+
+  // Direct insurance mention (+30 points) - NEW
+  if (message.includes('seguro') || message.includes('insurance')) {
     score += 30;
+  }
+
+  // Need/want expressions (+20 points) - NEW
+  const needExpressions = ['necesito', 'quiero', 'busco', 'need', 'want', 'looking for'];
+  if (needExpressions.some(expr => message.includes(expr))) {
+    score += 20;
   }
 
   // Tag matching (+10 per matching tag)
@@ -198,14 +208,14 @@ function calculateRelevanceScore(userMessage: string, plan: MockInsurancePlan): 
   });
 
   // Price preference (+15 for economic plans when user mentions price)
-  if (message.includes('barato') || message.includes('economico') || message.includes('precio')) {
-    if (plan.tags.some(tag => tag.toLowerCase().includes('economico'))) {
+  if (message.includes('barato') || message.includes('economico') || message.includes('precio') || message.includes('cheap') || message.includes('affordable')) {
+    if (plan.tags.some(tag => tag.toLowerCase().includes('economico') || tag.toLowerCase().includes('basico'))) {
       score += 15;
     }
   }
 
   // Premium preference (+10 for premium plans when user mentions quality/complete)
-  if (message.includes('completo') || message.includes('premium') || message.includes('mejor')) {
+  if (message.includes('completo') || message.includes('premium') || message.includes('mejor') || message.includes('complete') || message.includes('best')) {
     if (plan.tags.some(tag => tag.toLowerCase().includes('premium') || tag.toLowerCase().includes('completo'))) {
       score += 10;
     }
@@ -222,18 +232,18 @@ function createSystemPrompt(insurancePlans: MockInsurancePlan[], userMessage: st
   let prompt = `Eres Briki, un asistente de seguros amigable y profesional.
 
 REGLAS DE RECOMENDACIÓN:
-• Solo recomienda planes cuando el usuario:
+• Recomienda planes cuando el usuario:
   - Mencione necesidad específica de seguro
   - Describa un objeto/situación que requiere protección  
   - Pregunte directamente por opciones
 • Para saludos generales: responde amigablemente y pregunta qué le interesa
-• Mantén introducciones breves (máximo 2 líneas antes de mostrar planes)
+• Mantén respuestas concisas (máximo 2-3 líneas)
+• Sé directo al mostrar recomendaciones
 
 ESTILO DE RESPUESTA:
 • Conciso y directo
 • Amigable pero profesional
-• Enfocado en soluciones
-• Evita explicaciones largas antes de mostrar planes`;
+• Enfocado en soluciones`;
 
   // Add enriched context from knowledge base
   if (userMessage) {
@@ -262,19 +272,18 @@ ESTILO DE RESPUESTA:
       prompt += `\n\n${getCategoryName(category)}:`;
       plans.forEach(plan => {
         // Limit description and show only key features
-        const shortDescription = plan.description.length > 100 
-          ? plan.description.substring(0, 100) + '...'
+        const shortDescription = plan.description.length > 80 
+          ? plan.description.substring(0, 80) + '...'
           : plan.description;
-        const keyFeatures = plan.tags.slice(0, 3).join(', ');
-        prompt += `\n- ${plan.name} (${plan.provider}): ${shortDescription} Desde ${plan.basePrice} ${plan.currency}. Características: ${keyFeatures}`;
+        const keyFeatures = plan.tags.slice(0, 2).join(', ');
+        prompt += `\n- ${plan.name}: ${shortDescription} Desde ${plan.basePrice} ${plan.currency}`;
       });
     });
 
     prompt += `\n\nAL RECOMENDAR PLANES:
-• Da introducción breve (1-2 líneas máximo)
-• Menciona los planes más relevantes
-• Sé directo y útil
-• Si el usuario quiere más detalles, proporciónales después`;
+• Da respuesta breve (1-2 líneas máximo)
+• Los planes se mostrarán automáticamente como tarjetas
+• No repitas toda la información del plan en el texto`;
   }
 
   return prompt;
@@ -295,35 +304,59 @@ function getCategoryName(category: string): string {
 }
 
 /**
- * Analyze if the user message indicates they want insurance recommendations
- * Enhanced with semantic pattern matching
+ * FIXED: Enhanced insurance intent detection with better patterns
  */
 function shouldShowInsurancePlans(userMessage: string): boolean {
   const message = userMessage.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-  // Improved pattern-based analysis
+  // Enhanced pattern-based analysis with more comprehensive coverage
   const intentPatterns = {
-    greeting: /^(hola|hi|hello|buenas|buenos dias|buenas tardes|que tal|como estas).{0,30}$/,
-    needsInsurance: /(necesito|busco|quiero|me interesa|requiero).*(seguro|protec|cobertura|plan)/,
-    hasAsset: /(tengo|compre|mi|nuevo|acabo de comprar).*(carro|auto|perro|gato|viaje|casa|vehiculo|mascota)/,
-    priceInquiry: /(cuanto|precio|costo|barato|economico|vale).*(seguro|plan|cobertura)/,
-    comparison: /(comparar|opciones|diferentes|mejor|recomienda).*(seguro|plan|cobertura)/
+    // Clear insurance need patterns
+    directNeed: /(necesito|busco|quiero|me interesa|requiero|need|want|looking for).*(seguro|insurance|protec|cobertura|plan)/,
+
+    // Asset-based patterns (having something that needs insurance)
+    hasAsset: /(tengo|compre|mi|nuevo|acabo de comprar|have|own|bought|new).*(carro|auto|perro|gato|viaje|casa|vehiculo|mascota|car|pet|dog|cat|travel)/,
+
+    // Activity-based patterns (doing something that needs insurance)
+    activity: /(viajo|viajar|conducir|manejar|traveling|driving).*(seguro|insurance|protec)/,
+
+    // Direct insurance category mentions
+    categories: /(seguro de|insurance for).*(viaje|auto|mascota|salud|travel|car|pet|health)/,
+
+    // Question patterns about insurance
+    questions: /(que seguro|what insurance|cual plan|which plan|como proteger|how to protect)/,
+
+    // Price and comparison patterns
+    comparison: /(precio|costo|comparar|opciones|recomienda|price|cost|compare|recommend).*(seguro|insurance|plan)/
   };
 
-  // If it's just a greeting, don't show plans
-  if (intentPatterns.greeting.test(message)) return false;
+  // Exclude simple greetings (but allow longer messages with greetings)
+  const simpleGreetings = /^(hola|hi|hello|buenas|buenos dias|buenas tardes|hey)\.?\s*$/;
+  if (simpleGreetings.test(message)) {
+    return false;
+  }
 
-  // If there's clear insurance intent, show plans
-  return Object.values(intentPatterns).slice(1).some(pattern => pattern.test(message));
+  // Check if any insurance intent pattern matches
+  const hasIntent = Object.values(intentPatterns).some(pattern => pattern.test(message));
+
+  // Additional context-based detection
+  const insuranceKeywords = ['seguro', 'insurance', 'proteccion', 'cobertura', 'plan', 'poliza'];
+  const categoryKeywords = ['viaje', 'auto', 'mascota', 'salud', 'travel', 'car', 'pet', 'health'];
+  const actionKeywords = ['necesito', 'busco', 'quiero', 'need', 'want', 'looking'];
+
+  const hasInsuranceKeyword = insuranceKeywords.some(keyword => message.includes(keyword));
+  const hasCategoryKeyword = categoryKeywords.some(keyword => message.includes(keyword));
+  const hasActionKeyword = actionKeywords.some(keyword => message.includes(keyword));
+
+  // Show plans if we have clear intent OR if we have insurance + category/action keywords
+  return hasIntent || (hasInsuranceKeyword && (hasCategoryKeyword || hasActionKeyword));
 }
 
 /**
- * Find relevant plans based on user message with improved scoring
+ * FIXED: Enhanced plan finding with better filtering
  */
 function findRelevantPlans(userMessage: string, plans: MockInsurancePlan[]): MockInsurancePlan[] {
   if (!plans.length) return [];
-
-  const message = userMessage.toLowerCase();
 
   // Use the scoring system to find the most relevant plans
   const scoredPlans = plans.map(plan => ({
@@ -331,13 +364,34 @@ function findRelevantPlans(userMessage: string, plans: MockInsurancePlan[]): Moc
     score: calculateRelevanceScore(userMessage, plan)
   }));
 
-  // Sort by score and return top plans
+  // Sort by score and return plans with positive scores
   const sortedPlans = scoredPlans
     .sort((a, b) => b.score - a.score)
-    .filter(item => item.score > 0); // Only return plans with positive scores
+    .filter(item => item.score > 15); // Only return plans with meaningful relevance
 
-  // Return top 3 most relevant plans
-  return sortedPlans.slice(0, 3).map(item => item.plan);
+  // Return top 3 most relevant plans, or all if less than 3
+  const topPlans = sortedPlans.slice(0, 3).map(item => item.plan);
+
+  // If no highly relevant plans found, return some plans from the most likely category
+  if (topPlans.length === 0 && plans.length > 0) {
+    const message = userMessage.toLowerCase();
+
+    // Try to match category and return 2-3 plans from that category
+    if (message.includes('viaje') || message.includes('travel')) {
+      return plans.filter(p => p.category === 'travel').slice(0, 3);
+    } else if (message.includes('auto') || message.includes('car') || message.includes('carro')) {
+      return plans.filter(p => p.category === 'auto').slice(0, 3);
+    } else if (message.includes('mascota') || message.includes('pet') || message.includes('perro') || message.includes('gato')) {
+      return plans.filter(p => p.category === 'pet').slice(0, 3);
+    } else if (message.includes('salud') || message.includes('health')) {
+      return plans.filter(p => p.category === 'health').slice(0, 3);
+    }
+
+    // Fallback: return 3 random plans
+    return plans.slice(0, 3);
+  }
+
+  return topPlans;
 }
 
 /**
