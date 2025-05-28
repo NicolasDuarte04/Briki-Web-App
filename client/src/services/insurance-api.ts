@@ -5,6 +5,7 @@
 
 export interface InsurancePlan {
   id: string;
+  planId: string;
   category: string;
   provider: string;
   name: string;

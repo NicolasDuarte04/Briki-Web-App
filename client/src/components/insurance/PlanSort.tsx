@@ -15,8 +15,8 @@ export type SortOption =
 
 interface PlanSortProps {
   sortOption: SortOption;
-  onSortChange: (option: SortOption) => void;
-  resultsCount: number;
+  setSortOption: (option: SortOption) => void;
+  planCount: number;
 }
 
 const sortOptions = [
@@ -92,7 +92,7 @@ export default function PlanSort({
           <span className="text-sm font-medium text-gray-700">Sort by:</span>
         </div>
         
-        <Select value={sortOption} onValueChange={onSortChange}>
+        <Select value={sortOption} onValueChange={setSortOption}>
           <SelectTrigger className="w-48 bg-white">
             <SelectValue>
               <div className="flex items-center gap-2">
