@@ -26,6 +26,7 @@ import {
   comparePlans 
 } from "./services/openai";
 import { parseCSVFile, parseXLSXFile } from "./services/plan-upload";
+import { insuranceDataService } from "./services/insurance-data-service";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   console.warn('Warning: Missing STRIPE_SECRET_KEY environment variable');
@@ -800,6 +801,152 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Error comparing plans:", error);
       res.status(500).json({ error: "Failed to compare plans", message: error.message });
+    }
+  });
+
+  // ===== INSURANCE DATA API ENDPOINTS =====
+  
+  // Get all insurance plans
+  app.get("/api/insurance/plans", async (req, res) => {
+    try {
+      const plans = insuranceDataService.getAllPlans();
+      res.json(plans);
+    } catch (error: any) {
+      console.error("Error fetching plans:", error);
+      res.status(500).json({ error: "Failed to fetch insurance plans" });
+    }
+  });
+
+  // Get plans by category
+  app.get("/api/insurance/plans/:category", async (req, res) => {
+    try {
+      const { category } = req.params;
+      const { search, minPrice, maxPrice, features } = req.query;
+      
+      let plans = insuranceDataService.getPlansByCategory(category);
+      
+      // Apply search filter
+      if (search) {
+        const searchResults = insuranceDataService.searchPlans(search as string);
+        plans = plans.filter(plan => searchResults.some(result => result.id === plan.id));
+      }
+      
+      // Apply price filter
+      if (minPrice || maxPrice) {
+        const min = minPrice ? parseFloat(minPrice as string) : 0;
+        const max = maxPrice ? parseFloat(maxPrice as string) : Infinity;
+        plans = plans.filter(plan => plan.basePrice >= min && plan.basePrice <= max);
+      }
+      
+      // Apply features filter
+      if (features) {
+        const featureList = (features as string).split(',');
+        plans = plans.filter(plan => 
+          featureList.some(feature => 
+            plan.features.some(planFeature => 
+              planFeature.toLowerCase().includes(feature.toLowerCase())
+            )
+          )
+        );
+      }
+      
+      res.json(plans);
+    } catch (error: any) {
+      console.error("Error fetching plans by category:", error);
+      res.status(500).json({ error: "Failed to fetch insurance plans" });
+    }
+  });
+
+  // Get specific plan by ID
+  app.get("/api/insurance/plan/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const plan = insuranceDataService.getPlanById(id);
+      
+      if (!plan) {
+        return res.status(404).json({ error: "Plan not found" });
+      }
+      
+      res.json(plan);
+    } catch (error: any) {
+      console.error("Error fetching plan:", error);
+      res.status(500).json({ error: "Failed to fetch insurance plan" });
+    }
+  });
+
+  // Search plans
+  app.get("/api/insurance/search", async (req, res) => {
+    try {
+      const { q: query } = req.query;
+      
+      if (!query) {
+        return res.status(400).json({ error: "Search query is required" });
+      }
+      
+      const plans = insuranceDataService.searchPlans(query as string);
+      res.json(plans);
+    } catch (error: any) {
+      console.error("Error searching plans:", error);
+      res.status(500).json({ error: "Failed to search insurance plans" });
+    }
+  });
+
+  // Get plans by provider
+  app.get("/api/insurance/provider/:provider", async (req, res) => {
+    try {
+      const { provider } = req.params;
+      const plans = insuranceDataService.getPlansByProvider(provider);
+      res.json(plans);
+    } catch (error: any) {
+      console.error("Error fetching plans by provider:", error);
+      res.status(500).json({ error: "Failed to fetch plans by provider" });
+    }
+  });
+
+  // Get top-rated plans
+  app.get("/api/insurance/top-rated", async (req, res) => {
+    try {
+      const { limit = "10" } = req.query;
+      const plans = insuranceDataService.getTopRatedPlans(parseInt(limit as string));
+      res.json(plans);
+    } catch (error: any) {
+      console.error("Error fetching top-rated plans:", error);
+      res.status(500).json({ error: "Failed to fetch top-rated plans" });
+    }
+  });
+
+  // Get economical plans
+  app.get("/api/insurance/economical", async (req, res) => {
+    try {
+      const { category } = req.query;
+      const plans = insuranceDataService.getMostEconomicalPlans(category as string);
+      res.json(plans);
+    } catch (error: any) {
+      console.error("Error fetching economical plans:", error);
+      res.status(500).json({ error: "Failed to fetch economical plans" });
+    }
+  });
+
+  // Get premium plans
+  app.get("/api/insurance/premium", async (req, res) => {
+    try {
+      const { category } = req.query;
+      const plans = insuranceDataService.getPremiumPlans(category as string);
+      res.json(plans);
+    } catch (error: any) {
+      console.error("Error fetching premium plans:", error);
+      res.status(500).json({ error: "Failed to fetch premium plans" });
+    }
+  });
+
+  // Get insurance statistics
+  app.get("/api/insurance/stats", async (req, res) => {
+    try {
+      const stats = insuranceDataService.getStatistics();
+      res.json(stats);
+    } catch (error: any) {
+      console.error("Error fetching insurance statistics:", error);
+      res.status(500).json({ error: "Failed to fetch insurance statistics" });
     }
   });
 
