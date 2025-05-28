@@ -126,12 +126,15 @@ export function useInsurancePlans(options: UseInsurancePlansOptions = {}): UseIn
       let result: InsurancePlan[];
       
       if (category) {
-        result = await insuranceAPI.getPlansByCategory(category, filters);
+        result = await insurancePlansApi.getPlansByCategory(category);
       } else {
-        result = await insuranceAPI.getAllPlans();
+        result = await insurancePlansApi.getAllPlans();
       }
 
-      setPlans(result);
+      // Ensure result is always an array
+      const planArray = Array.isArray(result) ? result : [];
+      setPlans(planArray);
+      console.log(`[useInsurancePlans] Loaded ${planArray.length} plans successfully`);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load insurance plans';
       setError(errorMessage);
