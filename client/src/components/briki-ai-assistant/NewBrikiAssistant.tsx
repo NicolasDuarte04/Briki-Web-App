@@ -73,9 +73,9 @@ const NewBrikiAssistant: React.FC = () => {
     // Hide welcome card on first real message
     setShowWelcomeCard(false);
 
-    // Extract context from message
+    // FIXED: Accumulate context across multiple turns
     const newContext = extractContextFromMessage(messageToSend, userContext);
-    setUserContext(newContext);
+    setUserContext(prev => ({ ...prev, ...newContext })); // Merge instead of replace
 
     // Create user message
     const userMessage: Message = {
@@ -99,16 +99,19 @@ const NewBrikiAssistant: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // Prepare conversation history with memory preservation
+      // FIXED: Enhanced conversation history with plan memory
       const conversationHistory: APIMessage[] = messages
         .filter(msg => !msg.isLoading && msg.id !== 'welcome-msg')
         .map(msg => {
           if (msg.role === 'assistant' && msg.suggestedPlans && msg.suggestedPlans.length > 0) {
-            // Include assistant responses with plan summary for context
-            const planNames = msg.suggestedPlans.map(plan => plan.name).join(', ');
+            // FIXED: Include detailed plan context for memory
+            const planDetails = msg.suggestedPlans.map(plan => 
+              `${plan.name} (${plan.provider}) - $${plan.basePrice}`
+            ).join(', ');
+            
             return {
               role: msg.role,
-              content: `${msg.content}\n\n[Planes recomendados: ${planNames}]`
+              content: `${msg.content}\n\n[Planes recomendados: ${planDetails}]`
             };
           }
           return {
@@ -117,15 +120,20 @@ const NewBrikiAssistant: React.FC = () => {
           };
         });
 
-      // Add context if available
-      if (Object.keys(newContext).length > 0) {
-        const contextText = formatUserContext(newContext);
-        if (contextText) {
-          conversationHistory.unshift({
-            role: 'system',
-            content: `Contexto del usuario: ${contextText}`
-          } as APIMessage);
-        }
+      // FIXED: Enhanced context injection
+      const contextEntries = Object.entries(newContext).filter(([_, value]) => value);
+      if (contextEntries.length > 0) {
+        const contextText = contextEntries.map(([key, value]) => {
+          if (typeof value === 'object') {
+            return `${key}: ${JSON.stringify(value)}`;
+          }
+          return `${key}: ${value}`;
+        }).join(', ');
+        
+        conversationHistory.unshift({
+          role: 'system',
+          content: `Contexto acumulado del usuario: ${contextText}`
+        } as APIMessage);
       }
 
       // Get AI response
@@ -140,9 +148,9 @@ const NewBrikiAssistant: React.FC = () => {
                 id: `assistant-${Date.now()}`,
                 content: response.message || response.response || "No pude generar una respuesta.",
                 suggestedPlans: response.suggestedPlans || undefined,
-                // NEW: Create summary for future reference
+                // FIXED: Enhanced plan summary with provider details
                 plansSummary: (response.suggestedPlans && response.suggestedPlans.length > 0)
-                  ? response.suggestedPlans.map(plan => plan.name).join(', ')
+                  ? response.suggestedPlans.map(plan => `${plan.name} (${plan.provider})`).join(', ')
                   : undefined,
                 isLoading: false,
               }
