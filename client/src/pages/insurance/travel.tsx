@@ -4,10 +4,8 @@ import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { useEffect, useState, useMemo } from "react";
-import { Plane, Shield, Globe, ArrowRight, BadgeCheck, MapPin, Zap, HeartPulse, Search } from "lucide-react";
+import { Plane, Shield, Globe, ArrowRight, BadgeCheck, MapPin, Zap, HeartPulse, Search, Filter } from "lucide-react";
 import { HeroWrapper, ContentWrapper } from "@/components/layout";
-import { QuoteSummary } from "@/components/quote-summary";
-import { useQuoteStore } from "@/store/quote-store";
 import { useCompareStore } from "@/store/compare-store";
 import { ComparePageTrigger } from "@/components/compare-page-trigger";
 import { useToast } from "@/hooks/use-toast";
@@ -15,18 +13,46 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import GradientButton from "@/components/gradient-button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import FilterSidebar, { type FilterOptions } from "@/components/insurance/FilterSidebar";
+import PlanSort, { type SortOption, applySorting } from "@/components/insurance/PlanSort";
+import PlanPagination from "@/components/insurance/PlanPagination";
+import { useInsurancePlans } from "@/hooks/useInsurancePlans";
 
 export default function TravelInsurancePage() {
   const [, navigate] = useLocation();
   const { selectedPlans, addPlan, removePlan, isPlanSelected } = useCompareStore();
   const { toast } = useToast();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [sortOption, setSortOption] = useState("recommended");
+  const [sortOption, setSortOption] = useState<SortOption>('recommended');
   const [isLoaded, setIsLoaded] = useState(false);
-  const [plans, setPlans] = useState<InsurancePlan[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [showFilters, setShowFilters] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(12);
+  
+  // Advanced filtering state
+  const [filters, setFilters] = useState<FilterOptions>({
+    priceRange: [0, 1000],
+    providers: [],
+    coverageAmount: [0, 100000],
+    features: [],
+    rating: 0,
+    deductible: [0, 1000],
+    tags: []
+  });
+
+  // Use the insurance plans hook for better data management
+  const {
+    plans,
+    filteredPlans,
+    loading,
+    error,
+    metadata,
+    searchQuery,
+    setSearchQuery
+  } = useInsurancePlans({ 
+    category: 'travel',
+    autoLoad: true 
+  });
   
   // Animation variants
   const container = {
@@ -53,28 +79,26 @@ export default function TravelInsurancePage() {
     }
   };
   
+  // Initialize filters with metadata ranges once plans are loaded
+  useEffect(() => {
+    if (plans.length > 0 && metadata.ranges) {
+      setFilters(prev => ({
+        ...prev,
+        priceRange: metadata.ranges.priceRange,
+        coverageAmount: metadata.ranges.coverageRange,
+        deductible: metadata.ranges.deductibleRange
+      }));
+    }
+  }, [plans, metadata]);
+
   useEffect(() => {
     // Scroll to top when component mounts
     window.scrollTo(0, 0);
     
-    // Load travel plans from the API
-    const loadPlans = async () => {
-      try {
-        const travelPlans = await insuranceAPI.getPlansByCategory('travel');
-        setPlans(travelPlans);
-        setLoading(false);
-        
-        // Set isLoaded to true after a short delay to trigger animations
-        setTimeout(() => {
-          setIsLoaded(true);
-        }, 100);
-      } catch (error) {
-        console.error('Error loading travel plans:', error);
-        setLoading(false);
-      }
-    };
-    
-    loadPlans();
+    // Set isLoaded to true after a short delay to trigger animations
+    setTimeout(() => {
+      setIsLoaded(true);
+    }, 100);
   }, []);
   
   const handleCompareToggle = (id: string | number, isSelected: boolean) => {
@@ -130,25 +154,66 @@ export default function TravelInsurancePage() {
     }
   };
 
-  // Filter plans based on search query
-  const filteredPlans = plans.filter(plan => 
-    plan.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    plan.provider.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    plan.description?.toLowerCase().includes(searchQuery.toLowerCase())
+  // Apply advanced filtering and sorting
+  const processedPlans = useMemo(() => {
+    let result = [...filteredPlans];
+
+    // Apply advanced filters
+    if (filters.providers.length > 0) {
+      result = result.filter(plan => filters.providers.includes(plan.provider));
+    }
+
+    if (filters.features.length > 0) {
+      result = result.filter(plan =>
+        filters.features.some(feature =>
+          plan.features.some(planFeature =>
+            planFeature.toLowerCase().includes(feature.toLowerCase())
+          )
+        )
+      );
+    }
+
+    if (filters.tags.length > 0) {
+      result = result.filter(plan =>
+        plan.tags?.some(tag =>
+          filters.tags.some(filterTag =>
+            tag.toLowerCase().includes(filterTag.toLowerCase())
+          )
+        )
+      );
+    }
+
+    if (filters.rating > 0) {
+      result = result.filter(plan => plan.rating >= filters.rating);
+    }
+
+    // Price range filter
+    result = result.filter(plan =>
+      plan.basePrice >= filters.priceRange[0] &&
+      plan.basePrice <= filters.priceRange[1]
+    );
+
+    // Coverage amount filter
+    result = result.filter(plan =>
+      plan.coverageAmount >= filters.coverageAmount[0] &&
+      plan.coverageAmount <= filters.coverageAmount[1]
+    );
+
+    // Apply sorting
+    return applySorting(result, sortOption);
+  }, [filteredPlans, filters, sortOption]);
+
+  // Pagination logic
+  const totalPages = Math.ceil(processedPlans.length / itemsPerPage);
+  const paginatedPlans = processedPlans.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
   );
 
-  // Sort plans based on selected option
-  const sortedPlans = [...filteredPlans].sort((a, b) => {
-    if (sortOption === "price-low") {
-      return a.price - b.price;
-    } else if (sortOption === "price-high") {
-      return b.price - a.price;
-    } else if (sortOption === "rating") {
-      return parseFloat(b.rating || "0") - parseFloat(a.rating || "0");
-    }
-    // Default recommended sorting (no change to order)
-    return 0;
-  });
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filters, searchQuery, sortOption]);
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
