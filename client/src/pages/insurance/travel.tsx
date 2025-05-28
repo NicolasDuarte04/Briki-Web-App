@@ -13,11 +13,13 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import GradientButton from "@/components/gradient-button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import FilterSidebar, { type FilterOptions } from "@/components/insurance/FilterSidebar";
 import PlanSort, { type SortOption, applySorting } from "@/components/insurance/PlanSort";
 import PlanPagination from "@/components/insurance/PlanPagination";
 import { useInsurancePlans } from "@/hooks/useInsurancePlans";
+import { QuoteSummary } from "@/components/quote-summary";
 
 export default function TravelInsurancePage() {
   const [, navigate] = useLocation();
