@@ -1,0 +1,64 @@
+// ✅ Phase 4 — Full Blog Article Pages Implementation
+
+Hi! Everything looks great so far — the new blog homepage is working beautifully with dynamic featured articles and clean UI.
+
+We’re now ready to move into **Phase 4**, which focuses on building **fully functional blog article pages** when users click on a post.
+
+Please read carefully and **do not start implementing until we give you confirmation**, as we’ll first need your feedback and then prepare the article content accordingly.
+
+---
+
+📌 OBJECTIVE:
+When a user clicks on a blog post, it should open a complete, styled article page at `/blog/[slug]`.
+
+---
+
+🛠️ Required Features for This Phase:
+
+1. **Dynamic Route Setup**
+   • Create `/pages/blog/[slug].tsx` as a dynamic route
+   • Slug should match the article's `slug` field in the backend or JSON
+
+2. **Article Data Fetching**
+   • Fetch article data by slug (title, content, author, tags, publish date)
+   • Gracefully handle loading and 404 if slug is invalid
+
+3. **Content Rendering**
+   • Render full article content using either:
+     - Markdown-to-HTML renderer
+     - Or a structured rich text parser (headings, paragraphs, links)
+   • Support embedded images if possible
+
+4. **Design & Navigation**
+   • Match design system and blog homepage style
+   • Include title, author, date, tags, reading time, cover image
+   • Add a breadcrumb or “← Back to Blog” navigation link
+
+5. **SEO Optimization**
+   • Dynamic `<title>`, meta description, OG image (if available)
+
+---
+
+📦 Additional Questions Before We Proceed:
+
+1. **How many articles should we create for launch?**
+   - We want to prepare the right amount of quality content — what’s the ideal initial count for launch and for UI balance?
+
+2. **Do you prefer a markdown format or a WYSIWYG (rich text) setup for article creation/editing?**
+
+3. **For article images:**
+   - Should we support image uploads?
+   - Or do you prefer a curated folder of stock images?
+
+4. **Who should have access to the blog editor (admin panel)?**
+   - All authenticated users?
+   - Or just admin-level accounts?
+
+5. **Optional:**
+   - Should we add estimated reading time per article?
+
+---
+
+Once you answer these questions, we’ll get started on preparing the actual article content and confirm when you’re ready to implement.
+
+Thanks again — we’re almost there!
