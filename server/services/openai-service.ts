@@ -43,13 +43,9 @@ export async function generateAssistantResponse(
     // FIXED: Get real plans from insurance data service
     let allPlans: MockInsurancePlan[] = [];
     
-    try {
-      allPlans = await storage.getAllInsurancePlans();
-      console.log(`[OpenAI][${requestId}] Successfully loaded ${allPlans.length} real insurance plans`);
-    } catch (dataError) {
-      console.error(`[OpenAI][${requestId}] Failed to load real plans, falling back to loadMockInsurancePlans:`, dataError);
-      allPlans = loadMockInsurancePlans();
-    }
+    // Use the loadMockInsurancePlans function that loads real data from files
+    allPlans = loadMockInsurancePlans();
+    console.log(`[OpenAI][${requestId}] Successfully loaded ${allPlans.length} insurance plans`);
 
     // Filter and get relevant plans
     const filteredPlans = filterPlansByCountry(allPlans, userCountry);
@@ -64,15 +60,13 @@ export async function generateAssistantResponse(
     // FIXED: Check OpenAI availability and fallback logic
     if (!process.env.OPENAI_API_KEY) {
       console.warn(`[OpenAI][${requestId}] No API key configured, using fallback response`);
-      return await getMockResponse(userMessage, relevantPlans);
+      // Generate fallback response with relevant plans
+      const fallbackMessage = generateFallbackResponse(userMessage, relevantPlans);
+      return {
+        message: fallbackMessage,
+        suggestedPlans: relevantPlans.slice(0, 3)
+      };
     }
-
-  // Combine history with current message
-  const messages: AssistantMessage[] = [
-    systemMessage,
-    ...conversationHistory,
-    { role: "user", content: userMessage }
-  ];
 
     // Combine history with current message
     const messages: AssistantMessage[] = [

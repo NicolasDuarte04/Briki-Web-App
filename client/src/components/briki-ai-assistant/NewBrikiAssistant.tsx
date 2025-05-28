@@ -136,7 +136,7 @@ const NewBrikiAssistant: React.FC = () => {
         } as APIMessage);
       }
 
-      // Get AI response
+      // Get AI response with conversation history
       const response = await sendMessageToAI(messageToSend, conversationHistory);
 
       // Update loading message with response and memory

@@ -46,7 +46,7 @@ export async function sendMessageToAI(
       },
       body: JSON.stringify({
         message,
-        conversationHistory,
+        history: conversationHistory,
       }),
     });
 
