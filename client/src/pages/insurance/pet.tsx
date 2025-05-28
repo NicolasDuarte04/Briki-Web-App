@@ -1,12 +1,10 @@
 import { PlanCard } from "@/components/plans/PlanCard";
-import { petPlans } from "@/components/plans/mockPlans";
+import { insuranceAPI, type InsurancePlan } from "@/services/insurance-api";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { useEffect, useState, useMemo } from "react";
-import { Heart, Shield, ArrowRight, BadgeCheck, Search, PawPrint, Syringe, Wallet } from "lucide-react";
-import { QuoteSummary } from "@/components/quote-summary";
-import { useQuoteStore } from "@/store/quote-store";
+import { Heart, Shield, ArrowRight, BadgeCheck, Search, PawPrint, Syringe, Wallet, Filter } from "lucide-react";
 import { HeroWrapper, ContentWrapper } from "@/components/layout";
 import { useCompareStore } from "@/store/compare-store";
 import { ComparePageTrigger } from "@/components/compare-page-trigger";
@@ -15,16 +13,46 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import GradientButton from "@/components/gradient-button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import FilterSidebar, { type FilterOptions } from "@/components/insurance/FilterSidebar";
+import PlanSort, { type SortOption, applySorting } from "@/components/insurance/PlanSort";
+import PlanPagination from "@/components/insurance/PlanPagination";
+import { useInsurancePlans } from "@/hooks/useInsurancePlans";
 
 export default function PetInsurancePage() {
   const [, navigate] = useLocation();
   const { selectedPlans, addPlan, removePlan, isPlanSelected } = useCompareStore();
   const { toast } = useToast();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [sortOption, setSortOption] = useState("recommended");
+  const [sortOption, setSortOption] = useState<SortOption>('recommended');
   const [isLoaded, setIsLoaded] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(12);
+  
+  // Advanced filtering state
+  const [filters, setFilters] = useState<FilterOptions>({
+    priceRange: [0, 1000],
+    providers: [],
+    coverageAmount: [0, 100000],
+    features: [],
+    rating: 0,
+    deductible: [0, 1000],
+    tags: []
+  });
+
+  // Use the insurance plans hook for better data management
+  const {
+    plans,
+    filteredPlans,
+    loading,
+    error,
+    metadata,
+    searchQuery,
+    setSearchQuery
+  } = useInsurancePlans({ 
+    category: 'pet',
+    autoLoad: true 
+  });
   
   // Animation variants
   const container = {
