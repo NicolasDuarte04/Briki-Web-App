@@ -28,8 +28,6 @@ export default function TravelInsurancePage() {
   const [sortOption, setSortOption] = useState<SortOption>('recommended');
   const [isLoaded, setIsLoaded] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(12);
   
   // Advanced filtering state
   const [filters, setFilters] = useState<FilterOptions>({
@@ -63,10 +61,10 @@ export default function TravelInsurancePage() {
     autoLoad: true 
   });
 
-  // Apply sorting to filtered plans
+  // Apply sorting to paginated plans
   const sortedPlans = useMemo(() => {
-    return applySorting(filteredPlans, sortOption);
-  }, [filteredPlans, sortOption]);
+    return applySorting(paginatedPlans, sortOption);
+  }, [paginatedPlans, sortOption]);
   
   // Animation variants
   const container = {
@@ -508,6 +506,26 @@ export default function TravelInsurancePage() {
               >
                 Compare Selected Plans ({selectedPlans.length})
               </GradientButton>
+            </motion.div>
+          )}
+          
+          {/* Pagination Controls */}
+          {totalItems > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.2 }}
+              className="mt-8"
+            >
+              <PaginationControls
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={totalItems}
+                itemsPerPage={itemsPerPage}
+                onPageChange={setCurrentPage}
+                onItemsPerPageChange={setItemsPerPage}
+                loading={loading}
+              />
             </motion.div>
           )}
         </div>
