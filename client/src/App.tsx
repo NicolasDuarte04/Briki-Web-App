@@ -44,6 +44,7 @@ import AskBrikiPage from "@/pages/ask-briki";
 
 import AskBrikiAIPage from "@/pages/ask-briki-ai";
 import BlogPage from "@/pages/blog";
+import BlogPostPage from "@/pages/blog/[slug]";
 import ForumPage from "@/pages/forum";
 import CareersPage from "@/pages/careers";
 import ColorPaletteDemo from "@/pages/color-palette-demo";
