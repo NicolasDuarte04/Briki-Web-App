@@ -162,10 +162,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Insurance Plan Endpoints
   app.get("/api/plans", async (_req, res) => {
     try {
-      const plans = await storage.getAllInsurancePlans();
+      const plans = await insuranceDataService.getAllPlans();
       res.json(plans);
     } catch (error: any) {
       console.error("GET /api/plans - Error fetching plans:", error);
+      res.status(500).json({ message: "Failed to fetch insurance plans", error: error.message });
+    }
+  });
+
+  // New insurance API endpoints to match frontend expectations
+  app.get("/api/insurance/plans", async (_req, res) => {
+    try {
+      const plans = await insuranceDataService.getAllPlans();
+      res.json(plans);
+    } catch (error: any) {
+      console.error("GET /api/insurance/plans - Error fetching plans:", error);
       res.status(500).json({ message: "Failed to fetch insurance plans", error: error.message });
     }
   });
@@ -180,16 +191,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const plans = await storage.getInsurancePlansByCategory(category);
+      const plans = await insuranceDataService.getPlansByCategory(category);
       res.json(plans);
     } catch (error: any) {
       console.error(`GET /api/plans/${req.params.category} - Error:`, error);
       res.status(500).json({ message: "Failed to fetch insurance plans", error: error.message });
     }
   });
+
+  app.get("/api/insurance/plans/:category", async (req, res) => {
+    try {
+      const { category } = req.params;
+      if (!category || !['travel', 'auto', 'pet', 'health'].includes(category)) {
+        return res.status(400).json({ 
+          message: "Invalid insurance category. Must be one of: travel, auto, pet, health" 
+        });
+      }
+      
+      const plans = await insuranceDataService.getPlansByCategory(category);
+      
+      // Generate metadata from the plans
+      const providers = [...new Set(plans.map(p => p.provider))];
+      const features = [...new Set(plans.flatMap(p => p.features))];
+      const priceRange = plans.length > 0 ? [
+        Math.min(...plans.map(p => p.basePrice)),
+        Math.max(...plans.map(p => p.basePrice))
+      ] : [0, 1000];
+      const coverageRange = plans.length > 0 ? [
+        Math.min(...plans.map(p => p.coverageAmount)),
+        Math.max(...plans.map(p => p.coverageAmount))
+      ] : [0, 100000];
+      
+      const metadata = {
+        providers,
+        features,
+        priceRange,
+        coverageRange,
+        tags: []
+      };
+      
+      res.json({
+        plans,
+        metadata,
+        total: plans.length
+      });
+    } catch (error: any) {
+      console.error(`GET /api/insurance/plans/${req.params.category} - Error:`, error);
+      res.status(500).json({ message: "Failed to fetch insurance plans", error: error.message });
+    }
+  });
   
-  // Insurance API endpoints for frontend
-  app.get("/api/insurance/plans", async (_req, res) => {
+  // Additional insurance endpoints
+  app.get("/api/insurance/plan/:id", async (req, res) => {
     try {
       const plans = await storage.getAllInsurancePlans();
       res.json(plans);
