@@ -433,7 +433,11 @@ export default function HealthInsurancePage() {
             onFiltersChange={setFilters}
             availableProviders={metadata?.providers || []}
             availableFeatures={metadata?.features || []}
+            availableTags={metadata?.tags || []}
             category="health"
+            priceRange={metadata?.priceRange || [0, 1000]}
+            coverageRange={metadata?.coverageRange || [0, 100000]}
+            deductibleRange={[0, 1000]}
           />
           
           {/* Loading State */}
