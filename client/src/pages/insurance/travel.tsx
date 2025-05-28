@@ -24,6 +24,9 @@ import { AdvancedFilterPanel, type AdvancedFilters } from "@/components/insuranc
 import { applyAdvancedFilters, getFilterOptions, getDefaultFilters, countActiveFilters } from "@/utils/filterUtils";
 import { EnhancedSearchBar } from "@/components/insurance/EnhancedSearchBar";
 import { generatePlanInsights, trackPlanInteraction } from "@/utils/planInsights";
+import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
+import { ErrorState, EmptyState } from "@/components/ui/ErrorStates";
+import { useOptimizedQuery } from "@/hooks/useOptimizedQuery";
 
 export default function TravelInsurancePage() {
   const [, navigate] = useLocation();
