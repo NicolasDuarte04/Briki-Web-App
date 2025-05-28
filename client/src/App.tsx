@@ -208,6 +208,7 @@ function Router() {
 
         <Route path="/ask-briki-ai" component={AskBrikiAIPage} />
         <Route path="/blog" component={BlogPage} />
+        <Route path="/blog/:slug" component={BlogPostPage} />
         <Route path="/forum" component={ForumPage} />
         <Route path="/careers" component={CareersPage} />
         <Route path="/color-palette" component={ColorPaletteDemo} />
