@@ -61,7 +61,7 @@ export async function generateAssistantResponse(
     if (!process.env.OPENAI_API_KEY) {
       console.warn(`[OpenAI][${requestId}] No API key configured, using fallback response`);
       // Generate fallback response with relevant plans
-      const fallbackMessage = generateFallbackResponse(userMessage, relevantPlans);
+      const fallbackMessage = `¡Hola! Soy Briki, tu asistente de seguros. Entiendo que estás preguntando sobre: "${userMessage}". Te puedo ayudar con información sobre seguros y recomendarte los mejores planes disponibles.`;
       return {
         message: fallbackMessage,
         suggestedPlans: relevantPlans.slice(0, 3)
