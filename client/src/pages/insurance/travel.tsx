@@ -1,5 +1,5 @@
 import { PlanCard } from "@/components/plans/PlanCard";
-import { travelPlans } from "@/components/plans/mockPlans";
+import { insuranceAPI, type InsurancePlan } from "@/services/insurance-api";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
@@ -25,6 +25,8 @@ export default function TravelInsurancePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOption, setSortOption] = useState("recommended");
   const [isLoaded, setIsLoaded] = useState(false);
+  const [plans, setPlans] = useState<InsurancePlan[]>([]);
+  const [loading, setLoading] = useState(true);
   
   // Animation variants
   const container = {
@@ -55,27 +57,49 @@ export default function TravelInsurancePage() {
     // Scroll to top when component mounts
     window.scrollTo(0, 0);
     
-    // Set isLoaded to true after a short delay to trigger animations
-    const timer = setTimeout(() => {
-      setIsLoaded(true);
-    }, 100);
+    // Load travel plans from the API
+    const loadPlans = async () => {
+      try {
+        const travelPlans = await insuranceAPI.getPlansByCategory('travel');
+        setPlans(travelPlans);
+        setLoading(false);
+        
+        // Set isLoaded to true after a short delay to trigger animations
+        setTimeout(() => {
+          setIsLoaded(true);
+        }, 100);
+      } catch (error) {
+        console.error('Error loading travel plans:', error);
+        setLoading(false);
+      }
+    };
     
-    return () => clearTimeout(timer);
+    loadPlans();
   }, []);
   
   const handleCompareToggle = (id: string | number, isSelected: boolean) => {
     if (isSelected) {
-      // Find the full plan data from our mock data
-      const planToAdd = travelPlans.find(p => p.id === id);
+      // Find the full plan data from our real data
+      const planToAdd = plans.find(p => p.id === id);
       if (!planToAdd) return;
       
-      // Try to add the plan to comparison
-      const added = addPlan(planToAdd);
+      // Convert to format expected by compare store
+      const compareablePlan = {
+        id: planToAdd.id,
+        title: planToAdd.name,
+        provider: planToAdd.provider,
+        price: planToAdd.basePrice,
+        description: planToAdd.description,
+        features: planToAdd.features,
+        category: 'travel' as any,
+      };
       
-      // If adding failed, check why
-      if (!added) {
-        // Check if we're trying to mix categories
-        const selectedCategories = [...new Set(selectedPlans.map(p => p.category))];
+      // Try to add the plan to comparison
+      addPlan(compareablePlan);
+      
+      // Check if we're trying to mix categories or hit limits
+      if (selectedPlans.length > 0) {
+        const selectedCategories = selectedPlans.map(p => p.category).filter(Boolean);
         if (selectedCategories.length > 0 && !selectedCategories.includes('travel')) {
           toast({
             title: "Cannot compare plans from different categories",
@@ -107,8 +131,8 @@ export default function TravelInsurancePage() {
   };
 
   // Filter plans based on search query
-  const filteredPlans = travelPlans.filter(plan => 
-    plan.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  const filteredPlans = plans.filter(plan => 
+    plan.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     plan.provider.toLowerCase().includes(searchQuery.toLowerCase()) ||
     plan.description?.toLowerCase().includes(searchQuery.toLowerCase())
   );
