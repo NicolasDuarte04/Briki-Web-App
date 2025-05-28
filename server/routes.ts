@@ -862,7 +862,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all insurance plans
   app.get("/api/insurance/plans", async (req, res) => {
     try {
-      const plans = insuranceDataService.getAllPlans();
+      const { insuranceDataService } = await import('./services/insurance-data-service.js');
+      const plans = await insuranceDataService.getAllPlans();
+      console.log(`[API] GET /api/insurance/plans - Returning ${plans.length} plans`);
       res.json(plans);
     } catch (error: any) {
       console.error("Error fetching plans:", error);
