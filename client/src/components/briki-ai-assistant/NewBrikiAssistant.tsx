@@ -18,6 +18,8 @@ interface Message {
   timestamp: Date;
   isLoading?: boolean;
   suggestedPlans?: InsurancePlan[];
+  // NEW: Add summary for memory
+  plansSummary?: string;
 }
 
 const NewBrikiAssistant: React.FC = () => {
@@ -97,13 +99,23 @@ const NewBrikiAssistant: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // Prepare conversation history
+      // Prepare conversation history with memory preservation
       const conversationHistory: APIMessage[] = messages
         .filter(msg => !msg.isLoading && msg.id !== 'welcome-msg')
-        .map(msg => ({
-          role: msg.role,
-          content: msg.content,
-        }));
+        .map(msg => {
+          if (msg.role === 'assistant' && msg.suggestedPlans && msg.suggestedPlans.length > 0) {
+            // Include assistant responses with plan summary for context
+            const planNames = msg.suggestedPlans.map(plan => plan.name).join(', ');
+            return {
+              role: msg.role,
+              content: `${msg.content}\n\n[Planes recomendados: ${planNames}]`
+            };
+          }
+          return {
+            role: msg.role,
+            content: msg.content,
+          };
+        });
 
       // Add context if available
       if (Object.keys(newContext).length > 0) {
@@ -119,7 +131,7 @@ const NewBrikiAssistant: React.FC = () => {
       // Get AI response
       const response = await sendMessageToAI(messageToSend, conversationHistory);
 
-      // Update loading message with response
+      // Update loading message with response and memory
       setMessages(prev => 
         prev.map(msg => 
           msg.isLoading 
@@ -128,6 +140,10 @@ const NewBrikiAssistant: React.FC = () => {
                 id: `assistant-${Date.now()}`,
                 content: response.message || response.response || "No pude generar una respuesta.",
                 suggestedPlans: response.suggestedPlans || undefined,
+                // NEW: Create summary for future reference
+                plansSummary: response.suggestedPlans?.length > 0 
+                  ? response.suggestedPlans.map(plan => plan.name).join(', ')
+                  : undefined,
                 isLoading: false,
               }
             : msg
