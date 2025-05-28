@@ -22,6 +22,8 @@ import { QuoteSummary } from "@/components/quote-summary";
 import { PaginationControls } from "@/components/insurance/PaginationControls";
 import { AdvancedFilterPanel, type AdvancedFilters } from "@/components/insurance/AdvancedFilterPanel";
 import { applyAdvancedFilters, getFilterOptions, getDefaultFilters, countActiveFilters } from "@/utils/filterUtils";
+import { EnhancedSearchBar } from "@/components/insurance/EnhancedSearchBar";
+import { generatePlanInsights, trackPlanInteraction } from "@/utils/planInsights";
 
 export default function TravelInsurancePage() {
   const [, navigate] = useLocation();
