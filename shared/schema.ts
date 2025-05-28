@@ -270,3 +270,96 @@ export const planFieldLabels: Record<InsuranceCategory, Record<string, string>> 
     coversSpecialist: "Specialist Coverage"
   }
 };
+
+// Blog schema
+export const blogStatusEnum = pgEnum('blog_status', ['draft', 'published', 'archived']);
+
+export const blogCategories = pgTable("blog_categories", {
+  id: serial("id").primaryKey(),
+  name: varchar("name").notNull().unique(),
+  slug: varchar("slug").notNull().unique(),
+  description: text("description"),
+  color: varchar("color").default("#3B82F6"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const blogTags = pgTable("blog_tags", {
+  id: serial("id").primaryKey(),
+  name: varchar("name").notNull().unique(),
+  slug: varchar("slug").notNull().unique(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const blogPosts = pgTable("blog_posts", {
+  id: serial("id").primaryKey(),
+  title: varchar("title", { length: 255 }).notNull(),
+  slug: varchar("slug", { length: 255 }).notNull().unique(),
+  excerpt: text("excerpt").notNull(),
+  content: text("content").notNull(),
+  featuredImage: varchar("featured_image"),
+  authorId: varchar("author_id").references(() => users.id).notNull(),
+  categoryId: integer("category_id").references(() => blogCategories.id),
+  status: blogStatusEnum("status").default('draft'),
+  readTime: integer("read_time").default(5),
+  viewCount: integer("view_count").default(0),
+  featured: boolean("featured").default(false),
+  seoTitle: varchar("seo_title", { length: 60 }),
+  seoDescription: varchar("seo_description", { length: 160 }),
+  publishedAt: timestamp("published_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => {
+  return {
+    slugIdx: index("blog_posts_slug_idx").on(table.slug),
+    statusIdx: index("blog_posts_status_idx").on(table.status),
+    authorIdx: index("blog_posts_author_idx").on(table.authorId),
+    categoryIdx: index("blog_posts_category_idx").on(table.categoryId),
+    publishedAtIdx: index("blog_posts_published_at_idx").on(table.publishedAt),
+  }
+});
+
+export const blogPostTags = pgTable("blog_post_tags", {
+  id: serial("id").primaryKey(),
+  postId: integer("post_id").references(() => blogPosts.id, { onDelete: 'cascade' }).notNull(),
+  tagId: integer("tag_id").references(() => blogTags.id, { onDelete: 'cascade' }).notNull(),
+}, (table) => {
+  return {
+    postTagIdx: index("blog_post_tags_post_tag_idx").on(table.postId, table.tagId),
+  }
+});
+
+// Blog types
+export type BlogCategory = typeof blogCategories.$inferSelect;
+export type BlogTag = typeof blogTags.$inferSelect;
+export type BlogPost = typeof blogPosts.$inferSelect;
+export type BlogPostTag = typeof blogPostTags.$inferSelect;
+
+// Blog insert schemas
+export const insertBlogCategorySchema = createInsertSchema(blogCategories).omit({
+  id: true,
+  createdAt: true,
+});
+export type InsertBlogCategory = z.infer<typeof insertBlogCategorySchema>;
+
+export const insertBlogTagSchema = createInsertSchema(blogTags).omit({
+  id: true,
+  createdAt: true,
+});
+export type InsertBlogTag = z.infer<typeof insertBlogTagSchema>;
+
+export const insertBlogPostSchema = createInsertSchema(blogPosts).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  viewCount: true,
+}).extend({
+  tags: z.array(z.string()).optional(),
+});
+export type InsertBlogPost = z.infer<typeof insertBlogPostSchema>;
+
+// Blog post with relations
+export type BlogPostWithRelations = BlogPost & {
+  author: User;
+  category: BlogCategory | null;
+  tags: BlogTag[];
+};

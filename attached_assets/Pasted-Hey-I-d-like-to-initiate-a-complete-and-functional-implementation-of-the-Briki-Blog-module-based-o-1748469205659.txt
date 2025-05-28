@@ -1,0 +1,55 @@
+Hey! I’d like to initiate a complete and functional implementation of the Briki Blog module, based on the current mock version we have in production.
+
+📸 Context:
+
+As you can see from the latest screenshots:
+	•	The current blog UI is static and purely placeholder content.
+	•	Clicking on any article leads to a 404 Page Not Found.
+	•	There’s no CMS or dynamic structure supporting article creation or publishing.
+	•	Visually, the design feels a bit bland and lacks customization options or visual variety.
+
+⸻
+
+✅ Objectives:
+
+1. Make the Blog Fully Functional
+	•	Enable actual blog article creation, editing, and publishing.
+	•	Articles should be stored either in a CMS, database, or structured JSON file system.
+	•	Set up dynamic routes for articles (e.g. /blog/understanding-travel-insurance).
+	•	Implement proper slug generation and error handling for missing articles.
+
+2. Implement a Blog Admin CMS (Basic)
+	•	Temporary admin dashboard or markdown-based system for uploading/editing articles.
+	•	Optional: Use an MDX-based content structure or connect to an external CMS like Sanity/Contentful/Notion API.
+
+3. Improve UI/UX
+	•	Introduce dynamic tags, categories, and filterable article listings.
+	•	Add real-time reading time estimate, featured article flag, and publication date.
+	•	Redesign the article cards for more visual variation (images, color accents, hover effects).
+	•	Ensure full mobile responsiveness.
+
+⸻
+
+💻 Tech Requirements:
+	•	Use /pages/blog/index.tsx as the main article listing page
+	•	Create dynamic route /pages/blog/[slug].tsx for individual articles
+	•	Add a new data source (or database table) to store blog content
+	•	Consider a WYSIWYG editor or simple markdown parser for internal team use
+
+⸻
+
+🛠 Questions:
+
+Before we proceed, could you confirm:
+	1.	Are we currently using any blog/CMS solution or is everything static right now?
+	2.	Do you suggest using an in-house markdown file system or an external CMS (like Sanity or Notion API)?
+	3.	Would you prefer the articles to be editable via an admin panel or simply via commits to a markdown-based repo?
+	4.	Are there any reusable components or blog-related code already in place (even commented out)?
+	5.	Do we want comments, likes, or social share features from day one?
+	6.	What visual improvements do you recommend to better match Briki’s vibrant brand?
+
+⸻
+
+Once you reply to these points and give the green light, I’ll follow up with a technical plan for implementing the live blog system with CMS and publishing workflow.
+
+Let’s make the blog amazing!
