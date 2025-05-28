@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
-import { insuranceAPI, type InsurancePlan, type InsuranceAPIFilters } from '@/services/insurance-api';
+import { insurancePlansApi, type InsurancePlan } from '@/services/insurance-plans-api';
+import type { InsuranceAPIFilters } from '@/services/insurance-api';
 import { useToast } from '@/hooks/use-toast';
 
 export interface UseInsurancePlansOptions {

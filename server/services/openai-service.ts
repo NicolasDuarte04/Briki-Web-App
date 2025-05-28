@@ -43,9 +43,10 @@ export async function generateAssistantResponse(
     // FIXED: Get real plans from insurance data service
     let allPlans: MockInsurancePlan[] = [];
     
-    // Use the loadMockInsurancePlans function that loads real data from files
-    allPlans = loadMockInsurancePlans();
-    console.log(`[OpenAI][${requestId}] Successfully loaded ${allPlans.length} insurance plans`);
+    // Use the new dynamic insurance data service
+    const { insuranceDataService } = await import('./insurance-data-service.js');
+    allPlans = await insuranceDataService.getAllPlans();
+    console.log(`[OpenAI][${requestId}] Successfully loaded ${allPlans.length} insurance plans from dynamic service`);
 
     // Filter and get relevant plans
     const filteredPlans = filterPlansByCountry(allPlans, userCountry);
