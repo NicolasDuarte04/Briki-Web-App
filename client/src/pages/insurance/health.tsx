@@ -93,20 +93,17 @@ export default function HealthInsurancePage() {
   
   const handleCompareToggle = (id: string | number, isSelected: boolean) => {
     if (isSelected) {
-      // Find the full plan data from our mock data
-      const planToAdd = healthPlans.find(p => p.id === id);
+      // Find the full plan data from our plans
+      const planToAdd = plans.find(p => p.planId === id.toString());
       if (!planToAdd) return;
       
       // Try to add the plan to comparison
-      const added = addPlan({
-        ...planToAdd,
-        category: 'health'
-      });
+      const added = addPlan(planToAdd);
       
       // If adding failed, check why
       if (!added) {
         // Check if we're trying to mix categories
-        const selectedCategories = [...new Set(selectedPlans.map(p => p.category))];
+        const selectedCategories = Array.from(new Set(selectedPlans.map(p => p.category)));
         if (selectedCategories.length > 0 && !selectedCategories.includes('health')) {
           toast({
             title: "Cannot compare plans from different categories",
@@ -133,34 +130,64 @@ export default function HealthInsurancePage() {
         description: `${selectedPlans.length + 1} health insurance plans selected.`
       });
     } else {
-      removePlan(id);
+      removePlan(id.toString());
     }
   };
-  
-  // Filter plans based on search query
-  const filteredPlans = healthPlans.filter(plan => 
-    plan.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    plan.provider.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    plan.description?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
-  // Sort plans based on selected option
-  const sortedPlans = [...filteredPlans].sort((a, b) => {
-    if (sortOption === "price-low") {
-      return a.price - b.price;
-    } else if (sortOption === "price-high") {
-      return b.price - a.price;
-    } else if (sortOption === "rating") {
-      return parseFloat(b.rating || "0") - parseFloat(a.rating || "0");
+  // Apply client-side filtering and sorting
+  const finalFilteredPlans = useMemo(() => {
+    let filtered = filteredPlans || plans;
+    
+    // Apply advanced filters
+    if (filters.priceRange) {
+      filtered = filtered.filter(plan => 
+        plan.basePrice >= filters.priceRange[0] && 
+        plan.basePrice <= filters.priceRange[1]
+      );
     }
-    // Default recommended sorting (no change to order)
-    return 0;
-  });
+
+    if (filters.providers && filters.providers.length > 0) {
+      filtered = filtered.filter(plan => 
+        filters.providers.includes(plan.provider)
+      );
+    }
+
+    if (filters.coverageAmount) {
+      filtered = filtered.filter(plan => 
+        plan.coverageAmount >= filters.coverageAmount[0] && 
+        plan.coverageAmount <= filters.coverageAmount[1]
+      );
+    }
+
+    if (filters.features && filters.features.length > 0) {
+      filtered = filtered.filter(plan =>
+        filters.features.some(feature => 
+          plan.features.some(planFeature => 
+            planFeature.toLowerCase().includes(feature.toLowerCase())
+          )
+        )
+      );
+    }
+
+    if (filters.rating && filters.rating > 0) {
+      filtered = filtered.filter(plan => 
+        plan.rating && plan.rating >= filters.rating
+      );
+    }
+
+    // Apply sorting
+    return applySorting(filtered, sortOption);
+  }, [filteredPlans, plans, filters, sortOption]);
+
+  // Pagination
+  const totalPages = Math.ceil(finalFilteredPlans.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedPlans = finalFilteredPlans.slice(startIndex, startIndex + itemsPerPage);
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
       {/* Hero section with modern gradient */}
-      <div className="w-full bg-gradient-to-br from-blue-600 to-cyan-500 text-white">
+      <div className="w-full bg-gradient-to-br from-green-600 to-emerald-500 text-white">
         <div className="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -177,16 +204,16 @@ export default function HealthInsurancePage() {
                 Health Insurance
               </Badge>
               <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
-                Compare Health Insurance Plans
+                Your Health, Our Priority
               </h1>
               <p className="text-lg opacity-90 mb-6">
-                Find the right health insurance plan for you and your family with comprehensive coverage options that protect what matters most - your health and wellbeing.
+                Comprehensive health insurance plans to protect you and your family. From preventive care to emergency treatment, we ensure you get the care you need.
               </p>
               <div className="flex flex-wrap gap-4">
                 <Button 
                   size="lg" 
                   onClick={() => document.getElementById('plans-section')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="font-medium bg-white text-blue-600 hover:bg-white/90"
+                  className="font-medium bg-white text-green-600 hover:bg-white/90"
                 >
                   Compare Plans
                   <ArrowRight className="ml-2 h-4 w-4" />
@@ -197,76 +224,109 @@ export default function HealthInsurancePage() {
                   className="font-medium border-white/30 text-white hover:bg-white/10"
                   onClick={() => navigate('/insurance/health/quote')}
                 >
-                  Enter Health Details
+                  Get Health Quote
                 </Button>
               </div>
             </div>
             
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="hidden md:block"
-            >
-              <div className="relative w-72 h-72 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center overflow-hidden">
-                <Stethoscope className="w-40 h-40 text-white/80" />
-                <div className="absolute inset-0 bg-gradient-to-t from-blue-500/40 to-transparent" />
-              </div>
-            </motion.div>
+            <div className="relative">
+              <motion.div
+                animate={{ 
+                  y: [0, -10, 0],
+                  rotate: [0, 2, 0]
+                }}
+                transition={{ 
+                  duration: 6,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+                className="w-48 h-48 bg-white/10 rounded-3xl backdrop-blur-sm border border-white/20 flex items-center justify-center"
+              >
+                <Heart className="h-20 w-20 text-white" />
+              </motion.div>
+              
+              {/* Floating elements */}
+              <motion.div
+                animate={{ 
+                  y: [0, -15, 0],
+                  x: [0, 5, 0]
+                }}
+                transition={{ 
+                  duration: 4,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 1
+                }}
+                className="absolute -top-6 -right-6 w-16 h-16 bg-white/20 rounded-2xl backdrop-blur-sm border border-white/30 flex items-center justify-center"
+              >
+                <Stethoscope className="h-8 w-8 text-white" />
+              </motion.div>
+              
+              <motion.div
+                animate={{ 
+                  y: [0, -8, 0],
+                  x: [0, -3, 0]
+                }}
+                transition={{ 
+                  duration: 5,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 2
+                }}
+                className="absolute -bottom-4 -left-4 w-12 h-12 bg-white/15 rounded-xl backdrop-blur-sm border border-white/25 flex items-center justify-center"
+              >
+                <Activity className="h-6 w-6 text-white" />
+              </motion.div>
+            </div>
           </motion.div>
         </div>
       </div>
-      
-      {/* Trust indicators */}
-      <div className="bg-white py-8 border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="flex flex-wrap justify-center md:justify-between items-center gap-8 text-gray-500"
+
+      {/* Benefits section */}
+      <ContentWrapper className="py-16">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          viewport={{ once: true }}
+          className="text-center mb-12"
+        >
+          <h2 className="text-3xl font-bold tracking-tight text-gray-900 mb-4">Why Choose Our Health Insurance?</h2>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Comprehensive healthcare coverage with access to top medical professionals and facilities.
+          </p>
+        </motion.div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true }}
+            className="bg-gradient-to-br from-green-50 to-white p-8 rounded-2xl border border-green-100 shadow-sm hover:shadow-md transition-all"
           >
-            <div className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-blue-600" />
-              <span className="text-sm font-medium">Network Providers</span>
+            <div className="rounded-full bg-green-100 w-14 h-14 flex items-center justify-center mb-5">
+              <Shield className="h-7 w-7 text-green-600" />
             </div>
-            <div className="flex items-center gap-2">
-              <UserPlus className="h-5 w-5 text-blue-600" />
-              <span className="text-sm font-medium">Family Coverage</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Activity className="h-5 w-5 text-blue-600" />
-              <span className="text-sm font-medium">Preventive Care</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <BadgeCheck className="h-5 w-5 text-blue-600" />
-              <span className="text-sm font-medium">Accredited Insurers</span>
-            </div>
+            <h3 className="text-xl font-bold mb-3 text-gray-900">Complete Coverage</h3>
+            <p className="text-gray-600">
+              Comprehensive medical coverage including hospitalization, surgeries, and specialist treatments.
+            </p>
           </motion.div>
-        </div>
-      </div>
-      
-      {/* Features section with enhanced styling */}
-      <ContentWrapper
-        title="Why Choose Briki Health Insurance?"
-        description="We provide comprehensive health coverage options with exceptional service and support."
-        variant="white"
-        className="pt-12"
-      >
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
             viewport={{ once: true }}
-            className="bg-gradient-to-br from-blue-50 to-white p-8 rounded-2xl border border-blue-100 shadow-sm hover:shadow-md transition-all"
+            className="bg-gradient-to-br from-green-50 to-white p-8 rounded-2xl border border-green-100 shadow-sm hover:shadow-md transition-all"
           >
-            <div className="rounded-full bg-blue-100 w-14 h-14 flex items-center justify-center mb-5">
-              <Shield className="h-7 w-7 text-blue-600" />
+            <div className="rounded-full bg-green-100 w-14 h-14 flex items-center justify-center mb-5">
+              <Stethoscope className="h-7 w-7 text-green-600" />
             </div>
-            <h3 className="text-xl font-bold mb-3 text-gray-900">Extensive Coverage</h3>
+            <h3 className="text-xl font-bold mb-3 text-gray-900">Top Medical Network</h3>
             <p className="text-gray-600">
-              Comprehensive medical coverage including hospitalization, emergency care, and specialist consultations.
+              Access to a vast network of qualified doctors, specialists, and healthcare facilities.
             </p>
           </motion.div>
           
@@ -275,14 +335,14 @@ export default function HealthInsurancePage() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
             viewport={{ once: true }}
-            className="bg-gradient-to-br from-blue-50 to-white p-8 rounded-2xl border border-blue-100 shadow-sm hover:shadow-md transition-all"
+            className="bg-gradient-to-br from-green-50 to-white p-8 rounded-2xl border border-green-100 shadow-sm hover:shadow-md transition-all"
           >
-            <div className="rounded-full bg-blue-100 w-14 h-14 flex items-center justify-center mb-5">
-              <Activity className="h-7 w-7 text-blue-600" />
+            <div className="rounded-full bg-green-100 w-14 h-14 flex items-center justify-center mb-5">
+              <Activity className="h-7 w-7 text-green-600" />
             </div>
             <h3 className="text-xl font-bold mb-3 text-gray-900">Preventive Care</h3>
             <p className="text-gray-600">
-              Focus on wellness with included preventive services, annual checkups, and health screenings.
+              Regular health check-ups, vaccinations, and wellness programs to maintain optimal health.
             </p>
           </motion.div>
           
@@ -291,14 +351,14 @@ export default function HealthInsurancePage() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
             viewport={{ once: true }}
-            className="bg-gradient-to-br from-blue-50 to-white p-8 rounded-2xl border border-blue-100 shadow-sm hover:shadow-md transition-all"
+            className="bg-gradient-to-br from-green-50 to-white p-8 rounded-2xl border border-green-100 shadow-sm hover:shadow-md transition-all"
           >
-            <div className="rounded-full bg-blue-100 w-14 h-14 flex items-center justify-center mb-5">
-              <Heart className="h-7 w-7 text-blue-600" />
+            <div className="rounded-full bg-green-100 w-14 h-14 flex items-center justify-center mb-5">
+              <UserPlus className="h-7 w-7 text-green-600" />
             </div>
-            <h3 className="text-xl font-bold mb-3 text-gray-900">Family Coverage</h3>
+            <h3 className="text-xl font-bold mb-3 text-gray-900">Family Protection</h3>
             <p className="text-gray-600">
-              Flexible family plans that provide coverage for every member, with options for children and dependents.
+              Comprehensive family plans that cover all members with special benefits for children and seniors.
             </p>
           </motion.div>
         </div>
@@ -315,108 +375,160 @@ export default function HealthInsurancePage() {
             className="mb-8"
           >
             <div className="flex items-center gap-2 mb-4">
-              <Badge className="bg-blue-600">
+              <Badge className="bg-green-600">
                 <Heart className="h-3.5 w-3.5 mr-1.5" />
                 Health
               </Badge>
               <span className="text-sm text-gray-500">•</span>
-              <span className="text-sm text-gray-500">{sortedPlans.length} plans available</span>
+              <span className="text-sm text-gray-500">{finalFilteredPlans.length} plans available</span>
             </div>
             <h2 className="text-3xl font-bold tracking-tight text-gray-900 mb-4">Our Health Insurance Plans</h2>
             <p className="text-lg text-gray-600 max-w-3xl">
-              Choose from our range of health insurance options designed to provide comprehensive coverage for you and your family.
+              Choose from our carefully designed health insurance plans to ensure you and your family get the best medical care.
             </p>
           </motion.div>
           
-          {/* Quote Summary */}
-          <QuoteSummary category="health" />
-          
-          {/* Filter/sort controls */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            viewport={{ once: true }}
-            className="mb-8"
-          >
-            <Card className="border border-gray-200 bg-white shadow-sm">
-              <CardContent className="p-6">
-                <div className="flex flex-col md:flex-row gap-4">
-                  <div className="flex-1 relative">
-                    <Search className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                    <Input
-                      placeholder="Search plans..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div className="w-full md:w-48">
-                    <Select
-                      value={sortOption}
-                      onValueChange={setSortOption}
-                    >
-                      <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-blue-500">
-                        <SelectValue placeholder="Sort by" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="recommended">Recommended</SelectItem>
-                        <SelectItem value="price-low">Price: Low to High</SelectItem>
-                        <SelectItem value="price-high">Price: High to Low</SelectItem>
-                        <SelectItem value="rating">Highest Rated</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+          {/* Search and Filter Controls */}
+          <div className="mb-8 flex flex-col lg:flex-row gap-6">
+            {/* Search and Sort */}
+            <div className="flex-1">
+              <div className="flex flex-col sm:flex-row gap-4 mb-4">
+                <div className="flex-1 relative">
+                  <Search className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <Input
+                    placeholder="Search health insurance plans..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10 border-gray-300 focus:border-green-500 focus:ring-green-500"
+                  />
                 </div>
-              </CardContent>
-            </Card>
-          </motion.div>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowFilters(!showFilters)}
+                  className="flex items-center gap-2 whitespace-nowrap"
+                >
+                  <Filter className="h-4 w-4" />
+                  Filters
+                  {(filters.providers.length > 0 || filters.features.length > 0 || filters.rating > 0) && (
+                    <Badge variant="secondary" className="ml-1">
+                      {filters.providers.length + filters.features.length + (filters.rating > 0 ? 1 : 0)}
+                    </Badge>
+                  )}
+                </Button>
+              </div>
+              
+              <PlanSort 
+                sortOption={sortOption} 
+                setSortOption={setSortOption}
+                planCount={finalFilteredPlans.length}
+              />
+            </div>
+          </div>
+
+          {/* Filters Sidebar */}
+          <FilterSidebar
+            isOpen={showFilters}
+            onClose={() => setShowFilters(false)}
+            filters={filters}
+            onFiltersChange={setFilters}
+            availableProviders={metadata?.providers || []}
+            availableFeatures={metadata?.features || []}
+            category="health"
+          />
           
+          {/* Loading State */}
+          {loading && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="h-96 bg-gray-200 animate-pulse rounded-lg"></div>
+              ))}
+            </div>
+          )}
+
+          {/* Error State */}
+          {error && (
+            <div className="text-center py-12">
+              <div className="text-red-500 mb-4">
+                <Search className="h-12 w-12 mx-auto mb-4" />
+                <h3 className="text-lg font-medium">Error loading plans</h3>
+                <p className="text-gray-600">{error}</p>
+              </div>
+            </div>
+          )}
+
           {/* Plan listing */}
-          <motion.div
-            variants={container}
-            initial="hidden"
-            animate={isLoaded ? "show" : "hidden"}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-          >
-            {sortedPlans.map((plan, index) => (
+          {!loading && !error && (
+            <>
               <motion.div
-                key={plan.id}
-                variants={item}
-                className="h-full"
+                variants={container}
+                initial="hidden"
+                animate={isLoaded ? "show" : "hidden"}
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
               >
-                <PlanCard
-                  id={plan.id}
-                  title={plan.title}
-                  provider={plan.provider}
-                  price={plan.price}
-                  description={plan.description}
-                  features={plan.features}
-                  badge={plan.badge}
-                  rating={plan.rating}
-                  category="health"
-                  onCompareToggle={handleCompareToggle}
-                  isSelected={isPlanSelected(plan.id)}
-                  className="h-full border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all duration-300"
-                />
+                {paginatedPlans.map((plan, index) => (
+                  <motion.div
+                    key={plan.planId}
+                    variants={item}
+                    className="h-full"
+                  >
+                    <PlanCard
+                      id={plan.planId}
+                      title={plan.name}
+                      provider={plan.provider}
+                      price={plan.basePrice}
+                      description={plan.description}
+                      features={plan.features}
+                      rating={plan.rating}
+                      category="health"
+                      onCompareToggle={handleCompareToggle}
+                      isSelected={isPlanSelected(plan.planId)}
+                      className="h-full border-gray-200 hover:border-green-300 hover:shadow-lg transition-all duration-300"
+                    />
+                  </motion.div>
+                ))}
               </motion.div>
-            ))}
-          </motion.div>
-          
-          {/* No results state */}
-          {sortedPlans.length === 0 && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center py-12"
-            >
-              <Search className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No plans found</h3>
-              <p className="text-gray-600 mb-6">Try adjusting your search criteria.</p>
-              <Button variant="outline" onClick={() => setSearchQuery("")}>
-                Clear Search
-              </Button>
-            </motion.div>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="mt-8">
+                  <PlanPagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                    itemsPerPage={itemsPerPage}
+                    onItemsPerPageChange={setItemsPerPage}
+                    totalItems={finalFilteredPlans.length}
+                  />
+                </div>
+              )}
+
+              {/* No results state */}
+              {finalFilteredPlans.length === 0 && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-center py-12"
+                >
+                  <Search className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No plans found</h3>
+                  <p className="text-gray-600 mb-6">Try adjusting your search criteria or filters.</p>
+                  <Button variant="outline" onClick={() => {
+                    setSearchQuery("");
+                    setFilters({
+                      priceRange: [0, 1000],
+                      providers: [],
+                      coverageAmount: [0, 100000],
+                      features: [],
+                      rating: 0,
+                      deductible: [0, 1000],
+                      tags: []
+                    });
+                  }}>
+                    Clear All Filters
+                  </Button>
+                </motion.div>
+              )}
+            </>
           )}
           
           {/* Compare plans button */}
@@ -424,60 +536,13 @@ export default function HealthInsurancePage() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mt-12 flex justify-center"
+              className="fixed bottom-6 right-6 z-50"
             >
-              <GradientButton 
-                size="lg" 
-                onClick={() => navigate('/compare-plans')}
-                className="font-medium shadow-md"
-                gradientFrom="from-blue-600"
-                gradientTo="to-cyan-500"
-                disabled={selectedPlans.length < 2}
-              >
-                Compare Selected Plans ({selectedPlans.length})
-              </GradientButton>
+              <ComparePageTrigger />
             </motion.div>
           )}
         </div>
       </div>
-      
-      {/* CTA section */}
-      <div className="bg-gradient-to-br from-blue-600 to-cyan-500 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            viewport={{ once: true }}
-            className="text-center max-w-3xl mx-auto"
-          >
-            <h2 className="text-3xl font-bold mb-6">Take Control of Your Health</h2>
-            <p className="text-lg opacity-90 mb-8">
-              Your health is your most valuable asset. Protect it with comprehensive health insurance that provides access to quality healthcare when you need it most.
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Button 
-                size="lg" 
-                onClick={() => document.getElementById('plans-section')?.scrollIntoView({ behavior: 'smooth' })}
-                className="font-medium bg-white text-blue-600 hover:bg-white/90"
-              >
-                View All Plans
-              </Button>
-              <Button 
-                variant="outline" 
-                size="lg" 
-                className="font-medium border-white/30 text-white hover:bg-white/10"
-                onClick={() => navigate('/get-quote')}
-              >
-                Get Personalized Quote
-              </Button>
-            </div>
-          </motion.div>
-        </div>
-      </div>
-      
-      {/* Floating Compare Trigger */}
-      <ComparePageTrigger />
     </div>
   );
 }
