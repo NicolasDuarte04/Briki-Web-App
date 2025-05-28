@@ -46,7 +46,7 @@ export async function generateAssistantResponse(
   // Prepare system message with context and instructions
   const systemMessage: AssistantMessage = {
     role: "system",
-    content: createSystemPrompt(relevantPlans, userMessage)
+    content: createSystemPrompt(relevantPlans, userMessage, conversationHistory)
   };
 
   // Combine history with current message
