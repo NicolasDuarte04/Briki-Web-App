@@ -147,12 +147,15 @@ async function callOpenAIWithRetry(messages: any[], retries = 3): Promise<any> {
  * Filter insurance plans by user's country
  */
 function filterPlansByCountry(plans: MockInsurancePlan[], country: string): MockInsurancePlan[] {
-  return plans.filter(plan => 
-    !plan.restrictions?.countries || 
-    plan.restrictions.countries.includes(country) ||
-    plan.availableCountries?.includes(country) ||
-    !plan.availableCountries // If no country restrictions, include it
-  );
+  return plans.filter(plan => {
+    // Check eligibility countries if available
+    if (plan.eligibility?.countries) {
+      return plan.eligibility.countries.includes(country);
+    }
+    
+    // If no country restrictions, include all plans
+    return true;
+  });
 }
 
 /**
