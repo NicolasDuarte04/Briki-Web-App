@@ -20,6 +20,8 @@ import PlanSort, { type SortOption, applySorting } from "@/components/insurance/
 import { useInsurancePlans } from "@/hooks/useInsurancePlans";
 import { QuoteSummary } from "@/components/quote-summary";
 import { PaginationControls } from "@/components/insurance/PaginationControls";
+import { AdvancedFilterPanel, type AdvancedFilters } from "@/components/insurance/AdvancedFilterPanel";
+import { applyAdvancedFilters, getFilterOptions, getDefaultFilters, countActiveFilters } from "@/utils/filterUtils";
 
 export default function TravelInsurancePage() {
   const [, navigate] = useLocation();
@@ -214,13 +216,6 @@ export default function TravelInsurancePage() {
     // Apply sorting
     return applySorting(result, sortOption);
   }, [filteredPlans, filters, sortOption]);
-
-  // Pagination logic
-  const totalPages = Math.ceil(processedPlans.length / itemsPerPage);
-  const paginatedPlans = processedPlans.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
 
   // Reset to first page when filters change
   useEffect(() => {
