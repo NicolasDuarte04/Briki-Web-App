@@ -1,5 +1,6 @@
 import OpenAI from "openai";
-import { MockInsurancePlan, createEnrichedContext } from "../data-loader";
+import { MockInsurancePlan, createEnrichedContext, loadMockInsurancePlans } from "../data-loader";
+import { storage } from "../storage";
 
 // Initialize the OpenAI client with API key from environment variables
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -43,7 +44,7 @@ export async function generateAssistantResponse(
     let allPlans: MockInsurancePlan[] = [];
     
     try {
-      allPlans = await insuranceDataService.getAllPlans();
+      allPlans = await storage.getAllInsurancePlans();
       console.log(`[OpenAI][${requestId}] Successfully loaded ${allPlans.length} real insurance plans`);
     } catch (dataError) {
       console.error(`[OpenAI][${requestId}] Failed to load real plans, falling back to loadMockInsurancePlans:`, dataError);
