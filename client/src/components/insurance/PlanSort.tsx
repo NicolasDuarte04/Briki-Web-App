@@ -66,8 +66,8 @@ const sortOptions = [
 
 export default function PlanSort({ 
   sortOption, 
-  onSortChange, 
-  resultsCount
+  setSortOption, 
+  planCount
 }: PlanSortProps) {
   const currentSort = sortOptions.find(option => option.value === sortOption);
 
@@ -76,7 +76,7 @@ export default function PlanSort({
       {/* Results Count */}
       <div className="flex items-center gap-2">
         <Badge variant="outline" className="bg-white">
-          {resultsCount} plans found
+          {planCount} plans found
         </Badge>
         {currentSort && currentSort.value !== 'recommended' && (
           <span className="text-sm text-gray-600 hidden sm:inline">

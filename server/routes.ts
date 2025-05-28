@@ -211,8 +211,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const plans = await insuranceDataService.getPlansByCategory(category);
       
       // Generate metadata from the plans
-      const providers = [...new Set(plans.map(p => p.provider))];
-      const features = [...new Set(plans.flatMap(p => p.features))];
+      const providers = Array.from(new Set(plans.map(p => p.provider)));
+      const features = Array.from(new Set(plans.flatMap(p => p.features)));
       const priceRange = plans.length > 0 ? [
         Math.min(...plans.map(p => p.basePrice)),
         Math.max(...plans.map(p => p.basePrice))
