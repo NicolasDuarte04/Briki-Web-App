@@ -141,7 +141,7 @@ const NewBrikiAssistant: React.FC = () => {
                 content: response.message || response.response || "No pude generar una respuesta.",
                 suggestedPlans: response.suggestedPlans || undefined,
                 // NEW: Create summary for future reference
-                plansSummary: response.suggestedPlans?.length > 0 
+                plansSummary: (response.suggestedPlans && response.suggestedPlans.length > 0)
                   ? response.suggestedPlans.map(plan => plan.name).join(', ')
                   : undefined,
                 isLoading: false,

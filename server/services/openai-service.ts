@@ -225,9 +225,26 @@ function calculateRelevanceScore(userMessage: string, plan: MockInsurancePlan): 
 }
 
 /**
+ * Extract previous recommendations from conversation history
+ */
+function extractPreviousRecommendations(conversationHistory: AssistantMessage[]): string {
+  const lastAssistantMessage = conversationHistory
+    .filter(msg => msg.role === 'assistant')
+    .slice(-1)[0];
+    
+  if (lastAssistantMessage?.content.includes('[Planes recomendados:')) {
+    const match = lastAssistantMessage.content.match(/\[Planes recomendados: ([^\]]+)\]/);
+    if (match) {
+      return `\n\nCONTEXTO IMPORTANTE: En tu respuesta anterior recomendaste estos planes: ${match[1]}. El usuario puede estar refiriéndose a estos planes en su nueva pregunta.`;
+    }
+  }
+  return '';
+}
+
+/**
  * Create a system prompt with improved structure and context
  */
-function createSystemPrompt(insurancePlans: MockInsurancePlan[], userMessage: string = ''): string {
+function createSystemPrompt(insurancePlans: MockInsurancePlan[], userMessage: string = '', conversationHistory?: AssistantMessage[]): string {
   // Start with structured base instructions
   let prompt = `Eres Briki, un asistente de seguros amigable y profesional.
 
@@ -251,6 +268,12 @@ ESTILO DE RESPUESTA:
     if (enrichedContext.trim()) {
       prompt += `\n\nINFORMACIÓN CONTEXTUAL RELEVANTE:${enrichedContext}`;
     }
+  }
+
+  // Add previous conversation context if available
+  const previousContext = conversationHistory ? extractPreviousRecommendations(conversationHistory) : '';
+  if (previousContext) {
+    prompt += previousContext;
   }
 
   // Add context about available plans if provided
