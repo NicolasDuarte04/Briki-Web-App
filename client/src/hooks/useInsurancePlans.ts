@@ -7,6 +7,10 @@ export interface UseInsurancePlansOptions {
   category?: string;
   initialFilters?: InsuranceAPIFilters;
   autoLoad?: boolean;
+  pagination?: {
+    page: number;
+    itemsPerPage: number;
+  };
 }
 
 export interface FilterRanges {
@@ -25,15 +29,24 @@ export interface PlanMetadata {
 export interface UseInsurancePlansReturn {
   plans: InsurancePlan[];
   filteredPlans: InsurancePlan[];
+  paginatedPlans: InsurancePlan[];
   loading: boolean;
   error: string | null;
   metadata: PlanMetadata;
   filters: InsuranceAPIFilters;
   searchQuery: string;
   
+  // Pagination
+  currentPage: number;
+  totalPages: number;
+  itemsPerPage: number;
+  totalItems: number;
+  
   // Actions
   setFilters: (filters: InsuranceAPIFilters) => void;
   setSearchQuery: (query: string) => void;
+  setCurrentPage: (page: number) => void;
+  setItemsPerPage: (items: number) => void;
   refreshPlans: () => Promise<void>;
   clearFilters: () => void;
   
@@ -44,11 +57,13 @@ export interface UseInsurancePlansReturn {
 }
 
 export function useInsurancePlans(options: UseInsurancePlansOptions = {}): UseInsurancePlansReturn {
-  const { category, initialFilters = {}, autoLoad = true } = options;
+  const { category, initialFilters = {}, autoLoad = true, pagination } = options;
   const { toast } = useToast();
 
   // State
   const [plans, setPlans] = useState<InsurancePlan[]>([]);
+  const [currentPage, setCurrentPage] = useState(pagination?.page || 1);
+  const [itemsPerPage, setItemsPerPage] = useState(pagination?.itemsPerPage || 20);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<InsuranceAPIFilters>(initialFilters);
@@ -180,18 +195,50 @@ export function useInsurancePlans(options: UseInsurancePlansOptions = {}): UseIn
     }
   }, [filters]);
 
+  // Pagination calculations
+  const totalItems = filteredPlans.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  
+  // Paginated plans
+  const paginatedPlans = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredPlans.slice(startIndex, endIndex);
+  }, [filteredPlans, currentPage, itemsPerPage]);
+
+  // Pagination handlers with analytics
+  const handlePageChange = (page: number) => {
+    console.log(`[Analytics] Page change: ${page}`, { category, totalItems });
+    setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (items: number) => {
+    console.log(`[Analytics] Items per page change: ${items}`, { category });
+    setItemsPerPage(items);
+    setCurrentPage(1); // Reset to first page when changing items per page
+  };
+
   return {
     plans,
     filteredPlans,
+    paginatedPlans,
     loading,
     error,
     metadata,
     filters,
     searchQuery,
     
+    // Pagination
+    currentPage,
+    totalPages,
+    itemsPerPage,
+    totalItems,
+    
     // Actions
     setFilters,
     setSearchQuery,
+    setCurrentPage: handlePageChange,
+    setItemsPerPage: handleItemsPerPageChange,
     refreshPlans,
     clearFilters,
     
