@@ -16,7 +16,13 @@ import {
   planAnalytics,
   InsertCompanyPlan,
   INSURANCE_CATEGORIES,
-  InsuranceCategory
+  InsuranceCategory,
+  blogPosts,
+  blogCategories,
+  blogTags,
+  blogPostTags,
+  BlogPostWithRelations,
+  InsertBlogPost
 } from "@shared/schema";
 import { z } from "zod";
 import { 
@@ -1002,6 +1008,383 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Error fetching insurance statistics:", error);
       res.status(500).json({ error: "Failed to fetch insurance statistics" });
+    }
+  });
+
+  // ========== BLOG API ROUTES ==========
+
+  // Helper function to check if user is admin
+  function isAdmin(user: any): boolean {
+    return user && (user.role === 'admin' || (user.email && user.email.endsWith('@brikiapp.com')));
+  }
+
+  // Get all published blog posts (public)
+  app.get("/api/blog/posts", async (req, res) => {
+    try {
+      const { category, tag, featured, limit = "20", offset = "0" } = req.query;
+      
+      let query = `
+        SELECT 
+          bp.*,
+          u.name as author_name,
+          u.email as author_email,
+          bc.name as category_name,
+          bc.slug as category_slug,
+          bc.color as category_color,
+          COALESCE(
+            json_agg(
+              CASE WHEN bt.name IS NOT NULL 
+              THEN json_build_object('id', bt.id, 'name', bt.name, 'slug', bt.slug)
+              ELSE NULL END
+            ) FILTER (WHERE bt.name IS NOT NULL), 
+            '[]'
+          ) as tags
+        FROM blog_posts bp
+        JOIN users u ON bp.author_id = u.id
+        LEFT JOIN blog_categories bc ON bp.category_id = bc.id
+        LEFT JOIN blog_post_tags bpt ON bp.id = bpt.post_id
+        LEFT JOIN blog_tags bt ON bpt.tag_id = bt.id
+        WHERE bp.status = 'published'
+      `;
+      
+      const queryParams: any[] = [];
+      let paramCount = 0;
+      
+      if (category) {
+        paramCount++;
+        query += ` AND bc.slug = $${paramCount}`;
+        queryParams.push(category);
+      }
+      
+      if (featured === 'true') {
+        query += ` AND bp.featured = true`;
+      }
+      
+      query += `
+        GROUP BY bp.id, u.name, u.email, bc.name, bc.slug, bc.color
+        ORDER BY bp.published_at DESC, bp.created_at DESC
+        LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}
+      `;
+      
+      queryParams.push(parseInt(limit as string), parseInt(offset as string));
+      
+      const result = await pool.query(query, queryParams);
+      
+      let posts = result.rows.map(row => ({
+        ...row,
+        tags: row.tags || []
+      }));
+      
+      // Filter by tag if specified
+      if (tag) {
+        posts = posts.filter(post => 
+          post.tags.some((t: any) => t.slug === tag)
+        );
+      }
+      
+      res.json(posts);
+    } catch (error: any) {
+      console.error("Error fetching blog posts:", error);
+      res.status(500).json({ error: "Failed to fetch blog posts" });
+    }
+  });
+
+  // Get single blog post by slug (public)
+  app.get("/api/blog/posts/:slug", async (req, res) => {
+    try {
+      const { slug } = req.params;
+      
+      const query = `
+        SELECT 
+          bp.*,
+          u.name as author_name,
+          u.email as author_email,
+          bc.name as category_name,
+          bc.slug as category_slug,
+          bc.color as category_color,
+          COALESCE(
+            json_agg(
+              CASE WHEN bt.name IS NOT NULL 
+              THEN json_build_object('id', bt.id, 'name', bt.name, 'slug', bt.slug)
+              ELSE NULL END
+            ) FILTER (WHERE bt.name IS NOT NULL), 
+            '[]'
+          ) as tags
+        FROM blog_posts bp
+        JOIN users u ON bp.author_id = u.id
+        LEFT JOIN blog_categories bc ON bp.category_id = bc.id
+        LEFT JOIN blog_post_tags bpt ON bp.id = bpt.post_id
+        LEFT JOIN blog_tags bt ON bpt.tag_id = bt.id
+        WHERE bp.slug = $1 AND bp.status = 'published'
+        GROUP BY bp.id, u.name, u.email, bc.name, bc.slug, bc.color
+      `;
+      
+      const result = await pool.query(query, [slug]);
+      
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: "Blog post not found" });
+      }
+      
+      const post = {
+        ...result.rows[0],
+        tags: result.rows[0].tags || []
+      };
+      
+      // Increment view count
+      await pool.query(
+        'UPDATE blog_posts SET view_count = view_count + 1 WHERE id = $1',
+        [post.id]
+      );
+      
+      res.json(post);
+    } catch (error: any) {
+      console.error("Error fetching blog post:", error);
+      res.status(500).json({ error: "Failed to fetch blog post" });
+    }
+  });
+
+  // Get blog categories (public)
+  app.get("/api/blog/categories", async (req, res) => {
+    try {
+      const result = await pool.query('SELECT * FROM blog_categories ORDER BY name');
+      res.json(result.rows);
+    } catch (error: any) {
+      console.error("Error fetching blog categories:", error);
+      res.status(500).json({ error: "Failed to fetch blog categories" });
+    }
+  });
+
+  // Get blog tags (public)
+  app.get("/api/blog/tags", async (req, res) => {
+    try {
+      const result = await pool.query('SELECT * FROM blog_tags ORDER BY name');
+      res.json(result.rows);
+    } catch (error: any) {
+      console.error("Error fetching blog tags:", error);
+      res.status(500).json({ error: "Failed to fetch blog tags" });
+    }
+  });
+
+  // ========== ADMIN BLOG ROUTES ==========
+
+  // Admin middleware for blog management
+  const requireBlogAdmin = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    if (!isAdmin(req.user)) {
+      return res.status(403).json({ error: "Admin access required for blog management" });
+    }
+    next();
+  };
+
+  // Get all blog posts for admin (including drafts)
+  app.get("/api/admin/blog/posts", isAuthenticated, requireBlogAdmin, async (req, res) => {
+    try {
+      const { status, limit = "50", offset = "0" } = req.query;
+      
+      let query = `
+        SELECT 
+          bp.*,
+          u.name as author_name,
+          u.email as author_email,
+          bc.name as category_name,
+          bc.slug as category_slug
+        FROM blog_posts bp
+        JOIN users u ON bp.author_id = u.id
+        LEFT JOIN blog_categories bc ON bp.category_id = bc.id
+      `;
+      
+      const queryParams: any[] = [];
+      let paramCount = 0;
+      
+      if (status) {
+        paramCount++;
+        query += ` WHERE bp.status = $${paramCount}`;
+        queryParams.push(status);
+      }
+      
+      query += `
+        ORDER BY bp.updated_at DESC
+        LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}
+      `;
+      
+      queryParams.push(parseInt(limit as string), parseInt(offset as string));
+      
+      const result = await pool.query(query, queryParams);
+      res.json(result.rows);
+    } catch (error: any) {
+      console.error("Error fetching admin blog posts:", error);
+      res.status(500).json({ error: "Failed to fetch blog posts" });
+    }
+  });
+
+  // Create new blog post (admin only)
+  app.post("/api/admin/blog/posts", isAuthenticated, requireBlogAdmin, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { title, slug, excerpt, content, categoryId, status, featured, seoTitle, seoDescription, tags } = req.body;
+      
+      if (!title || !slug || !excerpt || !content) {
+        return res.status(400).json({ error: "Title, slug, excerpt, and content are required" });
+      }
+      
+      // Check if slug already exists
+      const existingPost = await pool.query('SELECT id FROM blog_posts WHERE slug = $1', [slug]);
+      if (existingPost.rows.length > 0) {
+        return res.status(400).json({ error: "A post with this slug already exists" });
+      }
+      
+      // Calculate read time (average reading speed: 200 words per minute)
+      const wordCount = content.split(/\s+/).length;
+      const readTime = Math.max(1, Math.ceil(wordCount / 200));
+      
+      const publishedAt = status === 'published' ? new Date() : null;
+      
+      // Insert blog post
+      const postResult = await pool.query(`
+        INSERT INTO blog_posts (
+          title, slug, excerpt, content, author_id, category_id, 
+          status, featured, read_time, seo_title, seo_description, published_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+        RETURNING *
+      `, [
+        title, slug, excerpt, content, req.user.id, categoryId || null,
+        status || 'draft', featured || false, readTime, seoTitle, seoDescription, publishedAt
+      ]);
+      
+      const newPost = postResult.rows[0];
+      
+      // Handle tags
+      if (tags && tags.length > 0) {
+        for (const tagName of tags) {
+          // Get or create tag
+          let tagResult = await pool.query('SELECT id FROM blog_tags WHERE name = $1', [tagName]);
+          
+          if (tagResult.rows.length === 0) {
+            const tagSlug = tagName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+            tagResult = await pool.query(
+              'INSERT INTO blog_tags (name, slug) VALUES ($1, $2) RETURNING id',
+              [tagName, tagSlug]
+            );
+          }
+          
+          const tagId = tagResult.rows[0].id;
+          
+          // Link post to tag
+          await pool.query(
+            'INSERT INTO blog_post_tags (post_id, tag_id) VALUES ($1, $2)',
+            [newPost.id, tagId]
+          );
+        }
+      }
+      
+      res.status(201).json(newPost);
+    } catch (error: any) {
+      console.error("Error creating blog post:", error);
+      res.status(500).json({ error: "Failed to create blog post" });
+    }
+  });
+
+  // Update blog post (admin only)
+  app.put("/api/admin/blog/posts/:id", isAuthenticated, requireBlogAdmin, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { id } = req.params;
+      const { title, slug, excerpt, content, categoryId, status, featured, seoTitle, seoDescription, tags } = req.body;
+      
+      // Check if post exists
+      const existingPost = await pool.query('SELECT * FROM blog_posts WHERE id = $1', [id]);
+      if (existingPost.rows.length === 0) {
+        return res.status(404).json({ error: "Blog post not found" });
+      }
+      
+      // Check if slug conflicts with another post
+      if (slug) {
+        const conflictingPost = await pool.query('SELECT id FROM blog_posts WHERE slug = $1 AND id != $2', [slug, id]);
+        if (conflictingPost.rows.length > 0) {
+          return res.status(400).json({ error: "A post with this slug already exists" });
+        }
+      }
+      
+      // Calculate read time if content changed
+      let readTime = existingPost.rows[0].read_time;
+      if (content) {
+        const wordCount = content.split(/\s+/).length;
+        readTime = Math.max(1, Math.ceil(wordCount / 200));
+      }
+      
+      const publishedAt = status === 'published' && !existingPost.rows[0].published_at ? new Date() : existingPost.rows[0].published_at;
+      
+      // Update blog post
+      const updateResult = await pool.query(`
+        UPDATE blog_posts SET
+          title = COALESCE($1, title),
+          slug = COALESCE($2, slug),
+          excerpt = COALESCE($3, excerpt),
+          content = COALESCE($4, content),
+          category_id = COALESCE($5, category_id),
+          status = COALESCE($6, status),
+          featured = COALESCE($7, featured),
+          read_time = $8,
+          seo_title = COALESCE($9, seo_title),
+          seo_description = COALESCE($10, seo_description),
+          published_at = COALESCE($11, published_at),
+          updated_at = NOW()
+        WHERE id = $12
+        RETURNING *
+      `, [
+        title, slug, excerpt, content, categoryId, status, featured, 
+        readTime, seoTitle, seoDescription, publishedAt, id
+      ]);
+      
+      // Update tags
+      if (tags !== undefined) {
+        // Remove existing tag associations
+        await pool.query('DELETE FROM blog_post_tags WHERE post_id = $1', [id]);
+        
+        // Add new tag associations
+        if (tags.length > 0) {
+          for (const tagName of tags) {
+            // Get or create tag
+            let tagResult = await pool.query('SELECT id FROM blog_tags WHERE name = $1', [tagName]);
+            
+            if (tagResult.rows.length === 0) {
+              const tagSlug = tagName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+              tagResult = await pool.query(
+                'INSERT INTO blog_tags (name, slug) VALUES ($1, $2) RETURNING id',
+                [tagName, tagSlug]
+              );
+            }
+            
+            const tagId = tagResult.rows[0].id;
+            
+            // Link post to tag
+            await pool.query(
+              'INSERT INTO blog_post_tags (post_id, tag_id) VALUES ($1, $2)',
+              [id, tagId]
+            );
+          }
+        }
+      }
+      
+      res.json(updateResult.rows[0]);
+    } catch (error: any) {
+      console.error("Error updating blog post:", error);
+      res.status(500).json({ error: "Failed to update blog post" });
+    }
+  });
+
+  // Delete blog post (admin only)
+  app.delete("/api/admin/blog/posts/:id", isAuthenticated, requireBlogAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      const result = await pool.query('DELETE FROM blog_posts WHERE id = $1 RETURNING *', [id]);
+      
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: "Blog post not found" });
+      }
+      
+      res.json({ message: "Blog post deleted successfully" });
+    } catch (error: any) {
+      console.error("Error deleting blog post:", error);
+      res.status(500).json({ error: "Failed to delete blog post" });
     }
   });
 
