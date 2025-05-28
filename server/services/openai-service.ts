@@ -21,7 +21,7 @@ export interface AssistantResponse {
 }
 
 /**
- * Generate a response from the AI assistant based on user input and conversation history
+ * FIXED: Enhanced generateAssistantResponse with real plan integration
  */
 export async function generateAssistantResponse(
   userMessage: string,
@@ -31,24 +31,40 @@ export async function generateAssistantResponse(
 ): Promise<AssistantResponse> {
   const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-  console.log(`[OpenAI][${requestId}] Starting request:`, {
+  console.log(`[OpenAI][${requestId}] Starting request with real data integration:`, {
     messageLength: userMessage.length,
     historyLength: conversationHistory.length,
-    availablePlans: insurancePlans.length,
     userCountry,
     timestamp: new Date().toISOString()
   });
 
-  // Get plans from the expanded database instead of mock data
-  const allPlans = insuranceDataService.getAllPlans();
-  const filteredPlans = filterPlansByCountry(allPlans, userCountry);
-  const relevantPlans = getTopRelevantPlans(userMessage, filteredPlans, 6);
+  try {
+    // FIXED: Get real plans from insurance data service
+    let allPlans: MockInsurancePlan[] = [];
+    
+    try {
+      allPlans = await insuranceDataService.getAllPlans();
+      console.log(`[OpenAI][${requestId}] Successfully loaded ${allPlans.length} real insurance plans`);
+    } catch (dataError) {
+      console.error(`[OpenAI][${requestId}] Failed to load real plans, falling back to loadMockInsurancePlans:`, dataError);
+      allPlans = loadMockInsurancePlans();
+    }
 
-  // Prepare system message with context and instructions
-  const systemMessage: AssistantMessage = {
-    role: "system",
-    content: createSystemPrompt(relevantPlans, userMessage, conversationHistory)
-  };
+    // Filter and get relevant plans
+    const filteredPlans = filterPlansByCountry(allPlans, userCountry);
+    const relevantPlans = getTopRelevantPlans(userMessage, filteredPlans, 6);
+
+    // FIXED: Enhanced system prompt with real plan data and memory context
+    const systemMessage: AssistantMessage = {
+      role: "system",
+      content: createSystemPrompt(relevantPlans, userMessage, conversationHistory)
+    };
+
+    // FIXED: Check OpenAI availability and fallback logic
+    if (!process.env.OPENAI_API_KEY) {
+      console.warn(`[OpenAI][${requestId}] No API key configured, using fallback response`);
+      return await getMockResponse(userMessage, relevantPlans);
+    }
 
   // Combine history with current message
   const messages: AssistantMessage[] = [
@@ -57,25 +73,28 @@ export async function generateAssistantResponse(
     { role: "user", content: userMessage }
   ];
 
-  try {
+    // Combine history with current message
+    const messages: AssistantMessage[] = [
+      systemMessage,
+      ...conversationHistory,
+      { role: "user", content: userMessage }
+    ];
+
     const startTime = Date.now();
-
-    // Call OpenAI API with retry mechanism
+    
+    // FIXED: Call OpenAI with proper error handling
     const response = await callOpenAIWithRetry(messages);
-
+    
     const endTime = Date.now();
     const responseTime = endTime - startTime;
 
-    // Extract and return response
     const assistantMessage = response.choices[0].message.content || "Lo siento, no pude generar una respuesta.";
 
-    // FIXED: Enhanced insurance intent detection
+    // Enhanced insurance intent detection
     let suggestedPlans: MockInsurancePlan[] = [];
     if (shouldShowInsurancePlans(userMessage)) {
       suggestedPlans = findRelevantPlans(userMessage, relevantPlans);
       console.log(`[OpenAI][${requestId}] Insurance intent detected, found ${suggestedPlans.length} relevant plans`);
-    } else {
-      console.log(`[OpenAI][${requestId}] No insurance intent detected for message: "${userMessage}"`);
     }
 
     // Log success with detailed metrics
