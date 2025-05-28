@@ -39,8 +39,9 @@ export async function generateAssistantResponse(
     timestamp: new Date().toISOString()
   });
 
-  // Filter plans by country and relevance before processing
-  const filteredPlans = filterPlansByCountry(insurancePlans, userCountry);
+  // Get plans from the expanded database instead of mock data
+  const allPlans = insuranceDataService.getAllPlans();
+  const filteredPlans = filterPlansByCountry(allPlans, userCountry);
   const relevantPlans = getTopRelevantPlans(userMessage, filteredPlans, 6);
 
   // Prepare system message with context and instructions
