@@ -17,9 +17,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import FilterSidebar, { type FilterOptions } from "@/components/insurance/FilterSidebar";
 import PlanSort, { type SortOption, applySorting } from "@/components/insurance/PlanSort";
-import PlanPagination from "@/components/insurance/PlanPagination";
 import { useInsurancePlans } from "@/hooks/useInsurancePlans";
 import { QuoteSummary } from "@/components/quote-summary";
+import { PaginationControls } from "@/components/insurance/PaginationControls";
 
 export default function TravelInsurancePage() {
   const [, navigate] = useLocation();
@@ -42,15 +42,22 @@ export default function TravelInsurancePage() {
     tags: []
   });
 
-  // Use the insurance plans hook for better data management
+  // Use the insurance plans hook with pagination
   const {
     plans,
     filteredPlans,
+    paginatedPlans,
     loading,
     error,
     metadata,
     searchQuery,
-    setSearchQuery
+    setSearchQuery,
+    currentPage,
+    totalPages,
+    itemsPerPage,
+    totalItems,
+    setCurrentPage,
+    setItemsPerPage
   } = useInsurancePlans({ 
     category: 'travel',
     autoLoad: true 
