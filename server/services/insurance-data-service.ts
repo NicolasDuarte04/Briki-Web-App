@@ -137,7 +137,7 @@ class InsuranceDataServiceImpl implements InsuranceDataService {
       plan.name.toLowerCase().includes(lowercaseQuery) ||
       plan.provider.toLowerCase().includes(lowercaseQuery) ||
       plan.description?.toLowerCase().includes(lowercaseQuery) ||
-      plan.features?.some(feature => feature.toLowerCase().includes(lowercaseQuery))
+      plan.features?.some((feature: string) => feature.toLowerCase().includes(lowercaseQuery))
     );
     
     console.log(`[Insurance Data Service] Search for "${query}" found ${matchingPlans.length} matching plans`);

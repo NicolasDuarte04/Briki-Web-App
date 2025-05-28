@@ -53,6 +53,11 @@ export default function TravelInsurancePage() {
     category: 'travel',
     autoLoad: true 
   });
+
+  // Apply sorting to filtered plans
+  const sortedPlans = useMemo(() => {
+    return applySorting(filteredPlans, sortOption);
+  }, [filteredPlans, sortOption]);
   
   // Animation variants
   const container = {
