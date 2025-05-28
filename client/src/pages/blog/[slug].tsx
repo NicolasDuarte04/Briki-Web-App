@@ -39,6 +39,10 @@ export default function BlogPostPage() {
 
   const { data: post, isLoading, error } = useQuery<BlogPost>({
     queryKey: ['/api/blog/posts', slug],
+    queryFn: () => fetch(`/api/blog/posts/${slug}`).then(res => {
+      if (!res.ok) throw new Error('Post not found');
+      return res.json();
+    }),
     enabled: !!slug,
   });
 
@@ -110,7 +114,7 @@ export default function BlogPostPage() {
         <meta property="article:author" content={post.author_name} />
         <meta property="article:published_time" content={post.published_at} />
         {post.category_name && <meta property="article:section" content={post.category_name} />}
-        {post.tags.map(tag => (
+        {post.tags && Array.isArray(post.tags) && post.tags.map(tag => (
           <meta key={tag.id} property="article:tag" content={tag.name} />
         ))}
       </Helmet>
@@ -202,7 +206,7 @@ export default function BlogPostPage() {
               />
 
               {/* Tags */}
-              {post.tags.length > 0 && (
+              {post.tags && Array.isArray(post.tags) && post.tags.length > 0 && (
                 <div className="mt-8 pt-8 border-t">
                   <h3 className="text-sm font-semibold text-gray-900 mb-3">Tags</h3>
                   <div className="flex flex-wrap gap-2">
