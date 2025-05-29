@@ -77,7 +77,6 @@ import QuoteConfirmationPage from "@/pages/quote-confirmation";
 import QuoteHistoryPage from "@/pages/quote-history";
 
 // Comparison pages
-import ComparePlansDemo from "@/pages/compare-plans-demo";
 import InsuranceQuote from "@/pages/insurance/[category]/quote";
 
 // Explore pages (public-facing SEO pages without app layout)
@@ -158,7 +157,7 @@ function Router() {
         <Route path="/get-quote" component={GetQuotePage} />
         <Route path="/quote-confirmation" component={QuoteConfirmationPage} />
         <Route path="/quote-history" component={QuoteHistoryPage} />
-        <Route path="/compare-plans-demo" component={ComparePlansDemo} />
+
         <Route path="/learn-more" component={LearnMorePage} />
         <Route path="/terms" component={TermsPage} />
         <Route path="/ai-assistant" component={AIAssistantDemo} />
