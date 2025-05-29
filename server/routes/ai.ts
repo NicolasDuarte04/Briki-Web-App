@@ -1,5 +1,5 @@
 import express from 'express';
-import { generateAssistantResponse, analyzeImageForInsurance } from '../services/openai-service';
+import { generateAssistantResponse, analyzeImageForInsurance } from '../services/openai-service-fixed';
 import { loadMockInsurancePlans, filterPlansByCategory, filterPlansByTags } from '../data-loader';
 import { generateMockResponse } from '../services/mock-assistant-responses';
 import { semanticSearch } from '../services/semantic-search';

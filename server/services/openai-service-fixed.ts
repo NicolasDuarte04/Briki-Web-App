@@ -412,3 +412,14 @@ async function getMockResponse(userMessage: string, relevantPlans: MockInsurance
   const { generateMockResponse } = await import("./mock-assistant-responses.js");
   return generateMockResponse(undefined, userMessage, relevantPlans);
 }
+
+/**
+ * Analyze image for insurance recommendations
+ */
+export async function analyzeImageForInsurance(imageData: string, prompt?: string): Promise<AssistantResponse> {
+  // For now, return a basic response - this can be enhanced later
+  return {
+    message: "He analizado la imagen. Para darte una recomendación más precisa, ¿podrías contarme qué tipo de seguro estás buscando?",
+    suggestedPlans: []
+  };
+}
