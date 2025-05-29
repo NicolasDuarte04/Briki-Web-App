@@ -21,7 +21,7 @@ import { AnonymousUserProvider } from "@/contexts/anonymous-user-context";
 
 import NotFound from "@/pages/not-found";
 import LandingPage from "@/pages/landing-page";
-import Dashboard from "@/pages/dashboard-enhanced";
+import DashboardRouter from "@/components/dashboard-router";
 // Import our new unified authentication screen
 import AuthPage from "@/pages/AuthPage";
 import TripInfoPage from "@/pages/trip-info-page";
@@ -122,7 +122,7 @@ function Router() {
       <Switch>
         <Route path="/" component={LandingPage} />
         <Route path="/countdown" component={CountdownPageNew} />
-        <Route path="/home" component={Dashboard} />
+        <Route path="/home" component={DashboardRouter} />
         <Route path="/auth" component={AuthPage} />
         <Route path="/categories" component={InsuranceCategoriesPage} />
         <Route path="/trip-info" component={TripInfoPage} />
