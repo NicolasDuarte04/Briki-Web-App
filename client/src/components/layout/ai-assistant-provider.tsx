@@ -1,12 +1,7 @@
-import React, { createContext, useState, useContext, ReactNode } from 'react';
-import { useLocation } from 'wouter';
-import { ChatInterface } from '@/components/ai-assistant';
+import React, { createContext, useContext, ReactNode } from 'react';
 
 interface AIAssistantContextType {
-  isOpen: boolean;
-  openAssistant: () => void;
-  closeAssistant: () => void;
-  toggleAssistant: () => void;
+  // Minimal context for compatibility - all actions now route to /ask-briki
 }
 
 const AIAssistantContext = createContext<AIAssistantContextType | undefined>(undefined);
@@ -16,27 +11,8 @@ interface AIAssistantProviderProps {
 }
 
 export const AIAssistantProvider: React.FC<AIAssistantProviderProps> = ({ children }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [location] = useLocation();
-
-  // Paths where the floating assistant should NOT be shown
-  const EXCLUDED_PATHS = ['/ask-briki', '/copilot/ask'];
-
-  const shouldShowAssistant = !EXCLUDED_PATHS.includes(location);
-
-  const openAssistant = () => setIsOpen(true);
-  const closeAssistant = () => setIsOpen(false);
-  const toggleAssistant = () => setIsOpen(prev => !prev);
-
   return (
-    <AIAssistantContext.Provider 
-      value={{ 
-        isOpen, 
-        openAssistant, 
-        closeAssistant, 
-        toggleAssistant 
-      }}
-    >
+    <AIAssistantContext.Provider value={{}}>
       {children}
     </AIAssistantContext.Provider>
   );

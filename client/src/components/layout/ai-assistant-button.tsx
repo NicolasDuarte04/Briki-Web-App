@@ -2,7 +2,7 @@ import React from 'react';
 import { Bot, SparklesIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { useAIAssistant } from './ai-assistant-provider';
+import { useLocation } from 'wouter';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -29,7 +29,7 @@ export function AIAssistantButton({
   size,
   disabled
 }: AIAssistantButtonProps) {
-  const { isOpen, toggleAssistant } = useAIAssistant();
+  const [, navigate] = useLocation();
   
   if (displayVariant === 'fab') {
     return (
@@ -42,7 +42,7 @@ export function AIAssistantButton({
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
-              onClick={toggleAssistant}
+              onClick={() => navigate('/ask-briki')}
               className={cn(
                 "h-14 w-14 rounded-full bg-gradient-to-br from-primary to-primary/90",
                 className
@@ -62,7 +62,7 @@ export function AIAssistantButton({
   if (displayVariant === 'text') {
     return (
       <Button
-        onClick={toggleAssistant}
+        onClick={() => navigate('/ask-briki')}
         variant={buttonVariant || "outline"}
         className={cn("gap-2", className)}
         size={size}
@@ -79,7 +79,7 @@ export function AIAssistantButton({
     <Tooltip>
       <TooltipTrigger asChild>
         <Button
-          onClick={toggleAssistant}
+          onClick={() => navigate('/ask-briki')}
           variant={buttonVariant || "ghost"}
           size={size || "icon"}
           className={className}
