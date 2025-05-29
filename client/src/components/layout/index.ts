@@ -5,7 +5,7 @@ export { ExploreLayout } from './public/explore-layout';
 export { ExploreLayout as OriginalExploreLayout } from './explore-layout';
 
 // Re-export components from authenticated layouts
-export { AuthenticatedLayout } from './authenticated/authenticated-layout';
+export { AuthenticatedLayout } from './authenticated-layout';
 
 // Re-export company layout - single source of truth
 import CompanyLayout from './company-layout';
