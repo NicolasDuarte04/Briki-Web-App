@@ -324,7 +324,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
           !!response.action,
           {
             messageId: assistantMessage.id,
-            hasError: assistantMessage.error,
+            hasError: assistantMessage.error || false,
             widgetType: assistantMessage.widgetData?.type || null
           }
         );
@@ -496,27 +496,12 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     return items;
   };
 
-  // Floating chat UI elements for when the assistant is minimized
-  const floatingButton = (
-    <motion.div
-      initial={{ scale: 0.8, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      transition={{ duration: 0.3 }}
-      className="fixed bottom-6 right-6 z-50"
-    >
-      <button
-        onClick={toggleExpand}
-        className="rounded-full w-14 h-14 bg-gradient-to-r from-primary to-blue-600 text-white shadow-lg flex items-center justify-center hover:shadow-xl transition-all"
-      >
-        <MessageSquare className="h-6 w-6" />
-      </button>
-    </motion.div>
-  );
+  // All assistant interactions now route to /ask-briki - no floating UI needed
 
   // Chat interface component
   const chatContainer = (
     <AnimatePresence>
-      {isExpanded && (
+      {(isExpanded || placement === "inline") && (
         <motion.div
           initial={{ opacity: 0, y: 50, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -644,17 +629,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     </AnimatePresence>
   );
 
-  // Render different layouts based on placement
-  if (placement === "floating") {
-    return (
-      <>
-        {!isExpanded && floatingButton}
-        {chatContainer}
-      </>
-    );
-  }
-
-  // Inline placement (full container)
+  // Only inline placement supported - floating functionality removed
   return chatContainer;
 };
 
