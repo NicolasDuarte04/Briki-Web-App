@@ -38,14 +38,6 @@ export const AIAssistantProvider: React.FC<AIAssistantProviderProps> = ({ childr
       }}
     >
       {children}
-      {shouldShowAssistant && (
-        <ChatInterface
-          placement="floating"
-          autoExpand={isOpen}
-          showClose={true}
-          onClose={closeAssistant}
-        />
-      )}
     </AIAssistantContext.Provider>
   );
 };
