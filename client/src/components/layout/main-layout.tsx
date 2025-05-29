@@ -25,7 +25,6 @@ import {
   Bot,
   ChevronDown,
 } from "lucide-react";
-import { useAIAssistant } from "@/components/layout";
 import {
   Sheet,
   SheetContent,
@@ -39,60 +38,45 @@ interface MainLayoutProps {
   showFooter?: boolean;
 }
 
-/**
- * Main layout component for B2C screens providing:
- * - Unified header with smooth scroll behavior
- * - Authentication state handling
- * - Navigation and user menu
- * - Footer (optional)
- */
 export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [location, navigate] = useLocation();
   const { user, isLoading, logoutMutation } = useAuth();
   const { t } = useLanguage();
-  const { toggleAssistant } = useAIAssistant();
-
-  // Handle scroll effect for transparent-to-solid transition
+  
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY;
       setIsScrolled(scrollPosition > 20);
     };
-
+    
     window.addEventListener('scroll', handleScroll);
-
-    // Check initial position in case page is loaded scrolled
     handleScroll();
-
+    
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
-
-  // Handle logout
+  
   const handleLogout = () => {
     logoutMutation.mutate();
   };
 
-  // Get user initials for avatar
   const getUserInitials = () => {
     if (!user) return "U";
-
+    
     if (user.name) {
       return user.name[0].toUpperCase();
     }
-
+    
     if (user.username) {
       return user.username[0].toUpperCase();
     }
-
-    // Fallback to email or generic avatar
+    
     return user.email ? user.email[0].toUpperCase() : "U";
   };
-
-  // Active path helper
+  
   const isActivePath = (path: string) => {
     if (location === path) {
       return "text-blue-600 dark:text-blue-400 font-medium border-b-2 border-blue-600";
@@ -102,7 +86,6 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Header - transitions from transparent to solid on scroll */}
       <header 
         className={`sticky top-0 z-50 w-full transition-all duration-300 ${
           isScrolled 
@@ -112,15 +95,13 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
-            {/* Logo */}
             <div className="flex items-center">
               <Link href="/" className="flex-shrink-0 flex items-center mr-10">
                 <h1 className="briki-logo text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-500">
                   briki
                 </h1>
               </Link>
-
-              {/* Desktop Navigation */}
+              
               <nav className="hidden md:flex items-center space-x-1">
                 <Link href="/features" className={`px-4 py-2 text-sm font-medium transition-colors ${isActivePath("/features")}`}>
                   Features
@@ -142,15 +123,13 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
                 </Link>
               </nav>
             </div>
-
-            {/* User Menu Section */}
+            
             {isLoading ? (
               <div className="flex items-center">
                 <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
               </div>
             ) : user ? (
               <div className="flex items-center space-x-3">
-                {/* B2B Link for logged-in users */}
                 <Button 
                   variant="outline" 
                   onClick={() => navigate("/company")}
@@ -159,27 +138,24 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
                 >
                   For Companies
                 </Button>
-
-                {/* AI Assistant Button */}
+                
                 <Button 
                   variant="ghost" 
                   size="icon" 
                   className="relative p-2 rounded-full text-blue-500 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/10"
-                  onClick={toggleAssistant}
+                  onClick={() => navigate('/ask-briki')}
                 >
                   <span className="sr-only">Open AI Assistant</span>
                   <Bot className="h-5 w-5" />
                   <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-blue-500 ring-2 ring-white dark:ring-gray-900"></span>
                 </Button>
-
-                {/* Notifications */}
+                
                 <Button variant="ghost" size="icon" className="relative p-2 rounded-full text-foreground/50 hover:text-foreground/70 hover:bg-gray-100 dark:hover:bg-gray-800/20">
                   <span className="sr-only">View notifications</span>
                   <Bell className="h-5 w-5" />
                   <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white dark:ring-gray-900"></span>
                 </Button>
-
-                {/* User Profile Menu */}
+                
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="flex text-sm rounded-full focus:outline-none items-center gap-1 pl-1 pr-2 py-1">
@@ -215,7 +191,7 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
                     </DropdownMenuItem>
                     <DropdownMenuItem 
                       className="cursor-pointer" 
-                      onClick={() => navigate("/ai-assistant")}
+                      onClick={() => navigate("/ask-briki")}
                     >
                       <Bot className="mr-2 h-4 w-4" />
                       <span>AI Assistant</span>
@@ -238,7 +214,6 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
               </div>
             ) : (
               <div className="flex items-center space-x-2 md:space-x-3">
-                {/* B2B Link for non-logged-in users */}
                 <Button 
                   variant="outline" 
                   onClick={() => navigate("/company")}
@@ -247,20 +222,18 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
                   <span>For Insurance Companies</span>
                   <span className="ml-2 text-xs opacity-70">→</span>
                 </Button>
-
-                {/* AI Assistant Button */}
+                
                 <Button 
                   variant="ghost" 
                   size="icon" 
                   className="relative p-2 rounded-full text-blue-500 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/10"
-                  onClick={toggleAssistant}
+                  onClick={() => navigate('/ask-briki')}
                 >
                   <span className="sr-only">Open AI Assistant</span>
                   <Bot className="h-5 w-5" />
                   <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-blue-500 ring-2 ring-white dark:ring-gray-900"></span>
                 </Button>
-
-                {/* Auth Buttons */}
+                
                 <Button 
                   variant="ghost" 
                   onClick={() => navigate("/auth")}
@@ -276,8 +249,7 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
                 </Button>
               </div>
             )}
-
-            {/* Mobile menu button */}
+            
             <div className="flex md:hidden">
               <Sheet open={isOpen} onOpenChange={setIsOpen}>
                 <SheetTrigger asChild>
@@ -294,8 +266,7 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
                       </h1>
                     </SheetTitle>
                   </SheetHeader>
-
-                  {/* Mobile navigation links */}
+                  
                   <div className="py-4">
                     <div className="space-y-1">
                       <Link 
@@ -326,8 +297,7 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
                       >
                         {t('healthInsurance')}
                       </Link>
-
-                      {/* No account yet? Links */}
+                      
                       {!user && (
                         <>
                           <div className="border-t border-gray-200 my-4"></div>
@@ -348,8 +318,7 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
                         </>
                       )}
                     </div>
-
-                    {/* User info in mobile menu */}
+                    
                     {user && (
                       <>
                         <div className="pt-4 pb-3 border-t border-gray-200 mt-4">
@@ -368,15 +337,14 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
                               <div className="text-sm font-medium text-gray-500">{user.email}</div>
                             </div>
                           </div>
-
-                          {/* Mobile menu AI Assistant button */}
+                          
                           <div className="flex items-center px-4 pb-2 mt-3">
                             <Button 
                               variant="outline"
                               size="sm"
                               className="flex-1 gap-2"
                               onClick={() => {
-                                toggleAssistant();
+                                navigate("/ask-briki");
                                 setIsOpen(false);
                               }}
                             >
@@ -384,8 +352,7 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
                               Chat with AI Assistant
                             </Button>
                           </div>
-
-                          {/* Mobile menu user actions */}
+                          
                           <div className="mt-3 space-y-1">
                             <Button 
                               variant="ghost" 
@@ -409,19 +376,19 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
                               <Settings className="mr-2 h-4 w-4" />
                               Settings
                             </Button>
-
+                            
                             <Button 
                               variant="ghost" 
                               className="w-full justify-start text-gray-500"
                               onClick={() => {
-                                navigate("/ai-assistant");
+                                navigate("/ask-briki");
                                 setIsOpen(false);
                               }}
                             >
                               <Bot className="mr-2 h-4 w-4" />
                               AI Assistant
                             </Button>
-
+                            
                             <Button 
                               variant="ghost" 
                               className="w-full justify-start text-gray-500"
@@ -450,7 +417,6 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
         </div>
       </header>
 
-      {/* Main content with AnimatePresence for smooth page transitions */}
       <AnimatePresence mode="wait" initial={false}>
         <motion.main
           key={location}
@@ -464,7 +430,6 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
         </motion.main>
       </AnimatePresence>
 
-      {/* Footer (optional) */}
       {showFooter && <Footer />}
     </div>
   );
