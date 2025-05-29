@@ -116,7 +116,7 @@ export async function generateAssistantResponse(
       // For follow-up questions, reattach the previously suggested plans
       suggestedPlans = previousPlans;
       console.log(
-        `[OpenAI][${requestId}] Follow-up question detected, reattaching ${suggestedPlans.length} previous plans`,
+        `🧠 [OpenAI][${requestId}] Follow-up question detected – reattaching ${suggestedPlans.length} previous plans`,
       );
     } else if (shouldShowInsurancePlans(userMessage)) {
       // For new insurance requests, find relevant plans
