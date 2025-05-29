@@ -1,0 +1,63 @@
+Please review and apply the following cleanup to `client/src/components/layout/index.ts`:
+
+🎯 Goal: Remove redundant exports and clarify layout intent for long-term stability.
+
+✅ Action Items:
+1. **Delete this unnecessary alias export** (it's creating naming confusion):
+```ts
+export { CompanyLayout as CompanyLayoutRedesigned };
+```
+
+2. **Keep this deprecated export**, but clearly label it:
+```ts
+export { ExploreLayout as OriginalExploreLayout } from './explore-layout'; // TODO: Remove once migration is complete
+```
+
+3. ✅ Keep all other exports as-is.
+
+📦 Final corrected code (please replace the entire file content with this):
+```ts
+// Re-export components from public layouts
+export { ExploreLayout } from './public/explore-layout';
+
+// NOTE: OriginalExploreLayout is deprecated. Remove once migration is complete.
+export { ExploreLayout as OriginalExploreLayout } from './explore-layout';
+
+// Re-export components from authenticated layouts
+export { AuthenticatedLayout } from './authenticated/authenticated-layout';
+
+// Re-export company layout - single source of truth
+import CompanyLayout from './company-layout';
+export { CompanyLayout };
+
+// Re-export other layout components
+export { AIAssistantProvider, useAIAssistant } from './ai-assistant-provider';
+export { AIAssistantButton } from './ai-assistant-button';
+export { FloatingAssistantButton } from './floating-assistant-button';
+export { ContentWrapper } from './ContentWrapper';
+export { HeroWrapper } from './HeroWrapper';
+export { MainLayout } from './main-layout';
+```
+
+🚫 Do not modify or touch any other files. Just reply with the corrected version here in chat. This is the code I want you to fix:  // Re-export components from public layouts
+export { ExploreLayout } from './public/explore-layout';
+
+// Re-export components from authenticated layouts
+export { AuthenticatedLayout } from './authenticated/authenticated-layout';
+
+// Original ExploreLayout (deprecated but kept for backward compatibility)
+export { ExploreLayout as OriginalExploreLayout } from './explore-layout';
+
+// Re-export company layout component - standardized version
+import CompanyLayout from './company-layout';
+export { CompanyLayout };
+// For backward compatibility during transition
+export { CompanyLayout as CompanyLayoutRedesigned };
+
+// Re-export other layout components
+export { AIAssistantProvider, useAIAssistant } from './ai-assistant-provider';
+export { AIAssistantButton } from './ai-assistant-button';
+export { FloatingAssistantButton } from './floating-assistant-button';
+export { ContentWrapper } from './ContentWrapper';
+export { HeroWrapper } from './HeroWrapper';
+export { MainLayout } from './main-layout';

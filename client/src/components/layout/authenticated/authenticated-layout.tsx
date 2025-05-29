@@ -1,5 +1,4 @@
 import React from 'react';
-import Navbar from '@/components/navbar';
 import { useNavigation } from '@/lib/navigation';
 
 interface AuthenticatedLayoutProps {
@@ -9,10 +8,17 @@ interface AuthenticatedLayoutProps {
 export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
   const { location } = useNavigation();
 
+  // Skip layout wrapper for auth pages to allow full-screen auth forms
+  if (location === '/auth') {
+    return <>{children}</>;
+  }
+
   return (
-    <>
-      {location !== '/auth' && <Navbar />}
-      {children}
-    </>
+    <div className="min-h-screen flex flex-col">
+      {/* Header/Navbar will be handled by parent layout or navigation system */}
+      <main className="flex-grow">
+        {children}
+      </main>
+    </div>
   );
 }
