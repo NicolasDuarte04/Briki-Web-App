@@ -53,24 +53,34 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
   const { user, isLoading, logoutMutation } = useAuth();
   const { t } = useLanguage();
   const { toggleAssistant } = useAIAssistant();
-
+  
+  // Check if current page should show AI Assistant
+  // Now we show AI Assistant on app pages regardless of auth status
+  const excludedPaths = ['/', '/auth', '/countdown', '/login', '/register', '/terms', '/learn-more', '/landing'];
+  const publicAppRoutes = ['/trip-info', '/get-quote', '/dashboard', '/insurance'];
+  const isPublicAppRoute = publicAppRoutes.some(path => 
+    location === path || location.startsWith(path)
+  );
+  const showAIAssistant = (user || isPublicAppRoute) && 
+    !excludedPaths.some(path => location === path || location.startsWith(`${path}/`));
+  
   // Handle scroll effect for transparent-to-solid transition
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY;
       setIsScrolled(scrollPosition > 20);
     };
-
+    
     window.addEventListener('scroll', handleScroll);
-
+    
     // Check initial position in case page is loaded scrolled
     handleScroll();
-
+    
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
-
+  
   // Handle logout
   const handleLogout = () => {
     logoutMutation.mutate();
@@ -79,19 +89,19 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
   // Get user initials for avatar
   const getUserInitials = () => {
     if (!user) return "U";
-
+    
     if (user.name) {
       return user.name[0].toUpperCase();
     }
-
+    
     if (user.username) {
       return user.username[0].toUpperCase();
     }
-
+    
     // Fallback to email or generic avatar
     return user.email ? user.email[0].toUpperCase() : "U";
   };
-
+  
   // Active path helper
   const isActivePath = (path: string) => {
     if (location === path) {
@@ -119,7 +129,7 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
                   briki
                 </h1>
               </Link>
-
+              
               {/* Desktop Navigation */}
               <nav className="hidden md:flex items-center space-x-1">
                 <Link href="/features" className={`px-4 py-2 text-sm font-medium transition-colors ${isActivePath("/features")}`}>
@@ -142,7 +152,7 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
                 </Link>
               </nav>
             </div>
-
+            
             {/* User Menu Section */}
             {isLoading ? (
               <div className="flex items-center">
@@ -159,26 +169,28 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
                 >
                   For Companies
                 </Button>
-
+                
                 {/* AI Assistant Button */}
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="relative p-2 rounded-full text-blue-500 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/10"
-                  onClick={toggleAssistant}
-                >
-                  <span className="sr-only">Open AI Assistant</span>
-                  <Bot className="h-5 w-5" />
-                  <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-blue-500 ring-2 ring-white dark:ring-gray-900"></span>
-                </Button>
-
+                {showAIAssistant && (
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="relative p-2 rounded-full text-blue-500 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/10"
+                    onClick={toggleAssistant}
+                  >
+                    <span className="sr-only">Open AI Assistant</span>
+                    <Bot className="h-5 w-5" />
+                    <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-blue-500 ring-2 ring-white dark:ring-gray-900"></span>
+                  </Button>
+                )}
+                
                 {/* Notifications */}
                 <Button variant="ghost" size="icon" className="relative p-2 rounded-full text-foreground/50 hover:text-foreground/70 hover:bg-gray-100 dark:hover:bg-gray-800/20">
                   <span className="sr-only">View notifications</span>
                   <Bell className="h-5 w-5" />
                   <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white dark:ring-gray-900"></span>
                 </Button>
-
+                
                 {/* User Profile Menu */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -213,13 +225,15 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
                       <Settings className="mr-2 h-4 w-4" />
                       <span>Settings</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem 
-                      className="cursor-pointer" 
-                      onClick={() => navigate("/ai-assistant")}
-                    >
-                      <Bot className="mr-2 h-4 w-4" />
-                      <span>AI Assistant</span>
-                    </DropdownMenuItem>
+                    {showAIAssistant && (
+                      <DropdownMenuItem 
+                        className="cursor-pointer" 
+                        onClick={() => navigate("/ai-assistant")}
+                      >
+                        <Bot className="mr-2 h-4 w-4" />
+                        <span>AI Assistant</span>
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem 
                       className="cursor-pointer"
@@ -247,19 +261,21 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
                   <span>For Insurance Companies</span>
                   <span className="ml-2 text-xs opacity-70">→</span>
                 </Button>
-
-                {/* AI Assistant Button */}
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="relative p-2 rounded-full text-blue-500 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/10"
-                  onClick={toggleAssistant}
-                >
-                  <span className="sr-only">Open AI Assistant</span>
-                  <Bot className="h-5 w-5" />
-                  <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-blue-500 ring-2 ring-white dark:ring-gray-900"></span>
-                </Button>
-
+                
+                {/* AI Assistant Button for anonymous users on public app routes */}
+                {!user && showAIAssistant && (
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="relative p-2 rounded-full text-blue-500 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/10"
+                    onClick={toggleAssistant}
+                  >
+                    <span className="sr-only">Open AI Assistant</span>
+                    <Bot className="h-5 w-5" />
+                    <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-blue-500 ring-2 ring-white dark:ring-gray-900"></span>
+                  </Button>
+                )}
+                
                 {/* Auth Buttons */}
                 <Button 
                   variant="ghost" 
@@ -276,7 +292,7 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
                 </Button>
               </div>
             )}
-
+            
             {/* Mobile menu button */}
             <div className="flex md:hidden">
               <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -294,7 +310,7 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
                       </h1>
                     </SheetTitle>
                   </SheetHeader>
-
+                  
                   {/* Mobile navigation links */}
                   <div className="py-4">
                     <div className="space-y-1">
@@ -326,7 +342,7 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
                       >
                         {t('healthInsurance')}
                       </Link>
-
+                      
                       {/* No account yet? Links */}
                       {!user && (
                         <>
@@ -348,7 +364,7 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
                         </>
                       )}
                     </div>
-
+                    
                     {/* User info in mobile menu */}
                     {user && (
                       <>
@@ -368,23 +384,25 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
                               <div className="text-sm font-medium text-gray-500">{user.email}</div>
                             </div>
                           </div>
-
+                          
                           {/* Mobile menu AI Assistant button */}
-                          <div className="flex items-center px-4 pb-2 mt-3">
-                            <Button 
-                              variant="outline"
-                              size="sm"
-                              className="flex-1 gap-2"
-                              onClick={() => {
-                                toggleAssistant();
-                                setIsOpen(false);
-                              }}
-                            >
-                              <Bot className="h-4 w-4" />
-                              Chat with AI Assistant
-                            </Button>
-                          </div>
-
+                          {showAIAssistant && (
+                            <div className="flex items-center px-4 pb-2 mt-3">
+                              <Button 
+                                variant="outline"
+                                size="sm"
+                                className="flex-1 gap-2"
+                                onClick={() => {
+                                  toggleAssistant();
+                                  setIsOpen(false);
+                                }}
+                              >
+                                <Bot className="h-4 w-4" />
+                                Chat with AI Assistant
+                              </Button>
+                            </div>
+                          )}
+                          
                           {/* Mobile menu user actions */}
                           <div className="mt-3 space-y-1">
                             <Button 
@@ -409,19 +427,21 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
                               <Settings className="mr-2 h-4 w-4" />
                               Settings
                             </Button>
-
-                            <Button 
-                              variant="ghost" 
-                              className="w-full justify-start text-gray-500"
-                              onClick={() => {
-                                navigate("/ai-assistant");
-                                setIsOpen(false);
-                              }}
-                            >
-                              <Bot className="mr-2 h-4 w-4" />
-                              AI Assistant
-                            </Button>
-
+                            
+                            {showAIAssistant && (
+                              <Button 
+                                variant="ghost" 
+                                className="w-full justify-start text-gray-500"
+                                onClick={() => {
+                                  navigate("/ai-assistant");
+                                  setIsOpen(false);
+                                }}
+                              >
+                                <Bot className="mr-2 h-4 w-4" />
+                                AI Assistant
+                              </Button>
+                            )}
+                            
                             <Button 
                               variant="ghost" 
                               className="w-full justify-start text-gray-500"

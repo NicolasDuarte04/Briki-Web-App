@@ -1,0 +1,90 @@
+Please correct the following file (`client/src/components/layout/ai-assistant-provider.tsx`) by implementing centralized route-based exclusion logic for the floating assistant.
+
+🚨 Important: Do NOT edit any files yourself. Just send back the full corrected version here in the chat.
+
+---
+
+🧠 CONTEXT:
+Right now, the floating assistant is always rendered via `<ChatInterface placement="floating" />`, regardless of the current route. This causes it to appear even on the dedicated `/ask-briki` page, where it should be hidden.
+
+We want to fix this by **adding a route exclusion check inside the provider itself** — so it stops rendering the assistant on certain paths (like `/ask-briki`).
+
+---
+
+✅ YOUR TASK:
+1. Import `useLocation` from `wouter`.
+2. Create a list of excluded paths:
+   ```ts
+   const EXCLUDED_PATHS = ['/ask-briki', '/copilot/ask']; // Add more if needed
+   ```
+3. Use the current route to conditionally render `<ChatInterface />`:
+   ```ts
+   const [location] = useLocation();
+   const shouldShowAssistant = !EXCLUDED_PATHS.includes(location);
+   ```
+4. Wrap the assistant render in a conditional:
+   ```tsx
+   {shouldShowAssistant && (
+     <ChatInterface
+       placement="floating"
+       autoExpand={isOpen}
+       showClose={true}
+       onClose={closeAssistant}
+     />
+   )}
+   ```
+
+📦 Output: Send back the **entire corrected version** of `ai-assistant-provider.tsx`, nothing else.:import React, { createContext, useState, useContext, ReactNode } from 'react';
+import { ChatInterface } from '@/components/ai-assistant';
+
+interface AIAssistantContextType {
+  isOpen: boolean;
+  openAssistant: () => void;
+  closeAssistant: () => void;
+  toggleAssistant: () => void;
+}
+
+const AIAssistantContext = createContext<AIAssistantContextType | undefined>(undefined);
+
+interface AIAssistantProviderProps {
+  children: ReactNode;
+}
+
+export const AIAssistantProvider: React.FC<AIAssistantProviderProps> = ({ children }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const openAssistant = () => setIsOpen(true);
+  const closeAssistant = () => setIsOpen(false);
+  const toggleAssistant = () => setIsOpen(prev => !prev);
+
+  return (
+    <AIAssistantContext.Provider 
+      value={{ 
+        isOpen, 
+        openAssistant, 
+        closeAssistant, 
+        toggleAssistant 
+      }}
+    >
+      {children}
+      <ChatInterface
+        placement="floating"
+        autoExpand={isOpen}
+        showClose={true}
+        onClose={closeAssistant}
+      />
+    </AIAssistantContext.Provider>
+  );
+};
+
+export const useAIAssistant = (): AIAssistantContextType => {
+  const context = useContext(AIAssistantContext);
+  
+  if (context === undefined) {
+    throw new Error('useAIAssistant must be used within an AIAssistantProvider');
+  }
+  
+  return context;
+};
+
+export default AIAssistantProvider;

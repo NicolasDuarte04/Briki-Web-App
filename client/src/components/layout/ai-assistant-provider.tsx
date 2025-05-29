@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, ReactNode } from 'react';
+import { useLocation } from 'wouter';
 import { ChatInterface } from '@/components/ai-assistant';
 
 interface AIAssistantContextType {
@@ -16,6 +17,12 @@ interface AIAssistantProviderProps {
 
 export const AIAssistantProvider: React.FC<AIAssistantProviderProps> = ({ children }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [location] = useLocation();
+
+  // Paths where the floating assistant should NOT be shown
+  const EXCLUDED_PATHS = ['/ask-briki', '/copilot/ask'];
+
+  const shouldShowAssistant = !EXCLUDED_PATHS.includes(location);
 
   const openAssistant = () => setIsOpen(true);
   const closeAssistant = () => setIsOpen(false);
@@ -31,23 +38,25 @@ export const AIAssistantProvider: React.FC<AIAssistantProviderProps> = ({ childr
       }}
     >
       {children}
-      <ChatInterface
-        placement="floating"
-        autoExpand={isOpen}
-        showClose={true}
-        onClose={closeAssistant}
-      />
+      {shouldShowAssistant && (
+        <ChatInterface
+          placement="floating"
+          autoExpand={isOpen}
+          showClose={true}
+          onClose={closeAssistant}
+        />
+      )}
     </AIAssistantContext.Provider>
   );
 };
 
 export const useAIAssistant = (): AIAssistantContextType => {
   const context = useContext(AIAssistantContext);
-  
+
   if (context === undefined) {
     throw new Error('useAIAssistant must be used within an AIAssistantProvider');
   }
-  
+
   return context;
 };
 
