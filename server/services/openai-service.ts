@@ -118,12 +118,23 @@ export async function generateAssistantResponse(
       console.log(
         `🧠 [OpenAI][${requestId}] Follow-up question detected – reattaching ${suggestedPlans.length} previous plans`,
       );
-    } else if (shouldShowInsurancePlans(userMessage)) {
-      // For new insurance requests, find relevant plans
-      suggestedPlans = findRelevantPlans(userMessage, relevantPlans);
-      console.log(
-        `[OpenAI][${requestId}] Insurance intent detected, found ${suggestedPlans.length} relevant plans`,
-      );
+    } else {
+      // NEW: Consultative logic - check if we need more context before showing plans
+      const contextAnalysis = analyzeContextNeeds(userMessage, conversationHistory);
+      
+      if (contextAnalysis.needsMoreContext) {
+        // Don't show plans yet, let AI ask for more context
+        console.log(
+          `🤔 [OpenAI][${requestId}] Context needed for ${contextAnalysis.category} - gathering info before showing plans`,
+        );
+        suggestedPlans = []; // No plans until we have enough context
+      } else if (shouldShowInsurancePlans(userMessage)) {
+        // Only show plans when we have sufficient context
+        suggestedPlans = findRelevantPlans(userMessage, relevantPlans);
+        console.log(
+          `[OpenAI][${requestId}] Sufficient context available, showing ${suggestedPlans.length} relevant plans`,
+        );
+      }
     }
 
     // Log success with detailed metrics
@@ -204,7 +215,191 @@ async function callOpenAIWithRetry(messages: any[], retries = 3): Promise<any> {
   }
 }
 
+/**
+ * Detect if the user message is a follow-up question about previously suggested plans
+ */
+function isFollowUpQuestion(message: string): boolean {
+  const lowerMessage = message.toLowerCase().trim();
+  
+  const followUpPatterns = [
+    /cuál es (el )?mejor/,
+    /cuál (me )?recomienda/,
+    /qué (me )?recomienda/,
+    /cuál es (la )?diferencia/,
+    /cuál conviene/,
+    /entre (esos|estos)/,
+    /qué incluye/,
+    /qué cubre/,
+    /cuánto cuesta/,
+    /precio/,
+    /cobertura/,
+    /el primero/,
+    /el segundo/,
+    /el tercero/,
+    /ese plan/,
+    /esa opción/,
+    /más información/,
+    /más detalles/,
+    /explica/,
+    /compara/,
+  ];
+  
+  return followUpPatterns.some(pattern => pattern.test(lowerMessage));
+}
 
+/**
+ * Extract previously suggested plans from conversation history
+ */
+function extractPreviousPlansFromHistory(history: AssistantMessage[]): MockInsurancePlan[] {
+  for (let i = history.length - 1; i >= 0; i--) {
+    const message = history[i];
+    if (message.role === 'assistant' && message.content.includes('[Planes previamente recomendados:')) {
+      const planMatch = message.content.match(/\[Planes previamente recomendados: ([^\]]+)\]/);
+      if (planMatch) {
+        const planString = planMatch[1];
+        return parsePlansFromString(planString);
+      }
+    }
+  }
+  return [];
+}
+
+/**
+ * Parse plan information from formatted string and return plan objects
+ */
+function parsePlansFromString(planString: string): MockInsurancePlan[] {
+  try {
+    const allPlans = loadMockInsurancePlans();
+    const extractedPlans: MockInsurancePlan[] = [];
+    const planEntries = planString.split(', ');
+    
+    for (const entry of planEntries) {
+      const nameMatch = entry.match(/^([^(]+?)\s+de\s+/);
+      if (nameMatch) {
+        const planName = nameMatch[1].trim();
+        const matchingPlan = allPlans.find(plan => 
+          plan.name.toLowerCase().includes(planName.toLowerCase()) ||
+          planName.toLowerCase().includes(plan.name.toLowerCase())
+        );
+        if (matchingPlan) {
+          extractedPlans.push(matchingPlan);
+        }
+      }
+    }
+    
+    return extractedPlans;
+  } catch (error) {
+    console.warn('Error parsing plans from string:', error);
+    return [];
+  }
+}
+
+/**
+ * Analyze if user message needs more context before showing plans
+ */
+interface ContextAnalysis {
+  needsMoreContext: boolean;
+  category: string;
+  missingInfo: string[];
+}
+
+function analyzeContextNeeds(userMessage: string, conversationHistory: AssistantMessage[]): ContextAnalysis {
+  const lowerMessage = userMessage.toLowerCase().trim();
+  
+  // Check if user already provided detailed context in conversation
+  const hasDetailedContext = conversationHistory.some(msg => 
+    msg.role === 'user' && (
+      msg.content.length > 50 || // Detailed messages
+      /\d+/.test(msg.content) || // Contains numbers (ages, dates, etc.)
+      /(años?|meses?|días?|duración|países?|raza|modelo|marca)/i.test(msg.content)
+    )
+  );
+  
+  // Travel insurance context analysis
+  if (/(viaj|europe|estados unidos|méxico|international|trip|travel)/i.test(lowerMessage)) {
+    const travelDetails = {
+      duration: /(días?|semanas?|meses?|\d+)/i.test(lowerMessage),
+      destination: /(europa|asia|méxico|estados unidos|[a-z]+)/i.test(lowerMessage),
+      travelers: /(solo|familia|acompañant|personas?)/i.test(lowerMessage)
+    };
+    
+    const missingTravelInfo = [];
+    if (!travelDetails.duration) missingTravelInfo.push('duración del viaje');
+    if (!travelDetails.destination) missingTravelInfo.push('destino específico');
+    if (!travelDetails.travelers) missingTravelInfo.push('número de viajeros');
+    
+    return {
+      needsMoreContext: !hasDetailedContext && missingTravelInfo.length > 1,
+      category: 'travel',
+      missingInfo: missingTravelInfo
+    };
+  }
+  
+  // Pet insurance context analysis
+  if (/(mascot|perr|gat|pet|animal)/i.test(lowerMessage)) {
+    const petDetails = {
+      age: /(\d+|años?|meses?|cachorro|adulto|mayor)/i.test(lowerMessage),
+      breed: /(raza|labrador|golden|pastor|siamés)/i.test(lowerMessage),
+      health: /(sano|enferm|condición|médic)/i.test(lowerMessage)
+    };
+    
+    const missingPetInfo = [];
+    if (!petDetails.age) missingPetInfo.push('edad de la mascota');
+    if (!petDetails.breed) missingPetInfo.push('raza');
+    if (!petDetails.health) missingPetInfo.push('estado de salud');
+    
+    return {
+      needsMoreContext: !hasDetailedContext && missingPetInfo.length > 1,
+      category: 'pet',
+      missingInfo: missingPetInfo
+    };
+  }
+  
+  // Auto insurance context analysis
+  if (/(auto|vehicul|carro|moto|seguro.*auto)/i.test(lowerMessage)) {
+    const autoDetails = {
+      vehicle: /(marca|modelo|año|toyota|honda|ford)/i.test(lowerMessage),
+      usage: /(trabajo|personal|comercial|uso)/i.test(lowerMessage),
+      coverage: /(básic|completo|terceros|todo riesgo)/i.test(lowerMessage)
+    };
+    
+    const missingAutoInfo = [];
+    if (!autoDetails.vehicle) missingAutoInfo.push('marca y modelo del vehículo');
+    if (!autoDetails.usage) missingAutoInfo.push('uso del vehículo');
+    
+    return {
+      needsMoreContext: !hasDetailedContext && missingAutoInfo.length > 0,
+      category: 'auto',
+      missingInfo: missingAutoInfo
+    };
+  }
+  
+  // Health insurance context analysis
+  if (/(salud|médic|hospital|health)/i.test(lowerMessage)) {
+    const healthDetails = {
+      coverage: /(básic|completo|familiar|individual)/i.test(lowerMessage),
+      needs: /(emergencias?|consultas?|especialistas?)/i.test(lowerMessage),
+      family: /(familia|hijos?|esposo|pareja)/i.test(lowerMessage)
+    };
+    
+    const missingHealthInfo = [];
+    if (!healthDetails.coverage) missingHealthInfo.push('tipo de cobertura');
+    if (!healthDetails.needs) missingHealthInfo.push('necesidades médicas');
+    
+    return {
+      needsMoreContext: !hasDetailedContext && missingHealthInfo.length > 0,
+      category: 'health',
+      missingInfo: missingHealthInfo
+    };
+  }
+  
+  // Default: no specific category detected or sufficient context
+  return {
+    needsMoreContext: false,
+    category: 'general',
+    missingInfo: []
+  };
+}
 
 /**
  * Filter insurance plans by user's country
@@ -400,22 +595,29 @@ function createSystemPrompt(
   userMessage: string = "",
   conversationHistory?: AssistantMessage[],
 ): string {
-  // Start with structured base instructions
-  let prompt = `Eres Briki, un asistente de seguros amigable y profesional.
+  // Start with consultative system instructions
+  let prompt = `Eres Briki, un asesor profesional de seguros que ayuda a los usuarios a encontrar la protección perfecta para sus necesidades específicas.
 
-REGLAS DE RECOMENDACIÓN:
-• Recomienda planes cuando el usuario:
-  - Mencione necesidad específica de seguro
-  - Describa un objeto/situación que requiere protección  
-  - Pregunte directamente por opciones
-• Para saludos generales: responde amigablemente y pregunta qué le interesa
-• Mantén respuestas concisas (máximo 2-3 líneas)
-• Sé directo al mostrar recomendaciones
+ENFOQUE CONSULTIVO:
+• NUNCA muestres planes inmediatamente en consultas vagas o generales
+• Primero RECOPILA contexto relevante haciendo 2-3 preguntas específicas
+• Solo RECOMIENDA planes cuando tengas suficiente información del usuario
+
+CUÁNDO RECOPILAR MÁS CONTEXTO:
+• Seguros de viaje: pregunta destino, duración, número de viajeros
+• Seguros de mascota: pregunta raza, edad, estado de salud
+• Seguros de auto: pregunta marca/modelo, uso, tipo de cobertura deseada
+• Seguros de salud: pregunta tipo de cobertura, necesidades, si es familiar
+
+CUÁNDO MOSTRAR PLANES:
+• Solo cuando el usuario haya proporcionado detalles específicos
+• Cuando responda preguntas de seguimiento sobre planes ya mostrados
+• Cuando sea una consulta muy específica con contexto claro
 
 ESTILO DE RESPUESTA:
-• Conciso y directo
-• Amigable pero profesional
-• Enfocado en soluciones`;
+• Profesional y consultivo como un asesor real
+• Haz preguntas relevantes para entender necesidades
+• Explica brevemente por qué necesitas esa información`;
 
   // Add enriched context from knowledge base
   if (userMessage) {
