@@ -1167,6 +1167,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // RSS feed for blog posts (public)
   app.get("/api/blog/rss", async (req, res) => {
+    console.log("RSS feed endpoint called");
     try {
       // Fetch published blog posts
       const result = await pool.query(`
