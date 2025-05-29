@@ -1,0 +1,66 @@
+Great — since the Briki AI is now running and partially functional, but we’ve observed lingering issues (like insurance cards not rendering properly or context being forgotten), we should ask the agent a targeted diagnostic set of questions. Here’s a structured block you can use to guide the agent’s next validation steps:
+
+⸻
+
+🧠 Briki AI – Targeted Diagnostic Questions for Agent
+
+Hi, I need your help performing a final set of validations to ensure the Briki AI Assistant is working end-to-end. Please only diagnose, don’t edit any files yet. Here are the questions:
+
+⸻
+
+1. 🧩 API Connection & Response Validation
+	•	Does the /api/ai/ask endpoint return suggestedPlans with the correct structure expected by the frontend?
+	•	Please share a sample payload.
+	•	If not, what fields are missing or misnamed?
+
+⸻
+
+2. 📤 Plan Suggestion Output
+	•	When the user sends a message like “Necesito seguro de viaje para Europa”, is the backend returning:
+	•	A message response?
+	•	A list of relevant plans inside suggestedPlans?
+	•	Are the plans being filtered by the correct insurance category?
+
+⸻
+
+3. 📚 Context Accumulation
+	•	Does the function extractContextFromMessage() preserve previous user context or overwrite it?
+	•	If it resets, what should be changed?
+	•	Is the formatUserContext() function actually injecting that context into the system message correctly?
+
+⸻
+
+4. 🧠 Memory & Conversation Flow
+	•	After showing plans once, if the user says ”¿Cuál es el mejor plan?”, does the AI remember which plans were already suggested?
+	•	Is the assistant including its own previous messages in the conversationHistory sent to OpenAI?
+	•	If not, why?
+
+⸻
+
+5. 🖼 Rendering & Conditional Logic
+	•	Is the component <SuggestedPlans /> receiving the suggestedPlans prop when appropriate?
+	•	If not, is it due to a null/undefined or empty value?
+	•	Is the rendering condition in the NewBrikiAssistant.tsx working correctly?
+
+{!isUser && message.suggestedPlans && message.suggestedPlans.length > 0}
+
+
+
+⸻
+
+6. 🧪 Logging & Debugging Support
+	•	Can you confirm that logging is active for:
+	•	Number of plans detected
+	•	When intent is matched
+	•	When fallback logic is used
+
+⸻
+
+Once you’ve reviewed each of these, please summarize:
+✅ What’s confirmed working
+🚨 What still needs fixing
+📌 What you recommend we improve next
+
+⸻
+
+Let me know if you want this in Spanish or want to send it now.
