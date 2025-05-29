@@ -73,9 +73,10 @@ const NewBrikiAssistant: React.FC = () => {
     // Hide welcome card on first real message
     setShowWelcomeCard(false);
 
-    // FIXED: Accumulate context across multiple turns
+    // Accumulate context across multiple turns - preserve all previous context
     const newContext = extractContextFromMessage(messageToSend, userContext);
-    setUserContext(prev => ({ ...prev, ...newContext })); // Merge instead of replace
+    const mergedContext = { ...userContext, ...newContext };
+    setUserContext(mergedContext);
 
     // Create user message
     const userMessage: Message = {
@@ -99,19 +100,19 @@ const NewBrikiAssistant: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // FIXED: Enhanced conversation history with plan memory
+      // Enhanced conversation history with plan memory preservation
       const conversationHistory: APIMessage[] = messages
         .filter(msg => !msg.isLoading && msg.id !== 'welcome-msg')
         .map(msg => {
           if (msg.role === 'assistant' && msg.suggestedPlans && msg.suggestedPlans.length > 0) {
-            // FIXED: Include detailed plan context for memory
+            // Include detailed plan context for memory with proper formatting
             const planDetails = msg.suggestedPlans.map(plan => 
-              `${plan.name} (${plan.provider}) - $${plan.basePrice}`
+              `${plan.name} de ${plan.provider} por ${plan.basePrice} ${plan.currency}`
             ).join(', ');
             
             return {
               role: msg.role,
-              content: `${msg.content}\n\n[Planes recomendados: ${planDetails}]`
+              content: `${msg.content}\n\n[Planes previamente recomendados: ${planDetails}]`
             };
           }
           return {
@@ -120,19 +121,24 @@ const NewBrikiAssistant: React.FC = () => {
           };
         });
 
-      // FIXED: Enhanced context injection
-      const contextEntries = Object.entries(newContext).filter(([_, value]) => value);
+      // Enhanced context injection - preserve accumulated user context
+      const contextEntries = Object.entries(mergedContext).filter(([_, value]) => value);
       if (contextEntries.length > 0) {
         const contextText = contextEntries.map(([key, value]) => {
           if (typeof value === 'object') {
-            return `${key}: ${JSON.stringify(value)}`;
+            // Format nested objects better for AI context
+            const formattedObject = Object.entries(value)
+              .filter(([_, v]) => v)
+              .map(([k, v]) => `${k}: ${v}`)
+              .join(', ');
+            return `${key}: {${formattedObject}}`;
           }
           return `${key}: ${value}`;
         }).join(', ');
         
         conversationHistory.unshift({
           role: 'system',
-          content: `Contexto acumulado del usuario: ${contextText}`
+          content: `Contexto acumulado del usuario: ${contextText}. Usa esta información para dar respuestas más personalizadas y recordar planes previamente sugeridos.`
         } as APIMessage);
       }
 

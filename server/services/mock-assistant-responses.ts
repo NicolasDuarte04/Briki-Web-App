@@ -46,7 +46,8 @@ export function generateMockResponse(
   // Primero verificar si el usuario realmente quiere recomendaciones de seguros
   if (!shouldShowInsurancePlans(query)) {
     return {
-      message: "¡Hola! 👋 Soy Briki, tu asistente de seguros. Estoy aquí para ayudarte a encontrar la protección perfecta para lo que más te importa. ¿En qué puedo ayudarte? ¿Tienes algo específico que te gustaría asegurar?"
+      message: "¡Hola! Soy Briki, tu asistente de seguros. Estoy aquí para ayudarte a encontrar la protección perfecta para lo que más te importa. ¿En qué puedo ayudarte? ¿Tienes algo específico que te gustaría asegurar?",
+      suggestedPlans: []
     };
   }
 
@@ -107,7 +108,7 @@ export function generateMockResponse(
 
   return {
     message,
-    suggestedPlans: relevantPlans.length > 0 ? relevantPlans : undefined
+    suggestedPlans: relevantPlans.length > 0 ? relevantPlans : []
   };
 }
 

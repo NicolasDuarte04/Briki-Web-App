@@ -1,0 +1,50 @@
+Here’s a well-structured diagnostic prompt to ask the agent the necessary questions and identify what might be causing Briki AI to:
+	1.	Not render insurance cards properly, and
+	2.	Restart or reset the chat after showing recommendations.
+
+⸻
+
+🛠 Briki AI Assistant – Diagnostic Questions Prompt
+
+Hi, we’re noticing two critical issues with the Briki AI Assistant and need help identifying the root causes. Please answer the following questions thoroughly without making any code changes yet — we’ll ask for implementations separately.
+
+⸻
+
+🔍 Problem 1: Insurance Cards Not Rendering Properly
+
+Symptoms:
+	•	User messages that should trigger plan recommendations (e.g., “Necesito un seguro de viaje para Europa”) are received.
+	•	The assistant responds, but insurance plan cards are not shown, or they appear inconsistently.
+
+Questions:
+	1.	Could there be a mismatch between the suggestedPlans array returned from the backend and the structure expected in <SuggestedPlans plans={...} />?
+	2.	Is the suggestedPlans field present and populated in the assistant’s response object?
+	3.	Is the render condition in NewBrikiAssistant.tsx:
+
+{!isUser && message.suggestedPlans && message.suggestedPlans.length > 0}
+
+ever failing due to data format issues, undefined values, or serialization problems?
+
+	4.	Are there recent changes in how plan objects are structured (e.g., missing required props like id, title, price, etc.) that might be silently breaking rendering?
+
+⸻
+
+🔄 Problem 2: Assistant Resets or Forgets Context
+
+Symptoms:
+	•	After showing suggested plans once, the assistant “forgets” the context or resets, treating follow-up messages like “¿Cuál es mejor?” as if the user had said something unrelated.
+
+Questions:
+	1.	Is conversationHistory being built correctly to include both:
+	•	The assistant’s previous response including plan suggestions
+	•	The user’s previous messages?
+	2.	Are we accidentally resetting userContext or messages state at any point during a new message cycle?
+	3.	Is there any chance that a re-render or unexpected useEffect is clearing the message array or suggestedPlans after each interaction?
+	4.	Could there be a bug in formatUserContext() or extractContextFromMessage() that’s unintentionally wiping previous context?
+	5.	Are you injecting suggestedPlans or references to previously recommended plans into the system prompt or assistant message history?
+
+⸻
+
+Please review and answer all the above to help us understand exactly where things are breaking. Once we know the answers, we’ll proceed with targeted fixes.
+
+Let me know once your diagnosis is complete.

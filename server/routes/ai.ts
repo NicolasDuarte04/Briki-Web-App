@@ -65,9 +65,10 @@ router.post('/ask', async (req, res) => {
       // Generar una respuesta personalizada basada en el mensaje y los planes relevantes
       const mockResponse = generateMockResponse(categoryToUse, message, relevantPlans);
       
+      // Ensure consistent response structure
       return res.json({
         message: mockResponse.message,
-        suggestedPlans: mockResponse.suggestedPlans
+        suggestedPlans: mockResponse.suggestedPlans || []
       });
     }
   } catch (error: any) {
