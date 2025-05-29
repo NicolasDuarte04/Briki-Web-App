@@ -1,11 +1,19 @@
 import OpenAI from "openai";
-import { MockInsurancePlan, createEnrichedContext, loadMockInsurancePlans } from "../data-loader";
-import { storage } from "../storage";
+import {
+  MockInsurancePlan,
+  createEnrichedContext,
+  loadMockInsurancePlans,
+} from "../data-loader";
 
 // Initialize the OpenAI client with API key from environment variables
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+// the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
 const DEFAULT_MODEL = process.env.OPENAI_MODEL || "gpt-4o";
 
+/**
+ * Interfaces for AI Assistant
+ */
 export interface AssistantMessage {
   role: "user" | "assistant" | "system";
   content: string;
@@ -17,86 +25,120 @@ export interface AssistantResponse {
 }
 
 /**
- * FIXED: Enhanced generateAssistantResponse with real plan integration
+ * Enhanced generateAssistantResponse with follow-up question support
  */
 export async function generateAssistantResponse(
   userMessage: string,
   conversationHistory: AssistantMessage[] = [],
   insurancePlans: MockInsurancePlan[] = [],
-  userCountry: string = 'Colombia'
+  userCountry: string = "Colombia",
 ): Promise<AssistantResponse> {
   const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-  console.log(`[OpenAI][${requestId}] Starting request with real data integration:`, {
-    messageLength: userMessage.length,
-    historyLength: conversationHistory.length,
-    userCountry,
-    timestamp: new Date().toISOString()
-  });
+  console.log(
+    `[OpenAI][${requestId}] Starting request with follow-up support:`,
+    {
+      messageLength: userMessage.length,
+      historyLength: conversationHistory.length,
+      userCountry,
+      timestamp: new Date().toISOString(),
+    },
+  );
 
   try {
-    // FIXED: Get real plans from storage
+    // Get real plans from insurance data service
     let allPlans: MockInsurancePlan[] = [];
-    
     try {
-      allPlans = await storage.getAllInsurancePlans();
-      console.log(`[OpenAI][${requestId}] Successfully loaded ${allPlans.length} real insurance plans`);
-    } catch (dataError) {
-      console.error(`[OpenAI][${requestId}] Failed to load real plans, falling back to loadMockInsurancePlans:`, dataError);
+      const { insuranceDataService } = await import("./insurance-data-service.js");
+      allPlans = await insuranceDataService.getAllPlans();
+      console.log(`[OpenAI][${requestId}] Successfully loaded ${allPlans.length} insurance plans from dynamic service`);
+    } catch (error) {
+      // Fallback to static data loader
       allPlans = loadMockInsurancePlans();
+      console.log(`[OpenAI][${requestId}] Using fallback data loader, loaded ${allPlans.length} plans`);
     }
 
     // Filter and get relevant plans
     const filteredPlans = filterPlansByCountry(allPlans, userCountry);
     const relevantPlans = getTopRelevantPlans(userMessage, filteredPlans, 6);
 
-    // FIXED: Enhanced system prompt with real plan data and memory context
+    // Enhanced system prompt with real plan data and memory context
     const systemMessage: AssistantMessage = {
       role: "system",
-      content: createSystemPrompt(relevantPlans, userMessage, conversationHistory)
+      content: createSystemPrompt(
+        relevantPlans,
+        userMessage,
+        conversationHistory,
+      ),
     };
 
-    // FIXED: Check OpenAI availability and fallback logic
+    // Check OpenAI availability and fallback logic
     if (!process.env.OPENAI_API_KEY) {
       console.warn(`[OpenAI][${requestId}] No API key configured, using fallback response`);
-      return await getMockResponse(userMessage, relevantPlans);
+      const fallbackMessage = `¡Hola! Soy Briki, tu asistente de seguros. Entiendo que estás preguntando sobre: "${userMessage}". Te puedo ayudar con información sobre seguros y recomendarte los mejores planes disponibles.`;
+      return {
+        message: fallbackMessage,
+        suggestedPlans: relevantPlans.slice(0, 3),
+      };
     }
 
     // Combine history with current message
     const messages: AssistantMessage[] = [
       systemMessage,
       ...conversationHistory,
-      { role: "user", content: userMessage }
+      { role: "user", content: userMessage },
     ];
 
     const startTime = Date.now();
-    
-    // FIXED: Call OpenAI with proper error handling
+
+    // Call OpenAI with proper error handling
     const response = await callOpenAIWithRetry(messages);
-    
+
     const endTime = Date.now();
     const responseTime = endTime - startTime;
 
-    const assistantMessage = response.choices[0].message.content || "Lo siento, no pude generar una respuesta.";
+    const assistantMessage =
+      response.choices[0].message.content ||
+      "Lo siento, no pude generar una respuesta.";
 
-    // Enhanced insurance intent detection
+    // Enhanced insurance intent detection with follow-up question support
     let suggestedPlans: MockInsurancePlan[] = [];
-    if (shouldShowInsurancePlans(userMessage)) {
+    
+    // Check if this is a follow-up question about previously suggested plans
+    const previousPlans = extractPreviousPlansFromHistory(conversationHistory);
+    const isFollowUp = isFollowUpQuestion(userMessage) && previousPlans.length > 0;
+    
+    if (isFollowUp) {
+      // For follow-up questions, reattach the previously suggested plans
+      suggestedPlans = previousPlans;
+      console.log(`[OpenAI][${requestId}] Follow-up question detected, reattaching ${suggestedPlans.length} previous plans`);
+    } else if (shouldShowInsurancePlans(userMessage)) {
+      // For new insurance requests, find relevant plans
       suggestedPlans = findRelevantPlans(userMessage, relevantPlans);
       console.log(`[OpenAI][${requestId}] Insurance intent detected, found ${suggestedPlans.length} relevant plans`);
     }
 
-    console.log(`[OpenAI][${requestId}] Request completed successfully in ${responseTime}ms`);
+    // Log success with detailed metrics
+    console.log(`[OpenAI][${requestId}] Success:`, {
+      model: DEFAULT_MODEL,
+      responseTime: `${responseTime}ms`,
+      tokensUsed: response.usage?.total_tokens || 0,
+      promptTokens: response.usage?.prompt_tokens || 0,
+      completionTokens: response.usage?.completion_tokens || 0,
+      responseLength: assistantMessage.length,
+      plansFound: suggestedPlans.length,
+      isFollowUp: isFollowUp,
+      timestamp: new Date().toISOString(),
+    });
 
     return {
       message: assistantMessage,
-      suggestedPlans: suggestedPlans.length > 0 ? suggestedPlans : undefined
+      suggestedPlans: suggestedPlans.length > 0 ? suggestedPlans : undefined,
     };
-
-  } catch (error) {
+  } catch (error: any) {
     console.error(`[OpenAI][${requestId}] OpenAI request failed, using fallback:`, error);
     
-    // FIXED: Fallback only when OpenAI is actually unreachable
+    // Fallback only when OpenAI is actually unreachable
     const allPlans = loadMockInsurancePlans();
     const relevantPlans = getTopRelevantPlans(userMessage, allPlans, 6);
     
@@ -105,108 +147,236 @@ export async function generateAssistantResponse(
 }
 
 /**
- * FIXED: Enhanced system prompt creation with memory context
+ * Detect if the user message is a follow-up question about previously suggested plans
  */
-function createSystemPrompt(
-  availablePlans: MockInsurancePlan[], 
-  currentMessage: string, 
-  conversationHistory: AssistantMessage[]
-): string {
-  // Extract previously recommended plans from conversation history
-  const previousPlans = extractPreviousPlansFromHistory(conversationHistory);
+function isFollowUpQuestion(message: string): boolean {
+  const lowerMessage = message.toLowerCase().trim();
   
-  const systemPrompt = `Eres Briki, un asistente especializado en seguros para Colombia. Tu objetivo es ayudar a los usuarios a encontrar la protección perfecta mediante recomendaciones personalizadas e inteligentes.
-
-MEMORIA DE CONVERSACIÓN:
-${previousPlans.length > 0 ? `Planes previamente recomendados: ${previousPlans.join(', ')}` : 'Primera interacción con el usuario'}
-
-PLANES DISPONIBLES (${availablePlans.length}):
-${availablePlans.map(plan => 
-  `- ${plan.name} (${plan.provider}): ${plan.description} - $${plan.basePrice}/${plan.duration} - Cobertura: $${plan.coverageAmount}`
-).join('\n')}
-
-INSTRUCCIONES:
-1. Mantén el contexto de planes previamente mostrados
-2. Responde de manera conversacional y amigable en español
-3. Haz preguntas específicas para entender las necesidades del usuario
-4. Recomienda planes específicos cuando sea apropiado
-5. Explica claramente por qué recomiendas cada plan
-6. Si el usuario pregunta sobre planes anteriores, refiérete a ellos específicamente
-
-CONTEXTO ACTUAL: ${currentMessage}`;
-
-  return systemPrompt;
+  const followUpPatterns = [
+    // Comparison questions
+    /cuál es (el )?mejor/,
+    /cuál (me )?recomienda/,
+    /qué (me )?recomienda/,
+    /cuál es (la )?diferencia/,
+    /cuál conviene/,
+    /entre (esos|estos)/,
+    
+    // Clarification questions
+    /qué incluye/,
+    /qué cubre/,
+    /cuánto cuesta/,
+    /precio/,
+    /cobertura/,
+    
+    // Choice questions
+    /el primero/,
+    /el segundo/,
+    /el tercero/,
+    /el último/,
+    /ese plan/,
+    /esa opción/,
+    
+    // Generic follow-ups
+    /más información/,
+    /más detalles/,
+    /explica/,
+    /compara/,
+  ];
+  
+  return followUpPatterns.some(pattern => pattern.test(lowerMessage));
 }
 
 /**
- * FIXED: Extract previously recommended plans from conversation
+ * Extract previously suggested plans from conversation history
  */
-function extractPreviousPlansFromHistory(history: AssistantMessage[]): string[] {
-  const planPattern = /\[Planes recomendados: ([^\]]+)\]/g;
-  const previousPlans: string[] = [];
-  
-  history.forEach(message => {
-    if (message.role === 'assistant') {
-      let match;
-      while ((match = planPattern.exec(message.content)) !== null) {
-        previousPlans.push(match[1]);
+function extractPreviousPlansFromHistory(history: AssistantMessage[]): MockInsurancePlan[] {
+  // Look for the most recent assistant message that mentions plans
+  for (let i = history.length - 1; i >= 0; i--) {
+    const message = history[i];
+    if (message.role === 'assistant' && message.content.includes('[Planes previamente recomendados:')) {
+      // Extract plan names from the formatted string
+      const planMatch = message.content.match(/\[Planes previamente recomendados: ([^\]]+)\]/);
+      if (planMatch) {
+        const planString = planMatch[1];
+        // Parse plan names and try to match them with available plans
+        return parsePlansFromString(planString);
       }
     }
-  });
-  
-  return previousPlans;
+  }
+  return [];
 }
 
-// Helper functions
-function filterPlansByCountry(plans: MockInsurancePlan[], country: string): MockInsurancePlan[] {
-  return plans; // For now, return all plans as they're for Colombia
-}
-
-function getTopRelevantPlans(message: string, plans: MockInsurancePlan[], limit: number): MockInsurancePlan[] {
-  const lowerMessage = message.toLowerCase();
-  
-  // Simple relevance scoring based on keywords
-  const scoredPlans = plans.map(plan => {
-    let score = 0;
+/**
+ * Parse plan information from formatted string and return plan objects
+ */
+function parsePlansFromString(planString: string): MockInsurancePlan[] {
+  try {
+    // Load all available plans to match against
+    const allPlans = loadMockInsurancePlans();
+    const extractedPlans: MockInsurancePlan[] = [];
     
-    // Category matching
-    if (lowerMessage.includes('viaje') || lowerMessage.includes('travel')) {
-      if (plan.category === 'travel') score += 10;
-    }
-    if (lowerMessage.includes('auto') || lowerMessage.includes('carro')) {
-      if (plan.category === 'auto') score += 10;
-    }
-    if (lowerMessage.includes('mascota') || lowerMessage.includes('pet')) {
-      if (plan.category === 'pet') score += 10;
-    }
-    if (lowerMessage.includes('salud') || lowerMessage.includes('health')) {
-      if (plan.category === 'health') score += 10;
-    }
+    // Split by commas and extract plan names
+    const planEntries = planString.split(', ');
     
-    // Feature matching
-    plan.features.forEach(feature => {
-      if (lowerMessage.includes(feature.toLowerCase())) {
-        score += 2;
+    for (const entry of planEntries) {
+      // Extract plan name (everything before " de ")
+      const nameMatch = entry.match(/^([^(]+?)\s+de\s+/);
+      if (nameMatch) {
+        const planName = nameMatch[1].trim();
+        // Find matching plan in available plans
+        const matchingPlan = allPlans.find(plan => 
+          plan.name.toLowerCase().includes(planName.toLowerCase()) ||
+          planName.toLowerCase().includes(plan.name.toLowerCase())
+        );
+        if (matchingPlan) {
+          extractedPlans.push(matchingPlan);
+        }
       }
-    });
+    }
     
-    return { plan, score };
-  });
-  
-  return scoredPlans
+    return extractedPlans;
+  } catch (error) {
+    console.warn('Error parsing plans from string:', error);
+    return [];
+  }
+}
+
+/**
+ * Filter insurance plans by user's country
+ */
+function filterPlansByCountry(
+  plans: MockInsurancePlan[],
+  country: string,
+): MockInsurancePlan[] {
+  // For now, return all plans as eligibility is handled elsewhere
+  return plans;
+}
+
+/**
+ * Get top relevant plans based on user message with scoring
+ */
+function getTopRelevantPlans(
+  userMessage: string,
+  plans: MockInsurancePlan[],
+  limit: number,
+): MockInsurancePlan[] {
+  if (!plans.length) return [];
+
+  const scored = plans.map((plan) => ({
+    plan,
+    score: calculateRelevanceScore(userMessage, plan),
+  }));
+
+  return scored
     .sort((a, b) => b.score - a.score)
     .slice(0, limit)
-    .map(item => item.plan);
+    .map((item) => item.plan);
 }
 
-function shouldShowInsurancePlans(message: string): boolean {
-  const lowerMessage = message.toLowerCase();
-  const insuranceKeywords = [
-    'seguro', 'plan', 'protección', 'cobertura', 'poliza',
-    'viaje', 'auto', 'mascota', 'salud', 'recomienda'
+/**
+ * Calculate relevance score for a plan based on user message
+ */
+function calculateRelevanceScore(
+  userMessage: string,
+  plan: MockInsurancePlan,
+): number {
+  const message = userMessage.toLowerCase();
+  let score = 0;
+
+  // Category matching
+  if (message.includes(plan.category)) score += 10;
+
+  // Name and description matching
+  const searchText = `${plan.name} ${plan.description}`.toLowerCase();
+  const messageWords = message.split(/\s+/);
+
+  messageWords.forEach((word) => {
+    if (word.length > 2 && searchText.includes(word)) {
+      score += 2;
+    }
+  });
+
+  // Feature matching
+  plan.features.forEach((feature) => {
+    const featureWords = feature.toLowerCase().split(/\s+/);
+    featureWords.forEach((word) => {
+      if (word.length > 2 && message.includes(word)) {
+        score += 1;
+      }
+    });
+  });
+
+  // Tag matching
+  plan.tags.forEach((tag) => {
+    if (message.includes(tag.toLowerCase())) {
+      score += 3;
+    }
+  });
+
+  return score;
+}
+
+/**
+ * Enhanced system prompt creation with memory context
+ */
+function createSystemPrompt(
+  plans: MockInsurancePlan[],
+  userMessage: string,
+  conversationHistory: AssistantMessage[],
+): string {
+  const plansContext = plans.length > 0 
+    ? `\n\nPlanes disponibles relevantes:\n${plans.map(plan => 
+        `- ${plan.name} (${plan.provider}): ${plan.description} - $${plan.basePrice} ${plan.currency}`
+      ).join('\n')}`
+    : '';
+
+  const memoryContext = conversationHistory.length > 0
+    ? `\n\nContexto de conversación: El usuario ya ha tenido una conversación previa. Mantén coherencia con las recomendaciones anteriores.`
+    : '';
+
+  return `Eres Briki, un asistente experto en seguros de Colombia. 
+
+Tu personalidad:
+- Amigable, confiable y profesional
+- Hablas en español colombiano de manera natural
+- Explicas conceptos complejos de forma simple
+- Siempre priorizas las necesidades específicas del usuario
+
+Tu objetivo: Ayudar a los usuarios a encontrar el seguro perfecto para sus necesidades específicas.
+
+Instrucciones importantes:
+1. Responde en español de manera conversacional y amigable
+2. Haz preguntas específicas para entender mejor las necesidades
+3. Recomienda solo planes que realmente se ajusten al perfil del usuario
+4. Explica los beneficios de manera clara sin jerga técnica
+5. Si hay planes específicos disponibles, menciona las diferencias clave
+
+${plansContext}${memoryContext}
+
+Responde de manera útil y conversacional.`;
+}
+
+/**
+ * Check if we should show insurance plans for this message
+ */
+function shouldShowInsurancePlans(userMessage: string): boolean {
+  const message = userMessage.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  
+  // Greetings and general conversation - NO show plans
+  const greetings = ['hola', 'hello', 'hi', 'buenas', 'buenos dias', 'buenas tardes', 'como estas', 'que tal', 'saludos'];
+  if (greetings.some(greeting => message.includes(greeting)) && message.length < 50) {
+    return false;
+  }
+  
+  // Words that indicate insurance need - YES show plans
+  const insuranceIntentKeywords = [
+    'seguro', 'seguros', 'asegurar', 'proteger', 'cobertura', 'proteccion',
+    'compre', 'tengo un', 'tengo una', 'mi carro', 'mi auto', 'mi perro', 'mi gato',
+    'viajo', 'viaje', 'viajar', 'vacaciones', 'mascota', 'vespa', 'moto', 'vehiculo',
+    'necesito', 'busco', 'quiero', 'recomienda', 'opciones', 'planes'
   ];
   
-  return insuranceKeywords.some(keyword => lowerMessage.includes(keyword));
+  return insuranceIntentKeywords.some(keyword => message.includes(keyword));
 }
 
 function findRelevantPlans(message: string, plans: MockInsurancePlan[]): MockInsurancePlan[] {
@@ -238,22 +408,7 @@ async function callOpenAIWithRetry(messages: AssistantMessage[]): Promise<any> {
   throw lastError;
 }
 
-async function getMockResponse(message: string, relevantPlans: MockInsurancePlan[] = []): Promise<AssistantResponse> {
-  console.warn('[OpenAI] Using mock response due to service unavailability');
-  
-  const lowerMessage = message.toLowerCase();
-  
-  if (lowerMessage.includes('seguro') || lowerMessage.includes('plan') || lowerMessage.includes('protección')) {
-    const plans = relevantPlans.length > 0 ? relevantPlans.slice(0, 3) : [];
-    
-    return {
-      message: `Entiendo que buscas información sobre seguros. Basándome en tu consulta, puedo recomendarte algunos planes. ${plans.length > 0 ? `He seleccionado ${plans.length} opciones que podrían interesarte.` : 'Para darte recomendaciones más específicas, ¿podrías decirme qué tipo de seguro necesitas?'}`,
-      suggestedPlans: plans
-    };
-  }
-  
-  return {
-    message: "Hola, soy Briki y estoy aquí para ayudarte con seguros. ¿En qué puedo asistirte hoy?",
-    suggestedPlans: []
-  };
+async function getMockResponse(userMessage: string, relevantPlans: MockInsurancePlan[]): Promise<AssistantResponse> {
+  const { generateMockResponse } = await import("./mock-assistant-responses.js");
+  return generateMockResponse(undefined, userMessage, relevantPlans);
 }
