@@ -41,13 +41,14 @@ const PlanCard: React.FC<PlanCardProps> = ({
 }) => {
   // Generar etiqueta según las características del plan
   const getBadge = () => {
-    if (plan.tags.includes('premium') || plan.tags.includes('exclusivo')) {
+    const tags = plan.tags || [];
+    if (tags.includes('premium') || tags.includes('exclusivo')) {
       return { text: 'Premium', variant: 'default' };
     }
-    if (plan.tags.includes('económico') || plan.tags.includes('básico')) {
+    if (tags.includes('económico') || tags.includes('básico')) {
       return { text: 'Económico', variant: 'secondary' };
     }
-    if (plan.tags.includes('completo')) {
+    if (tags.includes('completo')) {
       return { text: 'Completo', variant: 'outline' };
     }
     return null;
@@ -59,17 +60,18 @@ const PlanCard: React.FC<PlanCardProps> = ({
   };
 
   // Obtener características destacadas (máximo 3)
-  const highlightedFeatures = plan.features.slice(0, 3);
+  const highlightedFeatures = (plan.features || []).slice(0, 3);
 
   // Verificar si el plan es para un tipo específico
   const isSpecificPlan = () => {
-    if (plan.tags.includes('scooter') || plan.tags.includes('vespa') || plan.tags.includes('moto ligera')) {
+    const tags = plan.tags || [];
+    if (tags.includes('scooter') || tags.includes('vespa') || tags.includes('moto ligera')) {
       return 'Especial para scooters/motos';
     }
-    if (plan.tags.includes('familia') || plan.tags.includes('familiar')) {
+    if (tags.includes('familia') || tags.includes('familiar')) {
       return 'Plan familiar';
     }
-    if (plan.tags.includes('latinoamérica') || plan.tags.includes('latam')) {
+    if (tags.includes('latinoamérica') || tags.includes('latam')) {
       return 'Especializado Latinoamérica';
     }
     return null;
