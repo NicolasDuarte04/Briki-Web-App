@@ -1165,6 +1165,87 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // RSS feed for blog posts (public)
+  app.get("/api/blog/rss", async (req, res) => {
+    try {
+      // Fetch published blog posts
+      const result = await pool.query(`
+        SELECT 
+          bp.id,
+          bp.title,
+          bp.slug,
+          bp.excerpt,
+          bp.content,
+          bp.published_at,
+          bp.author,
+          bc.name as category_name,
+          ARRAY_AGG(bt.name) FILTER (WHERE bt.name IS NOT NULL) as tags
+        FROM blog_posts bp
+        LEFT JOIN blog_categories bc ON bp.category_id = bc.id
+        LEFT JOIN blog_post_tags bpt ON bp.id = bpt.post_id
+        LEFT JOIN blog_tags bt ON bpt.tag_id = bt.id
+        WHERE bp.status = 'published'
+        GROUP BY bp.id, bp.title, bp.slug, bp.excerpt, bp.content, bp.published_at, bp.author, bc.name
+        ORDER BY bp.published_at DESC
+        LIMIT 50
+      `);
+
+      const posts = result.rows;
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      const currentDate = new Date().toUTCString();
+
+      // Generate RSS 2.0 XML
+      const rssXml = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Briki Insurance Blog</title>
+    <link>${baseUrl}/blog</link>
+    <description>Stay informed with the latest insights on travel, auto, pet, and health insurance from Briki.</description>
+    <language>en-us</language>
+    <lastBuildDate>${currentDate}</lastBuildDate>
+    <generator>Briki Insurance Platform</generator>
+    <webMaster>info@briki.com</webMaster>
+    <managingEditor>info@briki.com</managingEditor>
+    <image>
+      <url>${baseUrl}/favicon.ico</url>
+      <title>Briki Insurance Blog</title>
+      <link>${baseUrl}/blog</link>
+    </image>
+${posts.map(post => {
+  const publishedDate = new Date(post.published_at).toUTCString();
+  const postUrl = `${baseUrl}/blog/${post.slug}`;
+  
+  // Clean content for RSS (remove HTML tags for description, keep for content:encoded)
+  const cleanExcerpt = post.excerpt ? post.excerpt.replace(/<[^>]*>/g, '') : '';
+  const cleanContent = post.content ? post.content : '';
+  
+  return `    <item>
+      <title><![CDATA[${post.title}]]></title>
+      <link>${postUrl}</link>
+      <guid isPermaLink="true">${postUrl}</guid>
+      <description><![CDATA[${cleanExcerpt}]]></description>
+      <content:encoded><![CDATA[${cleanContent}]]></content:encoded>
+      <pubDate>${publishedDate}</pubDate>
+      <dc:creator><![CDATA[${post.author || 'Briki Team'}]]></dc:creator>
+      ${post.category_name ? `<category><![CDATA[${post.category_name}]]></category>` : ''}
+      ${post.tags && post.tags.length > 0 ? post.tags.map(tag => `<category><![CDATA[${tag}]]></category>`).join('\n      ') : ''}
+    </item>`;
+}).join('\n')}
+  </channel>
+</rss>`;
+
+      res.set({
+        'Content-Type': 'application/rss+xml; charset=utf-8',
+        'Cache-Control': 'public, max-age=3600' // Cache for 1 hour
+      });
+      
+      res.send(rssXml);
+    } catch (error: any) {
+      console.error("Error generating RSS feed:", error);
+      res.status(500).json({ error: "Failed to generate RSS feed" });
+    }
+  });
+
   // ========== ADMIN BLOG ROUTES ==========
 
   // Admin middleware for blog management
