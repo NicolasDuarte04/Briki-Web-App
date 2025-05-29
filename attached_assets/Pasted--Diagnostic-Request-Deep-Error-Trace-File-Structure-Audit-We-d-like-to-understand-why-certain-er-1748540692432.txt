@@ -1,0 +1,29 @@
+ Diagnostic Request: Deep Error Trace & File Structure Audit
+
+We’d like to understand why certain errors and inconsistencies keep appearing across the Briki app — especially:
+
+❓ Key Questions:
+	1.	Navbar Duplication – What files/components are currently responsible for rendering <Navbar />? Are any pages importing it manually instead of relying on layout components?
+	2.	Floating Assistant Widget – Where is the floating chat assistant injected into the app? Is it hardcoded into a layout, globally injected in App.tsx, or imported inside specific pages?
+	3.	Broken Blog Article Pages – Now that we have /blog/[slug], what caused the undefined is not an object (evaluating 'post.tags.map') error? Can you trace the file and line where that runtime failure originated?
+	4.	Layout Overload – The dashboard page the user lands on after clicking “Pre-Test the App” feels too heavy for unauthenticated users. Which layout and which component tree renders this page? Can we simplify or split it?
+	5.	Page Rendering Failures – Are there any legacy files, unregistered routes, or misconfigured imports that could be causing 404s or slow load times?
+	6.	File Structure Conflicts – Are there any leftover files, shadow imports, or duplicated logic (mock vs. real data, mobile vs. desktop folders) that could be interfering with current functionality?
+	7.	Unused or Overlapping Components – Are there components that exist in multiple versions (e.g. Navbar.tsx, NavbarPublic.tsx, NavbarMobile.tsx)? Which are being actively used and which should be deprecated?
+
+🔍 Request:
+
+Please run a full audit of file dependencies and render trees for the following key pages:
+	•	/ (Landing)
+	•	/ask-briki
+	•	/pricing
+	•	/dashboard
+	•	/blog
+	•	/blog/[slug]
+
+Let us know:
+	•	Which layout wraps them
+	•	Which nav/assistant/component variants are being rendered
+	•	Where potential conflicts or duplicated logic exist
+
+Once you send us that map and diagnosis, we’ll prioritize what to clean up next. Do not implement fixes yet — just trace and report.
