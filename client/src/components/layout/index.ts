@@ -1,8 +1,7 @@
 // Re-export components from public layouts
 export { ExploreLayout } from './public/explore-layout';
 
-// NOTE: OriginalExploreLayout is deprecated. Remove once migration is complete.
-export { ExploreLayout as OriginalExploreLayout } from './explore-layout';
+
 
 // Re-export components from authenticated layouts
 export { AuthenticatedLayout } from './authenticated-layout';
