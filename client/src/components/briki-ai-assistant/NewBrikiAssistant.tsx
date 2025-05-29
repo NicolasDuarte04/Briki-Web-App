@@ -125,9 +125,9 @@ const NewBrikiAssistant: React.FC = () => {
       const contextEntries = Object.entries(mergedContext).filter(([_, value]) => value);
       if (contextEntries.length > 0) {
         const contextText = contextEntries.map(([key, value]) => {
-          if (typeof value === 'object') {
+          if (typeof value === 'object' && value !== null) {
             // Format nested objects better for AI context
-            const formattedObject = Object.entries(value)
+            const formattedObject = Object.entries(value as Record<string, any>)
               .filter(([_, v]) => v)
               .map(([k, v]) => `${k}: ${v}`)
               .join(', ');
