@@ -123,6 +123,7 @@ function Router() {
         <Route path="/" component={LandingPage} />
         <Route path="/countdown" component={CountdownPageNew} />
         <Route path="/home" component={DashboardRouter} />
+        <Route path="/dashboard" component={DashboardRouter} />
         <Route path="/auth" component={AuthPage} />
         <Route path="/categories" component={InsuranceCategoriesPage} />
         <Route path="/trip-info" component={TripInfoPage} />
