@@ -105,9 +105,21 @@ export async function generateAssistantResponse(
       response.choices[0].message.content ||
       "Lo siento, no pude generar una respuesta.";
 
-    // Enhanced insurance intent detection
+    // Enhanced insurance intent detection with follow-up question support
     let suggestedPlans: MockInsurancePlan[] = [];
-    if (shouldShowInsurancePlans(userMessage)) {
+    
+    // Check if this is a follow-up question about previously suggested plans
+    const previousPlans = extractPreviousPlansFromHistory(conversationHistory);
+    const isFollowUp = isFollowUpQuestion(userMessage) && previousPlans.length > 0;
+    
+    if (isFollowUp) {
+      // For follow-up questions, reattach the previously suggested plans
+      suggestedPlans = previousPlans;
+      console.log(
+        `[OpenAI][${requestId}] Follow-up question detected, reattaching ${suggestedPlans.length} previous plans`,
+      );
+    } else if (shouldShowInsurancePlans(userMessage)) {
+      // For new insurance requests, find relevant plans
       suggestedPlans = findRelevantPlans(userMessage, relevantPlans);
       console.log(
         `[OpenAI][${requestId}] Insurance intent detected, found ${suggestedPlans.length} relevant plans`,
@@ -193,6 +205,101 @@ async function callOpenAIWithRetry(messages: any[], retries = 3): Promise<any> {
 }
 
 /**
+ * Detect if the user message is a follow-up question about previously suggested plans
+ */
+function isFollowUpQuestion(message: string): boolean {
+  const lowerMessage = message.toLowerCase().trim();
+  
+  const followUpPatterns = [
+    // Comparison questions
+    /cuál es (el )?mejor/,
+    /cuál (me )?recomienda/,
+    /qué (me )?recomienda/,
+    /cuál es (la )?diferencia/,
+    /cuál conviene/,
+    /entre (esos|estos)/,
+    
+    // Clarification questions
+    /qué incluye/,
+    /qué cubre/,
+    /cuánto cuesta/,
+    /precio/,
+    /cobertura/,
+    
+    // Choice questions
+    /el primero/,
+    /el segundo/,
+    /el tercero/,
+    /el último/,
+    /ese plan/,
+    /esa opción/,
+    
+    // Generic follow-ups
+    /más información/,
+    /más detalles/,
+    /explica/,
+    /compara/,
+  ];
+  
+  return followUpPatterns.some(pattern => pattern.test(lowerMessage));
+}
+
+/**
+ * Extract previously suggested plans from conversation history
+ */
+function extractPreviousPlansFromHistory(history: AssistantMessage[]): MockInsurancePlan[] {
+  // Look for the most recent assistant message that mentions plans
+  for (let i = history.length - 1; i >= 0; i--) {
+    const message = history[i];
+    if (message.role === 'assistant' && message.content.includes('[Planes previamente recomendados:')) {
+      // Extract plan names from the formatted string
+      const planMatch = message.content.match(/\[Planes previamente recomendados: ([^\]]+)\]/);
+      if (planMatch) {
+        const planString = planMatch[1];
+        // Parse plan names and try to match them with available plans
+        return parsePlansFromString(planString);
+      }
+    }
+  }
+  return [];
+}
+
+/**
+ * Parse plan information from formatted string and return plan objects
+ */
+function parsePlansFromString(planString: string): MockInsurancePlan[] {
+  try {
+    // Load all available plans to match against
+    const allPlans = loadMockInsurancePlans();
+    const extractedPlans: MockInsurancePlan[] = [];
+    
+    // Split by commas and extract plan names
+    const planEntries = planString.split(', ');
+    
+    for (const entry of planEntries) {
+      // Extract plan name (everything before " de ")
+      const nameMatch = entry.match(/^([^(]+?)\s+de\s+/);
+      if (nameMatch) {
+        const planName = nameMatch[1].trim();
+        // Find matching plan in available plans
+        const matchingPlan = allPlans.find(plan => 
+          plan.name.toLowerCase().includes(planName.toLowerCase()) ||
+          planName.toLowerCase().includes(plan.name.toLowerCase())
+        );
+        if (matchingPlan) {
+          extractedPlans.push(matchingPlan);
+        }
+      }
+    }
+    
+    return extractedPlans;
+  } catch (error) {
+    console.warn('Error parsing plans from string:', error);
+    return [];
+  }
+}
+
+/**
  * Filter insurance plans by user's country
  */
 function filterPlansByCountry(
@@ -200,12 +307,8 @@ function filterPlansByCountry(
   country: string,
 ): MockInsurancePlan[] {
   return plans.filter((plan) => {
-    // Check eligibility countries if available
-    if (plan.eligibility?.countries) {
-      return plan.eligibility.countries.includes(country);
-    }
-
-    // If no country restrictions, include all plans
+    // For now, return all plans as eligibility is handled elsewhere
+    // Country filtering can be enhanced later if needed
     return true;
   });
 }
