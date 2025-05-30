@@ -1,0 +1,58 @@
+Hola, ya finalizamos las 4 plantillas conversacionales necesarias para activar el nuevo flujo consultivo del asistente. Estas plantillas están diseñadas para funcionar con la lógica actual del sistema:
+
+✅ La detección de categoría ya está funcionando correctamente  
+✅ El análisis de contexto identifica la categoría y qué información falta  
+✅ El sistema espera recibir las preguntas necesarias antes de mostrar planes  
+
+A continuación te comparto las plantillas por categoría:
+
+---
+
+🧳 **Seguro de Viajes**  
+**Preguntas:**
+1. ¿A qué país o región viajas?
+2. ¿Cuál es la duración del viaje?
+3. ¿Viajas solo o acompañado?
+4. ¿Cuál es tu prioridad? (precio, cobertura médica, cancelaciones, etc.)
+5. ¿Tienes alguna condición médica que deba estar cubierta durante el viaje?
+
+---
+
+🐶 **Seguro para Mascotas**  
+**Preguntas:**
+1. ¿Qué tipo de mascota tienes? (perro, gato, otro)
+2. ¿Cuál es su raza y edad aproximada?
+3. ¿Tiene alguna condición médica preexistente?
+4. ¿Te interesa cobertura veterinaria básica, vacunas o emergencias?
+5. ¿Qué tan seguido visitas al veterinario?
+
+---
+
+🚗 **Seguro de Auto**  
+**Preguntas:**
+1. ¿Qué marca y modelo es tu vehículo?
+2. ¿En qué año fue fabricado?
+3. ¿Cuál es el uso principal? (personal, trabajo, Uber, etc.)
+4. ¿Tienes seguro actualmente o sería tu primera vez?
+5. ¿Prefieres un plan con cobertura total o algo más económico?
+
+---
+
+🏥 **Seguro de Salud / Familiar**  
+**Preguntas:**
+1. ¿Estás buscando un seguro solo para ti o también para tu familia?
+2. ¿Cuántas personas deseas incluir en el plan? ¿Podrías indicarme sus edades aproximadas?
+3. ¿Tú o alguien en tu familia tiene condiciones médicas preexistentes?
+4. ¿Qué nivel de cobertura estás buscando? (básica, hospitalización, internacional, etc.)
+5. ¿Te interesa un plan con acceso a una red específica de clínicas o médicos?
+
+---
+
+Cada plantilla está pensada para que el asistente la utilice **solo cuando detecte una categoría clara y cuando falte contexto suficiente para filtrar planes relevantes**. 
+
+¿Puedes encargarte ahora de integrarlas dentro del flujo conversacional, asegurando que:
+1. Se usen las preguntas apropiadas antes de mostrar resultados
+2. Se acumulen las respuestas en el userContext
+3. El sistema determine automáticamente cuándo ya hay suficiente información para mostrar los planes?
+
+Avísame si necesitas que te enviemos estas plantillas en otro formato o si te gustaría que te acompañemos en la integración paso a paso.
