@@ -218,57 +218,35 @@ function Router() {
     </PageTransition>
   );
 }
+
+/**
+ * Component that wraps the Router with AI Assistant only when appropriate
+ */
 function AppContent() {
   const { location } = useNavigation();
   const { user } = useAuth();
-
-  // Marketing/public pages that should render as-is (no layout wrapper)
-  const marketingRoutes = [
-    '/features', 
-    '/pricing', 
-    '/ask-briki', 
-    '/ask-briki-ai', 
-    '/blog', 
-    '/forum', 
-    '/careers', 
-    '/terms', 
-    '/privacy', 
-    '/contact',
-    '/color-palette'
-  ];
-
-  // Check if current path is a marketing route
-  const isMarketingRoute = marketingRoutes.some(route => 
-    location === route || location.startsWith(`${route}/`)
-  );
-
+  
   // Public app routes that don't require authentication
   const publicAppRoutes = ['/trip-info', '/get-quote', '/dashboard', '/insurance'];
   const isPublicAppRoute = publicAppRoutes.some(path => 
     location === path || location.startsWith(path)
   );
-
+  
   // List of paths where AI Assistant should NOT be provided
   const excludedPaths = ['/', '/auth', '/countdown', '/login', '/register', '/terms', '/learn-more', '/landing', '/ask-briki', '/ask-briki-ai'];
   const isExcludedPath = excludedPaths.some(path => 
     location === path || location.startsWith(`${path}/`)
   );
-
+  
   // Debug logging for app render
   console.log("App render - Layout selection:", { 
     path: location, 
     isAuthenticated: !!user, 
     isExcludedPath,
     isPublicAppRoute,
-    isMarketingRoute,
     shouldShowAI: (!!user || isPublicAppRoute) && !isExcludedPath
   });
-
-  // Marketing routes render as-is (they have their own PublicLayout)
-  if (isMarketingRoute) {
-    return <Router />;
-  }
-
+  
   // For authenticated users on app pages - use AuthenticatedLayout with assistant
   if (user && !isExcludedPath) {
     return (
@@ -280,17 +258,17 @@ function AppContent() {
       </AIAssistantProvider>
     );
   }
-
+  
   // For landing page, just render the Router directly (it has its own layout)
   if (location === '/') {
     return <Router />;
   }
-
+  
   // For explore pages, render the Router directly (they have their own self-contained layout)
   if (location.startsWith('/explore')) {
     return <Router />;
   }
-
+  
   // For public app routes - use MainLayout with limited assistant
   if (isPublicAppRoute) {
     return (
@@ -301,7 +279,7 @@ function AppContent() {
       </AIAssistantProvider>
     );
   }
-
+  
   // Use MainLayout for other B2C routes but not for auth pages
   if (location !== '/auth' && !location.startsWith('/company') && !location.startsWith('/briki-pilot')) {
     return (
@@ -312,7 +290,7 @@ function AppContent() {
       </AIAssistantProvider>
     );
   }
-
+  
   // Auth pages and B2B routes don't use MainLayout
   return <Router />;
 }
