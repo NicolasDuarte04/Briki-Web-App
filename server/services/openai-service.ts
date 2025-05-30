@@ -64,12 +64,14 @@ export async function generateAssistantResponse(
     const relevantPlans = getTopRelevantPlans(userMessage, filteredPlans, 6);
 
     // FIXED: Enhanced system prompt with real plan data and memory context
+    const contextAnalysis = analyzeContextNeeds(userMessage, conversationHistory);
     const systemMessage: AssistantMessage = {
       role: "system",
       content: createSystemPrompt(
         relevantPlans,
         userMessage,
         conversationHistory,
+        contextAnalysis,
       ),
     };
 
@@ -301,6 +303,7 @@ interface ContextAnalysis {
   needsMoreContext: boolean;
   category: string;
   missingInfo: string[];
+  suggestedQuestions?: string[];
 }
 
 function analyzeContextNeeds(userMessage: string, conversationHistory: AssistantMessage[]): ContextAnalysis {
@@ -318,78 +321,100 @@ function analyzeContextNeeds(userMessage: string, conversationHistory: Assistant
   // Travel insurance context analysis
   if (/(viaj|europe|estados unidos|méxico|international|trip|travel)/i.test(lowerMessage)) {
     const travelDetails = {
-      duration: /(días?|semanas?|meses?|\d+)/i.test(lowerMessage),
       destination: /(europa|asia|méxico|estados unidos|[a-z]+)/i.test(lowerMessage),
-      travelers: /(solo|familia|acompañant|personas?)/i.test(lowerMessage)
+      duration: /(días?|semanas?|meses?|\d+)/i.test(lowerMessage),
+      travelers: /(solo|familia|acompañant|personas?)/i.test(lowerMessage),
+      priorities: /(precio|cobertura|médic|cancelac)/i.test(lowerMessage),
+      medical: /(condición|médic|enferm|salud)/i.test(lowerMessage)
     };
     
-    const missingTravelInfo = [];
-    if (!travelDetails.duration) missingTravelInfo.push('duración del viaje');
-    if (!travelDetails.destination) missingTravelInfo.push('destino específico');
-    if (!travelDetails.travelers) missingTravelInfo.push('número de viajeros');
+    const missingCount = Object.values(travelDetails).filter(Boolean).length;
+    const needsMoreInfo = !hasDetailedContext && missingCount < 2;
     
     return {
-      needsMoreContext: !hasDetailedContext && missingTravelInfo.length > 1,
+      needsMoreContext: needsMoreInfo,
       category: 'travel',
-      missingInfo: missingTravelInfo
+      missingInfo: ['destino', 'duración', 'acompañantes'],
+      suggestedQuestions: needsMoreInfo ? [
+        "¿A qué país o región viajas?",
+        "¿Cuál es la duración del viaje?",
+        "¿Viajas solo o acompañado?"
+      ] : undefined
     };
   }
   
   // Pet insurance context analysis
   if (/(mascot|perr|gat|pet|animal)/i.test(lowerMessage)) {
     const petDetails = {
+      type: /(perr|gat|dog|cat)/i.test(lowerMessage),
       age: /(\d+|años?|meses?|cachorro|adulto|mayor)/i.test(lowerMessage),
       breed: /(raza|labrador|golden|pastor|siamés)/i.test(lowerMessage),
-      health: /(sano|enferm|condición|médic)/i.test(lowerMessage)
+      health: /(sano|enferm|condición|médic|preexist)/i.test(lowerMessage),
+      coverage: /(básic|vacun|emergenc|veterinari)/i.test(lowerMessage)
     };
     
-    const missingPetInfo = [];
-    if (!petDetails.age) missingPetInfo.push('edad de la mascota');
-    if (!petDetails.breed) missingPetInfo.push('raza');
-    if (!petDetails.health) missingPetInfo.push('estado de salud');
+    const missingCount = Object.values(petDetails).filter(Boolean).length;
+    const needsMoreInfo = !hasDetailedContext && missingCount < 2;
     
     return {
-      needsMoreContext: !hasDetailedContext && missingPetInfo.length > 1,
+      needsMoreContext: needsMoreInfo,
       category: 'pet',
-      missingInfo: missingPetInfo
+      missingInfo: ['tipo de mascota', 'edad', 'raza'],
+      suggestedQuestions: needsMoreInfo ? [
+        "¿Qué tipo de mascota tienes? (perro, gato, otro)",
+        "¿Cuál es su raza y edad aproximada?",
+        "¿Tiene alguna condición médica preexistente?"
+      ] : undefined
     };
   }
   
   // Auto insurance context analysis
   if (/(auto|vehicul|carro|moto|seguro.*auto)/i.test(lowerMessage)) {
     const autoDetails = {
-      vehicle: /(marca|modelo|año|toyota|honda|ford)/i.test(lowerMessage),
-      usage: /(trabajo|personal|comercial|uso)/i.test(lowerMessage),
-      coverage: /(básic|completo|terceros|todo riesgo)/i.test(lowerMessage)
+      brand: /(marca|toyota|honda|ford|chevrolet|nissan)/i.test(lowerMessage),
+      model: /(modelo|civic|corolla|sentra)/i.test(lowerMessage),
+      year: /(año|\d{4})/i.test(lowerMessage),
+      usage: /(trabajo|personal|comercial|uber|uso)/i.test(lowerMessage),
+      coverage: /(básic|completo|terceros|todo riesgo|económic)/i.test(lowerMessage)
     };
     
-    const missingAutoInfo = [];
-    if (!autoDetails.vehicle) missingAutoInfo.push('marca y modelo del vehículo');
-    if (!autoDetails.usage) missingAutoInfo.push('uso del vehículo');
+    const missingCount = Object.values(autoDetails).filter(Boolean).length;
+    const needsMoreInfo = !hasDetailedContext && missingCount < 2;
     
     return {
-      needsMoreContext: !hasDetailedContext && missingAutoInfo.length > 0,
+      needsMoreContext: needsMoreInfo,
       category: 'auto',
-      missingInfo: missingAutoInfo
+      missingInfo: ['marca y modelo', 'año', 'uso'],
+      suggestedQuestions: needsMoreInfo ? [
+        "¿Qué marca y modelo es tu vehículo?",
+        "¿En qué año fue fabricado?",
+        "¿Cuál es el uso principal? (personal, trabajo, Uber, etc.)"
+      ] : undefined
     };
   }
   
   // Health insurance context analysis
   if (/(salud|médic|hospital|health)/i.test(lowerMessage)) {
     const healthDetails = {
-      coverage: /(básic|completo|familiar|individual)/i.test(lowerMessage),
-      needs: /(emergencias?|consultas?|especialistas?)/i.test(lowerMessage),
-      family: /(familia|hijos?|esposo|pareja)/i.test(lowerMessage)
+      individual: /(solo|individual|personal)/i.test(lowerMessage),
+      family: /(familia|hijos?|esposo|pareja)/i.test(lowerMessage),
+      coverage: /(básic|completo|hospitalización|internacional)/i.test(lowerMessage),
+      preexisting: /(condición|médic|enferm|preexist)/i.test(lowerMessage),
+      network: /(clínic|médic|red)/i.test(lowerMessage)
     };
     
-    const missingHealthInfo = [];
-    if (!healthDetails.coverage) missingHealthInfo.push('tipo de cobertura');
-    if (!healthDetails.needs) missingHealthInfo.push('necesidades médicas');
+    const missingCount = Object.values(healthDetails).filter(Boolean).length;
+    const needsMoreInfo = !hasDetailedContext && missingCount < 2;
     
     return {
-      needsMoreContext: !hasDetailedContext && missingHealthInfo.length > 0,
+      needsMoreContext: needsMoreInfo,
       category: 'health',
-      missingInfo: missingHealthInfo
+      missingInfo: ['tipo de plan', 'beneficiarios', 'cobertura'],
+      suggestedQuestions: needsMoreInfo ? [
+        "¿Estás buscando un seguro solo para ti o también para tu familia?",
+        "¿Cuántas personas deseas incluir en el plan?",
+        "¿Qué nivel de cobertura estás buscando? (básica, hospitalización, internacional)"
+      ] : undefined
     };
   }
   
@@ -594,6 +619,7 @@ function createSystemPrompt(
   insurancePlans: MockInsurancePlan[],
   userMessage: string = "",
   conversationHistory?: AssistantMessage[],
+  contextAnalysis?: ContextAnalysis,
 ): string {
   // Start with consultative system instructions
   let prompt = `Eres Briki, un asesor profesional de seguros que ayuda a los usuarios a encontrar la protección perfecta para sus necesidades específicas.
@@ -618,6 +644,14 @@ ESTILO DE RESPUESTA:
 • Profesional y consultivo como un asesor real
 • Haz preguntas relevantes para entender necesidades
 • Explica brevemente por qué necesitas esa información`;
+
+  // Add specific questions for this conversation if context is needed
+  if (contextAnalysis?.needsMoreContext && contextAnalysis.suggestedQuestions) {
+    prompt += `\n\nPREGUNTAS ESPECÍFICAS PARA ESTA CONSULTA:
+${contextAnalysis.suggestedQuestions.map((q, i) => `${i + 1}. ${q}`).join('\n')}
+
+Usa estas preguntas para recopilar la información necesaria antes de recomendar planes específicos.`;
+  }
 
   // Add enriched context from knowledge base
   if (userMessage) {
