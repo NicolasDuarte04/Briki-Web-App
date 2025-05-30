@@ -780,7 +780,66 @@ function shouldShowInsurancePlans(userMessage: string): boolean {
 }
 
 /**
- * FIXED: Enhanced plan finding with better filtering
+ * Detect insurance category from user message with high precision
+ */
+function detectInsuranceCategory(userMessage: string): string {
+  const message = userMessage.toLowerCase().trim();
+  
+  // Pet insurance keywords (high priority - specific animals)
+  const petKeywords = [
+    'mascota', 'mascotas', 'perro', 'perros', 'gato', 'gatos', 
+    'cachorro', 'gatito', 'veterinario', 'veterinaria',
+    'pet', 'pets', 'dog', 'dogs', 'cat', 'cats', 'puppy', 'kitten'
+  ];
+  
+  // Travel insurance keywords
+  const travelKeywords = [
+    'viaje', 'viajes', 'viajar', 'vacaciones', 'turismo', 'internacional',
+    'europa', 'estados unidos', 'mexico', 'destino', 'trip', 'travel', 'vacation'
+  ];
+  
+  // Auto insurance keywords
+  const autoKeywords = [
+    'auto', 'autos', 'carro', 'carros', 'vehiculo', 'vehiculos', 
+    'automovil', 'moto', 'motos', 'vespa', 'conducir', 'manejar',
+    'car', 'cars', 'vehicle', 'vehicles', 'motorcycle', 'bike'
+  ];
+  
+  // Health insurance keywords
+  const healthKeywords = [
+    'salud', 'medico', 'medica', 'hospital', 'consulta', 'doctor',
+    'enfermedad', 'medicina', 'clinica', 'emergencia',
+    'health', 'medical', 'doctor', 'hospital', 'clinic'
+  ];
+  
+  // Check for exact matches first (most specific)
+  if (petKeywords.some(keyword => message.includes(keyword))) {
+    return 'pet';
+  }
+  
+  if (travelKeywords.some(keyword => message.includes(keyword))) {
+    return 'travel';
+  }
+  
+  if (autoKeywords.some(keyword => message.includes(keyword))) {
+    return 'auto';
+  }
+  
+  if (healthKeywords.some(keyword => message.includes(keyword))) {
+    return 'health';
+  }
+  
+  // Check for insurance type patterns
+  if (/seguro.*(mascot|perr|gat)/i.test(message)) return 'pet';
+  if (/seguro.*(viaj|travel)/i.test(message)) return 'travel';
+  if (/seguro.*(auto|vehicul|carro)/i.test(message)) return 'auto';
+  if (/seguro.*(salud|medic)/i.test(message)) return 'health';
+  
+  return 'general';
+}
+
+/**
+ * ENHANCED: Intelligent plan finding with strict category filtering
  */
 function findRelevantPlans(
   userMessage: string,
@@ -788,46 +847,54 @@ function findRelevantPlans(
 ): MockInsurancePlan[] {
   if (!plans.length) return [];
 
-  // Use the scoring system to find the most relevant plans
+  // STEP 1: Detect user intent and required category
+  const detectedCategory = detectInsuranceCategory(userMessage);
+  
+  console.log(`🎯 Category detection: "${detectedCategory}" from message: "${userMessage}"`);
+
+  // STEP 2: If category is clearly detected, ONLY return plans from that category
+  if (detectedCategory && detectedCategory !== 'general') {
+    const categoryPlans = plans.filter(plan => plan.category === detectedCategory);
+    
+    if (categoryPlans.length > 0) {
+      // Score only plans from the correct category
+      const scoredPlans = categoryPlans.map((plan) => ({
+        plan,
+        score: calculateRelevanceScore(userMessage, plan),
+      }));
+
+      const sortedPlans = scoredPlans
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 3)
+        .map((item) => item.plan);
+
+      console.log(`✅ Strict filtering: Found ${sortedPlans.length} ${detectedCategory} plans`);
+      return sortedPlans;
+    } else {
+      console.log(`❌ No plans found for category: ${detectedCategory}`);
+      return []; // Return empty array instead of irrelevant plans
+    }
+  }
+
+  // STEP 3: For general queries, use scoring but with higher threshold
   const scoredPlans = plans.map((plan) => ({
     plan,
     score: calculateRelevanceScore(userMessage, plan),
   }));
 
-  // Sort by score and return plans with positive scores
+  // Sort by score and return plans with high relevance scores only
   const sortedPlans = scoredPlans
     .sort((a, b) => b.score - a.score)
-    .filter((item) => item.score > 15); // Only return plans with meaningful relevance
+    .filter((item) => item.score > 30); // Increased threshold for general queries
 
-  // Return top 3 most relevant plans, or all if less than 3
   const topPlans = sortedPlans.slice(0, 3).map((item) => item.plan);
 
-  // If no highly relevant plans found, return some plans from the most likely category
-  if (topPlans.length === 0 && plans.length > 0) {
-    const message = userMessage.toLowerCase();
-
-    // Try to match category and return 2-3 plans from that category
-    if (message.includes("viaje") || message.includes("travel")) {
-      return plans.filter((p) => p.category === "travel").slice(0, 3);
-    } else if (
-      message.includes("auto") ||
-      message.includes("car") ||
-      message.includes("carro")
-    ) {
-      return plans.filter((p) => p.category === "auto").slice(0, 3);
-    } else if (
-      message.includes("mascota") ||
-      message.includes("pet") ||
-      message.includes("perro") ||
-      message.includes("gato")
-    ) {
-      return plans.filter((p) => p.category === "pet").slice(0, 3);
-    } else if (message.includes("salud") || message.includes("health")) {
-      return plans.filter((p) => p.category === "health").slice(0, 3);
-    }
-
-    // Fallback: return 3 random plans
-    return plans.slice(0, 3);
+  console.log(`🔍 General search: Found ${topPlans.length} plans with score > 30`);
+  
+  // If no highly relevant plans found, return empty instead of random plans
+  if (topPlans.length === 0) {
+    console.log(`🚫 No relevant plans found - returning empty array to avoid confusion`);
+    return [];
   }
 
   return topPlans;

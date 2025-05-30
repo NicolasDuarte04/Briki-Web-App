@@ -1,0 +1,28 @@
+Hola,
+
+Hemos notado un problema crítico durante el uso real del Briki AI Assistant: está recomendando planes que no son relevantes para la intención del usuario. Por ejemplo, al preguntar por un seguro para una mascota, en lugar de mostrar planes de mascotas, el asistente recomienda seguros familiares o planes de vehículos.
+
+Esto daña la confianza del usuario y reduce el valor percibido del asistente. A partir de esto, queremos trabajar contigo para elevar la experiencia y convertir a Briki AI en una herramienta verdaderamente inteligente y útil.
+
+Diagnóstico preliminar:
+1. El sistema no está filtrando correctamente por categoría.  
+2. La lógica de puntuación parece permitir coincidencias poco estrictas.  
+3. Podría faltar una validación de tipo de plan antes de enviarlo al frontend.  
+4. El prompt enviado a OpenAI puede no estar incluyendo el contexto suficiente para limitar los resultados.
+
+Objetivo:
+Queremos lograr que el asistente sea capaz de:
+- Detectar claramente la categoría de seguro relevante (viaje, mascota, auto, salud, etc).
+- Filtrar los planes exclusivamente por esa categoría (o categorías relacionadas si hay ambigüedad).
+- Reforzar el uso del contexto acumulado para evitar confusiones en preguntas de seguimiento.
+- Rechazar mostrar planes si no hay coincidencia clara, en lugar de “rellenar” con lo que haya.
+
+Siguiente paso:
+¿Podrías ayudarnos a mejorar la precisión del motor de filtrado? En particular:
+1. Revisar la función de puntuación (`scorePlanAgainstContext`) para agregar un filtro obligatorio por categoría cuando la intención sea clara.
+2. Confirmar si el `userContext.category` está siendo correctamente utilizado en todos los puntos del flujo.
+3. Validar que el `suggestedPlans` solo contenga planes cuya categoría coincida directamente con la intención.
+
+Además, estamos trabajando en una mejora del flujo conversacional donde el asistente primero hace preguntas clave (como edad del perro, destino del viaje, etc) antes de recomendar planes. Ya estamos preparando esas plantillas.
+
+¿Te gustaría que te las enviemos para integrarlas como parte del flujo inteligente de conversación?
