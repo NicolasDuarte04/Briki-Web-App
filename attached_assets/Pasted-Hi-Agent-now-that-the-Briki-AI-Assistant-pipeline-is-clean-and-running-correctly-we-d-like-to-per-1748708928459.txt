@@ -1,0 +1,50 @@
+Hi Agent — now that the Briki AI Assistant pipeline is clean and running correctly, we’d like to perform a **full technical diagnosis of the Briki app** to ensure stability, efficiency, and readiness for production across all major areas.
+
+Please perform a full-scope diagnostic and answer the following questions with clear ✅/❌ status and detailed explanations where necessary:
+
+---
+
+🧱 **Frontend Health Check**
+1. Are there any unused or duplicate UI components still present in `client/src/components`?
+2. Are all public pages (e.g., /features, /pricing, /blog, /forum, /careers) wrapped in the correct layout (`<PublicLayout />`) and NOT rendering dashboard-style UI?
+3. Are there any inconsistent or outdated layout implementations (`AuthenticatedLayout`, `PublicLayout`, `CompanyLayout`) across pages?
+4. Are there any unnecessary route definitions or broken links in `App.tsx`?
+5. Is the global `<Navbar />` and `<Footer />` usage standardized and non-redundant across all layouts?
+
+---
+
+🧠 **AI & Assistant System Check**
+6. Are assistant queries routed *only* through the new `/ask-briki-ai` flow?
+7. Is `NewBrikiAssistant.tsx` the only active assistant interface?
+8. Does the OpenAI backend service respond with valid structure (message + suggestedPlans) for *all* categories (pet, auto, travel, health)?
+9. Are follow-up questions triggering proper memory and plan redisplay?
+10. Are all plan rendering issues (in `SuggestedPlans.tsx` and `PlanCard.tsx`) resolved?
+
+---
+
+🔧 **Backend/API Health**
+11. Are there any deprecated or unused service files in `/server/services/`?
+12. Are all active API routes correctly documented and protected if necessary?
+13. Is the `/api/blog/rss` feed functioning at `https://brikiapp.com/api/blog/rss` with correct content format?
+14. Is the blog CMS/database syncing correctly with the RSS feed and rendering on `/blog`?
+15. Are there any backend logs showing recurring warnings or unhandled errors?
+
+---
+
+📈 **Performance & Optimization**
+16. Are there large unused JS/CSS bundles affecting load time?
+17. Are animations and transitions optimized for mobile?
+18. Is lazy-loading or code-splitting implemented on key components/pages?
+19. Are there unnecessary API calls or duplicated queries triggered during assistant use?
+20. Are caching and retry strategies set up for backend requests?
+
+---
+
+🧪 **Deployment & Readiness**
+21. Are all build scripts working cleanly with no warnings?
+22. Is the latest deployment version pointing to `https://brikiapp.com` correctly?
+23. Are all console errors (both frontend and backend) resolved in current deployment?
+24. Is there any test/demo content or logic still present in production files?
+25. Are we ready for live user onboarding from a technical perspective?
+
+Let us know if you’d like a CSV template or checklist format for future diagnostics. Please begin the full validation and send back your findings when ready.
