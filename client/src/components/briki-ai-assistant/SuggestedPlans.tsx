@@ -11,8 +11,17 @@ const SuggestedPlans: React.FC<SuggestedPlansProps> = ({ plans }) => {
   const [location, navigate] = useLocation();
   const { toast } = useToast();
 
+  // Debug logging for plan rendering
+  console.log('🎯 SuggestedPlans - Component rendered with:', {
+    plansReceived: !!plans,
+    planCount: plans?.length || 0,
+    planNames: plans?.map(p => p.name) || [],
+    fullPlans: plans
+  });
+
   // Si no hay planes, no renderizar nada
   if (!plans || plans.length === 0) {
+    console.log('❌ SuggestedPlans - No plans to render, returning null');
     return null;
   }
 

@@ -145,6 +145,15 @@ const NewBrikiAssistant: React.FC = () => {
       // Get AI response with conversation history
       const response = await sendMessageToAI(messageToSend, conversationHistory);
 
+      // Debug logging for data flow analysis
+      console.log('🔍 NewBrikiAssistant - AI Response received:', {
+        hasMessage: !!response.message,
+        hasSuggestedPlans: !!response.suggestedPlans,
+        planCount: response.suggestedPlans?.length || 0,
+        planNames: response.suggestedPlans?.map(p => p.name) || [],
+        fullResponse: response
+      });
+
       // Update loading message with response and memory
       setMessages(prev => 
         prev.map(msg => 
