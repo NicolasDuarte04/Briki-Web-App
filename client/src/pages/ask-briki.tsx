@@ -6,9 +6,7 @@ import { Button } from '@/components/ui/button';
 import GradientButton from '@/components/gradient-button';
 import { Helmet } from 'react-helmet';
 import { ArrowRight, Send as SendIcon, Bot, Shield, MessageCircle } from 'lucide-react';
-import PlanRecommendationCard, { PlanRecommendations } from '@/components/PlanRecommendationCard';
 import { ChatMessage } from '@/types/chat';
-import BrikiAIChat from '@/components/BrikiAIChat';
 
 export default function AskBrikiPage() {
   const { navigate } = useNavigation();

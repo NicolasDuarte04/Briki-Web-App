@@ -60,8 +60,7 @@ import {
 import { 
   InsurancePlansRedirect 
 } from "@/pages/redirects/plans-redirects";
-import AIAssistantDemo from "@/pages/ai-assistant-demo";
-import AIAssistantScreen from "@/pages/assistant";
+// Legacy AI assistant imports removed - all routes now redirect to /ask-briki-ai
 import CountdownPageNew from "@/pages/countdown-page-new";
 import BrikiPilotPortal from "@/pages/briki-pilot-portal";
 
@@ -160,11 +159,17 @@ function Router() {
 
         <Route path="/learn-more" component={LearnMorePage} />
         <Route path="/terms" component={TermsPage} />
-        <Route path="/ai-assistant" component={AIAssistantDemo} />
+        <Route path="/ai-assistant" component={() => {
+          window.location.replace("/ask-briki-ai");
+          return null;
+        }} />
         <Route path="/profile" component={ProfilePage} />
         <Route path="/settings" component={SettingsPage} />
         <Route path="/api-settings" component={ApiSettingsPage} />
-        <Route path="/assistant" component={AIAssistantScreen} />
+        <Route path="/assistant" component={() => {
+          window.location.replace("/ask-briki-ai");
+          return null;
+        }} />
         
         {/* Company/Partner Routes - Updated for consistency */}
         <Route path="/company" component={CompanyPage} />
