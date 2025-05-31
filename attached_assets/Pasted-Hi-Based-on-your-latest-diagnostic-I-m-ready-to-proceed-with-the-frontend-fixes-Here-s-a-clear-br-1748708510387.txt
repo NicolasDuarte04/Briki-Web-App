@@ -1,0 +1,35 @@
+Hi! Based on your latest diagnostic, I’m ready to proceed with the frontend fixes. Here's a clear breakdown of what we need to address:
+
+🎯 Objective:
+Ensure that the `NewBrikiAssistant.tsx` component correctly receives and displays the `suggestedPlans` returned from the backend AI service. The goal is for relevant insurance plans to show as cards in the UI after valid queries.
+
+🔍 Areas to Inspect and Fix:
+
+1. ✅ Backend confirmed working:
+   - The `suggestedPlans` array is correctly formed and sent from `server/services/openai-service.ts`.
+   - Plan objects contain all necessary fields (id, name, provider, basePrice, tags, etc).
+
+2. ⚠️ Suspected Frontend Issues:
+
+   A. `client/src/components/briki-ai-assistant/NewBrikiAssistant.tsx`
+   - Inspect lines 145–160.
+   - Confirm that `response.suggestedPlans` is properly assigned into the message object inside `setMessages()`.
+   - Validate that it reaches each `Message` object with correct structure.
+
+   B. `client/src/services/openai-service.ts`
+   - Check how the response is being parsed.
+   - Confirm that `suggestedPlans` is not being lost, dropped, or filtered unintentionally.
+   - Ensure the return type for `sendMessageToAI()` includes the full `AssistantResponse`, including `suggestedPlans`.
+
+   C. `client/src/components/briki-ai-assistant/SuggestedPlans.tsx`
+   - Confirm it’s receiving the correct `plans` prop and that it renders when `plans.length > 0`.
+   - Double-check conditional rendering and props typing.
+
+🛠 Next Steps:
+1. Trace the response from `sendMessageToAI()` and confirm that `suggestedPlans` makes it into the `Message` object.
+2. Ensure that `suggestedPlans` is retained in the frontend state across re-renders.
+3. Confirm plan cards render correctly in the UI based on that state.
+
+Would you like to proceed by patching and testing each step of the data flow — from response parsing to rendering — and then validating visually with a live query (e.g. “Necesito seguro para mi perro”)?
+
+Let me know when ready.
