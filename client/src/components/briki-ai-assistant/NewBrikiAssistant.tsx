@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Suspense, lazy } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,9 +6,11 @@ import { Loader2, Send, Bot } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { sendMessageToAI, getMockResponse, APIMessage } from '@/services/openai-service';
-import SuggestedPlans from './SuggestedPlans';
 import WelcomeCard from './WelcomeCard';
 import { InsurancePlan } from './PlanCard';
+
+// Lazy load the SuggestedPlans component
+const SuggestedPlans = lazy(() => import('./SuggestedPlans'));
 import { formatUserContext, extractContextFromMessage, isGenericGreeting } from '@/utils/context-utils';
 
 interface Message {
@@ -257,7 +259,12 @@ const NewBrikiAssistant: React.FC = () => {
         {/* Suggested Plans */}
         {!isUser && message.suggestedPlans && message.suggestedPlans.length > 0 && (
           <div className="w-full mt-4">
-            <SuggestedPlans plans={message.suggestedPlans} />
+            <Suspense fallback={<div className="flex items-center justify-center p-4">
+              <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
+              <span className="ml-2 text-sm text-gray-600">Loading plans...</span>
+            </div>}>
+              <SuggestedPlans plans={message.suggestedPlans} />
+            </Suspense>
           </div>
         )}
       </motion.div>
