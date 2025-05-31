@@ -1,0 +1,42 @@
+Hello agent. Please conduct a final, thorough technical and product-level assessment to prepare the Briki app for public release.
+
+We want you to **evaluate the entire app** from the perspective of being its full-time product manager and lead developer. Your task is to **systematically answer the following questions** across all relevant files and functionality:
+
+🧠 PRODUCT READINESS
+1. Are all core features stable and intuitive (landing → assistant → plan recommendation → selection)?
+2. Do we have working fallback flows for edge cases (e.g. no plan found, AI returns null, user skips questions)?
+3. Are the AI recommendations clearly structured in the code and traceable?
+4. Is mobile responsiveness fully implemented across views and components?
+
+🔐 SECURITY & COMPLIANCE
+5. Are we correctly handling user data across the stack (frontend, API, database)?
+6. Are there any missing compliance elements (GDPR, Latin American privacy laws)?
+7. Are external APIs (e.g. plan providers) being called securely and within proper authorization limits?
+
+🧪 PERFORMANCE & QA
+8. Have we identified and resolved any high-load or API fail scenarios?
+9. Are logs, errors, and backend failures being recorded in a trackable way?
+10. Have we tested the full app across modern browsers and devices?
+
+🎯 USER EXPERIENCE & TRUST
+11. Is the onboarding process clear and frictionless?
+12. Do the AI recommendations feel trustworthy (structure, disclaimers, tone)?
+13. Is there any social proof or testimonial mechanism in place?
+14. Is our brand tone consistent across the interface and AI messages?
+
+📊 ANALYTICS & GROWTH
+15. Are analytics tracking core events like AI queries, plan card views, CTA clicks, and funnel drops?
+16. Is Google Analytics (or another tool) installed and operational in production?
+17. Do we have any feedback collection method integrated (e.g. "was this helpful?" or NPS)?
+
+🛠️ SCALABILITY & MAINTAINABILITY
+18. Is the architecture prepared for scaling to more insurance categories?
+19. Can we add new categories, plans, or questions without breaking logic?
+20. Do we have enough documentation or modularity to onboard future devs or partners?
+
+📦 POST-LAUNCH & SUPPORT
+21. Is there a support mechanism (chat, form, email, etc.) available for users?
+22. Are error handling and fast hotfix pathways ready in case something breaks post-launch?
+23. Are there any hardcoded routes, legacy components, or non-production assets left?
+
+Please investigate each question with supporting file references and detailed diagnostics. The goal is to get a complete launch-readiness score across all technical and product dimensions.
