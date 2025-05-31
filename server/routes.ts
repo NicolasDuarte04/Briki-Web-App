@@ -1178,15 +1178,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
           bp.excerpt,
           bp.content,
           bp.published_at,
-          bp.author,
+          COALESCE(u.name, u.email, 'Briki Team') as author,
           bc.name as category_name,
           ARRAY_AGG(bt.name) FILTER (WHERE bt.name IS NOT NULL) as tags
         FROM blog_posts bp
+        LEFT JOIN users u ON bp.author_id = u.id
         LEFT JOIN blog_categories bc ON bp.category_id = bc.id
         LEFT JOIN blog_post_tags bpt ON bp.id = bpt.post_id
         LEFT JOIN blog_tags bt ON bpt.tag_id = bt.id
         WHERE bp.status = 'published'
-        GROUP BY bp.id, bp.title, bp.slug, bp.excerpt, bp.content, bp.published_at, bp.author, bc.name
+        GROUP BY bp.id, bp.title, bp.slug, bp.excerpt, bp.content, bp.published_at, u.name, u.email, bc.name
         ORDER BY bp.published_at DESC
         LIMIT 50
       `);
