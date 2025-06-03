@@ -4,10 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Bot, Car, Plane, Heart, Shield } from 'lucide-react';
 
 interface WelcomeCardProps {
-  onQuestionSelect: (question: string) => void;
+  onSendMessage: (message: string) => void;
 }
 
-const WelcomeCard: React.FC<WelcomeCardProps> = ({ onQuestionSelect }) => {
+const WelcomeCard: React.FC<WelcomeCardProps> = ({ onSendMessage }) => {
   const quickOptions = [
     {
       icon: Car,
@@ -63,7 +63,7 @@ const WelcomeCard: React.FC<WelcomeCardProps> = ({ onQuestionSelect }) => {
             transition={{ duration: 0.4, delay: index * 0.1 }}
           >
             <Button
-              onClick={() => onQuestionSelect(option.question)}
+              onClick={() => onSendMessage(option.question)}
               variant="outline"
               className="w-full p-6 h-auto text-left border-2 hover:border-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200 group"
             >
