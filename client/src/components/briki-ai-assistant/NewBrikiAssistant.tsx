@@ -24,6 +24,138 @@ interface Message {
   plansSummary?: string;
 }
 
+// NEW: Context validation helpers to align with backend logic
+interface ContextRequirements {
+  travel: string[];
+  pet: string[];
+  auto: string[];
+  health: string[];
+}
+
+const REQUIRED_CONTEXT: ContextRequirements = {
+  travel: ['destination', 'duration', 'travelers'],
+  pet: ['petType', 'age', 'breed'],
+  auto: ['brand', 'model', 'year'],
+  health: ['age', 'familySize', 'conditions']
+};
+
+// NEW: Detect insurance category from user message
+function detectInsuranceCategory(message: string): string {
+  const lowerMessage = message.toLowerCase().trim();
+
+  const petKeywords = ['mascota', 'perro', 'gato', 'pet', 'dog', 'cat', 'animal', 'veterinario'];
+  const travelKeywords = ['viaje', 'travel', 'trip', 'internacional', 'europa', 'estados unidos', 'méxico', 'vacaciones'];
+  const autoKeywords = ['auto', 'carro', 'vehiculo', 'moto', 'car', 'vehicle', 'motorcycle', 'scooter'];
+  const healthKeywords = ['salud', 'health', 'médico', 'medical', 'hospital', 'doctor', 'medicina'];
+
+  if (petKeywords.some(keyword => lowerMessage.includes(keyword))) return 'pet';
+  if (travelKeywords.some(keyword => lowerMessage.includes(keyword))) return 'travel';
+  if (autoKeywords.some(keyword => lowerMessage.includes(keyword))) return 'auto';
+  if (healthKeywords.some(keyword => lowerMessage.includes(keyword))) return 'health';
+
+  return 'general';
+}
+
+// NEW: Check if user has provided sufficient context for plan recommendations
+function hasSufficientContext(userContext: any, conversationHistory: Message[], currentMessage: string): boolean {
+  const category = detectInsuranceCategory(currentMessage);
+
+  if (category === 'general') return false;
+
+  // Check if conversation history contains detailed context
+  const hasDetailedHistory = conversationHistory.some(msg => 
+    msg.role === 'user' && (
+      msg.content.length > 50 || // Detailed messages
+      /\d+/.test(msg.content) || // Contains numbers (ages, dates, etc.)
+      /(años?|meses?|días?|duración|países?|raza|modelo|marca)/i.test(msg.content)
+    )
+  );
+
+  // Check current message for detailed context
+  const hasDetailedCurrentMessage = currentMessage.length > 50 || 
+    /\d+/.test(currentMessage) ||
+    /(años?|meses?|días?|duración|países?|raza|modelo|marca)/i.test(currentMessage);
+
+  // Category-specific context validation
+  switch (category) {
+    case 'travel':
+      const travelDetails = {
+        destination: /(europa|asia|méxico|estados unidos|[a-z]+)/i.test(currentMessage),
+        duration: /(días?|semanas?|meses?|\d+)/i.test(currentMessage),
+        travelers: /(solo|familia|acompañant|personas?)/i.test(currentMessage)
+      };
+      const travelContextCount = Object.values(travelDetails).filter(Boolean).length;
+      return hasDetailedHistory || hasDetailedCurrentMessage || travelContextCount >= 2;
+
+    case 'pet':
+      const petDetails = {
+        type: /(perr|gat|dog|cat)/i.test(currentMessage),
+        age: /(\d+|años?|meses?|cachorro|adulto|mayor)/i.test(currentMessage),
+        breed: /(raza|labrador|golden|pastor|siamés)/i.test(currentMessage)
+      };
+      const petContextCount = Object.values(petDetails).filter(Boolean).length;
+      return hasDetailedHistory || hasDetailedCurrentMessage || petContextCount >= 2;
+
+    case 'auto':
+      const autoDetails = {
+        brand: /(marca|toyota|honda|ford|chevrolet|nissan)/i.test(currentMessage),
+        model: /(modelo|\d{4}|año)/i.test(currentMessage),
+        use: /(trabajo|personal|comercial|uber)/i.test(currentMessage)
+      };
+      const autoContextCount = Object.values(autoDetails).filter(Boolean).length;
+      return hasDetailedHistory || hasDetailedCurrentMessage || autoContextCount >= 2;
+
+    case 'health':
+      const healthDetails = {
+        age: /(\d+|años?|joven|adulto|mayor)/i.test(currentMessage),
+        family: /(familia|hijo|esposa|pareja)/i.test(currentMessage),
+        conditions: /(condición|enferm|diabetes|hipertens)/i.test(currentMessage)
+      };
+      const healthContextCount = Object.values(healthDetails).filter(Boolean).length;
+      return hasDetailedHistory || hasDetailedCurrentMessage || healthContextCount >= 2;
+
+    default:
+      return false;
+  }
+}
+
+// NEW: Check if message should trigger plan recommendations (aligned with backend logic)
+function shouldShowInsurancePlans(message: string, userContext: any, conversationHistory: Message[]): boolean {
+  const lowerMessage = message.toLowerCase().trim();
+
+  // Clear intent patterns that indicate readiness for plan recommendations
+  const strongIntentPatterns = [
+    /quiero (ver|conocer|comparar) planes/,
+    /muestra.*planes/,
+    /recomienda.*plan/,
+    /necesito.*seguro/,
+    /busco.*seguro/,
+    /qué planes.*tienes/,
+    /opciones.*seguro/,
+  ];
+
+  const hasStrongIntent = strongIntentPatterns.some(pattern => pattern.test(lowerMessage));
+
+  if (hasStrongIntent && hasSufficientContext(userContext, conversationHistory, message)) {
+    return true;
+  }
+
+  // Conservative keyword-based detection with context requirement
+  const insuranceKeywords = ["seguro", "insurance", "protección", "cobertura", "plan", "póliza"];
+  const categoryKeywords = ["viaje", "auto", "mascota", "salud", "travel", "car", "pet", "health"];
+  const actionKeywords = ["necesito", "busco", "quiero", "need", "want", "looking"];
+
+  const hasInsuranceKeyword = insuranceKeywords.some((keyword) => message.includes(keyword));
+  const hasCategoryKeyword = categoryKeywords.some((keyword) => message.includes(keyword));
+  const hasActionKeyword = actionKeywords.some((keyword) => message.includes(keyword));
+
+  // Only show plans if we have clear intent AND sufficient context
+  return hasInsuranceKeyword && 
+         hasCategoryKeyword && 
+         hasActionKeyword && 
+         hasSufficientContext(userContext, conversationHistory, message);
+}
+
 const NewBrikiAssistant: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -56,7 +188,7 @@ const NewBrikiAssistant: React.FC = () => {
   // Smart scroll function - only when needed
   const scrollToBottom = (force = false) => {
     if (!messagesEndRef.current) return;
-    
+
     // Only scroll if user is near bottom or if forced
     if (force || !showScrollIndicator) {
       setTimeout(() => {
@@ -102,6 +234,18 @@ const NewBrikiAssistant: React.FC = () => {
     setIsLoading(true);
 
     try {
+      // FIXED: Check if we should show plans based on context sufficiency
+      const currentMessages = [...messages, userMessage];
+      const shouldRequestPlans = shouldShowInsurancePlans(messageToSend, mergedContext, currentMessages);
+
+      console.log('🔍 Context Analysis:', {
+        message: messageToSend,
+        category: detectInsuranceCategory(messageToSend),
+        hasSufficientContext: hasSufficientContext(mergedContext, currentMessages, messageToSend),
+        shouldShowPlans: shouldRequestPlans,
+        contextData: mergedContext
+      });
+
       // Enhanced conversation history with plan memory preservation
       const conversationHistory: APIMessage[] = messages
         .filter(msg => !msg.isLoading && msg.id !== 'welcome-msg')
@@ -111,7 +255,7 @@ const NewBrikiAssistant: React.FC = () => {
             const planDetails = msg.suggestedPlans.map(plan => 
               `${plan.name} de ${plan.provider} por ${plan.basePrice} ${plan.currency}`
             ).join(', ');
-            
+
             return {
               role: msg.role,
               content: `${msg.content}\n\n[Planes previamente recomendados: ${planDetails}]`
@@ -137,10 +281,10 @@ const NewBrikiAssistant: React.FC = () => {
           }
           return `${key}: ${value}`;
         }).join(', ');
-        
+
         conversationHistory.unshift({
           role: 'system',
-          content: `Contexto acumulado del usuario: ${contextText}. Usa esta información para dar respuestas más personalizadas y recordar planes previamente sugeridos.`
+          content: `Contexto acumulado del usuario: ${contextText}. ${shouldRequestPlans ? 'El usuario tiene suficiente contexto para ver planes.' : 'El usuario necesita más contexto antes de mostrar planes.'}`
         } as APIMessage);
       }
 
@@ -153,8 +297,24 @@ const NewBrikiAssistant: React.FC = () => {
         hasSuggestedPlans: !!response.suggestedPlans,
         planCount: response.suggestedPlans?.length || 0,
         planNames: response.suggestedPlans?.map(p => p.name) || [],
+        shouldHaveShownPlans: shouldRequestPlans,
         fullResponse: response
       });
+
+      // FIXED: Validate that plans are only shown when context is sufficient
+      let finalSuggestedPlans = response.suggestedPlans;
+
+      if (response.suggestedPlans && response.suggestedPlans.length > 0) {
+        if (!shouldRequestPlans) {
+          console.warn('⚠️  Plans were returned but context is insufficient - filtering out plans');
+          finalSuggestedPlans = undefined;
+
+          // Show a helpful message instead
+          if (!response.message.includes('más información') && !response.message.includes('preguntas')) {
+            response.message += '\n\nPara recomendarte los mejores planes, necesito conocer un poco más sobre tus necesidades específicas.';
+          }
+        }
+      }
 
       // Update loading message with response and memory
       setMessages(prev => 
@@ -164,197 +324,4 @@ const NewBrikiAssistant: React.FC = () => {
                 ...msg,
                 id: `assistant-${Date.now()}`,
                 content: response.message || response.response || "No pude generar una respuesta.",
-                suggestedPlans: response.suggestedPlans || undefined,
-                // FIXED: Enhanced plan summary with provider details
-                plansSummary: (response.suggestedPlans && response.suggestedPlans.length > 0)
-                  ? response.suggestedPlans.map(plan => `${plan.name} (${plan.provider})`).join(', ')
-                  : undefined,
-                isLoading: false,
-              }
-            : msg
-        )
-      );
-
-      // Smart scroll: only if response has plans or is long, and not a greeting
-      if (!isGenericGreeting(messageToSend) && 
-          ((response.suggestedPlans?.length || 0) > 0 || (response.message?.length || 0) > 200)) {
-        scrollToBottom(true);
-      }
-
-    } catch (error) {
-      console.error('Error getting AI response:', error);
-      
-      setMessages(prev => 
-        prev.map(msg => 
-          msg.isLoading 
-            ? {
-                ...msg,
-                id: `error-${Date.now()}`,
-                content: "Disculpa, hubo un problema procesando tu mensaje. ¿Podrías intentar de nuevo?",
-                isLoading: false,
-              }
-            : msg
-        )
-      );
-
-      toast({
-        title: "Error de conexión",
-        description: "No se pudo conectar con el asistente. Verifica tu conexión.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const renderMessage = (message: Message) => {
-    const isUser = message.role === 'user';
-    const isWelcome = message.id === 'welcome-msg';
-
-    return (
-      <motion.div
-        key={message.id}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className={`flex flex-col ${isUser ? 'items-end' : 'items-start'} mb-6 w-full`}
-      >
-        <div
-          className={`
-            max-w-[85%] rounded-3xl p-5 shadow-sm
-            ${isUser 
-              ? 'bg-gradient-to-r from-blue-600 to-cyan-500 text-white' 
-              : isWelcome
-                ? 'bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 text-gray-800 dark:text-gray-200 border-2 border-blue-100 dark:border-blue-800'
-                : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700'
-            }
-          `}
-        >
-          {!isUser && (
-            <div className="flex items-center mb-3">
-              <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mr-3">
-                <Bot className="h-3 w-3 text-blue-600 dark:text-blue-400" />
-              </div>
-              <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Briki</span>
-            </div>
-          )}
-          
-          {message.isLoading ? (
-            <div className="flex items-center py-2">
-              <Loader2 className="h-5 w-5 mr-3 animate-spin text-blue-600" />
-              <span className="text-gray-600 dark:text-gray-400">Analizando tu consulta...</span>
-            </div>
-          ) : (
-            <div className="whitespace-pre-wrap leading-relaxed text-base">
-              {message.content}
-            </div>
-          )}
-        </div>
-        
-        {/* Timestamp */}
-        <div className={`text-xs text-gray-400 mt-2 px-2 ${isUser ? 'text-right' : 'text-left'}`}>
-          {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-        </div>
-        
-        {/* Suggested Plans */}
-        {!isUser && message.suggestedPlans && message.suggestedPlans.length > 0 && (
-          <div className="w-full mt-4">
-            <Suspense fallback={<div className="flex items-center justify-center p-4">
-              <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
-              <span className="ml-2 text-sm text-gray-600">Loading plans...</span>
-            </div>}>
-              <SuggestedPlans plans={message.suggestedPlans} />
-            </Suspense>
-          </div>
-        )}
-      </motion.div>
-    );
-  };
-
-  return (
-    <div className="flex flex-col h-screen w-full bg-gradient-to-br from-gray-50 to-blue-50/30 dark:from-gray-900 dark:to-blue-900/10">
-      {/* Header */}
-      <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 p-6">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
-            <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mr-4">
-              <Bot className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-            </div>
-            Briki AI Assistant
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2 ml-14">
-            Tu asistente inteligente para encontrar el seguro perfecto
-          </p>
-        </div>
-      </div>
-
-      {/* Scroll Indicator */}
-      {showScrollIndicator && (
-        <motion.div 
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="absolute top-20 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-4 py-2 rounded-full text-sm shadow-lg z-10 flex items-center"
-        >
-          ↑ Hay mensajes anteriores
-        </motion.div>
-      )}
-      
-      {/* Messages Area */}
-      <ScrollArea 
-        ref={scrollAreaRef}
-        className="flex-1 p-6"
-        onScroll={handleScroll}
-      >
-        <div className="max-w-4xl mx-auto space-y-6">
-          {/* Welcome Card */}
-          {showWelcomeCard && messages.length === 1 && (
-            <WelcomeCard 
-              onQuestionSelect={(question) => {
-                setShowWelcomeCard(false);
-                handleSendMessage(question);
-              }} 
-            />
-          )}
-          
-          {/* Messages */}
-          {messages.map(renderMessage)}
-          
-          {/* Scroll anchor */}
-          <div ref={messagesEndRef} />
-        </div>
-      </ScrollArea>
-      
-      {/* Input Form */}
-      <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-t border-gray-200 dark:border-gray-700 p-6">
-        <form onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }} className="max-w-4xl mx-auto">
-          <div className="flex space-x-4 p-3 bg-white dark:bg-gray-800 rounded-2xl border-2 border-gray-200 dark:border-gray-600 shadow-lg">
-            <Input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="¿Qué tipo de seguro necesitas? Cuéntame sobre tu situación..."
-              disabled={isLoading}
-              className="flex-grow text-base py-4 px-6 rounded-xl border-0 bg-transparent focus:ring-0 placeholder:text-gray-400"
-            />
-            <Button 
-              type="submit" 
-              disabled={isLoading || !input.trim()}
-              className="px-8 py-4 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-medium transition-all duration-200 disabled:opacity-50 shadow-lg hover:shadow-xl transform hover:scale-105"
-            >
-              {isLoading ? (
-                <Loader2 className="h-5 w-5 animate-spin" />
-              ) : (
-                <Send className="h-5 w-5" />
-              )}
-            </Button>
-          </div>
-          
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-3 text-center">
-            💡 Menciona tu ubicación, vehículo, mascota o planes de viaje para recomendaciones más precisas
-          </p>
-        </form>
-      </div>
-    </div>
-  );
-};
-
-export default NewBrikiAssistant;
+                sug

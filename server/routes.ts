@@ -863,6 +863,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // AI Assistant chat endpoint
+  app.post("/api/ai/chat", async (req, res) => {
+    try {
+      const { message, conversationHistory } = req.body;
+      const { generateAssistantResponse } = await import("./services/openai-service.js");
+      
+      const response = await generateAssistantResponse(
+        message,
+        conversationHistory || [],
+        [],
+        "Colombia"
+      );
+      
+      res.json(response);
+    } catch (error: any) {
+      console.error("AI chat error:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // ===== INSURANCE DATA API ENDPOINTS =====
   
   // Get all insurance plans
