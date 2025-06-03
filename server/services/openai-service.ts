@@ -709,3 +709,82 @@ function getTopRelevantPlans(userMessage: string, plans: MockInsurancePlan[], li
     .slice(0, limit)
     .map(item => item.plan);
 }
+
+/**
+ * Legacy function exports for compatibility with existing routes
+ */
+export async function getChatCompletionFromOpenAI(message: string): Promise<string> {
+  try {
+    const response = await generateAssistantResponse(message, [], [], "Colombia");
+    return response.message;
+  } catch (error) {
+    console.error("Error in getChatCompletionFromOpenAI:", error);
+    throw error;
+  }
+}
+
+export async function generateInsuranceRecommendation(category: string, criteria: any): Promise<string> {
+  try {
+    const message = `I need ${category} insurance with these requirements: ${JSON.stringify(criteria)}`;
+    const response = await generateAssistantResponse(message, [], [], "Colombia");
+    return response.message;
+  } catch (error) {
+    console.error("Error in generateInsuranceRecommendation:", error);
+    throw error;
+  }
+}
+
+export async function explainInsuranceTerm(term: string): Promise<string> {
+  try {
+    const message = `Please explain the insurance term: ${term}`;
+    const response = await generateAssistantResponse(message, [], [], "Colombia");
+    return response.message;
+  } catch (error) {
+    console.error("Error in explainInsuranceTerm:", error);
+    throw error;
+  }
+}
+
+export async function comparePlans(plans: any[]): Promise<string> {
+  try {
+    const message = `Please compare these insurance plans: ${JSON.stringify(plans)}`;
+    const response = await generateAssistantResponse(message, [], [], "Colombia");
+    return response.message;
+  } catch (error) {
+    console.error("Error in comparePlans:", error);
+    throw error;
+  }
+}
+
+export async function analyzeImageForInsurance(imageData: string, prompt?: string): Promise<any> {
+  try {
+    const analysis = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: prompt || "Analyze this image and suggest relevant insurance products.",
+            },
+            {
+              type: "image_url",
+              image_url: {
+                url: `data:image/jpeg;base64,${imageData}`,
+              },
+            },
+          ],
+        },
+      ],
+      max_tokens: 500,
+    });
+
+    return {
+      message: analysis.choices[0]?.message?.content || "Unable to analyze image",
+    };
+  } catch (error) {
+    console.error("Error in analyzeImageForInsurance:", error);
+    throw error;
+  }
+}

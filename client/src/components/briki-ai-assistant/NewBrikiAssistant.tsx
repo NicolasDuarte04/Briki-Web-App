@@ -324,4 +324,13 @@ const NewBrikiAssistant: React.FC = () => {
                 ...msg,
                 id: `assistant-${Date.now()}`,
                 content: response.message || response.response || "No pude generar una respuesta.",
-                sug
+                suggestedPlans: response.suggestedPlans || [],
+                isLoading: false,
+                timestamp: new Date(),
+                plansSummary: response.suggestedPlans?.length > 0 
+                  ? `Mostré ${response.suggestedPlans.length} planes de ${response.category || 'seguros'}` 
+                  : undefined
+              }
+            : msg
+        )
+      );
