@@ -1,0 +1,42 @@
+Hi, I need help addressing three key issues that are still affecting the Briki AI assistant. Please read carefully and answer each section fully:
+
+---
+
+### 1. MEMORY RESET AFTER PLAN RECOMMENDATION
+
+🔍 Issue: After the AI recommends insurance plans, it seems to **reset** the conversation. It forgets the user context and starts again as if it’s a new query.
+
+🧠 Questions:
+- Where is conversation memory stored and preserved between messages?
+- Does the `conversationHistory` array get cleared or overwritten after plan suggestions?
+- Can we ensure the AI retains **category, user context, and last recommended plans** across multiple turns?
+
+---
+
+### 2. AI ISN’T ASKING QUESTIONS BEFORE RECOMMENDING PLANS
+
+🔍 Issue: The AI jumps to showing plans without asking important context-based questions (e.g. dog’s age for pet insurance).
+
+🧠 Questions:
+- How can we make the assistant **pause and ask questions** before suggesting plans?
+- Can we enable a flow where each category has 2–3 mandatory questions before displaying plan cards?
+- Is the current assistant capable of using the follow-up templates we already created?
+- If so, what do we need to activate them and block premature recommendations?
+
+---
+
+### 3. AI FETCHES WRONG PLANS (e.g. Family Plans for Pets)
+
+🔍 Issue: Even with a clear prompt like “seguro para mi perro,” the AI sometimes shows unrelated plans (e.g. family health insurance).
+
+🧠 Questions:
+- How is the category currently detected?
+- Where does the system filter the plan database? (file + line reference)
+- Are we 100% sure that `suggestedPlans = findRelevantPlans(...)` only returns **correct-category** results?
+- Is there a fallback in place (like “if nothing is found, return random plans”)? If so, how can we disable that completely?
+
+---
+
+We want to make Briki's assistant more consultative and precise before public launch. Please help us verify if each part of this logic is already supported or if code changes are needed.
+
+Let us know once ready to test and deploy a fix.
