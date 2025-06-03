@@ -13,7 +13,7 @@ import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/components/language-selector";
-import { PublicLayout } from "@/components/layout/public/public-layout";
+import { PublicLayout } from "@/components/layout/public-layout";
 
 /**
  * The new dual-audience landing page for Briki
