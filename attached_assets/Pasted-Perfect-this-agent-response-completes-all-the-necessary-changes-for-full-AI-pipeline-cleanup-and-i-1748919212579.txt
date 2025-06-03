@@ -1,0 +1,119 @@
+Perfect — this agent response completes all the necessary changes for full AI pipeline cleanup and integration. Here’s your next step-by-step action plan to finalize everything.
+
+⸻
+
+✅ FINAL BRIKI AI PIPELINE CLEANUP PLAN
+
+1. ✅ Update server/routes.ts
+
+Add the following exact block near line 865:
+
+// AI Assistant chat endpoint
+app.post("/api/ai/chat", async (req, res) => {
+  try {
+    const { message, conversationHistory } = req.body;
+    const { generateAssistantResponse } = await import("./services/openai-service.js");
+
+    const response = await generateAssistantResponse(
+      message,
+      conversationHistory || [],
+      [],
+      "Colombia"
+    );
+
+    res.json(response);
+  } catch (error: any) {
+    console.error("AI chat error:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+⸻
+
+2. ✅ Create client/src/services/openai-service.ts
+
+Create this frontend service file exactly as follows:
+
+import { apiRequest } from '@/lib/queryClient';
+
+export interface APIMessage {
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp?: Date;
+}
+
+export interface AIResponse {
+  response: string;
+  suggestedPlans?: any[];
+  category?: string;
+  userContext?: any;
+}
+
+/**
+ * Send a message to the AI assistant backend
+ */
+export async function sendMessageToAI(
+  message: string,
+  conversationHistory: APIMessage[] = []
+): Promise<AIResponse> {
+  try {
+    const response = await apiRequest('POST', '/api/ai/chat', {
+      message,
+      conversationHistory
+    });
+
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error sending message to AI:', error);
+    throw error;
+  }
+}
+
+/**
+ * Mock response function for fallback - should not be used in production
+ */
+export function getMockResponse(): AIResponse {
+  return {
+    response: "I'm having trouble connecting to the AI service. Please try again.",
+    suggestedPlans: [],
+    category: undefined
+  };
+}
+
+
+⸻
+
+3. 🚨 Delete Legacy and Conflicting Files
+
+Run these commands:
+
+rm server/services/openai.ts
+rm client/src/services/assistantService.ts
+rm client/src/services/ai-service.ts
+rm client/src/pages/ai-assistant-demo.tsx
+rm client/src/pages/assistant.tsx
+rm client/src/components/ai-assistant/chat-interface.tsx
+rm client/src/hooks/use-ai-assistant.ts
+rm client/src/services/memory-service.ts  # Only if not used anywhere else
+
+
+⸻
+
+4. 🔁 Test the Pipeline
+
+Manually confirm the following:
+	•	/ask-briki-ai loads and responds
+	•	Plans returned are relevant (check with pet, travel, etc.)
+	•	Context is preserved across follow-up messages
+	•	No frontend console or server errors
+
+⸻
+
+Once you complete this checklist, your Briki AI Assistant will be fully cleaned, context-aware, and production-ready.
+
+Would you like me to generate a PDF deployment checklist or commit message for Git?

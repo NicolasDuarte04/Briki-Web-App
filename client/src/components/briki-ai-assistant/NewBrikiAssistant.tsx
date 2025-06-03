@@ -259,12 +259,12 @@ const NewBrikiAssistant: React.FC = () => {
             return {
               role: msg.role,
               content: `${msg.content}\n\n[Planes previamente recomendados: ${planDetails}]`
-            };
+            } as APIMessage;
           }
           return {
             role: msg.role,
             content: msg.content,
-          };
+          } as APIMessage;
         });
 
       // Enhanced context injection - preserve accumulated user context
@@ -324,13 +324,121 @@ const NewBrikiAssistant: React.FC = () => {
                 ...msg,
                 id: `assistant-${Date.now()}`,
                 content: response.message || response.response || "No pude generar una respuesta.",
-                suggestedPlans: response.suggestedPlans || [],
+                suggestedPlans: finalSuggestedPlans || [],
                 isLoading: false,
                 timestamp: new Date(),
-                plansSummary: response.suggestedPlans?.length > 0 
-                  ? `Mostré ${response.suggestedPlans.length} planes de ${response.category || 'seguros'}` 
+                plansSummary: finalSuggestedPlans?.length > 0 
+                  ? `Mostré ${finalSuggestedPlans.length} planes de ${response.category || 'seguros'}` 
                   : undefined
               }
             : msg
         )
       );
+
+    } catch (error) {
+      console.error('Error sending message:', error);
+      toast({
+        title: "Error",
+        description: "No pude procesar tu mensaje. Por favor intenta de nuevo.",
+        variant: "destructive",
+      });
+      
+      // Remove loading message and show error
+      setMessages(prev => prev.filter(msg => !msg.isLoading));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  return (
+    <div className="flex flex-col h-full max-h-[600px] bg-white rounded-lg border border-gray-200 shadow-sm">
+      {/* Header */}
+      <div className="flex items-center gap-3 p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-cyan-500">
+        <Bot className="h-6 w-6 text-white" />
+        <div>
+          <h3 className="font-semibold text-white">Briki AI Assistant</h3>
+          <p className="text-sm text-blue-100">Tu compañero inteligente para seguros</p>
+        </div>
+      </div>
+
+      {/* Messages */}
+      <ScrollArea ref={scrollAreaRef} className="flex-1 p-4">
+        <div className="space-y-4">
+          {showWelcomeCard && <WelcomeCard onSendMessage={handleSendMessage} />}
+          
+          {messages.map((message) => (
+            <div
+              key={message.id}
+              className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+            >
+              <div
+                className={`max-w-[80%] rounded-lg p-3 ${
+                  message.role === 'user'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-900'
+                }`}
+              >
+                {message.isLoading ? (
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>Pensando...</span>
+                  </div>
+                ) : (
+                  <>
+                    <p className="whitespace-pre-wrap">{message.content}</p>
+                    {message.suggestedPlans && message.suggestedPlans.length > 0 && (
+                      <div className="mt-3">
+                        <Suspense fallback={<div>Cargando planes...</div>}>
+                          <SuggestedPlans plans={message.suggestedPlans} />
+                        </Suspense>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+          ))}
+          <div ref={messagesEndRef} />
+        </div>
+      </ScrollArea>
+
+      {/* Input */}
+      <div className="p-4 border-t border-gray-200">
+        <div className="flex gap-2">
+          <Input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="Escribe tu mensaje..."
+            disabled={isLoading}
+            className="flex-1"
+          />
+          <Button
+            onClick={() => handleSendMessage()}
+            disabled={isLoading || !input.trim()}
+            size="icon"
+          >
+            <Send className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default NewBrikiAssistant;
