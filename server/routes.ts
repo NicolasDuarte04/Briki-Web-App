@@ -30,7 +30,7 @@ import {
   generateInsuranceRecommendation, 
   explainInsuranceTerm, 
   comparePlans 
-} from "./services/openai";
+} from "./services/openai-service";
 import { parseCSVFile, parseXLSXFile } from "./services/plan-upload";
 import { insuranceDataService } from "./services/insurance-data-service";
 
