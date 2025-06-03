@@ -68,14 +68,45 @@ export default function BlogPostPage() {
     return (
       <PublicLayout>
         <main className="min-h-screen bg-gray-50">
-          <div className="max-w-4xl mx-auto px-4 py-12">
-            <div className="bg-white rounded-lg shadow-sm p-8 animate-pulse">
-              <div className="h-8 bg-gray-200 rounded mb-4"></div>
-              <div className="h-4 bg-gray-200 rounded w-2/3 mb-6"></div>
-              <div className="space-y-3">
+          {/* Header skeleton */}
+          <div className="bg-white border-b">
+            <div className="max-w-4xl mx-auto px-4 py-4">
+              <div className="w-24 h-8 bg-gray-200 rounded animate-pulse"></div>
+            </div>
+          </div>
+          
+          {/* Content skeleton */}
+          <div className="max-w-4xl mx-auto px-4 py-8 sm:py-12">
+            <div className="bg-white rounded-lg shadow-sm p-4 sm:p-8 animate-pulse">
+              {/* Category badge skeleton */}
+              <div className="w-20 h-6 bg-gray-200 rounded-full mb-4"></div>
+              
+              {/* Title skeleton */}
+              <div className="space-y-3 mb-6">
+                <div className="h-6 sm:h-8 bg-gray-200 rounded"></div>
+                <div className="h-6 sm:h-8 bg-gray-200 rounded w-4/5"></div>
+              </div>
+              
+              {/* Excerpt skeleton */}
+              <div className="space-y-2 mb-6">
+                <div className="h-4 bg-gray-200 rounded"></div>
+                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+              </div>
+              
+              {/* Meta info skeleton */}
+              <div className="flex flex-wrap gap-4 mb-8 pb-6 border-b">
+                <div className="w-20 h-4 bg-gray-200 rounded"></div>
+                <div className="w-24 h-4 bg-gray-200 rounded"></div>
+                <div className="w-16 h-4 bg-gray-200 rounded"></div>
+              </div>
+              
+              {/* Content skeleton */}
+              <div className="space-y-4">
                 <div className="h-4 bg-gray-200 rounded"></div>
                 <div className="h-4 bg-gray-200 rounded"></div>
                 <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+                <div className="h-4 bg-gray-200 rounded w-4/5"></div>
+                <div className="h-4 bg-gray-200 rounded"></div>
               </div>
             </div>
           </div>
@@ -135,65 +166,77 @@ export default function BlogPostPage() {
         </div>
 
         {/* Article content */}
-        <article className="max-w-4xl mx-auto px-4 py-12">
+        <article className="max-w-4xl mx-auto px-4 py-8 sm:py-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             className="bg-white rounded-lg shadow-sm overflow-hidden"
           >
+            {/* Featured image */}
+            {post.featured_image && (
+              <div className="w-full h-48 sm:h-64 md:h-80 overflow-hidden">
+                <img
+                  src={post.featured_image}
+                  alt={post.title}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
+
             {/* Article header */}
-            <div className="p-8 pb-6">
+            <div className="p-4 sm:p-8 pb-4 sm:pb-6">
               {post.category_name && (
-                <div className="flex items-center gap-2 mb-4">
+                <div className="flex flex-wrap items-center gap-2 mb-4">
                   <span 
-                    className="px-3 py-1 rounded-full text-sm font-medium text-white"
+                    className="px-3 py-1 rounded-full text-xs sm:text-sm font-medium text-white"
                     style={{ backgroundColor: post.category_color || '#3B82F6' }}
                   >
                     {post.category_name}
                   </span>
                   {post.featured && (
-                    <span className="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-sm font-medium">
+                    <span className="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-xs sm:text-sm font-medium">
                       Featured
                     </span>
                   )}
                 </div>
               )}
 
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 leading-tight">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4 leading-tight">
                 {post.title}
               </h1>
 
-              <p className="text-xl text-gray-600 mb-6 leading-relaxed">
+              <p className="text-lg sm:text-xl text-gray-600 mb-6 leading-relaxed">
                 {post.excerpt}
               </p>
 
               {/* Article meta */}
-              <div className="flex flex-wrap items-center gap-6 text-sm text-gray-500 pb-6 border-b">
-                <div className="flex items-center gap-2">
-                  <User className="w-4 h-4" />
+              <div className="flex flex-wrap items-center gap-3 sm:gap-6 text-xs sm:text-sm text-gray-500 pb-4 sm:pb-6 border-b">
+                <div className="flex items-center gap-1 sm:gap-2">
+                  <User className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span>By {post.author_name}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <CalendarIcon className="w-4 h-4" />
-                  <span>{format(publishedDate, 'MMMM d, yyyy')}</span>
+                <div className="flex items-center gap-1 sm:gap-2">
+                  <CalendarIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">{format(publishedDate, 'MMMM d, yyyy')}</span>
+                  <span className="sm:hidden">{format(publishedDate, 'MMM d, yyyy')}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4" />
+                <div className="flex items-center gap-1 sm:gap-2">
+                  <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span>{post.read_time} min read</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Eye className="w-4 h-4" />
+                <div className="flex items-center gap-1 sm:gap-2">
+                  <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span>{post.view_count} views</span>
                 </div>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={sharePost}
-                  className="flex items-center gap-2 ml-auto"
+                  className="flex items-center gap-1 sm:gap-2 ml-auto text-xs sm:text-sm p-1 sm:p-2"
                 >
-                  <Share2 className="w-4 h-4" />
-                  Share
+                  <Share2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Share</span>
                 </Button>
               </div>
             </div>

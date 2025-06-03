@@ -20,14 +20,21 @@ const loginSchema = z.object({
 });
 
 const registrationSchema = z.object({
-  firstName: z.string().min(1, "First name is required"),
+  firstName: z.string()
+    .min(1, "First name is required")
+    .min(2, "First name must be at least 2 characters")
+    .regex(/^[a-zA-Z\s]+$/, "First name can only contain letters"),
   lastName: z.string().optional(),
-  email: z.string().email("Please enter a valid email"),
+  email: z.string()
+    .email("Please enter a valid email")
+    .min(1, "Email is required"),
   password: z.string()
     .min(8, "Password must be at least 8 characters")
+    .max(128, "Password must be less than 128 characters")
     .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
     .regex(/[a-z]/, "Password must contain at least one lowercase letter")
-    .regex(/[0-9]/, "Password must contain at least one number"),
+    .regex(/[0-9]/, "Password must contain at least one number")
+    .regex(/[!@#$%^&*(),.?":{}|<>]/, "Password must contain at least one special character"),
   confirmPassword: z.string().min(1, "Please confirm your password"),
   acceptTerms: z.boolean().refine(val => val === true, {
     message: "You must accept the terms and conditions"
@@ -136,19 +143,31 @@ export default function UnifiedAuthForm({ mode, onSuccess }: UnifiedAuthFormProp
       minLength: password.length >= 8,
       hasUppercase: /[A-Z]/.test(password),
       hasLowercase: /[a-z]/.test(password),
-      hasNumber: /[0-9]/.test(password)
+      hasNumber: /[0-9]/.test(password),
+      hasSpecial: /[!@#$%^&*(),.?":{}|<>]/.test(password)
     };
   };
   
   const passwordValidation = getPasswordValidation(registerPassword);
+  const passwordStrength = Object.values(passwordValidation).filter(Boolean).length;
   
   // Component for rendering password requirements
   const PasswordRequirement = ({ fulfilled, text }: { fulfilled: boolean; text: string }) => (
-    <div className="flex items-center gap-2 text-sm">
-      <div className={`w-2 h-2 rounded-full transition-colors duration-300 ${fulfilled ? 'bg-green-500' : 'bg-gray-300'}`}></div>
-      <span className={fulfilled ? 'text-green-600' : 'text-gray-500'}>{text}</span>
+    <div className="flex items-center gap-2 text-xs">
+      <div className={`w-1.5 h-1.5 rounded-full transition-colors duration-300 ${fulfilled ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+      <span className={`transition-colors duration-300 ${fulfilled ? 'text-green-600' : 'text-gray-500'}`}>{text}</span>
     </div>
   );
+
+  // Password strength indicator
+  const getPasswordStrengthText = (strength: number) => {
+    if (strength <= 2) return { text: "Weak", color: "text-red-500" };
+    if (strength <= 3) return { text: "Fair", color: "text-yellow-500" };
+    if (strength <= 4) return { text: "Good", color: "text-blue-500" };
+    return { text: "Strong", color: "text-green-500" };
+  };
+
+  const passwordStrengthIndicator = getPasswordStrengthText(passwordStrength);
 
   // Handle Google OAuth login
   const handleGoogleLogin = () => {
