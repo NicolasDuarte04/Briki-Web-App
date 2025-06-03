@@ -13,40 +13,77 @@ import { AIAssistantProvider, AuthenticatedLayout, MainLayout } from "@/componen
 import { LoginNotification } from "@/components/login-notification";
 import { useNavigation } from "@/lib/navigation";
 import { useAnalytics } from "@/hooks/use-analytics";
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense } from "react";
 import { initGA, trackEvent } from "@/lib/analytics";
 import { EventCategory } from "@/constants/analytics";
 import { ColorProvider } from "@/contexts/color-context";
 import { AnonymousUserProvider } from "@/contexts/anonymous-user-context";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ErrorBoundary } from "@/components/error-boundary";
 
+// Core pages (loaded immediately)
 import NotFound from "@/pages/not-found";
 import LandingPage from "@/pages/landing-page";
 import DashboardRouter from "@/components/dashboard-router";
-// Import our new unified authentication screen
 import AuthPage from "@/pages/AuthPage";
-import TripInfoPage from "@/pages/trip-info-page";
-import InsuranceCategoriesPage from "@/pages/insurance-categories-page";
-import CheckoutPage from "@/pages/checkout-page";
-import WeatherRiskPage from "@/pages/weather-risk-page";
-import LearnMorePage from "@/pages/learn-more-page";
-import TermsPage from "@/pages/terms-page";
-import ProfilePage from "@/pages/profile-page";
-import SettingsPage from "@/pages/settings-page";
-import ApiSettingsPage from "@/pages/api-settings-page";
-// Import comparison screens
-import ComparePlansFixed from "@/pages/compare-plans-fixed";  // Fixed version of comparison component
 
-// Import new public site pages
-import FeaturesPage from "@/pages/features";
-import PricingPage from "@/pages/pricing";
-import AskBrikiPage from "@/pages/ask-briki";
+// Lazy-loaded pages for better performance
+const TripInfoPage = lazy(() => import("@/pages/trip-info-page"));
+const InsuranceCategoriesPage = lazy(() => import("@/pages/insurance-categories-page"));
+const CheckoutPage = lazy(() => import("@/pages/checkout-page"));
+const WeatherRiskPage = lazy(() => import("@/pages/weather-risk-page"));
+const LearnMorePage = lazy(() => import("@/pages/learn-more-page"));
+const TermsPage = lazy(() => import("@/pages/terms-page"));
+const ProfilePage = lazy(() => import("@/pages/profile-page"));
+const SettingsPage = lazy(() => import("@/pages/settings-page"));
+const ApiSettingsPage = lazy(() => import("@/pages/api-settings-page"));
+const ComparePlansFixed = lazy(() => import("@/pages/compare-plans-fixed"));
 
-import AskBrikiAIPage from "@/pages/ask-briki-ai";
-import BlogPage from "@/pages/blog";
-import BlogPostPage from "@/pages/blog/[slug]";
-import ForumPage from "@/pages/forum";
-import CareersPage from "@/pages/careers";
-import ColorPaletteDemo from "@/pages/color-palette-demo";
+// Public site pages
+const FeaturesPage = lazy(() => import("@/pages/features"));
+const PricingPage = lazy(() => import("@/pages/pricing"));
+const AskBrikiPage = lazy(() => import("@/pages/ask-briki"));
+const AskBrikiAIPage = lazy(() => import("@/pages/ask-briki-ai"));
+const BlogPage = lazy(() => import("@/pages/blog"));
+const BlogPostPage = lazy(() => import("@/pages/blog/[slug]"));
+const ForumPage = lazy(() => import("@/pages/forum"));
+const CareersPage = lazy(() => import("@/pages/careers"));
+const ColorPaletteDemo = lazy(() => import("@/pages/color-palette-demo"));
+
+// Insurance category pages
+const TravelInsurance = lazy(() => import("@/pages/insurance/travel"));
+const AutoInsurance = lazy(() => import("@/pages/insurance/auto"));
+const PetInsurance = lazy(() => import("@/pages/insurance/pet"));
+const HealthInsurance = lazy(() => import("@/pages/insurance/health"));
+
+// Quote pages
+const GetQuotePage = lazy(() => import("@/pages/get-quote"));
+const QuoteConfirmationPage = lazy(() => import("@/pages/quote-confirmation"));
+const QuoteHistoryPage = lazy(() => import("@/pages/quote-history"));
+const InsuranceQuote = lazy(() => import("@/pages/insurance/[category]/quote"));
+
+// Explore pages
+const ExploreTravelInsurance = lazy(() => import("@/pages/explore/travel"));
+const ExploreAutoInsurance = lazy(() => import("@/pages/explore/auto"));
+const ExplorePetInsurance = lazy(() => import("@/pages/explore/pet"));
+const ExploreHealthInsurance = lazy(() => import("@/pages/explore/health"));
+
+// Company pages
+const CompanyPage = lazy(() => import("@/pages/company-page"));
+const CompanyLogin = lazy(() => import("@/pages/company-login"));
+const CompanyRegister = lazy(() => import("@/pages/company-register"));
+const CompanyDashboard = lazy(() => import("@/pages/company-dashboard"));
+const CompanyUploadPage = lazy(() => import("@/pages/company-upload-page"));
+const CompanyAnalysisPage = lazy(() => import("@/pages/company-analysis-page"));
+const CompanyMarketplacePage = lazy(() => import("@/pages/company-marketplace-page"));
+const CompanySettings = lazy(() => import("@/pages/company-settings-page"));
+const CompanyPreviewPage = lazy(() => import("@/pages/company-preview-page"));
+const CompanyRequestPilotPage = lazy(() => import("@/pages/company-request-pilot-page"));
+const ContactSalesPage = lazy(() => import("@/pages/contact-sales-page"));
+const CompanyPlans = lazy(() => import("@/pages/company-plans"));
+const CompanyPlanEdit = lazy(() => import("@/pages/company-plan-edit"));
+const CountdownPageNew = lazy(() => import("@/pages/countdown-page-new"));
+const BrikiPilotPortal = lazy(() => import("@/pages/briki-pilot-portal"));
 
 // Import redirects from their respective files
 import { 
@@ -59,44 +96,16 @@ import {
 import { 
   InsurancePlansRedirect 
 } from "@/pages/redirects/plans-redirects";
-// Legacy AI assistant imports removed - all routes now redirect to /ask-briki-ai
-import CountdownPageNew from "@/pages/countdown-page-new";
-import BrikiPilotPortal from "@/pages/briki-pilot-portal";
 
-// New insurance category pages
-import TravelInsurance from "@/pages/insurance/travel";
-import AutoInsurance from "@/pages/insurance/auto";
-import PetInsurance from "@/pages/insurance/pet";
-import HealthInsurance from "@/pages/insurance/health";
-
-// Quote pages
-import GetQuotePage from "@/pages/get-quote";
-import QuoteConfirmationPage from "@/pages/quote-confirmation";
-import QuoteHistoryPage from "@/pages/quote-history";
-
-// Comparison pages
-import InsuranceQuote from "@/pages/insurance/[category]/quote";
-
-// Explore pages (public-facing SEO pages without app layout)
-import ExploreTravelInsurance from "@/pages/explore/travel";
-import ExploreAutoInsurance from "@/pages/explore/auto";
-import ExplorePetInsurance from "@/pages/explore/pet";
-import ExploreHealthInsurance from "@/pages/explore/health";
-
-// Company pages
-import CompanyPage from "@/pages/company-page";
-import CompanyLogin from "@/pages/company-login";
-import CompanyRegister from "@/pages/company-register";
-import CompanyDashboard from "@/pages/company-dashboard";
-import CompanyUploadPage from "@/pages/company-upload-page";
-import CompanyAnalysisPage from "@/pages/company-analysis-page";
-import CompanyMarketplacePage from "@/pages/company-marketplace-page";
-import CompanySettings from "@/pages/company-settings-page";
-import CompanyPreviewPage from "@/pages/company-preview-page";
-import CompanyRequestPilotPage from "@/pages/company-request-pilot-page";
-import ContactSalesPage from "@/pages/contact-sales-page";
-import CompanyPlans from "@/pages/company-plans";
-import CompanyPlanEdit from "@/pages/company-plan-edit";
+// Loading component for lazy-loaded pages
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="text-center space-y-4">
+      <Skeleton className="h-8 w-48 mx-auto" />
+      <Skeleton className="h-4 w-32 mx-auto" />
+    </div>
+  </div>
+);
 
 // Removed unused ConditionalAIProvider
 
@@ -118,14 +127,34 @@ function Router() {
     <PageTransition>
       <Switch>
         <Route path="/" component={LandingPage} />
-        <Route path="/countdown" component={CountdownPageNew} />
+        <Route path="/countdown">
+          <Suspense fallback={<PageLoader />}>
+            <CountdownPageNew />
+          </Suspense>
+        </Route>
         <Route path="/home" component={DashboardRouter} />
         <Route path="/dashboard" component={DashboardRouter} />
         <Route path="/auth" component={AuthPage} />
-        <Route path="/categories" component={InsuranceCategoriesPage} />
-        <Route path="/trip-info" component={TripInfoPage} />
-        <Route path="/checkout/:planId" component={CheckoutPage} />
-        <Route path="/weather-risk" component={WeatherRiskPage} />
+        <Route path="/categories">
+          <Suspense fallback={<PageLoader />}>
+            <InsuranceCategoriesPage />
+          </Suspense>
+        </Route>
+        <Route path="/trip-info">
+          <Suspense fallback={<PageLoader />}>
+            <TripInfoPage />
+          </Suspense>
+        </Route>
+        <Route path="/checkout/:planId">
+          <Suspense fallback={<PageLoader />}>
+            <CheckoutPage />
+          </Suspense>
+        </Route>
+        <Route path="/weather-risk">
+          <Suspense fallback={<PageLoader />}>
+            <WeatherRiskPage />
+          </Suspense>
+        </Route>
         {/* Legacy routes - redirected to new paths */}
         <Route path="/auto-insurance" component={AutoInsuranceRedirect} />
         <Route path="/pet-insurance" component={PetInsuranceRedirect} />
