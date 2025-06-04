@@ -349,20 +349,63 @@ function Router() {
           </Suspense>
         </Route>
         {/* Legacy routes */}
-        <Route path="/company-dashboard/preview" component={CompanyPreviewPage} />
-        <Route path="/company-dashboard/request-pilot" component={CompanyRequestPilotPage} />
+        <Route path="/company-dashboard/preview">
+          <Suspense fallback={<PageLoader />}>
+            <CompanyPreviewPage />
+          </Suspense>
+        </Route>
+        <Route path="/company-dashboard/request-pilot">
+          <Suspense fallback={<PageLoader />}>
+            <CompanyRequestPilotPage />
+          </Suspense>
+        </Route>
         
-        {/* New public site routes */}
-        <Route path="/features" component={FeaturesPage} />
-        <Route path="/pricing" component={PricingPage} />
-        <Route path="/ask-briki" component={AskBrikiPage} />
-
-        <Route path="/ask-briki-ai" component={AskBrikiAIPage} />
-        <Route path="/blog" component={BlogPage} />
-        <Route path="/blog/:slug" component={BlogPostPage} />
-        <Route path="/forum" component={ForumPage} />
-        <Route path="/careers" component={CareersPage} />
-        <Route path="/color-palette" component={ColorPaletteDemo} />
+        {/* Public site routes with Suspense */}
+        <Route path="/features">
+          <Suspense fallback={<PageLoader />}>
+            <FeaturesPage />
+          </Suspense>
+        </Route>
+        <Route path="/pricing">
+          <Suspense fallback={<PageLoader />}>
+            <PricingPage />
+          </Suspense>
+        </Route>
+        <Route path="/ask-briki">
+          <Suspense fallback={<PageLoader />}>
+            <AskBrikiPage />
+          </Suspense>
+        </Route>
+        <Route path="/ask-briki-ai">
+          <Suspense fallback={<PageLoader />}>
+            <AskBrikiAIPage />
+          </Suspense>
+        </Route>
+        <Route path="/blog">
+          <Suspense fallback={<PageLoader />}>
+            <BlogPage />
+          </Suspense>
+        </Route>
+        <Route path="/blog/:slug">
+          <Suspense fallback={<PageLoader />}>
+            <BlogPostPage />
+          </Suspense>
+        </Route>
+        <Route path="/forum">
+          <Suspense fallback={<PageLoader />}>
+            <ForumPage />
+          </Suspense>
+        </Route>
+        <Route path="/careers">
+          <Suspense fallback={<PageLoader />}>
+            <CareersPage />
+          </Suspense>
+        </Route>
+        <Route path="/color-palette">
+          <Suspense fallback={<PageLoader />}>
+            <ColorPaletteDemo />
+          </Suspense>
+        </Route>
         
         <Route component={NotFound} />
       </Switch>
