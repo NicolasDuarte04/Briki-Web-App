@@ -20,6 +20,7 @@ import { ColorProvider } from "@/contexts/color-context";
 import { AnonymousUserProvider } from "@/contexts/anonymous-user-context";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorBoundary } from "@/components/error-boundary";
+import FeedbackWidget from "@/components/feedback/FeedbackWidget";
 
 // Core pages (loaded immediately)
 import NotFound from "@/pages/not-found";
@@ -84,6 +85,7 @@ const CompanyPlans = lazy(() => import("@/pages/company-plans"));
 const CompanyPlanEdit = lazy(() => import("@/pages/company-plan-edit"));
 const CountdownPageNew = lazy(() => import("@/pages/countdown-page-new"));
 const BrikiPilotPortal = lazy(() => import("@/pages/briki-pilot-portal"));
+const FeedbackAnalyticsPage = lazy(() => import("@/pages/feedback-analytics"));
 
 // Import redirects from their respective files
 import { 
@@ -407,6 +409,13 @@ function Router() {
           </Suspense>
         </Route>
         
+        {/* Feedback Analytics (Admin/Internal) */}
+        <Route path="/admin/feedback">
+          <Suspense fallback={<PageLoader />}>
+            <FeedbackAnalyticsPage />
+          </Suspense>
+        </Route>
+        
         <Route component={NotFound} />
       </Switch>
     </PageTransition>
@@ -491,6 +500,7 @@ function AppContent() {
       <AIAssistantProvider>
         <MainLayout>
           <Router />
+          <FeedbackWidget />
         </MainLayout>
       </AIAssistantProvider>
     );
@@ -502,6 +512,7 @@ function AppContent() {
       <AIAssistantProvider>
         <MainLayout>
           <Router />
+          <FeedbackWidget />
         </MainLayout>
       </AIAssistantProvider>
     );
