@@ -13,7 +13,7 @@ import { AIAssistantProvider, AuthenticatedLayout, MainLayout } from "@/componen
 import { LoginNotification } from "@/components/login-notification";
 import { useNavigation } from "@/lib/navigation";
 import { useAnalytics } from "@/hooks/use-analytics";
-import { useEffect, lazy, Suspense } from "react";
+import { useEffect, lazy, Suspense, startTransition } from "react";
 import { initGA, trackEvent } from "@/lib/analytics";
 import { EventCategory } from "@/constants/analytics";
 import { ColorProvider } from "@/contexts/color-context";
@@ -162,45 +162,134 @@ function Router() {
         <Route path="/travel-insurance" component={TravelInsuranceRedirect} />
         <Route path="/insurance-plans" component={InsurancePlansRedirect} />
         
-        {/* New insurance category routes (for authenticated app) */}
-        <Route path="/insurance/travel" component={TravelInsurance} />
-        <Route path="/insurance/auto" component={AutoInsurance} />
-        <Route path="/insurance/pet" component={PetInsurance} />
-        <Route path="/insurance/health" component={HealthInsurance} />
-        {/* Use the fixed version of the comparison page */}
-        <Route path="/compare-plans" component={ComparePlansFixed} />
+        {/* Insurance category routes with proper Suspense */}
+        <Route path="/insurance/travel">
+          <Suspense fallback={<PageLoader />}>
+            <TravelInsurance />
+          </Suspense>
+        </Route>
+        <Route path="/insurance/auto">
+          <Suspense fallback={<PageLoader />}>
+            <AutoInsurance />
+          </Suspense>
+        </Route>
+        <Route path="/insurance/pet">
+          <Suspense fallback={<PageLoader />}>
+            <PetInsurance />
+          </Suspense>
+        </Route>
+        <Route path="/insurance/health">
+          <Suspense fallback={<PageLoader />}>
+            <HealthInsurance />
+          </Suspense>
+        </Route>
         
-        {/* Public-facing explore pages (for SEO and non-authenticated users) */}
-        <Route path="/explore/travel" component={ExploreTravelInsurance} />
-        <Route path="/explore/auto" component={ExploreAutoInsurance} />
-        <Route path="/explore/pet" component={ExplorePetInsurance} />
-        <Route path="/explore/health" component={ExploreHealthInsurance} />
+        {/* Comparison page */}
+        <Route path="/compare-plans">
+          <Suspense fallback={<PageLoader />}>
+            <ComparePlansFixed />
+          </Suspense>
+        </Route>
         
-        {/* Quote pages for each insurance category */}
-        <Route path="/insurance/:category/quote" component={InsuranceQuote} />
-        <Route path="/get-quote" component={GetQuotePage} />
-        <Route path="/quote-confirmation" component={QuoteConfirmationPage} />
-        <Route path="/quote-history" component={QuoteHistoryPage} />
+        {/* Public explore pages */}
+        <Route path="/explore/travel">
+          <Suspense fallback={<PageLoader />}>
+            <ExploreTravelInsurance />
+          </Suspense>
+        </Route>
+        <Route path="/explore/auto">
+          <Suspense fallback={<PageLoader />}>
+            <ExploreAutoInsurance />
+          </Suspense>
+        </Route>
+        <Route path="/explore/pet">
+          <Suspense fallback={<PageLoader />}>
+            <ExplorePetInsurance />
+          </Suspense>
+        </Route>
+        <Route path="/explore/health">
+          <Suspense fallback={<PageLoader />}>
+            <ExploreHealthInsurance />
+          </Suspense>
+        </Route>
+        
+        {/* Quote pages */}
+        <Route path="/insurance/:category/quote">
+          <Suspense fallback={<PageLoader />}>
+            <InsuranceQuote />
+          </Suspense>
+        </Route>
+        <Route path="/get-quote">
+          <Suspense fallback={<PageLoader />}>
+            <GetQuotePage />
+          </Suspense>
+        </Route>
+        <Route path="/quote-confirmation">
+          <Suspense fallback={<PageLoader />}>
+            <QuoteConfirmationPage />
+          </Suspense>
+        </Route>
+        <Route path="/quote-history">
+          <Suspense fallback={<PageLoader />}>
+            <QuoteHistoryPage />
+          </Suspense>
+        </Route>
 
-        <Route path="/learn-more" component={LearnMorePage} />
-        <Route path="/terms" component={TermsPage} />
+        <Route path="/learn-more">
+          <Suspense fallback={<PageLoader />}>
+            <LearnMorePage />
+          </Suspense>
+        </Route>
+        <Route path="/terms">
+          <Suspense fallback={<PageLoader />}>
+            <TermsPage />
+          </Suspense>
+        </Route>
         <Route path="/ai-assistant" component={() => {
           window.location.replace("/ask-briki-ai");
           return null;
         }} />
-        <Route path="/profile" component={ProfilePage} />
-        <Route path="/settings" component={SettingsPage} />
-        <Route path="/api-settings" component={ApiSettingsPage} />
+        <Route path="/profile">
+          <Suspense fallback={<PageLoader />}>
+            <ProfilePage />
+          </Suspense>
+        </Route>
+        <Route path="/settings">
+          <Suspense fallback={<PageLoader />}>
+            <SettingsPage />
+          </Suspense>
+        </Route>
+        <Route path="/api-settings">
+          <Suspense fallback={<PageLoader />}>
+            <ApiSettingsPage />
+          </Suspense>
+        </Route>
         <Route path="/assistant" component={() => {
           window.location.replace("/ask-briki-ai");
           return null;
         }} />
         
-        {/* Company/Partner Routes - Updated for consistency */}
-        <Route path="/company" component={CompanyPage} />
-        <Route path="/briki-pilot" component={BrikiPilotPortal} />
-        <Route path="/company-login" component={CompanyLogin} />
-        <Route path="/company-register" component={CompanyRegister} />
+        {/* Company/Partner Routes with proper Suspense */}
+        <Route path="/company">
+          <Suspense fallback={<PageLoader />}>
+            <CompanyPage />
+          </Suspense>
+        </Route>
+        <Route path="/briki-pilot">
+          <Suspense fallback={<PageLoader />}>
+            <BrikiPilotPortal />
+          </Suspense>
+        </Route>
+        <Route path="/company-login">
+          <Suspense fallback={<PageLoader />}>
+            <CompanyLogin />
+          </Suspense>
+        </Route>
+        <Route path="/company-register">
+          <Suspense fallback={<PageLoader />}>
+            <CompanyRegister />
+          </Suspense>
+        </Route>
         
         {/* Backward compatibility redirects */}
         <Route path="/company-login-new" component={() => {
@@ -212,21 +301,53 @@ function Router() {
           return null;
         }} />
         
-        <Route path="/contact-sales" component={ContactSalesPage} />
-        <Route path="/company-dashboard" component={CompanyDashboard} />
+        <Route path="/contact-sales">
+          <Suspense fallback={<PageLoader />}>
+            <ContactSalesPage />
+          </Suspense>
+        </Route>
+        <Route path="/company-dashboard">
+          <Suspense fallback={<PageLoader />}>
+            <CompanyDashboard />
+          </Suspense>
+        </Route>
         
         {/* Redirect for legacy routes */}
         <Route path="/company-dashboard-redesigned" component={() => {
           window.location.replace("/company-dashboard");
           return null;
         }} />
-        <Route path="/company-dashboard/upload" component={CompanyUploadPage} />
-        <Route path="/company-dashboard/analysis" component={CompanyAnalysisPage} />
-        <Route path="/company-dashboard/marketplace" component={CompanyMarketplacePage} />
-        <Route path="/company-dashboard/settings" component={CompanySettings} />
+        <Route path="/company-dashboard/upload">
+          <Suspense fallback={<PageLoader />}>
+            <CompanyUploadPage />
+          </Suspense>
+        </Route>
+        <Route path="/company-dashboard/analysis">
+          <Suspense fallback={<PageLoader />}>
+            <CompanyAnalysisPage />
+          </Suspense>
+        </Route>
+        <Route path="/company-dashboard/marketplace">
+          <Suspense fallback={<PageLoader />}>
+            <CompanyMarketplacePage />
+          </Suspense>
+        </Route>
+        <Route path="/company-dashboard/settings">
+          <Suspense fallback={<PageLoader />}>
+            <CompanySettings />
+          </Suspense>
+        </Route>
         {/* Plan management routes */}
-        <Route path="/company-plans" component={CompanyPlans} />
-        <Route path="/company-plans/:id/edit" component={CompanyPlanEdit} />
+        <Route path="/company-plans">
+          <Suspense fallback={<PageLoader />}>
+            <CompanyPlans />
+          </Suspense>
+        </Route>
+        <Route path="/company-plans/:id/edit">
+          <Suspense fallback={<PageLoader />}>
+            <CompanyPlanEdit />
+          </Suspense>
+        </Route>
         {/* Legacy routes */}
         <Route path="/company-dashboard/preview" component={CompanyPreviewPage} />
         <Route path="/company-dashboard/request-pilot" component={CompanyRequestPilotPage} />
