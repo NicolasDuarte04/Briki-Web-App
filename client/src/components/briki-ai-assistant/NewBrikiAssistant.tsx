@@ -39,6 +39,66 @@ const REQUIRED_CONTEXT: ContextRequirements = {
   health: ['age', 'familySize', 'conditions']
 };
 
+// Plan extraction function to parse AI response and populate suggestedPlans array
+function extractPlansFromMessage(message: string): { cleanedMessage: string; plans: InsurancePlan[] } {
+  const plans: InsurancePlan[] = [];
+  let cleanedMessage = message;
+
+  // Pattern to match plan blocks in the AI response
+  const planPattern = /(\d+\.\s*\*\*([^*]+)\*\*[^]*?)(?=\d+\.\s*\*\*|$)/g;
+  const matches = Array.from(message.matchAll(planPattern));
+
+  for (const match of matches) {
+    const planBlock = match[1];
+    const planName = match[2];
+
+    // Extract plan details using regex patterns
+    const priceMatch = planBlock.match(/Precio:\s*([^\n]+)/);
+    const coverageMatch = planBlock.match(/Cobertura:\s*([^\n]+)/);
+    const descriptionMatch = planBlock.match(/Descripción:\s*([^\n]+)/);
+    const providerMatch = planBlock.match(/\(([^)]+)\)/);
+
+    if (priceMatch && coverageMatch && descriptionMatch) {
+      const priceText = priceMatch[1].trim();
+      const basePrice = parseFloat(priceText.match(/[\d.]+/)?.[0] || '0');
+      const currency = priceText.includes('USD') ? 'USD' : 'COP';
+      const coverageAmount = parseInt(coverageMatch[1].trim().match(/[\d]+/)?.[0] || '0');
+      const provider = providerMatch?.[1] || 'Proveedor';
+
+      const plan: InsurancePlan = {
+        id: `plan-${plans.length + 1}`,
+        category: 'pet', // Default, can be enhanced to detect category
+        provider: provider,
+        name: planName.trim(),
+        description: descriptionMatch[1].trim(),
+        basePrice: basePrice,
+        currency: currency,
+        duration: 'mensual',
+        coverageAmount: coverageAmount,
+        coverage: {},
+        features: [],
+        deductible: 0,
+        exclusions: [],
+        addOns: [],
+        tags: ['recomendado'],
+        rating: 4.5,
+        status: 'active'
+      };
+
+      plans.push(plan);
+    }
+  }
+
+  // Remove plan blocks from message if plans were extracted
+  if (plans.length > 0) {
+    cleanedMessage = message.replace(planPattern, '').trim();
+    // Clean up any remaining numbered list artifacts
+    cleanedMessage = cleanedMessage.replace(/^\d+\.\s*/gm, '').trim();
+  }
+
+  return { cleanedMessage, plans };
+}
+
 // NEW: Detect insurance category from user message
 function detectInsuranceCategory(message: string): string {
   const lowerMessage = message.toLowerCase().trim();
@@ -283,35 +343,45 @@ const NewBrikiAssistant: React.FC = () => {
         }).join(', ');
 
         conversationHistory.unshift({
-          role: 'system',
+          role: 'assistant',
           content: `Contexto acumulado del usuario: ${contextText}. ${shouldRequestPlans ? 'El usuario tiene suficiente contexto para ver planes.' : 'El usuario necesita más contexto antes de mostrar planes.'}`
-        } as APIMessage);
+        });
       }
 
       // Get AI response with conversation history
       const response = await sendMessageToAI(messageToSend, conversationHistory);
 
+      // Extract plans from response text if not already in suggestedPlans array
+      const { cleanedMessage, plans: extractedPlans } = extractPlansFromMessage(response.response);
+      
       // Debug logging for data flow analysis
       console.log('🔍 NewBrikiAssistant - AI Response received:', {
-        hasMessage: !!response.message,
+        hasMessage: !!response.response,
         hasSuggestedPlans: !!response.suggestedPlans,
         planCount: response.suggestedPlans?.length || 0,
-        planNames: response.suggestedPlans?.map(p => p.name) || [],
+        planNames: response.suggestedPlans?.map((p: any) => p.name) || [],
+        extractedPlanCount: extractedPlans.length,
+        extractedPlanNames: extractedPlans.map(p => p.name),
         shouldHaveShownPlans: shouldRequestPlans,
         fullResponse: response
       });
 
-      // FIXED: Validate that plans are only shown when context is sufficient
-      let finalSuggestedPlans = response.suggestedPlans;
+      // Use extracted plans if backend didn't return structured plans
+      let finalSuggestedPlans = response.suggestedPlans && response.suggestedPlans.length > 0 
+        ? response.suggestedPlans 
+        : extractedPlans;
 
-      if (response.suggestedPlans && response.suggestedPlans.length > 0) {
+      // Use cleaned message if plans were extracted, otherwise use original
+      let finalMessage = extractedPlans.length > 0 ? cleanedMessage : response.response;
+
+      if (finalSuggestedPlans && finalSuggestedPlans.length > 0) {
         if (!shouldRequestPlans) {
           console.warn('⚠️  Plans were returned but context is insufficient - filtering out plans');
-          finalSuggestedPlans = undefined;
+          finalSuggestedPlans = [];
 
           // Show a helpful message instead
-          if (!response.message.includes('más información') && !response.message.includes('preguntas')) {
-            response.message += '\n\nPara recomendarte los mejores planes, necesito conocer un poco más sobre tus necesidades específicas.';
+          if (!finalMessage.includes('más información') && !finalMessage.includes('preguntas')) {
+            finalMessage += '\n\nPara recomendarte los mejores planes, necesito conocer un poco más sobre tus necesidades específicas.';
           }
         }
       }
