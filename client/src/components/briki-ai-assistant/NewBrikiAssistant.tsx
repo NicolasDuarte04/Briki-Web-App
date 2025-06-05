@@ -350,6 +350,10 @@ const NewBrikiAssistant: React.FC = () => {
 
       // Get AI response with conversation history
       const response = await sendMessageToAI(messageToSend, conversationHistory);
+      
+      console.log('🔍 Raw AI Response:', response);
+      console.log('🔍 Response type:', typeof response);
+      console.log('🔍 Response keys:', Object.keys(response || {}));
 
       // Extract plans from response text if not already in suggestedPlans array
       const { cleanedMessage, plans: extractedPlans } = extractPlansFromMessage(response.response);
