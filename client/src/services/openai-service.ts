@@ -21,16 +21,15 @@ export async function sendMessageToAI(
   conversationHistory: APIMessage[] = []
 ): Promise<AIResponse> {
   try {
-    const response = await apiRequest('POST', '/api/ai/chat', {
-      message,
-      conversationHistory
+    const response = await apiRequest('/api/ai/chat', {
+      method: 'POST',
+      data: {
+        message,
+        conversationHistory
+      }
     });
 
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
-    }
-
-    return await response.json();
+    return response;
   } catch (error) {
     console.error('Error sending message to AI:', error);
     throw error;
