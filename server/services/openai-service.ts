@@ -394,7 +394,8 @@ function analyzeContextNeeds(userMessage: string, conversationHistory: Assistant
     };
 
     const missingCount = Object.values(autoDetails).filter(Boolean).length;
-    const needsMoreInfo = !hasDetailedContext && missingCount < 2;
+    // More lenient - show plans with minimal context for auto insurance
+    const needsMoreInfo = !hasDetailedContext && missingCount === 0;
 
     return {
       needsMoreContext: needsMoreInfo,
@@ -494,6 +495,12 @@ ${contextAnalysis.needsMoreContext ? `
 - Explica en términos simples
 - Haz preguntas relevantes para entender mejor las necesidades
 - SIEMPRE termina invitando a continuar la conversación
+- CUANDO MUESTRES PLANES: Menciona brevemente que verán las opciones como tarjetas visuales
+
+## IMPORTANTE SOBRE MOSTRAR PLANES:
+- Si tienes planes relevantes disponibles, menciona que aparecerán como tarjetas interactivas
+- NO describas los planes en detalle en texto, las tarjetas mostrarán toda la información
+- Simplemente introduce los planes y deja que las tarjetas hagan el trabajo visual
 
 ${relevantPlans.length > 0 ? `
 ## PLANES DISPONIBLES:
