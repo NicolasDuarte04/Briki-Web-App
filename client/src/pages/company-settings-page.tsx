@@ -1,524 +1,668 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { useToast } from '@/hooks/use-toast';
-import { 
-  Building2, 
-  Bell, 
-  Shield, 
-  CreditCard,
-  Settings,
+import { useState } from "react";
+import {
   Save,
-  Upload
-} from 'lucide-react';
+  Lock,
+  User,
+  Bell,
+  Key,
+  Mail,
+  Shield,
+  HelpCircle,
+  Globe,
+  Moon,
+  Sun,
+  Languages,
+  Clock
+} from "lucide-react";
+import CompanyLayout from "@/components/layout/company-layout";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/use-auth";
 
-interface CompanyProfile {
-  name: string;
-  email: string;
-  phone: string;
-  website: string;
-  address: string;
-  description: string;
-  logo?: string;
-}
-
-interface NotificationSettings {
-  emailNotifications: boolean;
-  smsNotifications: boolean;
-  marketingEmails: boolean;
-  weeklyReports: boolean;
-}
-
-interface APISettings {
-  apiKey: string;
-  webhookUrl: string;
-  rateLimit: number;
-}
-
-const CompanySettingsPage: React.FC = () => {
-  const [profile, setProfile] = useState<CompanyProfile>({
-    name: '',
-    email: '',
-    phone: '',
-    website: '',
-    address: '',
-    description: ''
-  });
-  
-  const [notifications, setNotifications] = useState<NotificationSettings>({
-    emailNotifications: true,
-    smsNotifications: false,
-    marketingEmails: true,
-    weeklyReports: true
-  });
-
-  const [apiSettings, setApiSettings] = useState<APISettings>({
-    apiKey: '',
-    webhookUrl: '',
-    rateLimit: 1000
-  });
-
-  const [isLoading, setIsLoading] = useState(false);
+export default function CompanySettingsPage() {
   const { toast } = useToast();
+  const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState("account");
+  const [darkMode, setDarkMode] = useState(true);
+  const [emailNotifications, setEmailNotifications] = useState(true);
+  const [browserNotifications, setBrowserNotifications] = useState(true);
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+  const [language, setLanguage] = useState("en");
+  const [timezone, setTimezone] = useState("America/New_York");
 
-  useEffect(() => {
-    loadCompanySettings();
-  }, []);
-
-  const loadCompanySettings = async () => {
-    try {
-      const savedProfile = localStorage.getItem('companyProfile');
-      const savedNotifications = localStorage.getItem('notificationSettings');
-      const savedApiSettings = localStorage.getItem('apiSettings');
-
-      if (savedProfile) setProfile(JSON.parse(savedProfile));
-      if (savedNotifications) setNotifications(JSON.parse(savedNotifications));
-      if (savedApiSettings) setApiSettings(JSON.parse(savedApiSettings));
-    } catch (error) {
-      console.error('Error loading settings:', error);
-    }
+  // Save settings handler
+  const handleSaveSettings = () => {
+    toast({
+      title: "Settings saved",
+      description: "Your preferences have been updated successfully",
+    });
   };
 
-  const handleSaveProfile = async () => {
-    setIsLoading(true);
-    try {
-      localStorage.setItem('companyProfile', JSON.stringify(profile));
-      toast({
-        title: "Profile Updated",
-        description: "Your company profile has been saved successfully.",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update profile. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
+  // Get company name or fallback to username
+  const getCompanyName = () => {
+    if (!user) return "Company";
+    
+    if (user.companyProfile?.name) {
+      return user.companyProfile.name;
     }
+    
+    return user.username;
   };
 
-  const handleSaveNotifications = async () => {
-    setIsLoading(true);
-    try {
-      localStorage.setItem('notificationSettings', JSON.stringify(notifications));
-      toast({
-        title: "Notifications Updated",
-        description: "Your notification preferences have been saved.",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update notifications. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSaveApiSettings = async () => {
-    setIsLoading(true);
-    try {
-      localStorage.setItem('apiSettings', JSON.stringify(apiSettings));
-      toast({
-        title: "API Settings Updated",
-        description: "Your API configuration has been saved.",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update API settings. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+  // Get user email
+  const getUserEmail = () => {
+    if (!user) return "email@example.com";
+    return user.email;
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-4 sm:py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <div className="mb-6 sm:mb-8">
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-3">
-              <Settings className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600" />
-              Company Settings
-            </h1>
-            <p className="text-gray-600 mt-2 text-sm sm:text-base">
-              Manage your company profile, notifications, and API settings
-            </p>
-          </div>
-
-          <Tabs defaultValue="profile" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4">
-              <TabsTrigger value="profile" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
-                <Building2 className="h-3 w-3 sm:h-4 sm:w-4" />
-                <span className="hidden sm:inline">Profile</span>
-                <span className="sm:hidden">Info</span>
-              </TabsTrigger>
-              <TabsTrigger value="notifications" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
-                <Bell className="h-3 w-3 sm:h-4 sm:w-4" />
-                <span className="hidden sm:inline">Notifications</span>
-                <span className="sm:hidden">Alerts</span>
-              </TabsTrigger>
-              <TabsTrigger value="api" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
-                <Shield className="h-3 w-3 sm:h-4 sm:w-4" />
-                <span>API</span>
-              </TabsTrigger>
-              <TabsTrigger value="billing" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
-                <CreditCard className="h-3 w-3 sm:h-4 sm:w-4" />
-                <span className="hidden sm:inline">Billing</span>
-                <span className="sm:hidden">Bill</span>
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="profile">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg sm:text-xl">Company Profile</CardTitle>
-                  <CardDescription className="text-sm sm:text-base">
-                    Update your company information and branding
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4 sm:space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+    <CompanyLayout>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="space-y-1">
+          <h1 className="text-2xl font-semibold text-white">Settings</h1>
+          <p className="text-gray-400">Manage your account preferences and company settings</p>
+        </div>
+        
+        {/* Settings Tabs */}
+        <Card className="bg-[#0A2540] border-[#1E3A59]">
+          <div className="flex flex-col md:flex-row">
+            {/* Sidebar */}
+            <div className="md:w-64 border-r border-[#1E3A59] flex-shrink-0">
+              <div className="p-6">
+                <div className="space-y-1">
+                  <h3 className="text-white font-medium">Settings</h3>
+                  <p className="text-gray-400 text-sm">Manage your preferences</p>
+                </div>
+              </div>
+              <div className="border-t border-[#1E3A59]">
+                <div className="py-2">
+                  <button
+                    className={`w-full text-left px-6 py-3 transition-colors flex items-center ${activeTab === "account" ? "bg-[#01101F] text-white" : "text-gray-400 hover:text-white hover:bg-[#01101F]"}`}
+                    onClick={() => setActiveTab("account")}
+                  >
+                    <User className="h-4 w-4 mr-3" />
+                    Account
+                  </button>
+                  <button
+                    className={`w-full text-left px-6 py-3 transition-colors flex items-center ${activeTab === "security" ? "bg-[#01101F] text-white" : "text-gray-400 hover:text-white hover:bg-[#01101F]"}`}
+                    onClick={() => setActiveTab("security")}
+                  >
+                    <Lock className="h-4 w-4 mr-3" />
+                    Security
+                  </button>
+                  <button
+                    className={`w-full text-left px-6 py-3 transition-colors flex items-center ${activeTab === "notifications" ? "bg-[#01101F] text-white" : "text-gray-400 hover:text-white hover:bg-[#01101F]"}`}
+                    onClick={() => setActiveTab("notifications")}
+                  >
+                    <Bell className="h-4 w-4 mr-3" />
+                    Notifications
+                  </button>
+                  <button
+                    className={`w-full text-left px-6 py-3 transition-colors flex items-center ${activeTab === "appearance" ? "bg-[#01101F] text-white" : "text-gray-400 hover:text-white hover:bg-[#01101F]"}`}
+                    onClick={() => setActiveTab("appearance")}
+                  >
+                    <Moon className="h-4 w-4 mr-3" />
+                    Appearance
+                  </button>
+                  <button
+                    className={`w-full text-left px-6 py-3 transition-colors flex items-center ${activeTab === "apiKeys" ? "bg-[#01101F] text-white" : "text-gray-400 hover:text-white hover:bg-[#01101F]"}`}
+                    onClick={() => setActiveTab("apiKeys")}
+                  >
+                    <Key className="h-4 w-4 mr-3" />
+                    API Keys
+                  </button>
+                  <button
+                    className={`w-full text-left px-6 py-3 transition-colors flex items-center ${activeTab === "help" ? "bg-[#01101F] text-white" : "text-gray-400 hover:text-white hover:bg-[#01101F]"}`}
+                    onClick={() => setActiveTab("help")}
+                  >
+                    <HelpCircle className="h-4 w-4 mr-3" />
+                    Help & Support
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            {/* Content Area */}
+            <div className="flex-1 p-6">
+              {/* Account Settings */}
+              {activeTab === "account" && (
+                <div className="space-y-6">
+                  <div>
+                    <h2 className="text-xl font-semibold text-white mb-1">Account Settings</h2>
+                    <p className="text-gray-400">Manage your company profile and account preferences</p>
+                  </div>
+                  
+                  <div className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="name" className="text-sm sm:text-base">Company Name</Label>
+                      <Label htmlFor="company-name" className="text-white">Company Name</Label>
                       <Input
-                        id="name"
-                        value={profile.name}
-                        onChange={(e) => setProfile({...profile, name: e.target.value})}
-                        placeholder="Enter company name"
-                        className="text-sm sm:text-base"
+                        id="company-name"
+                        value={getCompanyName()}
+                        className="bg-[#01101F] border-[#1E3A59] text-white focus-visible:ring-[#33BFFF]"
                       />
                     </div>
+                    
                     <div className="space-y-2">
-                      <Label htmlFor="email" className="text-sm sm:text-base">Contact Email</Label>
+                      <Label htmlFor="email" className="text-white">Email Address</Label>
                       <Input
                         id="email"
                         type="email"
-                        value={profile.email}
-                        onChange={(e) => setProfile({...profile, email: e.target.value})}
-                        placeholder="contact@company.com"
-                        className="text-sm sm:text-base"
+                        value={getUserEmail()}
+                        className="bg-[#01101F] border-[#1E3A59] text-white focus-visible:ring-[#33BFFF]"
                       />
                     </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="language" className="text-white">Language</Label>
+                        <Select value={language} onValueChange={setLanguage}>
+                          <SelectTrigger id="language" className="bg-[#01101F] border-[#1E3A59] text-white focus:ring-[#33BFFF]">
+                            <SelectValue placeholder="Select language" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-[#0A2540] border-[#1E3A59] text-white">
+                            <SelectItem value="en">English</SelectItem>
+                            <SelectItem value="es">Spanish</SelectItem>
+                            <SelectItem value="fr">French</SelectItem>
+                            <SelectItem value="de">German</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="timezone" className="text-white">Timezone</Label>
+                        <Select value={timezone} onValueChange={setTimezone}>
+                          <SelectTrigger id="timezone" className="bg-[#01101F] border-[#1E3A59] text-white focus:ring-[#33BFFF]">
+                            <SelectValue placeholder="Select timezone" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-[#0A2540] border-[#1E3A59] text-white">
+                            <SelectItem value="America/New_York">Eastern Time (US & Canada)</SelectItem>
+                            <SelectItem value="America/Chicago">Central Time (US & Canada)</SelectItem>
+                            <SelectItem value="America/Denver">Mountain Time (US & Canada)</SelectItem>
+                            <SelectItem value="America/Los_Angeles">Pacific Time (US & Canada)</SelectItem>
+                            <SelectItem value="Europe/London">London</SelectItem>
+                            <SelectItem value="Europe/Paris">Paris</SelectItem>
+                            <SelectItem value="Asia/Tokyo">Tokyo</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="border-t border-[#1E3A59] pt-6">
+                    <Button 
+                      className="bg-[#1570EF] hover:bg-[#0E63D6] text-white"
+                      onClick={handleSaveSettings}
+                    >
+                      <Save className="h-4 w-4 mr-2" />
+                      Save Changes
+                    </Button>
+                  </div>
+                </div>
+              )}
+              
+              {/* Security Settings */}
+              {activeTab === "security" && (
+                <div className="space-y-6">
+                  <div>
+                    <h2 className="text-xl font-semibold text-white mb-1">Security Settings</h2>
+                    <p className="text-gray-400">Manage your account security and authentication methods</p>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <Card className="bg-[#01101F] border-[#1E3A59]">
+                      <CardHeader className="pb-2">
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <CardTitle className="text-white">Two-Factor Authentication</CardTitle>
+                            <CardDescription className="text-gray-400">
+                              Add an extra layer of security to your account
+                            </CardDescription>
+                          </div>
+                          <Switch 
+                            checked={twoFactorEnabled}
+                            onCheckedChange={setTwoFactorEnabled}
+                          />
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-gray-400 text-sm">
+                          When enabled, you'll be required to provide a code from your authenticator app 
+                          in addition to your password when signing in.
+                        </p>
+                      </CardContent>
+                      {!twoFactorEnabled && (
+                        <CardFooter className="border-t border-[#1E3A59] pt-4">
+                          <Button
+                            variant="outline"
+                            className="border-[#1E3A59] text-white hover:bg-[#0A2540] hover:border-[#33BFFF]"
+                            onClick={() => setTwoFactorEnabled(true)}
+                          >
+                            <Shield className="h-4 w-4 mr-2" />
+                            Enable 2FA
+                          </Button>
+                        </CardFooter>
+                      )}
+                    </Card>
+                    
                     <div className="space-y-2">
-                      <Label htmlFor="phone" className="text-sm sm:text-base">Phone Number</Label>
+                      <Label htmlFor="current-password" className="text-white">Current Password</Label>
                       <Input
-                        id="phone"
-                        value={profile.phone}
-                        onChange={(e) => setProfile({...profile, phone: e.target.value})}
-                        placeholder="+1 (555) 123-4567"
-                        className="text-sm sm:text-base"
+                        id="current-password"
+                        type="password"
+                        placeholder="••••••••"
+                        className="bg-[#01101F] border-[#1E3A59] text-white focus-visible:ring-[#33BFFF]"
                       />
                     </div>
+                    
                     <div className="space-y-2">
-                      <Label htmlFor="website" className="text-sm sm:text-base">Website</Label>
+                      <Label htmlFor="new-password" className="text-white">New Password</Label>
                       <Input
-                        id="website"
-                        value={profile.website}
-                        onChange={(e) => setProfile({...profile, website: e.target.value})}
-                        placeholder="https://company.com"
-                        className="text-sm sm:text-base"
+                        id="new-password"
+                        type="password"
+                        placeholder="••••••••"
+                        className="bg-[#01101F] border-[#1E3A59] text-white focus-visible:ring-[#33BFFF]"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="confirm-password" className="text-white">Confirm New Password</Label>
+                      <Input
+                        id="confirm-password"
+                        type="password"
+                        placeholder="••••••••"
+                        className="bg-[#01101F] border-[#1E3A59] text-white focus-visible:ring-[#33BFFF]"
                       />
                     </div>
                   </div>
                   
-                  <div className="space-y-2">
-                    <Label htmlFor="address" className="text-sm sm:text-base">Address</Label>
-                    <Input
-                      id="address"
-                      value={profile.address}
-                      onChange={(e) => setProfile({...profile, address: e.target.value})}
-                      placeholder="123 Business St, City, State 12345"
-                      className="text-sm sm:text-base"
-                    />
+                  <div className="border-t border-[#1E3A59] pt-6">
+                    <Button 
+                      className="bg-[#1570EF] hover:bg-[#0E63D6] text-white"
+                      onClick={handleSaveSettings}
+                    >
+                      <Save className="h-4 w-4 mr-2" />
+                      Update Password
+                    </Button>
+                  </div>
+                </div>
+              )}
+              
+              {/* Notification Settings */}
+              {activeTab === "notifications" && (
+                <div className="space-y-6">
+                  <div>
+                    <h2 className="text-xl font-semibold text-white mb-1">Notification Settings</h2>
+                    <p className="text-gray-400">Manage how and when you receive notifications</p>
                   </div>
                   
-                  <div className="space-y-2">
-                    <Label htmlFor="description" className="text-sm sm:text-base">Company Description</Label>
-                    <Textarea
-                      id="description"
-                      value={profile.description}
-                      onChange={(e) => setProfile({...profile, description: e.target.value})}
-                      placeholder="Describe your company and services..."
-                      className="min-h-[80px] sm:min-h-[100px] text-sm sm:text-base"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="text-sm sm:text-base">Company Logo</Label>
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                      <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-100 rounded-lg flex items-center justify-center">
-                        <Building2 className="h-6 w-6 sm:h-8 sm:w-8 text-gray-400" />
+                  <div className="space-y-6">
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-medium text-white">Email Notifications</h3>
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-white text-sm">All email notifications</p>
+                            <p className="text-gray-400 text-xs">Enable or disable all email notifications</p>
+                          </div>
+                          <Switch 
+                            checked={emailNotifications}
+                            onCheckedChange={setEmailNotifications}
+                          />
+                        </div>
+                        
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-white text-sm">Plan performance updates</p>
+                            <p className="text-gray-400 text-xs">Weekly summary of your plan performance</p>
+                          </div>
+                          <Switch checked={emailNotifications} disabled={!emailNotifications} />
+                        </div>
+                        
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-white text-sm">Market insights</p>
+                            <p className="text-gray-400 text-xs">Competitive analysis and market movement alerts</p>
+                          </div>
+                          <Switch checked={emailNotifications} disabled={!emailNotifications} />
+                        </div>
+                        
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-white text-sm">Security alerts</p>
+                            <p className="text-gray-400 text-xs">Critical account security notifications</p>
+                          </div>
+                          <Switch checked={true} disabled={!emailNotifications} />
+                        </div>
                       </div>
-                      <Button variant="outline" size="sm" className="text-sm">
-                        <Upload className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
-                        Upload Logo
-                      </Button>
+                    </div>
+                    
+                    <div className="pt-4 border-t border-[#1E3A59] space-y-4">
+                      <h3 className="text-lg font-medium text-white">Browser Notifications</h3>
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-white text-sm">All browser notifications</p>
+                            <p className="text-gray-400 text-xs">Enable or disable all browser notifications</p>
+                          </div>
+                          <Switch 
+                            checked={browserNotifications}
+                            onCheckedChange={setBrowserNotifications}
+                          />
+                        </div>
+                        
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-white text-sm">Real-time marketplace activity</p>
+                            <p className="text-gray-400 text-xs">Notifications for significant views or clicks</p>
+                          </div>
+                          <Switch checked={browserNotifications} disabled={!browserNotifications} />
+                        </div>
+                        
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-white text-sm">Competitive alerts</p>
+                            <p className="text-gray-400 text-xs">When your competitiveness changes significantly</p>
+                          </div>
+                          <Switch checked={browserNotifications} disabled={!browserNotifications} />
+                        </div>
+                      </div>
                     </div>
                   </div>
-
-                  <Button 
-                    onClick={handleSaveProfile} 
-                    disabled={isLoading}
-                    className="w-full sm:w-auto text-sm sm:text-base"
-                  >
-                    {isLoading ? (
-                      <>Saving...</>
-                    ) : (
-                      <>
-                        <Save className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
-                        Save Profile
-                      </>
-                    )}
-                  </Button>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="notifications">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg sm:text-xl">Notification Preferences</CardTitle>
-                  <CardDescription className="text-sm sm:text-base">
-                    Configure how you want to receive updates and alerts
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4 sm:space-y-6">
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5 flex-1 mr-4">
-                        <Label className="text-sm sm:text-base">Email Notifications</Label>
-                        <p className="text-xs sm:text-sm text-gray-600">
-                          Receive important updates via email
-                        </p>
-                      </div>
-                      <Switch
-                        checked={notifications.emailNotifications}
-                        onCheckedChange={(checked) => 
-                          setNotifications({...notifications, emailNotifications: checked})
-                        }
-                      />
-                    </div>
-                    
-                    <Separator />
-                    
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5 flex-1 mr-4">
-                        <Label className="text-sm sm:text-base">SMS Notifications</Label>
-                        <p className="text-xs sm:text-sm text-gray-600">
-                          Get urgent alerts via text
-                        </p>
-                      </div>
-                      <Switch
-                        checked={notifications.smsNotifications}
-                        onCheckedChange={(checked) => 
-                          setNotifications({...notifications, smsNotifications: checked})
-                        }
-                      />
-                    </div>
-                    
-                    <Separator />
-                    
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5 flex-1 mr-4">
-                        <Label className="text-sm sm:text-base">Marketing Emails</Label>
-                        <p className="text-xs sm:text-sm text-gray-600">
-                          Product updates and promotions
-                        </p>
-                      </div>
-                      <Switch
-                        checked={notifications.marketingEmails}
-                        onCheckedChange={(checked) => 
-                          setNotifications({...notifications, marketingEmails: checked})
-                        }
-                      />
-                    </div>
-                    
-                    <Separator />
-                    
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5 flex-1 mr-4">
-                        <Label className="text-sm sm:text-base">Weekly Reports</Label>
-                        <p className="text-xs sm:text-sm text-gray-600">
-                          Weekly analytics summaries
-                        </p>
-                      </div>
-                      <Switch
-                        checked={notifications.weeklyReports}
-                        onCheckedChange={(checked) => 
-                          setNotifications({...notifications, weeklyReports: checked})
-                        }
-                      />
-                    </div>
+                  
+                  <div className="border-t border-[#1E3A59] pt-6">
+                    <Button 
+                      className="bg-[#1570EF] hover:bg-[#0E63D6] text-white"
+                      onClick={handleSaveSettings}
+                    >
+                      <Save className="h-4 w-4 mr-2" />
+                      Save Preferences
+                    </Button>
                   </div>
-
-                  <Button 
-                    onClick={handleSaveNotifications} 
-                    disabled={isLoading}
-                    className="w-full sm:w-auto text-sm sm:text-base"
-                  >
-                    {isLoading ? (
-                      <>Saving...</>
-                    ) : (
-                      <>
-                        <Save className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
-                        Save Preferences
-                      </>
-                    )}
-                  </Button>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="api">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg sm:text-xl">API Configuration</CardTitle>
-                  <CardDescription className="text-sm sm:text-base">
-                    Manage your API keys and integration settings
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4 sm:space-y-6">
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="apiKey" className="text-sm sm:text-base">API Key</Label>
-                      <div className="flex flex-col sm:flex-row gap-2">
-                        <Input
-                          id="apiKey"
-                          type="password"
-                          value={apiSettings.apiKey}
-                          onChange={(e) => setApiSettings({...apiSettings, apiKey: e.target.value})}
-                          placeholder="Enter your API key"
-                          className="flex-1 text-sm sm:text-base"
+                </div>
+              )}
+              
+              {/* Appearance Settings */}
+              {activeTab === "appearance" && (
+                <div className="space-y-6">
+                  <div>
+                    <h2 className="text-xl font-semibold text-white mb-1">Appearance Settings</h2>
+                    <p className="text-gray-400">Customize how the Briki Copilot interface looks</p>
+                  </div>
+                  
+                  <div className="space-y-6">
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-medium text-white">Theme</h3>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <div className={`w-10 h-10 rounded-full border ${darkMode ? 'border-[#33BFFF] bg-[#01101F]' : 'border-[#1E3A59] bg-[#F9FAFB]'} mr-3 flex items-center justify-center`}>
+                            {darkMode ? (
+                              <Moon className="h-5 w-5 text-[#33BFFF]" />
+                            ) : (
+                              <Sun className="h-5 w-5 text-gray-500" />
+                            )}
+                          </div>
+                          <div>
+                            <p className="text-white text-sm font-medium">{darkMode ? 'Dark Mode' : 'Light Mode'}</p>
+                            <p className="text-gray-400 text-xs">{darkMode ? 'Easier on the eyes at night' : 'Better visibility in bright light'}</p>
+                          </div>
+                        </div>
+                        <Switch 
+                          checked={darkMode}
+                          onCheckedChange={setDarkMode}
                         />
-                        <Button variant="outline" size="sm" className="text-sm">
-                          Generate
-                        </Button>
                       </div>
                     </div>
                     
-                    <div className="space-y-2">
-                      <Label htmlFor="webhookUrl" className="text-sm sm:text-base">Webhook URL</Label>
-                      <Input
-                        id="webhookUrl"
-                        value={apiSettings.webhookUrl}
-                        onChange={(e) => setApiSettings({...apiSettings, webhookUrl: e.target.value})}
-                        placeholder="https://your-site.com/webhook"
-                        className="text-sm sm:text-base"
-                      />
+                    <div className="space-y-4 pt-4 border-t border-[#1E3A59]">
+                      <h3 className="text-lg font-medium text-white">Language & Region</h3>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="language-select" className="text-white">Language</Label>
+                        <Select value={language} onValueChange={setLanguage}>
+                          <SelectTrigger id="language-select" className="bg-[#01101F] border-[#1E3A59] text-white focus:ring-[#33BFFF]">
+                            <SelectValue placeholder="Select language" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-[#0A2540] border-[#1E3A59] text-white">
+                            <SelectItem value="en">English</SelectItem>
+                            <SelectItem value="es">Spanish</SelectItem>
+                            <SelectItem value="fr">French</SelectItem>
+                            <SelectItem value="de">German</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="timezone-select" className="text-white">Timezone</Label>
+                        <Select value={timezone} onValueChange={setTimezone}>
+                          <SelectTrigger id="timezone-select" className="bg-[#01101F] border-[#1E3A59] text-white focus:ring-[#33BFFF]">
+                            <SelectValue placeholder="Select timezone" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-[#0A2540] border-[#1E3A59] text-white">
+                            <SelectItem value="America/New_York">Eastern Time (US & Canada)</SelectItem>
+                            <SelectItem value="America/Chicago">Central Time (US & Canada)</SelectItem>
+                            <SelectItem value="America/Denver">Mountain Time (US & Canada)</SelectItem>
+                            <SelectItem value="America/Los_Angeles">Pacific Time (US & Canada)</SelectItem>
+                            <SelectItem value="Europe/London">London</SelectItem>
+                            <SelectItem value="Europe/Paris">Paris</SelectItem>
+                            <SelectItem value="Asia/Tokyo">Tokyo</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
+                  </div>
+                  
+                  <div className="border-t border-[#1E3A59] pt-6">
+                    <Button 
+                      className="bg-[#1570EF] hover:bg-[#0E63D6] text-white"
+                      onClick={handleSaveSettings}
+                    >
+                      <Save className="h-4 w-4 mr-2" />
+                      Save Preferences
+                    </Button>
+                  </div>
+                </div>
+              )}
+              
+              {/* API Keys Settings */}
+              {activeTab === "apiKeys" && (
+                <div className="space-y-6">
+                  <div>
+                    <h2 className="text-xl font-semibold text-white mb-1">API Keys</h2>
+                    <p className="text-gray-400">Manage API access for integrations with your systems</p>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <Card className="bg-[#01101F] border-[#1E3A59]">
+                      <CardHeader>
+                        <CardTitle className="text-white">API Authentication</CardTitle>
+                        <CardDescription className="text-gray-400">
+                          Create and manage API keys for secure programmatic access
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="api-key" className="text-white">Current API Key</Label>
+                            <div className="flex">
+                              <Input
+                                id="api-key"
+                                value="••••••••••••••••••••••••••••••"
+                                readOnly
+                                className="bg-[#0A2540] border-[#1E3A59] text-white focus-visible:ring-[#33BFFF] rounded-r-none"
+                              />
+                              <Button
+                                className="rounded-l-none bg-[#1570EF] hover:bg-[#0E63D6] text-white"
+                              >
+                                Show
+                              </Button>
+                            </div>
+                          </div>
+                          
+                          <p className="text-gray-400 text-sm">
+                            Your API key grants full access to your account. Keep it secure and never share it publicly.
+                          </p>
+                          
+                          <div className="flex flex-wrap gap-3">
+                            <Button
+                              variant="outline"
+                              className="border-[#1E3A59] text-white hover:bg-[#0A2540] hover:border-[#33BFFF]"
+                            >
+                              Generate New Key
+                            </Button>
+                            <Button
+                              variant="outline"
+                              className="border-[#1E3A59] text-white hover:bg-[#0A2540] hover:border-[#33BFFF]"
+                            >
+                              Revoke All Keys
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
                     
-                    <div className="space-y-2">
-                      <Label htmlFor="rateLimit" className="text-sm sm:text-base">Rate Limit (requests/hour)</Label>
-                      <Input
-                        id="rateLimit"
-                        type="number"
-                        value={apiSettings.rateLimit}
-                        onChange={(e) => setApiSettings({...apiSettings, rateLimit: parseInt(e.target.value)})}
-                        placeholder="1000"
-                        className="text-sm sm:text-base"
-                      />
-                    </div>
+                    <Card className="bg-[#01101F] border-[#1E3A59]">
+                      <CardHeader>
+                        <CardTitle className="text-white">API Documentation</CardTitle>
+                        <CardDescription className="text-gray-400">
+                          Learn how to integrate with the Briki Copilot platform
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-gray-400">
+                          Our comprehensive API documentation covers everything you need to integrate 
+                          Briki Copilot with your existing systems, from authentication to data models.
+                        </p>
+                        <div className="mt-4">
+                          <Button
+                            variant="outline"
+                            className="border-[#1E3A59] text-white hover:bg-[#0A2540] hover:border-[#33BFFF]"
+                            onClick={() => window.open('https://api.brikiapp.com/docs', '_blank')}
+                          >
+                            <Globe className="h-4 w-4 mr-2" />
+                            View Documentation
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
                   </div>
-
-                  <div className="bg-blue-50 p-3 sm:p-4 rounded-lg">
-                    <h4 className="font-medium text-blue-900 mb-2 text-sm sm:text-base">API Documentation</h4>
-                    <p className="text-blue-800 text-xs sm:text-sm mb-3">
-                      Access our comprehensive API documentation to integrate with your systems.
-                    </p>
-                    <Button variant="outline" size="sm" className="text-blue-600 border-blue-200 text-xs sm:text-sm">
-                      View Documentation
-                    </Button>
+                </div>
+              )}
+              
+              {/* Help & Support */}
+              {activeTab === "help" && (
+                <div className="space-y-6">
+                  <div>
+                    <h2 className="text-xl font-semibold text-white mb-1">Help & Support</h2>
+                    <p className="text-gray-400">Resources and assistance for your Briki Copilot account</p>
                   </div>
-
-                  <Button 
-                    onClick={handleSaveApiSettings} 
-                    disabled={isLoading}
-                    className="w-full sm:w-auto text-sm sm:text-base"
-                  >
-                    {isLoading ? (
-                      <>Saving...</>
-                    ) : (
-                      <>
-                        <Save className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
-                        Save API Settings
-                      </>
-                    )}
-                  </Button>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="billing">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg sm:text-xl">Billing & Subscription</CardTitle>
-                  <CardDescription className="text-sm sm:text-base">
-                    Manage your subscription and billing information
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4 sm:space-y-6">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 bg-green-50 rounded-lg gap-3">
-                    <div>
-                      <h4 className="font-medium text-green-900 text-sm sm:text-base">Current Plan: Professional</h4>
-                      <p className="text-green-800 text-xs sm:text-sm">Next billing date: January 15, 2024</p>
-                    </div>
-                    <Badge variant="secondary" className="bg-green-100 text-green-800 text-xs sm:text-sm">
-                      Active
-                    </Badge>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Card className="bg-[#01101F] border-[#1E3A59]">
+                      <CardHeader>
+                        <CardTitle className="text-white">Documentation</CardTitle>
+                        <CardDescription className="text-gray-400">
+                          Comprehensive guides and tutorials
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <p className="text-gray-400 text-sm">
+                          Explore our knowledge base for detailed information about all Briki Copilot features and capabilities.
+                        </p>
+                        <Button
+                          variant="outline"
+                          className="w-full border-[#1E3A59] text-white hover:bg-[#0A2540] hover:border-[#33BFFF]"
+                          onClick={() => window.open('https://docs.brikiapp.com', '_blank')}
+                        >
+                          View Documentation
+                        </Button>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card className="bg-[#01101F] border-[#1E3A59]">
+                      <CardHeader>
+                        <CardTitle className="text-white">Contact Support</CardTitle>
+                        <CardDescription className="text-gray-400">
+                          Get help from our customer success team
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <p className="text-gray-400 text-sm">
+                          Our support team is available Monday-Friday, 9am-6pm ET to assist with your questions.
+                        </p>
+                        <Button
+                          className="w-full bg-[#1570EF] hover:bg-[#0E63D6] text-white"
+                          onClick={() => window.open('mailto:support@brikiapp.com', '_blank')}
+                        >
+                          <Mail className="h-4 w-4 mr-2" />
+                          Email Support
+                        </Button>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card className="bg-[#01101F] border-[#1E3A59]">
+                      <CardHeader>
+                        <CardTitle className="text-white">Schedule Training</CardTitle>
+                        <CardDescription className="text-gray-400">
+                          Book a session with our product specialists
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <p className="text-gray-400 text-sm">
+                          Get personalized training for your team to maximize the value of your Briki Copilot subscription.
+                        </p>
+                        <Button
+                          variant="outline"
+                          className="w-full border-[#1E3A59] text-white hover:bg-[#0A2540] hover:border-[#33BFFF]"
+                          onClick={() => window.open('https://calendly.com/briki-training', '_blank')}
+                        >
+                          <Clock className="h-4 w-4 mr-2" />
+                          Schedule Session
+                        </Button>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card className="bg-[#01101F] border-[#1E3A59]">
+                      <CardHeader>
+                        <CardTitle className="text-white">FAQ</CardTitle>
+                        <CardDescription className="text-gray-400">
+                          Quickly find answers to common questions
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <p className="text-gray-400 text-sm">
+                          Browse our frequently asked questions for immediate answers to the most common inquiries.
+                        </p>
+                        <Button
+                          variant="outline"
+                          className="w-full border-[#1E3A59] text-white hover:bg-[#0A2540] hover:border-[#33BFFF]"
+                          onClick={() => window.open('https://brikiapp.com/faq', '_blank')}
+                        >
+                          <HelpCircle className="h-4 w-4 mr-2" />
+                          View FAQ
+                        </Button>
+                      </CardContent>
+                    </Card>
                   </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-                    <div className="text-center p-3 sm:p-4 border rounded-lg">
-                      <h4 className="font-medium text-sm sm:text-base">Monthly Usage</h4>
-                      <p className="text-xl sm:text-2xl font-bold text-blue-600">847</p>
-                      <p className="text-xs sm:text-sm text-gray-600">API calls</p>
-                    </div>
-                    <div className="text-center p-3 sm:p-4 border rounded-lg">
-                      <h4 className="font-medium text-sm sm:text-base">Plan Limit</h4>
-                      <p className="text-xl sm:text-2xl font-bold text-green-600">5,000</p>
-                      <p className="text-xs sm:text-sm text-gray-600">API calls</p>
-                    </div>
-                    <div className="text-center p-3 sm:p-4 border rounded-lg">
-                      <h4 className="font-medium text-sm sm:text-base">Next Bill</h4>
-                      <p className="text-xl sm:text-2xl font-bold text-gray-900">$99</p>
-                      <p className="text-xs sm:text-sm text-gray-600">USD</p>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-                    <Button variant="outline" className="text-sm sm:text-base">
-                      <CreditCard className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
-                      Update Payment Method
-                    </Button>
-                    <Button variant="outline" className="text-sm sm:text-base">
-                      Download Invoices
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
-        </motion.div>
+                </div>
+              )}
+            </div>
+          </div>
+        </Card>
       </div>
-    </div>
+    </CompanyLayout>
   );
-};
-
-export default CompanySettingsPage;
+}

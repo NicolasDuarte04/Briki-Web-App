@@ -20,8 +20,8 @@ interface ExtendedInsurancePlan extends BasePlan {
   trend?: number;
 }
 
-// Analytics data types
-interface PlanAnalytics {
+// Mock data for insurance plan analytics
+interface MockPlan {
   id: number;
   name: string;
   category: string;
@@ -29,12 +29,12 @@ interface PlanAnalytics {
   trend: number;
 }
 
-interface DashboardMetrics {
-  totalPlans: number;
-  totalSubscribers: number;
-  monthlyGrowth: number;
-  activeQuotes: number;
-}
+const mockPlans: MockPlan[] = [
+  { id: 1, name: "Travel Pro", category: "travel", subscribers: 1243, trend: +12.5 },
+  { id: 2, name: "Auto Shield Plus", category: "auto", subscribers: 876, trend: -3.2 },
+  { id: 3, name: "Pet Care Complete", category: "pet", subscribers: 421, trend: +8.7 },
+  { id: 4, name: "Health Essentials", category: "health", subscribers: 956, trend: +5.1 },
+];
 
 export default function CompanyDashboard() {
   const { user } = useAuth();
