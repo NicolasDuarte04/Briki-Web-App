@@ -1,4 +1,4 @@
-import { apiRequest } from '@/lib/api';
+import { apiRequest } from '@/lib/queryClient';
 
 export interface APIMessage {
   role: 'user' | 'assistant';
@@ -21,15 +21,9 @@ export async function sendMessageToAI(
   conversationHistory: APIMessage[] = []
 ): Promise<AIResponse> {
   try {
-    const response = await fetch('/api/ai/chat', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        message,
-        conversationHistory
-      })
+    const response = await apiRequest('POST', '/api/ai/chat', {
+      message,
+      conversationHistory
     });
 
     if (!response.ok) {
