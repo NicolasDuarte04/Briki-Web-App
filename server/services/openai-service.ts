@@ -136,6 +136,16 @@ export async function generateAssistantResponse(
         console.log(
           `[OpenAI][${requestId}] Sufficient context available, showing ${suggestedPlans.length} relevant plans`,
         );
+      } else {
+        // ENHANCED: Also check if user has provided enough context in current message
+        const category = detectInsuranceCategory(userMessage);
+        if (category !== 'general' && relevantPlans.length > 0) {
+          // If we detect a clear insurance category and have relevant plans, show them
+          suggestedPlans = findRelevantPlans(userMessage, relevantPlans);
+          console.log(
+            `[OpenAI][${requestId}] Category detected (${category}), showing ${suggestedPlans.length} relevant plans`,
+          );
+        }
       }
     }
 
