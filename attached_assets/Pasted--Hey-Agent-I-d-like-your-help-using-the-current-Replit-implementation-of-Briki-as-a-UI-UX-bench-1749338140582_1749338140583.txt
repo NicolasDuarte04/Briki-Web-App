@@ -1,0 +1,57 @@
+👋 Hey Agent, I’d like your help using the current Replit implementation of Briki as a **UI/UX benchmark** for our migration to Cursor.
+
+Our goal is to rebuild the Briki insurance assistant with:
+- A stunning, mobile-first UI (Apple-like, elegant)
+- A clean structure (atomic, scalable)
+- A beautiful landing page (think Stripe/Linear quality)
+- A fully working chat interface with plan recommendations
+
+---
+
+## 📌 Please answer these specific questions based on our current Replit app:
+
+### 🧠 1. **Visual & Layout System**
+- How would you describe the **overall design system** of this app?
+  - What makes it look good?
+  - What Tailwind patterns, spacing, or components are we using?
+- What are the **core UI components** that define Briki’s aesthetic?
+- Is there any specific file, section, or pattern you recommend **preserving** or **replicating** during the migration?
+
+---
+
+### 🔧 2. **Component Architecture**
+- Do we currently follow an **atomic design structure**? (ui/, layout/, features/)
+- If not, what would you recommend to make it easier to maintain inside a Next.js 14 app?
+- How are common UI pieces (e.g., PlanCards, buttons, sections) organized?
+
+---
+
+### 🎨 3. **Branding & Styling**
+- What fonts, shadows, and gradients are we using that give it this professional feel?
+- How is the color palette managed?
+- Are there any files or tokens controlling typography and spacing?
+
+---
+
+### 🧱 4. **Layout & Responsiveness**
+- Is our layout system truly **mobile-first**?
+- How is responsiveness handled in each page?
+- What files or patterns handle that best?
+
+---
+
+### 💬 5. **AI Assistant Flow**
+- How is the AI assistant logic connected to the UI in this version?
+- What files control:
+  - Message display
+  - Plan recommendation rendering
+  - Assistant context/question flow
+
+---
+
+## 🙏 Final Question
+Can you give us a **UI migration guideline** based on this Replit project?
+- What would you recommend copying over or referencing as inspiration?
+- Are there any common mistakes we should avoid when re-implementing this in Cursor?
+
+We’ll use your answers to guide our next steps with the Cursor agent. Thanks in advance!
