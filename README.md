@@ -1,150 +1,155 @@
-# Briki Travel Insurance Platform
+# Briki Insurance Platform
 
-Briki is a cutting-edge travel insurance comparison platform that leverages AI and cross-platform technologies to deliver intelligent, personalized travel protection for travelers in Colombia and Mexico.
+An advanced AI-powered multilingual insurance recommendation platform that delivers hyper-personalized experiences through intelligent conversational design and adaptive user interfaces.
 
-## Project Structure
+## Features
 
-This repository contains both the backend and frontend components of the Briki travel insurance platform:
+- **AI-Powered Assistant**: Intelligent conversational interface supporting multiple languages
+- **Multi-Category Insurance**: Travel, Auto, Pet, and Health insurance plans
+- **Plan Visualization**: Interactive cards displaying insurance recommendations
+- **Real-time Recommendations**: Context-aware plan suggestions based on user needs
+- **Responsive Design**: Mobile-first approach with desktop optimization
+- **Secure Authentication**: Google OAuth integration with PostgreSQL sessions
 
-- `/server`: Express.js backend with PostgreSQL database integration
-- `/client`: React web application frontend
-- `/mobile-app`: React Native mobile application with Expo
-- `/shared`: Shared types and utilities between frontend and backend
+## Tech Stack
 
-## Key Technologies
+### Frontend
+- React.js with TypeScript
+- Tailwind CSS for styling
+- Radix UI components
+- Framer Motion for animations
+- Wouter for routing
+- TanStack Query for data management
 
-- **Backend**: 
-  - TypeScript and Express.js
-  - PostgreSQL with Drizzle ORM
-  - Token-based authentication
-  - Stripe payment integration
+### Backend
+- Express.js with TypeScript
+- PostgreSQL database with Drizzle ORM
+- OpenAI GPT-4 integration
+- Passport.js authentication
+- Stripe payment processing
+- Real-time insurance plan matching
 
-- **Web Frontend**:
-  - React with TypeScript
-  - TanStack Query for data fetching
-  - Shadcn UI components
-  - Tailwind CSS for styling
-
-- **Mobile App**:
-  - React Native with Expo
-  - React Navigation
-  - React Native Paper UI components
-  - Expo Application Services (EAS) for deployment
+### Development
+- Vite for bundling
+- ESBuild for fast compilation
+- Hot module replacement
+- TypeScript strict mode
 
 ## Getting Started
 
 ### Prerequisites
-
-- Node.js (v16 or later)
+- Node.js 20+
 - PostgreSQL database
-- Stripe account (for payments)
+- OpenAI API key (optional, falls back to mock responses)
 
 ### Installation
 
 1. Clone the repository:
-   ```bash
-   git clone https://github.com/your-username/briki-travel-insurance.git
-   cd briki-travel-insurance
-   ```
+```bash
+git clone <your-repo-url>
+cd briki-insurance-platform
+```
 
 2. Install dependencies:
-   ```bash
-   npm install
-   ```
+```bash
+npm install
+```
 
 3. Set up environment variables:
-   Create a `.env` file in the root directory with the following variables:
-   ```
-   DATABASE_URL=postgresql://username:password@localhost:5432/briki
-   STRIPE_SECRET_KEY=your_stripe_secret_key
-   VITE_STRIPE_PUBLIC_KEY=your_stripe_public_key
-   ```
+```bash
+cp .env.example .env
+# Add your DATABASE_URL, OPENAI_API_KEY, and other required variables
+```
 
-4. Start the development server:
-   ```bash
-   npm run dev
-   ```
+4. Set up the database:
+```bash
+npm run db:push
+```
 
-This will start both the backend server and frontend development server concurrently.
+5. Start the development server:
+```bash
+npm run dev
+```
 
-### Mobile App
+The application will be available at `http://localhost:5000`
 
-See the [mobile app README](./mobile-app/README.md) for instructions on setting up and deploying the mobile application.
+## Project Structure
 
-## Features
+```
+├── client/                 # Frontend React application
+│   ├── src/
+│   │   ├── components/     # Reusable UI components
+│   │   ├── pages/          # Application pages
+│   │   ├── services/       # API integration
+│   │   └── utils/          # Utility functions
+├── server/                 # Backend Express application
+│   ├── data/              # Insurance plan data
+│   ├── routes/            # API route handlers
+│   ├── services/          # Business logic services
+│   └── auth/              # Authentication modules
+├── shared/                # Shared types and schemas
+└── migrations/            # Database migrations
+```
 
-- **User Authentication**: Secure login, registration, and profile management
-- **Trip Information**: Input and storage of trip details for insurance quotes
-- **Insurance Plan Comparison**: Compare multiple insurance plans with detailed coverage information
-- **Weather Risk Analysis**: AI-powered weather risk assessment for destinations
-- **Checkout Process**: Secure payment processing with Stripe
-- **Mobile Integration**: Seamless experience across web and mobile platforms
+## Key Components
 
-## API Documentation
+### AI Assistant
+- Natural language processing for insurance queries
+- Context-aware recommendations
+- Multi-turn conversations with memory
+- Support for multiple insurance categories
 
-### Authentication Endpoints
+### Insurance Plans
+- Dynamic plan loading from JSON files
+- Category-based filtering (travel, auto, pet, health)
+- Real-time price comparisons
+- Interactive plan cards with detailed information
 
-- `POST /api/register`: Register a new user
-- `POST /api/login`: Authenticate a user
-- `POST /api/logout`: Log out a user
-- `GET /api/user`: Get current user information
+### Authentication
+- Google OAuth integration
+- Session-based authentication
+- User profile management
+- Secure route protection
 
-### Trip Endpoints
+## API Endpoints
 
-- `POST /api/trips`: Create a new trip
-- `GET /api/trips`: Get all trips for the current user
-- `GET /api/trips/:id`: Get a specific trip
+- `POST /api/ai/chat` - AI assistant conversations
+- `GET /api/insurance/plans` - Retrieve insurance plans
+- `POST /api/auth/google` - Google OAuth authentication
+- `GET /api/auth/user` - Get current user
+- `POST /api/quotes` - Generate insurance quotes
 
-### Insurance Plan Endpoints
+## Environment Variables
 
-- `GET /api/plans`: Get all insurance plans
-- `GET /api/plans/:id`: Get a specific insurance plan
-- `POST /api/plans/filter`: Filter plans based on criteria
+```bash
+DATABASE_URL=postgresql://user:password@localhost:5432/briki
+OPENAI_API_KEY=your_openai_api_key
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+STRIPE_SECRET_KEY=your_stripe_secret_key
+SESSION_SECRET=your_session_secret
+```
 
-### Order Endpoints
+## Development Scripts
 
-- `POST /api/orders`: Create a new insurance order
-- `GET /api/orders`: Get all orders for the current user
-
-### Payment Endpoints
-
-- `POST /api/create-payment-intent`: Create a Stripe payment intent
-
-## Deployment
-
-### Web Application
-
-The web application is deployed on Replit and can be accessed at [https://briki-travel.replit.app](https://briki-travel.replit.app).
-
-### Mobile Application
-
-The mobile app can be deployed using Expo Application Services (EAS). See the [mobile app README](./mobile-app/README.md) for detailed instructions.
-
-## Development Roadmap
-
-- Add support for additional countries beyond Colombia and Mexico
-- Implement AI-driven personalized insurance recommendations
-- Add travel alerts and notifications for policy holders
-- Integrate with travel booking platforms
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run db:push` - Push database schema changes
+- `npm run check` - TypeScript type checking
 
 ## Contributing
 
 1. Fork the repository
-2. Create your feature branch: `git checkout -b feature/amazing-feature`
-3. Commit your changes: `git commit -m 'Add some amazing feature'`
-4. Push to the branch: `git push origin feature/amazing-feature`
-5. Open a pull request
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## License
 
-This project is proprietary and confidential.
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-## Acknowledgements
+## Support
 
-- [React](https://reactjs.org/)
-- [React Native](https://reactnative.dev/)
-- [Express.js](https://expressjs.com/)
-- [PostgreSQL](https://www.postgresql.org/)
-- [Drizzle ORM](https://github.com/drizzle-team/drizzle-orm)
-- [Expo](https://expo.dev/)
-- [Stripe](https://stripe.com/)
+For support and questions, please contact the development team or open an issue in the repository.
