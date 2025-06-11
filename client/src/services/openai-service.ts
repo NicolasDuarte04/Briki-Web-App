@@ -1,13 +1,14 @@
 import { apiRequest } from '@/lib/queryClient';
 
 export interface APIMessage {
-  role: 'user' | 'assistant';
+  role: 'user' | 'assistant' | 'system';
   content: string;
   timestamp?: Date;
 }
 
 export interface AIResponse {
-  response: string;
+  message?: string;
+  response?: string;
   suggestedPlans?: any[];
   category?: string;
   userContext?: any;

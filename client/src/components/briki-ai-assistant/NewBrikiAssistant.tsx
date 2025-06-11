@@ -293,7 +293,7 @@ const NewBrikiAssistant: React.FC = () => {
 
       // Debug logging for data flow analysis
       console.log('🔍 NewBrikiAssistant - AI Response received:', {
-        hasMessage: !!response.message,
+        hasMessage: !!(response.message || response.response),
         hasSuggestedPlans: !!response.suggestedPlans,
         planCount: response.suggestedPlans?.length || 0,
         planNames: response.suggestedPlans?.map(p => p.name) || [],
@@ -301,20 +301,8 @@ const NewBrikiAssistant: React.FC = () => {
         fullResponse: response
       });
 
-      // FIXED: Validate that plans are only shown when context is sufficient
-      let finalSuggestedPlans = response.suggestedPlans;
-
-      if (response.suggestedPlans && response.suggestedPlans.length > 0) {
-        if (!shouldRequestPlans) {
-          console.warn('⚠️  Plans were returned but context is insufficient - filtering out plans');
-          finalSuggestedPlans = undefined;
-
-          // Show a helpful message instead
-          if (!response.message.includes('más información') && !response.message.includes('preguntas')) {
-            response.message += '\n\nPara recomendarte los mejores planes, necesito conocer un poco más sobre tus necesidades específicas.';
-          }
-        }
-      }
+      // Trust backend decision - if plans are returned, show them
+      const finalSuggestedPlans = response.suggestedPlans;
 
       // Update loading message with response and memory
       setMessages(prev => 
@@ -327,7 +315,7 @@ const NewBrikiAssistant: React.FC = () => {
                 suggestedPlans: finalSuggestedPlans || [],
                 isLoading: false,
                 timestamp: new Date(),
-                plansSummary: finalSuggestedPlans?.length > 0 
+                plansSummary: (finalSuggestedPlans && finalSuggestedPlans.length > 0) 
                   ? `Mostré ${finalSuggestedPlans.length} planes de ${response.category || 'seguros'}` 
                   : undefined
               }
