@@ -595,6 +595,34 @@ function detectInsuranceCategory(userMessage: string): string {
 }
 
 /**
+ * Extract requested number of plans from user message
+ */
+function extractRequestedPlanCount(message: string): number | null {
+  const lowerMessage = message.toLowerCase();
+  
+  // Look for explicit numbers like "4 planes", "5 opciones", "3 seguros"
+  const numberMatch = lowerMessage.match(/(\d+)\s*(planes?|opciones?|seguros?|recommendations?)/);
+  if (numberMatch) {
+    const count = parseInt(numberMatch[1]);
+    return count <= 10 ? count : null; // Cap at 10 for sanity
+  }
+  
+  // Look for written numbers
+  const writtenNumbers: Record<string, number> = {
+    'uno': 1, 'dos': 2, 'tres': 3, 'cuatro': 4, 'cinco': 5,
+    'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5
+  };
+  
+  for (const [word, num] of Object.entries(writtenNumbers)) {
+    if (lowerMessage.includes(word)) {
+      return num;
+    }
+  }
+  
+  return null;
+}
+
+/**
  * FIXED: Strict category filtering with NO fallback to prevent cross-category contamination
  */
 function findRelevantPlans(
@@ -613,6 +641,10 @@ function findRelevantPlans(
     const categoryPlans = plans.filter(plan => plan.category === detectedCategory);
 
     if (categoryPlans.length > 0) {
+      // Check if user requested specific number of plans
+      const requestedCount = extractRequestedPlanCount(userMessage);
+      const maxPlans = requestedCount || Math.min(categoryPlans.length, 4); // Default to 4 or available plans
+      
       // Score only plans from the correct category
       const scoredPlans = categoryPlans.map((plan) => ({
         plan,
@@ -621,10 +653,10 @@ function findRelevantPlans(
 
       const sortedPlans = scoredPlans
         .sort((a, b) => b.score - a.score)
-        .slice(0, 3)
+        .slice(0, maxPlans)
         .map(item => item.plan);
 
-      console.log(`✅ Found ${sortedPlans.length} ${detectedCategory} plans`);
+      console.log(`✅ Found ${sortedPlans.length} ${detectedCategory} plans (requested: ${requestedCount || 'default'})`);
       return sortedPlans;
     } else {
       // FIXED: NO fallback - return empty array instead of wrong category plans
@@ -637,6 +669,8 @@ function findRelevantPlans(
   console.log(`❓ No clear category detected, not showing any plans`);
   return [];
 }
+
+
 
 /**
  * Calculate relevance score based on multiple factors
