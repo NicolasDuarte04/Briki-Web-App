@@ -1,0 +1,113 @@
+Ran tool
+
+Ran tool
+
+Ran tool
+
+Read file: client/src/components/briki-ai-assistant/NewBrikiAssistant.tsx
+
+Ran tool
+
+Ran tool
+
+Ran tool
+
+Read file: client/src/components/ai-assistant/index.ts
+
+Ran tool
+
+Ran tool
+
+Ran tool
+
+Read file: client/src/components/ai-assistant/plan-recommender.tsx
+
+Read file: client/src/components/briki-ai-assistant/PlanCard.tsx
+
+Read file: client/src/components/briki-ai-assistant/SuggestedPlans.tsx
+
+Ran tool
+
+Read file: client/src/pages/ask-briki-ai.tsx
+
+Ran tool
+
+Ran tool
+
+Read file: client/src/types/chat.ts
+
+Ran tool
+
+Ran tool
+
+Ran tool
+
+Ran tool
+
+Read file: client/src/components/gradient-button.tsx
+
+Ran tool
+
+Read file: client/src/components/assistant/AssistantWidget.tsx
+
+Ran tool
+
+Ran tool
+
+Read file: client/src/components/assistant/MockPlansCard.tsx
+
+Ran tool
+
+Ran tool
+
+Ran tool
+
+Read file: client/src/components/ui/ai-assistant.tsx
+
+Read file: client/src/components/ui/ai-assistant.tsx
+
+Ran tool
+
+Ran tool
+
+Here’s what I found:
+
+1. In `ask-briki.tsx` you’re rendering a `<BrikiAIChat>`:
+
+   ```99:102:client/src/pages/ask-briki.tsx
+   <BrikiAIChat 
+     initialMessages={initialMessages}
+     demoMode={true}
+   />
+   ```
+
+   • That component isn’t imported (and as far as I can see isn’t defined anywhere), so you never actually hand off your `ChatMessage.widget` data to a chat UI that knows how to render “plans” as cards.  
+
+2. The only chat UIs we have in the codebase today are:  
+   – The generic `AIAssistant` (in `components/ui/ai-assistant.tsx`), which simply prints `message.content` and never looks at `message.widget`.  
+   – The “new” assistant in `components/briki-ai-assistant/NewBrikiAssistant.tsx`, which does support `suggestedPlans` and renders them via `SuggestedPlans`.  
+
+   Neither of those is being used by your `ask-briki.tsx` page.
+
+3. On top of that, the legacy `AssistantWidget` (in `components/assistant/widgets/AssistantWidget.tsx`) only parses JSON code fences inside the text—​it doesn’t inspect a `widget` prop at all—​so passing your plans in `widget: { type: 'plans', … }` on the message object is simply ignored.
+
+That’s why your “plans” come through as plain text/code blocks instead of flashcards: the chat component you’re actually using doesn’t know about `message.widget`.
+
+**Next steps**  
+• Either switch this page to use the `NewBrikiAssistant` (which already hooks up `SuggestedPlans`)—​you can copy what `ask-briki-ai.tsx` does:  
+
+```tsx
+// client/src/pages/ask-briki.tsx
+import NewBrikiAssistant from '@/components/briki-ai-assistant/NewBrikiAssistant'
+
+// … inside your JSX …
+<NewBrikiAssistant />
+```
+
+• Or extend whichever chat component you do want to use (e.g. the one behind `BrikiAIChat`) so that it:
+
+  a) actually reads the `widget` field on each `ChatMessage`,  
+  b) when `widget.type === 'plans'` renders `<SuggestedPlans plans={message.widget.plans} />`,  
+  c) falls back to text otherwise.
+
+Either approach will give you the flash-card UI you’re expecting.
