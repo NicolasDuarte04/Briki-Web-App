@@ -41,8 +41,8 @@ const SuggestedPlans: React.FC<SuggestedPlansProps> = ({ plans }) => {
   return (
     <div className="mt-3 mb-2">
       <div className="text-sm font-medium mb-2">Planes recomendados:</div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {plans.slice(0, 3).map((plan, index) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+        {plans.map((plan, index) => (
           <PlanCard
             key={plan.id}
             plan={plan}
@@ -52,11 +52,6 @@ const SuggestedPlans: React.FC<SuggestedPlansProps> = ({ plans }) => {
           />
         ))}
       </div>
-      {plans.length > 3 && (
-        <div className="text-xs text-center mt-2 text-muted-foreground">
-          Mostrando 3 de {plans.length} planes recomendados
-        </div>
-      )}
     </div>
   );
 };
