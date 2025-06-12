@@ -121,31 +121,21 @@ export async function generateAssistantResponse(
         `🧠 [OpenAI][${requestId}] Follow-up question detected – reattaching ${suggestedPlans.length} previous plans`,
       );
     } else {
-      // NEW: Consultative logic - check if we need more context before showing plans
-      const contextAnalysis = analyzeContextNeeds(userMessage, conversationHistory);
-
-      if (contextAnalysis.needsMoreContext) {
-        // Don't show plans yet, let AI ask for more context
-        console.log(
-          `🤔 [OpenAI][${requestId}] Context needed for ${contextAnalysis.category} - gathering info before showing plans`,
-        );
-        suggestedPlans = []; // No plans until we have enough context
-      } else if (shouldShowInsurancePlans(userMessage)) {
-        // Only show plans when we have sufficient context
+      // SIMPLIFIED: Always show plans if we detect an insurance category
+      const category = detectInsuranceCategory(userMessage);
+      
+      if (category !== 'general' && relevantPlans.length > 0) {
+        // Show plans immediately for any detected insurance category
         suggestedPlans = findRelevantPlans(userMessage, relevantPlans);
         console.log(
-          `[OpenAI][${requestId}] Sufficient context available, showing ${suggestedPlans.length} relevant plans`,
+          `[OpenAI][${requestId}] Category detected (${category}), showing ${suggestedPlans.length} relevant plans`,
         );
-      } else {
-        // ENHANCED: Also check if user has provided enough context in current message
-        const category = detectInsuranceCategory(userMessage);
-        if (category !== 'general' && relevantPlans.length > 0) {
-          // If we detect a clear insurance category and have relevant plans, show them
-          suggestedPlans = findRelevantPlans(userMessage, relevantPlans);
-          console.log(
-            `[OpenAI][${requestId}] Category detected (${category}), showing ${suggestedPlans.length} relevant plans`,
-          );
-        }
+      } else if (shouldShowInsurancePlans(userMessage)) {
+        // Fallback to intent-based detection
+        suggestedPlans = findRelevantPlans(userMessage, relevantPlans);
+        console.log(
+          `[OpenAI][${requestId}] Insurance intent detected, showing ${suggestedPlans.length} relevant plans`,
+        );
       }
     }
 
@@ -333,7 +323,7 @@ function analyzeContextNeeds(userMessage: string, conversationHistory: Assistant
     )
   );
 
-  // Travel insurance context analysis
+  // Travel insurance context analysis - more permissive for showing plans
   if (/(viaj|europe|estados unidos|méxico|international|trip|travel)/i.test(lowerMessage)) {
     const travelDetails = {
       destination: /(europa|asia|méxico|estados unidos|[a-z]+)/i.test(lowerMessage),
@@ -344,21 +334,18 @@ function analyzeContextNeeds(userMessage: string, conversationHistory: Assistant
     };
 
     const missingCount = Object.values(travelDetails).filter(Boolean).length;
-    const needsMoreInfo = !hasDetailedContext && missingCount < 2;
+    // Show plans immediately for travel insurance - users can compare and ask follow-ups
+    const needsMoreInfo = false; // Always show plans for travel insurance
 
     return {
       needsMoreContext: needsMoreInfo,
       category: 'travel',
-      missingInfo: ['destino', 'duración', 'acompañantes'],
-      suggestedQuestions: needsMoreInfo ? [
-        "¿A qué país o región viajas?",
-        "¿Cuál es la duración del viaje?",
-        "¿Viajas solo o acompañado?"
-      ] : undefined
+      missingInfo: [],
+      suggestedQuestions: undefined
     };
   }
 
-  // Pet insurance context analysis
+  // Pet insurance context analysis - more permissive for showing plans
   if (/(mascot|perr|gat|pet|animal)/i.test(lowerMessage)) {
     const petDetails = {
       type: /(perr|gat|dog|cat)/i.test(lowerMessage),
@@ -369,17 +356,14 @@ function analyzeContextNeeds(userMessage: string, conversationHistory: Assistant
     };
 
     const missingCount = Object.values(petDetails).filter(Boolean).length;
-    const needsMoreInfo = !hasDetailedContext && missingCount < 2;
+    // Show plans immediately for pet insurance - users can compare and ask follow-ups
+    const needsMoreInfo = false; // Always show plans for pet insurance
 
     return {
       needsMoreContext: needsMoreInfo,
       category: 'pet',
-      missingInfo: ['tipo de mascota', 'edad', 'raza'],
-      suggestedQuestions: needsMoreInfo ? [
-        "¿Qué tipo de mascota tienes? (perro, gato, otro)",
-        "¿Cuál es su raza y edad aproximada?",
-        "¿Tiene alguna condición médica preexistente?"
-      ] : undefined
+      missingInfo: [],
+      suggestedQuestions: undefined
     };
   }
 
@@ -405,7 +389,7 @@ function analyzeContextNeeds(userMessage: string, conversationHistory: Assistant
     };
   }
 
-  // Health insurance context analysis
+  // Health insurance context analysis - more permissive for showing plans
   if (/(salud|médic|health|hospitaliz)/i.test(lowerMessage)) {
     const healthDetails = {
       age: /(\d+|años?|joven|adulto|mayor)/i.test(lowerMessage),
@@ -416,17 +400,14 @@ function analyzeContextNeeds(userMessage: string, conversationHistory: Assistant
     };
 
     const missingCount = Object.values(healthDetails).filter(Boolean).length;
-    const needsMoreInfo = !hasDetailedContext && missingCount < 2;
+    // Show plans immediately for health insurance - users can compare and ask follow-ups
+    const needsMoreInfo = false; // Always show plans for health insurance
 
     return {
       needsMoreContext: needsMoreInfo,
       category: 'health',
-      missingInfo: ['edad', 'personas a cubrir', 'tipo de cobertura'],
-      suggestedQuestions: needsMoreInfo ? [
-        "¿Para quién es el seguro? (individual, familiar)",
-        "¿Qué edad tienen las personas a asegurar?",
-        "¿Tienen alguna condición médica preexistente?"
-      ] : undefined
+      missingInfo: [],
+      suggestedQuestions: undefined
     };
   }
 
@@ -493,19 +474,17 @@ ${contextAnalysis.needsMoreContext ? `
 - SIEMPRE termina invitando a continuar la conversación
 - CUANDO MUESTRES PLANES: Menciona brevemente que verán las opciones como tarjetas visuales
 
-## IMPORTANTE SOBRE MOSTRAR PLANES:
-- Si tienes planes relevantes disponibles, menciona que aparecerán como tarjetas interactivas
-- NO describas los planes en detalle en texto, las tarjetas mostrarán toda la información
-- Simplemente introduce los planes y deja que las tarjetas hagan el trabajo visual
+## CRÍTICO - EVITAR DUPLICACIÓN DE PLANES:
+- Cuando muestres planes, NUNCA los listes por nombre en tu respuesta de texto
+- SOLO di "He encontrado algunas opciones que aparecerán como tarjetas interactivas"
+- NO menciones nombres específicos de planes, precios, o características
+- Las tarjetas muestran toda la información - tu texto debe ser breve
+- Enfócate en invitar al usuario a revisar las tarjetas y hacer preguntas
 
 ${relevantPlans.length > 0 ? `
-## PLANES DISPONIBLES:
+## PLANES DISPONIBLES PARA REFERENCIA (NO INCLUIR EN RESPUESTA):
 ${relevantPlans.map(plan => `
-- **${plan.name}** (${plan.provider})
-  - Precio: ${plan.basePrice} ${plan.currency}
-  - Categoría: ${plan.category}
-  - Cobertura: ${plan.coverageAmount}
-  - Descripción: ${plan.description}
+- ${plan.name} (${plan.provider}) - ${plan.category}
 `).join('\n')}
 ` : ''}
 
@@ -584,11 +563,11 @@ function shouldShowInsurancePlans(message: string): boolean {
 function detectInsuranceCategory(userMessage: string): string {
   const message = userMessage.toLowerCase().trim();
 
-  // High-confidence patterns first
-  const petKeywords = ['mascota', 'perro', 'gato', 'pet', 'dog', 'cat', 'animal', 'veterinario'];
-  const travelKeywords = ['viaje', 'travel', 'trip', 'internacional', 'europa', 'estados unidos', 'méxico', 'vacaciones'];
-  const autoKeywords = ['auto', 'carro', 'vehiculo', 'vehículo', 'moto', 'car', 'vehicle', 'motorcycle', 'scooter', 'vespa'];
-  const healthKeywords = ['salud', 'health', 'médico', 'medical', 'hospital', 'doctor', 'medicina'];
+  // Enhanced keyword detection for all categories
+  const petKeywords = ['mascota', 'perro', 'gato', 'pet', 'dog', 'cat', 'animal', 'veterinario', 'cachorro', 'felino', 'canino'];
+  const travelKeywords = ['viaje', 'travel', 'trip', 'internacional', 'europa', 'estados unidos', 'méxico', 'vacaciones', 'turismo', 'exterior', 'extranjero'];
+  const autoKeywords = ['auto', 'carro', 'vehiculo', 'vehículo', 'moto', 'car', 'vehicle', 'motorcycle', 'scooter', 'vespa', 'motocicleta', 'automóvil'];
+  const healthKeywords = ['salud', 'health', 'médico', 'medical', 'hospital', 'doctor', 'medicina', 'hospitalización', 'clínica'];
 
   if (petKeywords.some(keyword => message.includes(keyword))) {
     return 'pet';
