@@ -383,8 +383,8 @@ function analyzeContextNeeds(userMessage: string, conversationHistory: Assistant
     };
   }
 
-  // Auto insurance context analysis
-  if (/(auto|vehicul|carro|moto|seguro.*auto)/i.test(lowerMessage)) {
+  // Auto insurance context analysis - more permissive for showing plans
+  if (/(auto|vehicul|vehículo|carro|moto|seguro.*auto)/i.test(lowerMessage)) {
     const autoDetails = {
       brand: /(marca|toyota|honda|ford|chevrolet|nissan)/i.test(lowerMessage),
       model: /(modelo|\d{4}|año)/i.test(lowerMessage),
@@ -394,18 +394,14 @@ function analyzeContextNeeds(userMessage: string, conversationHistory: Assistant
     };
 
     const missingCount = Object.values(autoDetails).filter(Boolean).length;
-    // More lenient - show plans with minimal context for auto insurance
-    const needsMoreInfo = !hasDetailedContext && missingCount === 0;
+    // Show plans immediately for auto insurance - users can compare and ask follow-ups
+    const needsMoreInfo = false; // Always show plans for auto insurance
 
     return {
       needsMoreContext: needsMoreInfo,
       category: 'auto',
-      missingInfo: ['marca y modelo', 'año del vehículo', 'uso del vehículo'],
-      suggestedQuestions: needsMoreInfo ? [
-        "¿Cuál es la marca y modelo de tu vehículo?",
-        "¿De qué año es y para qué lo usas principalmente?",
-        "¿Prefieres cobertura básica o completa?"
-      ] : undefined
+      missingInfo: [],
+      suggestedQuestions: undefined
     };
   }
 
@@ -531,6 +527,9 @@ function shouldShowInsurancePlans(message: string): boolean {
     /busco.*seguro/,
     /qué planes.*tienes/,
     /opciones.*seguro/,
+    /seguro.*para.*mi/,
+    /seguro.*de/,
+    /necesito.*para.*mi/,
   ];
 
   const hasStrongIntent = strongIntentPatterns.some(pattern => pattern.test(lowerMessage));
@@ -588,7 +587,7 @@ function detectInsuranceCategory(userMessage: string): string {
   // High-confidence patterns first
   const petKeywords = ['mascota', 'perro', 'gato', 'pet', 'dog', 'cat', 'animal', 'veterinario'];
   const travelKeywords = ['viaje', 'travel', 'trip', 'internacional', 'europa', 'estados unidos', 'méxico', 'vacaciones'];
-  const autoKeywords = ['auto', 'carro', 'vehiculo', 'moto', 'car', 'vehicle', 'motorcycle', 'scooter'];
+  const autoKeywords = ['auto', 'carro', 'vehiculo', 'vehículo', 'moto', 'car', 'vehicle', 'motorcycle', 'scooter', 'vespa'];
   const healthKeywords = ['salud', 'health', 'médico', 'medical', 'hospital', 'doctor', 'medicina'];
 
   if (petKeywords.some(keyword => message.includes(keyword))) {

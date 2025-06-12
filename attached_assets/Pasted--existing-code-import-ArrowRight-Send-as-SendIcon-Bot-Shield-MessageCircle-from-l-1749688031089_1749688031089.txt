@@ -1,0 +1,88 @@
+// ... existing code ...
+import { ArrowRight, Send as SendIcon, Bot, Shield, MessageCircle } from 'lucide-react';
+import { ChatMessage } from '@/types/chat';
+import NewBrikiAssistant from '@/components/briki-ai-assistant/NewBrikiAssistant';
+
+export default function AskBrikiPage() {
+  const { navigate } = useNavigation();
+  
+  // Create initial messages, including the Vespa example from the prompt
+  // This is now handled by the NewBrikiAssistant component itself.
+  /*
+  const initialMessages: ChatMessage[] = [
+    {
+      id: '1',
+      sender: 'user',
+      content: "I just bought a Vespa and need insurance in Colombia."
+    },
+    {
+      id: '2',
+      sender: 'assistant',
+      content: "Para tu Vespa, te recomendaría un seguro que incluya responsabilidad civil, cobertura por robo, y asistencia en carretera. He encontrado estas opciones que se ajustan a tus necesidades:",
+      detectedIntent: 'auto_insurance',
+      widget: {
+        type: 'plans',
+        plans: [
+          {
+            name: "Scooter Basic",
+            description: "Cobertura esencial para tu Vespa",
+            price: 28,
+            priceUnit: "/mo",
+            badge: "Recomendado",
+            category: "auto",
+            features: [
+              { text: "Responsabilidad civil obligatoria", color: "blue-500" },
+              { text: "Asistencia básica en vía", color: "cyan-500" },
+              { text: "Cobertura por robo", color: "indigo-500" },
+              { text: "Daños a terceros", color: "purple-500" }
+            ]
+          },
+          {
+            name: "Scooter Plus",
+            description: "Protección ampliada para motocicletas y scooters",
+            price: 42,
+            priceUnit: "/mo",
+            badge: "Más popular",
+            category: "auto",
+            features: [
+              { text: "Todo lo del plan Basic", color: "blue-500" },
+              { text: "Daños por accidente", color: "cyan-500" },
+              { text: "Asistencia 24/7 premium", color: "indigo-500" },
+              { text: "Accesorios cubiertos hasta $500", color: "purple-500" }
+            ]
+          },
+          {
+            name: "Scooter Premium",
+            description: "Cobertura total para tu Vespa con beneficios exclusivos",
+            price: 65,
+            priceUnit: "/mo",
+            badge: "Todo incluido",
+            category: "auto",
+            features: [
+              { text: "Cobertura todo riesgo", color: "blue-500" },
+              { text: "Vespa de reemplazo por 15 días", color: "cyan-500" },
+              { text: "Valor a nuevo durante 2 años", color: "indigo-500" },
+              { text: "Accesorios cubiertos sin límite", color: "purple-500" }
+            ]
+          }
+        ],
+        ctaText: "Ver todos los planes de auto",
+        ctaLink: "/auto/plans"
+      }
+    }
+  ];
+  */
+
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+// ... existing code ...
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              <NewBrikiAssistant />
+            </motion.div>
+
+            {/* Questions People Ask */}
+            <motion.div 
+// ... existing code ...
