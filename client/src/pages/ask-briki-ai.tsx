@@ -34,13 +34,6 @@ export default function AskBrikiAIPage() {
             transition={{ duration: 0.8 }}
             className="text-center mb-8"
           >
-            <div className="flex items-center justify-center mb-4">
-              <div className="relative">
-                <Bot className="h-12 w-12 text-blue-600 dark:text-blue-400" />
-                <Sparkles className="h-5 w-5 text-yellow-500 absolute -top-1 -right-1 animate-pulse" />
-              </div>
-            </div>
-            
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 via-cyan-600 to-blue-700 bg-clip-text text-transparent mb-4">
               Briki – Tu Asistente Personal
             </h1>
@@ -49,11 +42,6 @@ export default function AskBrikiAIPage() {
               Encuentra el seguro perfecto para ti con ayuda de inteligencia artificial avanzada. 
               Conversación natural, recomendaciones personalizadas.
             </p>
-
-            <div className="flex items-center justify-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-              <MessageCircle className="h-4 w-4" />
-              <span>Powered by GPT-4o • Respuestas en tiempo real</span>
-            </div>
           </motion.div>
 
           {/* New Assistant - Full Screen */}
