@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Bot, Car, Plane, Heart, Shield } from 'lucide-react';
+import { Car, Plane, Heart, Stethoscope } from 'lucide-react';
 
 interface WelcomeCardProps {
   onSendMessage: (message: string) => void;
@@ -13,24 +13,28 @@ const WelcomeCard: React.FC<WelcomeCardProps> = ({ onSendMessage }) => {
       icon: Car,
       title: 'Seguro de Auto',
       question: 'Necesito un seguro para mi vehículo',
+      description: 'Protección completa para tu automóvil',
       color: 'from-blue-500 to-blue-600'
     },
     {
       icon: Plane,
       title: 'Seguro de Viaje', 
       question: 'Voy a viajar y necesito seguro de viaje',
+      description: 'Cobertura para tus aventuras',
       color: 'from-green-500 to-green-600'
     },
     {
       icon: Heart,
       title: 'Seguro de Mascota',
       question: 'Mi mascota necesita seguro veterinario',
+      description: 'Cuidado veterinario para tu compañero',
       color: 'from-pink-500 to-pink-600'
     },
     {
-      icon: Shield,
+      icon: Stethoscope,
       title: 'Seguro de Salud',
       question: 'Busco un seguro de salud',
+      description: 'Atención médica cuando la necesites',
       color: 'from-purple-500 to-purple-600'
     }
   ];
@@ -43,9 +47,6 @@ const WelcomeCard: React.FC<WelcomeCardProps> = ({ onSendMessage }) => {
       className="mb-8 p-8 bg-white dark:bg-gray-800 rounded-3xl border border-gray-200 dark:border-gray-700 shadow-xl"
     >
       <div className="text-center mb-8">
-        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center">
-          <Bot className="h-8 w-8 text-white" />
-        </div>
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
           ¡Bienvenido a Briki!
         </h2>
@@ -76,7 +77,7 @@ const WelcomeCard: React.FC<WelcomeCardProps> = ({ onSendMessage }) => {
                     {option.title}
                   </h3>
                   <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    Obtén recomendaciones personalizadas
+                    {option.description}
                   </p>
                 </div>
               </div>
