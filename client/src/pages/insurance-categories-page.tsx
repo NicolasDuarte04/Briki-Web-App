@@ -5,7 +5,7 @@ import { InsuranceCategory } from "@shared/schema";
 
 // Import our new components
 import AnimatedBackground from "@/components/animated-background";
-import { GlassCard } from "@/components/auth/GlassCard";
+import GlassCard from "@/components/glass-card";
 import GradientButton from "@/components/gradient-button";
 import { PublicLayout } from "@/components/layout/public-layout";
 

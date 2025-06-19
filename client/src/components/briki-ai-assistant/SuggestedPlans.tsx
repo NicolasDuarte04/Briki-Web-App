@@ -1,5 +1,5 @@
 import React from 'react';
-import PlanCard, { InsurancePlan } from '@/components/briki-ai-assistant/PlanCard';
+import PlanCard, { InsurancePlan } from './PlanCard';
 import { useToast } from '@/hooks/use-toast';
 import { useLocation } from 'wouter';
 
@@ -25,34 +25,6 @@ const SuggestedPlans: React.FC<SuggestedPlansProps> = ({ plans }) => {
     return null;
   }
 
-  // Mostrar el contenido de plans para depuración visual
-  // (esto se puede quitar después de la depuración)
-  // Si las tarjetas no aparecen, forzar el render de un plan de demo
-  const forceDemo = true; // Cambia a true para forzar demo
-  const demoPlans = [
-    {
-      id: 'demo-plan',
-      name: 'Demo Plan',
-      price: '$19.99',
-      features: ['Cobertura médica', 'Asistencia 24/7', 'Equipaje perdido'],
-      provider: 'Prueba',
-      deductible: '$40 USD',
-      type: 'Recomendado',
-      category: 'travel',
-      description: 'Plan de prueba',
-      basePrice: 19.99,
-      currency: 'USD',
-      duration: '10 días',
-      coverageAmount: 10000,
-      coverage: {},
-      exclusions: [],
-      addOns: [],
-      tags: [],
-      rating: 5,
-      status: 'active',
-    }
-  ];
-
   const handleViewDetails = (planId: string) => {
     // Por ahora solo mostraremos un toast, pero podríamos navegar a una página de detalles
     toast({
@@ -73,11 +45,11 @@ const SuggestedPlans: React.FC<SuggestedPlansProps> = ({ plans }) => {
         Planes recomendados para ti:
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {(forceDemo ? demoPlans : plans).map((plan, index) => (
+        {plans.map((plan, index) => (
           <PlanCard
             key={plan.id}
             plan={plan}
-            highlighted={index === 0}
+            highlighted={index === 0} // Destacar el primer plan como el más recomendado
             onViewDetails={handleViewDetails}
             onQuote={handleQuote}
           />

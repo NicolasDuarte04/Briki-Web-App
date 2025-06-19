@@ -1,4 +1,4 @@
-import PlanCard from "@/components/briki-ai-assistant/PlanCard";
+import { PlanCard } from "@/components/plans/PlanCard";
 import { insuranceAPI, type InsurancePlan } from "@/services/insurance-api";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";

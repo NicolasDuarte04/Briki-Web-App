@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from '@/hooks/use-auth';
 import { motion } from 'framer-motion';
 import GradientBackground from '@/components/ui/gradient-background';
-import { GlassCard } from '@/components/auth/GlassCard';
+import GlassCard from '@/components/ui/glass-card';
 
 const registerSchema = z.object({
   username: z.string().min(3, 'Username must be at least 3 characters'),
