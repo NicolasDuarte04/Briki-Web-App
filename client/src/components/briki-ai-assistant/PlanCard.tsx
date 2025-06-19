@@ -129,17 +129,18 @@ const PlanCard: React.FC<PlanCardProps> = ({
         <Button 
           variant="outline" 
           size="sm"
-          className="flex-1"
+          className="flex-1 border-gray-300 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800"
           onClick={() => onViewDetails && onViewDetails(plan.id)}
         >
           Detalles
         </Button>
         <Button 
           size="sm"
-          className="flex-1"
+          className={`flex-1 transition-all duration-200 ${highlighted ? 'bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 shadow-md' : 'bg-blue-600 hover:bg-blue-700'}`}
           onClick={() => onQuote && onQuote(plan.id)}
         >
-          Cotizar <ArrowRight className="ml-1 h-4 w-4" />
+          <ArrowRight className="h-4 w-4 mr-1" />
+          Cotizar
         </Button>
       </CardFooter>
     </Card>
