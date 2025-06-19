@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from '@/hooks/use-auth';
 import { motion } from 'framer-motion';
 import GradientBackground from '@/components/ui/gradient-background';
-import GlassCard from '@/components/ui/glass-card';
+import { GlassCard } from '@/components/auth/GlassCard';
 
 const loginSchema = z.object({
   identifier: z.string().min(1, 'Email or username is required'),
