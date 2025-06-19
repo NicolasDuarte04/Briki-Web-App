@@ -9,9 +9,7 @@ import { sendMessageToAI, getMockResponse, APIMessage } from '@/services/openai-
 import WelcomeCard from './WelcomeCard';
 import { InsurancePlan } from './PlanCard';
 import SuggestedQuestions from './SuggestedQuestions';
-
-// Lazy load the SuggestedPlans component
-const SuggestedPlans = lazy(() => import('./SuggestedPlans'));
+import SuggestedPlans from './SuggestedPlans';
 import { formatUserContext, extractContextFromMessage, isGenericGreeting } from '@/utils/context-utils';
 
 interface Message {
@@ -166,6 +164,8 @@ const NewBrikiAssistant: React.FC = () => {
   const [userContext, setUserContext] = useState<any>({});
   const [pendingQuestions, setPendingQuestions] = useState<string[]>([]);
   const [suggestedPlans, setSuggestedPlans] = useState<InsurancePlan[]>([]);
+  const [hasShownPlans, setHasShownPlans] = useState(false);
+  const [needsMoreContext, setNeedsMoreContext] = useState<boolean>(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
@@ -294,29 +294,29 @@ const NewBrikiAssistant: React.FC = () => {
       // Get AI response with conversation history
       const response = await sendMessageToAI(messageToSend, conversationHistory);
 
-      // Debug logging for data flow analysis
-      console.log('🔍 NewBrikiAssistant - AI Response received:', {
-        hasMessage: !!(response.message || response.response),
-        hasSuggestedPlans: !!response.suggestedPlans,
-        planCount: response.suggestedPlans?.length || 0,
-        planNames: response.suggestedPlans?.map(p => p.name) || [],
-        shouldHaveShownPlans: shouldRequestPlans,
-        fullResponse: response
+      // A. Log after receiving backend response
+      console.log('AI Response:', response);
+
+      // B. Log before updating states
+      console.log('Before state update:', {
+        pendingQuestions: response.suggestedQuestions,
+        needsMoreContext: response.needsMoreContext,
+        suggestedPlans: response.suggestedPlans,
       });
 
-      // Manejar preguntas sugeridas si falta contexto
-      if (response.needsMoreContext && response.suggestedQuestions?.length > 0) {
-        setPendingQuestions(response.suggestedQuestions);
-        setSuggestedPlans([]); // Limpiar planes si hay preguntas pendientes
+      // Lógica robusta para limpiar planes y controlar preguntas
+      if (response.needsMoreContext) {
+        setPendingQuestions(response.suggestedQuestions || []);
+        setSuggestedPlans([]);
+        setHasShownPlans(false);
+        setNeedsMoreContext(true);
       } else {
-        setPendingQuestions([]); // Limpiar preguntas si ya no hay
+        setPendingQuestions([]);
         setSuggestedPlans(response.suggestedPlans || []);
+        setHasShownPlans(!!(response.suggestedPlans && response.suggestedPlans.length > 0));
+        setNeedsMoreContext(false);
       }
 
-      // Trust backend decision - if plans are returned, show them
-      const finalSuggestedPlans = response.suggestedPlans;
-
-      // Update loading message with response and memory
       setMessages(prev => 
         prev.map(msg => 
           msg.isLoading 
@@ -324,11 +324,11 @@ const NewBrikiAssistant: React.FC = () => {
                 ...msg,
                 id: `assistant-${Date.now()}`,
                 content: response.message || response.response || "No pude generar una respuesta.",
-                suggestedPlans: finalSuggestedPlans || [],
+                suggestedPlans: response.suggestedPlans || [],
                 isLoading: false,
                 timestamp: new Date(),
-                plansSummary: (finalSuggestedPlans && finalSuggestedPlans.length > 0) 
-                  ? `Mostré ${finalSuggestedPlans.length} planes de ${response.category || 'seguros'}` 
+                plansSummary: (response.suggestedPlans && response.suggestedPlans.length > 0) 
+                  ? `Mostré ${response.suggestedPlans.length} planes de ${response.category || 'seguros'}` 
                   : undefined
               }
             : msg
@@ -412,13 +412,11 @@ const NewBrikiAssistant: React.FC = () => {
                 ) : (
                   <>
                     <p className="whitespace-pre-wrap">{message.content}</p>
-                    {/* Mostrar SuggestedPlans solo si no hay preguntas pendientes y hay planes */}
-                    {!pendingQuestions.length && suggestedPlans.length > 0 && (
-                      <div className="mt-3">
-                        <Suspense fallback={<div>Cargando planes...</div>}>
-                          <SuggestedPlans plans={suggestedPlans} />
-                        </Suspense>
-                      </div>
+                    {/* C. Log before rendering SuggestedPlans */}
+                    {message.suggestedPlans && message.suggestedPlans.length > 0 && (
+                      <>
+                        <SuggestedPlans plans={message.suggestedPlans} />
+                      </>
                     )}
                   </>
                 )}
