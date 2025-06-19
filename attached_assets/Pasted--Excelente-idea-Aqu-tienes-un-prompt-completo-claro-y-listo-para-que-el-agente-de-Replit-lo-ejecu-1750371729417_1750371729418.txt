@@ -1,0 +1,55 @@
+¡Excelente idea! Aquí tienes un prompt completo, claro y listo para que el agente de Replit lo ejecute y replique la solución exacta.
+
+---
+
+### **Prompt para el Agente de Replit**
+
+Hola. Necesito que apliques una serie de correcciones para solucionar un bug que impide que las tarjetas de planes de seguros se muestren en la interfaz del asistente. Ya hemos diagnosticado el problema y sabemos exactamente qué hacer.
+
+Por favor, sigue estas instrucciones al pie de la letra:
+
+---
+
+#### **Tarea 1: Corregir la Importación Incorrecta en `SuggestedPlans.tsx`**
+
+1.  **Abre el archivo:** `client/src/components/briki-ai-assistant/SuggestedPlans.tsx`
+2.  **Busca la línea de importación** de `PlanCard`.
+3.  **Reemplázala** con la ruta correcta.
+
+    *   **Línea a cambiar (aproximadamente línea 2):**
+        ```javascript
+        import PlanCard, { InsurancePlan } from '@/components/plans/PlanCard'; 
+        ```
+    *   **Reemplazar con:**
+        ```javascript
+        import PlanCard, { InsurancePlan } from '@/components/briki-ai-assistant/PlanCard';
+        ```
+
+---
+
+#### **Tarea 2: Eliminar Archivos Duplicados y Redundantes**
+
+Para evitar futuros conflictos y limpiar el código, por favor elimina los siguientes archivos:
+
+1.  **Elimina el re-exportador de `PlanCard`:**
+    *   **Ruta del archivo a eliminar:** `client/src/components/plans/PlanCard.tsx`
+
+2.  **Elimina las copias duplicadas de `GlassCard`:**
+    *   **Ruta del archivo a eliminar:** `client/src/components/glass-card.tsx`
+    *   **Ruta del archivo a eliminar:** `client/src/components/ui/glass-card.tsx`
+
+3.  **Consolida `GlassCard` (Asegúrate de que este archivo exista):**
+    *   Verifica que el único `GlassCard` que quede sea el de la ruta: `client/src/components/auth/GlassCard.tsx`. Si no existe, mueve uno de los eliminados a esta ruta.
+
+---
+
+#### **Tarea 3: Verificación Final**
+
+1.  Una vez aplicados los cambios, reinicia el servidor de desarrollo (`npm run dev` o el comando que uses).
+2.  Navega a la página del asistente de Briki.
+3.  Inicia una conversación que garantice la recomendación de planes (ej. "Necesito seguro de viaje para España por 2 semanas").
+4.  **Verifica que las tarjetas de planes de seguros (`PlanCard`) ahora se muestran correctamente en la interfaz.**
+
+---
+
+Gracias. Por favor, procede con estas ediciones.
