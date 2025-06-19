@@ -141,15 +141,21 @@ export async function generateAssistantResponse(
         // For travel category or if we detect travel intent, show travel plans
         if (category === 'travel' && relevantPlans.length > 0) {
           suggestedPlans = findRelevantPlans(userMessage, relevantPlans);
-          console.log(`✅ Found ${suggestedPlans.length} travel plans (requested: default)`);
-        } else if (category !== 'general' && relevantPlans.length > 0) {
+          console.log(`✅ Found ${suggestedPlans.length} travel plans (category: ${category})`);
+        } else if (category !== 'general' && category !== null && relevantPlans.length > 0) {
           suggestedPlans = findRelevantPlans(userMessage, relevantPlans);
           console.log(`[OpenAI][${requestId}] Category detected (${category}), showing ${suggestedPlans.length} relevant plans`);
         } else if (shouldShowInsurancePlans(userMessage)) {
           suggestedPlans = findRelevantPlans(userMessage, relevantPlans);
           console.log(`[OpenAI][${requestId}] Insurance intent detected, showing ${suggestedPlans.length} relevant plans`);
         } else {
-          console.log(`[OpenAI][${requestId}] No clear category or intent detected, no plans shown`);
+          // Force travel detection as fallback if context analysis detected travel
+          if (planContextAnalysis.category === 'travel' && relevantPlans.length > 0) {
+            suggestedPlans = findRelevantPlans(userMessage, relevantPlans);
+            console.log(`🔄 Fallback: Using context analysis travel category, showing ${suggestedPlans.length} plans`);
+          } else {
+            console.log(`[OpenAI][${requestId}] No clear category or intent detected, no plans shown`);
+          }
         }
       }
     }
