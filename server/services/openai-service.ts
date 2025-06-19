@@ -21,8 +21,13 @@ export interface AssistantMessage {
 }
 
 export interface AssistantResponse {
-  message: string;
+  message?: string;
+  response?: string;
   suggestedPlans?: MockInsurancePlan[];
+  category?: string;
+  userContext?: any;
+  needsMoreContext?: boolean;
+  suggestedQuestions?: string[];
 }
 
 /**
@@ -82,9 +87,15 @@ export async function generateAssistantResponse(
       );
       // Generate fallback response with relevant plans
       const fallbackMessage = `¡Hola! Soy Briki, tu asistente de seguros. Entiendo que estás preguntando sobre: "${userMessage}". Te puedo ayudar con información sobre seguros y recomendarte los mejores planes disponibles.`;
+      const fallbackContextAnalysis = analyzeContextNeeds(userMessage, conversationHistory);
+      
       return {
         message: fallbackMessage,
+        response: fallbackMessage,
         suggestedPlans: relevantPlans.slice(0, 3),
+        category: detectInsuranceCategory(userMessage),
+        needsMoreContext: fallbackContextAnalysis.needsMoreContext,
+        suggestedQuestions: fallbackContextAnalysis.suggestedQuestions || [],
       };
     }
 
@@ -123,7 +134,7 @@ export async function generateAssistantResponse(
     } else {
       // SIMPLIFIED: Always show plans if we detect an insurance category
       const category = detectInsuranceCategory(userMessage);
-      
+
       if (category !== 'general' && relevantPlans.length > 0) {
         // Show plans immediately for any detected insurance category
         suggestedPlans = findRelevantPlans(userMessage, relevantPlans);
@@ -151,9 +162,16 @@ export async function generateAssistantResponse(
       timestamp: new Date().toISOString(),
     });
 
+    // Analyze context and determine if more information is needed
+    const finalContextAnalysis = analyzeContextNeeds(userMessage, conversationHistory);
+    
     return {
       message: assistantMessage,
+      response: assistantMessage, // Provide both for compatibility
       suggestedPlans: suggestedPlans.length > 0 ? suggestedPlans : undefined,
+      category: detectInsuranceCategory(userMessage),
+      needsMoreContext: finalContextAnalysis.needsMoreContext,
+      suggestedQuestions: finalContextAnalysis.suggestedQuestions || [],
     };
   } catch (error: any) {
     // Enhanced error handling with specific error types
@@ -314,107 +332,157 @@ interface ContextAnalysis {
 function analyzeContextNeeds(userMessage: string, conversationHistory: AssistantMessage[]): ContextAnalysis {
   const lowerMessage = userMessage.toLowerCase().trim();
 
-  // Check if user already provided detailed context in conversation
-  const hasDetailedContext = conversationHistory.some(msg => 
-    msg.role === 'user' && (
-      msg.content.length > 50 || // Detailed messages
-      /\d+/.test(msg.content) || // Contains numbers (ages, dates, etc.)
-      /(años?|meses?|días?|duración|países?|raza|modelo|marca)/i.test(msg.content)
-    )
-  );
-
-  // Travel insurance context analysis - more permissive for showing plans
-  if (/(viaj|europe|estados unidos|méxico|international|trip|travel)/i.test(lowerMessage)) {
-    const travelDetails = {
-      destination: /(europa|asia|méxico|estados unidos|[a-z]+)/i.test(lowerMessage),
-      duration: /(días?|semanas?|meses?|\d+)/i.test(lowerMessage),
-      travelers: /(solo|familia|acompañant|personas?)/i.test(lowerMessage),
-      priorities: /(precio|cobertura|médic|cancelac)/i.test(lowerMessage),
-      medical: /(condición|médic|enferm|salud)/i.test(lowerMessage)
-    };
-
-    const missingCount = Object.values(travelDetails).filter(Boolean).length;
-    // Show plans immediately for travel insurance - users can compare and ask follow-ups
-    const needsMoreInfo = false; // Always show plans for travel insurance
-
-    return {
-      needsMoreContext: needsMoreInfo,
-      category: 'travel',
-      missingInfo: [],
-      suggestedQuestions: undefined
-    };
+  // Extraer contexto de mensajes previos
+  let context: any = {};
+  for (const msg of conversationHistory) {
+    if (msg.role === 'user') {
+      // Simple extracción por regex (puedes mejorar con NLP si lo deseas)
+      if (/europa|asia|méxico|estados unidos|colombia|españa|francia|alemania|italia|brasil|chile|perú|usa|canadá|argentina/.test(msg.content.toLowerCase())) {
+        context.destination = true;
+      }
+      if (/(días?|semanas?|meses?|\d+\s*(días?|semanas?|meses?))/.test(msg.content.toLowerCase())) {
+        context.duration = true;
+      }
+      if (/(toyota|honda|ford|chevrolet|nissan|mazda|kia|bmw|mercedes|marca)/.test(msg.content.toLowerCase())) {
+        context.brand = true;
+      }
+      if (/(modelo|\d{4})/.test(msg.content.toLowerCase())) {
+        context.model = true;
+      }
+      if (/(año|\d{4})/.test(msg.content.toLowerCase())) {
+        context.year = true;
+      }
+      if (/(perro|gato|mascota|dog|cat)/.test(msg.content.toLowerCase())) {
+        context.petType = true;
+      }
+      if (/(\d+\s*(años?|meses?)|cachorro|adulto|mayor|edad)/.test(msg.content.toLowerCase())) {
+        context.petAge = true;
+      }
+      if (/(\d+\s*(años?|edad|meses?)|joven|adulto|mayor)/.test(msg.content.toLowerCase())) {
+        context.healthAge = true;
+      }
+      if (/(diabetes|hipertens|asma|condición|enferm|preexist)/.test(msg.content.toLowerCase())) {
+        context.healthCondition = true;
+      }
+    }
   }
 
-  // Pet insurance context analysis - more permissive for showing plans
-  if (/(mascot|perr|gat|pet|animal)/i.test(lowerMessage)) {
-    const petDetails = {
-      type: /(perr|gat|dog|cat)/i.test(lowerMessage),
-      age: /(\d+|años?|meses?|cachorro|adulto|mayor)/i.test(lowerMessage),
-      breed: /(raza|labrador|golden|pastor|siamés)/i.test(lowerMessage),
-      health: /(sano|enferm|condición|médic|preexist)/i.test(lowerMessage),
-      coverage: /(básic|vacun|emergenc|veterinari)/i.test(lowerMessage)
-    };
-
-    const missingCount = Object.values(petDetails).filter(Boolean).length;
-    // Show plans immediately for pet insurance - users can compare and ask follow-ups
-    const needsMoreInfo = false; // Always show plans for pet insurance
-
-    return {
-      needsMoreContext: needsMoreInfo,
-      category: 'pet',
-      missingInfo: [],
-      suggestedQuestions: undefined
-    };
+  // También analizar el mensaje actual
+  const msg = lowerMessage;
+  if (/europa|asia|méxico|estados unidos|colombia|españa|francia|alemania|italia|brasil|chile|perú|usa|canadá|argentina/.test(msg)) {
+    context.destination = true;
+  }
+  if (/(días?|semanas?|meses?|\d+\s*(días?|semanas?|meses?))/.test(msg)) {
+    context.duration = true;
+  }
+  if (/(toyota|honda|ford|chevrolet|nissan|mazda|kia|bmw|mercedes|marca)/.test(msg)) {
+    context.brand = true;
+  }
+  if (/(modelo|\d{4})/.test(msg)) {
+    context.model = true;
+  }
+  if (/(año|\d{4})/.test(msg)) {
+    context.year = true;
+  }
+  if (/(perro|gato|mascota|dog|cat)/.test(msg)) {
+    context.petType = true;
+  }
+  if (/(\d+\s*(años?|meses?)|cachorro|adulto|mayor|edad)/.test(msg)) {
+    context.petAge = true;
+  }
+  if (/(\d+\s*(años?|edad|meses?)|joven|adulto|mayor)/.test(msg)) {
+    context.healthAge = true;
+  }
+  if (/(diabetes|hipertens|asma|condición|enferm|preexist)/.test(msg)) {
+    context.healthCondition = true;
   }
 
-  // Auto insurance context analysis - more permissive for showing plans
-  if (/(auto|vehicul|vehículo|carro|moto|seguro.*auto)/i.test(lowerMessage)) {
-    const autoDetails = {
-      brand: /(marca|toyota|honda|ford|chevrolet|nissan)/i.test(lowerMessage),
-      model: /(modelo|\d{4}|año)/i.test(lowerMessage),
-      age: /(\d+|años?|nuevo|usado)/i.test(lowerMessage),
-      coverage: /(básic|completo|terceros|todo riesgo)/i.test(lowerMessage),
-      use: /(trabajo|personal|comercial|uber)/i.test(lowerMessage)
-    };
-
-    const missingCount = Object.values(autoDetails).filter(Boolean).length;
-    // Show plans immediately for auto insurance - users can compare and ask follow-ups
-    const needsMoreInfo = false; // Always show plans for auto insurance
-
-    return {
-      needsMoreContext: needsMoreInfo,
-      category: 'auto',
-      missingInfo: [],
-      suggestedQuestions: undefined
-    };
+  // Detectar categoría
+  let category = 'general';
+  if (/(viaj|trip|travel|europa|estados unidos|méxico|vacaciones|turismo|exterior|extranjero)/i.test(msg)) {
+    category = 'travel';
+  } else if (/(auto|carro|vehicul|vehículo|moto|car|vehicle|motorcycle|scooter|vespa|automóvil)/i.test(msg)) {
+    category = 'auto';
+  } else if (/(mascota|perro|gato|pet|dog|cat|animal|veterinario|cachorro|felino|canino)/i.test(msg)) {
+    category = 'pet';
+  } else if (/(salud|médic|health|hospitaliz|doctor|medicina|clínica)/i.test(msg)) {
+    category = 'health';
   }
 
-  // Health insurance context analysis - more permissive for showing plans
-  if (/(salud|médic|health|hospitaliz)/i.test(lowerMessage)) {
-    const healthDetails = {
-      age: /(\d+|años?|joven|adulto|mayor)/i.test(lowerMessage),
-      family: /(familia|hijo|esposa|pareja)/i.test(lowerMessage),
-      conditions: /(condición|enferm|diabetes|hipertens)/i.test(lowerMessage),
-      coverage: /(básic|completo|internacional)/i.test(lowerMessage),
-      budget: /(económic|precio|barato|premium)/i.test(lowerMessage)
-    };
-
-    const missingCount = Object.values(healthDetails).filter(Boolean).length;
-    // Show plans immediately for health insurance - users can compare and ask follow-ups
-    const needsMoreInfo = false; // Always show plans for health insurance
-
-    return {
-      needsMoreContext: needsMoreInfo,
-      category: 'health',
-      missingInfo: [],
-      suggestedQuestions: undefined
-    };
+  // Lógica por categoría
+  if (category === 'travel') {
+    const missingInfo = [];
+    if (!context.destination) missingInfo.push('destination');
+    if (!context.duration) missingInfo.push('duration');
+    if (missingInfo.length > 0) {
+      return {
+        needsMoreContext: true,
+        category: 'travel',
+        missingInfo,
+        suggestedQuestions: [
+          ...(missingInfo.includes('destination') ? ["¿A qué país planeas viajar?"] : []),
+          ...(missingInfo.includes('duration') ? ["¿Cuántos días durará tu viaje?"] : [])
+        ]
+      };
+    }
+  }
+  if (category === 'auto') {
+    const missingInfo = [];
+    if (!context.brand) missingInfo.push('marca');
+    if (!context.model) missingInfo.push('modelo');
+    if (!context.year) missingInfo.push('año');
+    if (missingInfo.length > 0) {
+      return {
+        needsMoreContext: true,
+        category: 'auto',
+        missingInfo,
+        suggestedQuestions: [
+          ...(missingInfo.includes('marca') ? ["¿Cuál es la marca de tu vehículo?"] : []),
+          ...(missingInfo.includes('modelo') ? ["¿Cuál es el modelo?"] : []),
+          ...(missingInfo.includes('año') ? ["¿De qué año es tu vehículo?"] : [])
+        ]
+      };
+    }
+  }
+  if (category === 'pet') {
+    const missingInfo = [];
+    if (!context.petType) missingInfo.push('tipo de mascota');
+    if (!context.petAge) missingInfo.push('edad');
+    if (missingInfo.length > 0) {
+      return {
+        needsMoreContext: true,
+        category: 'pet',
+        missingInfo,
+        suggestedQuestions: [
+          ...(missingInfo.includes('tipo de mascota') ? ["¿Qué tipo de mascota tienes? (perro, gato, etc.)"] : []),
+          ...(missingInfo.includes('edad') ? ["¿Qué edad tiene tu mascota?"] : [])
+        ]
+      };
+    }
+  }
+  if (category === 'health') {
+    const missingInfo = [];
+    if (!context.healthAge) missingInfo.push('edad');
+    if (!context.healthCondition) missingInfo.push('condiciones de salud');
+    if (missingInfo.length > 0) {
+      return {
+        needsMoreContext: true,
+        category: 'health',
+        missingInfo,
+        suggestedQuestions: [
+          ...(missingInfo.includes('edad') ? ["¿Qué edad tienes?"] : []),
+          ...(missingInfo.includes('condiciones de salud') ? ["¿Tienes alguna condición de salud preexistente?"] : [])
+        ]
+      };
+    }
   }
 
+  // Si no falta nada relevante
   return {
     needsMoreContext: false,
-    category: 'general',
-    missingInfo: []
+    category,
+    missingInfo: [],
+    suggestedQuestions: []
   };
 }
 
@@ -599,26 +667,26 @@ function detectInsuranceCategory(userMessage: string): string {
  */
 function extractRequestedPlanCount(message: string): number | null {
   const lowerMessage = message.toLowerCase();
-  
+
   // Look for explicit numbers like "4 planes", "5 opciones", "3 seguros"
   const numberMatch = lowerMessage.match(/(\d+)\s*(planes?|opciones?|seguros?|recommendations?)/);
   if (numberMatch) {
     const count = parseInt(numberMatch[1]);
     return count <= 10 ? count : null; // Cap at 10 for sanity
   }
-  
+
   // Look for written numbers
   const writtenNumbers: Record<string, number> = {
     'uno': 1, 'dos': 2, 'tres': 3, 'cuatro': 4, 'cinco': 5,
     'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5
   };
-  
+
   for (const [word, num] of Object.entries(writtenNumbers)) {
     if (lowerMessage.includes(word)) {
       return num;
     }
   }
-  
+
   return null;
 }
 
@@ -644,7 +712,7 @@ function findRelevantPlans(
       // Check if user requested specific number of plans
       const requestedCount = extractRequestedPlanCount(userMessage);
       const maxPlans = requestedCount || Math.min(categoryPlans.length, 4); // Default to 4 or available plans
-      
+
       // Score only plans from the correct category
       const scoredPlans = categoryPlans.map((plan) => ({
         plan,
@@ -669,8 +737,6 @@ function findRelevantPlans(
   console.log(`❓ No clear category detected, not showing any plans`);
   return [];
 }
-
-
 
 /**
  * Calculate relevance score based on multiple factors
@@ -744,8 +810,8 @@ function getTopRelevantPlans(userMessage: string, plans: MockInsurancePlan[], li
  */
 export async function getChatCompletionFromOpenAI(message: string): Promise<string> {
   try {
-    const response = await generateAssistantResponse(message, [], [], "Colombia");
-    return response.message;
+    const response = await generateAssistantResponse(message, []);
+    return response.message || response.response || "No response generated";
   } catch (error) {
     console.error("Error in getChatCompletionFromOpenAI:", error);
     throw error;
@@ -755,8 +821,8 @@ export async function getChatCompletionFromOpenAI(message: string): Promise<stri
 export async function generateInsuranceRecommendation(category: string, criteria: any): Promise<string> {
   try {
     const message = `I need ${category} insurance with these requirements: ${JSON.stringify(criteria)}`;
-    const response = await generateAssistantResponse(message, [], [], "Colombia");
-    return response.message;
+    const response = await generateAssistantResponse(message, []);
+    return response.message || response.response || "No recommendation generated";
   } catch (error) {
     console.error("Error in generateInsuranceRecommendation:", error);
     throw error;
@@ -766,8 +832,8 @@ export async function generateInsuranceRecommendation(category: string, criteria
 export async function explainInsuranceTerm(term: string): Promise<string> {
   try {
     const message = `Please explain the insurance term: ${term}`;
-    const response = await generateAssistantResponse(message, [], [], "Colombia");
-    return response.message;
+    const response = await generateAssistantResponse(message, []);
+    return response.message || response.response || "No explanation generated";
   } catch (error) {
     console.error("Error in explainInsuranceTerm:", error);
     throw error;
