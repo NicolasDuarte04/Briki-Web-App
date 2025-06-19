@@ -68,9 +68,6 @@ const SuggestedPlans: React.FC<SuggestedPlansProps> = ({ plans }) => {
 
   return (
     <div className="mt-4 mb-3">
-      <pre style={{background:'#f0f4fa', color:'#222', fontSize:12, marginBottom:8, borderRadius:4, padding:8, overflow:'auto'}}>
-        {JSON.stringify(plans, null, 2)}
-      </pre>
       <div className="flex items-center gap-2 text-sm font-medium mb-3 text-gray-700 dark:text-gray-300">
         <div className="w-1 h-4 bg-gradient-to-b from-blue-500 to-cyan-500 rounded-full"></div>
         Planes recomendados para ti:
