@@ -39,9 +39,12 @@ const SuggestedPlans: React.FC<SuggestedPlansProps> = ({ plans }) => {
   };
 
   return (
-    <div className="mt-3 mb-2">
-      <div className="text-sm font-medium mb-2">Planes recomendados:</div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+    <div className="mt-4 mb-3">
+      <div className="flex items-center gap-2 text-sm font-medium mb-3 text-gray-700 dark:text-gray-300">
+        <div className="w-1 h-4 bg-gradient-to-b from-blue-500 to-cyan-500 rounded-full"></div>
+        Planes recomendados para ti:
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {plans.map((plan, index) => (
           <PlanCard
             key={plan.id}

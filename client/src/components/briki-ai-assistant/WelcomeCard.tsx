@@ -44,14 +44,14 @@ const WelcomeCard: React.FC<WelcomeCardProps> = ({ onSendMessage }) => {
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="mb-8 p-8 bg-white dark:bg-gray-800 rounded-3xl border border-gray-200 dark:border-gray-700 shadow-xl"
+      className="mb-6 p-6 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-gray-800 dark:to-gray-700 rounded-2xl border border-blue-200 dark:border-gray-600 shadow-md"
     >
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+      <div className="text-center mb-6">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
           ¡Bienvenido a Briki!
         </h2>
-        <p className="text-gray-600 dark:text-gray-400 text-lg max-w-md mx-auto">
-          Estoy aquí para ayudarte a encontrar el seguro perfecto. ¿Por dónde quieres empezar?
+        <p className="text-gray-600 dark:text-gray-400 text-base max-w-md mx-auto">
+          Encuentra el seguro perfecto. ¿Por dónde empezamos?
         </p>
       </div>
       
@@ -66,11 +66,11 @@ const WelcomeCard: React.FC<WelcomeCardProps> = ({ onSendMessage }) => {
             <Button
               onClick={() => onSendMessage(option.question)}
               variant="outline"
-              className="w-full p-6 h-auto text-left border-2 hover:border-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200 group"
+              className="w-full p-4 h-auto text-left border-2 hover:border-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200 group hover:shadow-md"
             >
-              <div className="flex items-center space-x-4">
-                <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${option.color} flex items-center justify-center group-hover:scale-110 transition-transform duration-200`}>
-                  <option.icon className="h-6 w-6 text-white" />
+              <div className="flex items-center space-x-3">
+                <div className={`w-10 h-10 rounded-lg bg-gradient-to-r ${option.color} flex items-center justify-center group-hover:scale-105 transition-transform duration-200 shadow-sm`}>
+                  <option.icon className="h-5 w-5 text-white" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900 dark:text-white text-base">

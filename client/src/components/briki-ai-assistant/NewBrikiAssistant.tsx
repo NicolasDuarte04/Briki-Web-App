@@ -351,12 +351,22 @@ const NewBrikiAssistant: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full max-h-[600px] bg-white rounded-lg border border-gray-200 shadow-sm">
-      {/* Header */}
-      <div className="flex items-center gap-3 p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-cyan-500">
-        <Bot className="h-6 w-6 text-white" />
-        <div>
-          <h3 className="font-semibold text-white">Briki AI Assistant</h3>
-          <p className="text-sm text-blue-100">Tu compañero inteligente para seguros</p>
+      {/* Enhanced Header */}
+      <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 via-blue-700 to-cyan-600 shadow-lg">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center ring-2 ring-white/30">
+            <Bot className="h-5 w-5 text-white" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-lg text-white">Briki AI</h3>
+            <p className="text-xs text-blue-100">Tu asistente personal de seguros</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full">
+            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+            <span className="text-xs font-medium text-white">En línea</span>
+          </div>
         </div>
       </div>
 
@@ -368,13 +378,13 @@ const NewBrikiAssistant: React.FC = () => {
           {messages.map((message) => (
             <div
               key={message.id}
-              className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} mb-4`}
             >
               <div
-                className={`max-w-[80%] rounded-lg p-3 ${
+                className={`max-w-[85%] rounded-2xl p-4 shadow-sm ${
                   message.role === 'user'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-900'
+                    ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white ml-auto'
+                    : 'bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-600'
                 }`}
               >
                 {message.isLoading ? (
@@ -401,25 +411,41 @@ const NewBrikiAssistant: React.FC = () => {
         </div>
       </ScrollArea>
 
-      {/* Input */}
-      <div className="p-4 border-t border-gray-200">
-        <div className="flex gap-2">
-          <Input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder="Escribe tu mensaje..."
-            disabled={isLoading}
-            className="flex-1"
-          />
+      {/* Enhanced Input Area */}
+      <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+        <div className="flex gap-3 items-end">
+          <div className="flex-1 relative">
+            <Input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Escribe tu pregunta sobre seguros..."
+              disabled={isLoading}
+              className="flex-1 pr-12 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 focus:border-blue-500 transition-all duration-200 bg-white dark:bg-gray-900"
+            />
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-gray-400">
+              {input.length}/500
+            </div>
+          </div>
           <Button
             onClick={() => handleSendMessage()}
             disabled={isLoading || !input.trim()}
             size="icon"
+            className="h-12 w-12 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 transition-all duration-200 shadow-lg"
           >
-            <Send className="h-4 w-4" />
+            {isLoading ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              <Send className="h-5 w-5" />
+            )}
           </Button>
         </div>
+        {isLoading && (
+          <div className="flex items-center gap-2 mt-2 text-sm text-gray-500">
+            <Loader2 className="h-3 w-3 animate-spin" />
+            <span>Briki está escribiendo...</span>
+          </div>
+        )}
       </div>
     </div>
   );
