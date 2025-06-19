@@ -134,9 +134,9 @@ export async function generateAssistantResponse(
         console.log(`[OpenAI][${requestId}] More context needed for ${planContextAnalysis.category}, not showing plans yet`);
         suggestedPlans = [];
       } else {
-        // Show plans if context is sufficient - but first detect category properly
-        const category = detectInsuranceCategory(userMessage);
-        console.log(`🎯 Category detection: "${category}" from message: "${userMessage}"`);
+        // Show plans if context is sufficient - use context analysis category
+        const category = planContextAnalysis.category;
+        console.log(`🎯 Category from context analysis: "${category}" from message: "${userMessage}"`);
 
         // For travel category or if we detect travel intent, show travel plans
         if (category === 'travel' && relevantPlans.length > 0) {
@@ -633,7 +633,7 @@ function detectInsuranceCategory(userMessage: string): string {
 
   // Enhanced keyword detection for all categories
   const petKeywords = ['mascota', 'perro', 'gato', 'pet', 'dog', 'cat', 'animal', 'veterinario', 'cachorro', 'felino', 'canino'];
-  const travelKeywords = ['viaje', 'travel', 'trip', 'internacional', 'europa', 'estados unidos', 'méxico', 'vacaciones', 'turismo', 'exterior', 'extranjero'];
+  const travelKeywords = ['viaje', 'travel', 'trip', 'internacional', 'europa', 'estados unidos', 'méxico', 'vacaciones', 'turismo', 'exterior', 'extranjero', 'tailandia', 'thailand', 'japón', 'japan', 'china', 'corea', 'korea', 'vietnam', 'singapur', 'singapore', 'malasia', 'malaysia', 'indonesia', 'filipinas', 'philippines', 'india', 'rusia', 'russia', 'reino unido', 'uk', 'irlanda', 'ireland', 'portugal', 'grecia', 'greece', 'turquía', 'turkey', 'egipto', 'egypt', 'marruecos', 'morocco', 'sudáfrica', 'australia', 'nueva zelanda', 'new zealand', 'país', 'country', 'destino', 'destination'];
   const autoKeywords = ['auto', 'carro', 'vehiculo', 'vehículo', 'moto', 'car', 'vehicle', 'motorcycle', 'scooter', 'vespa', 'motocicleta', 'automóvil'];
   const healthKeywords = ['salud', 'health', 'médico', 'medical', 'hospital', 'doctor', 'medicina', 'hospitalización', 'clínica'];
 
