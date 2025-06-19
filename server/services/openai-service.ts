@@ -21,13 +21,8 @@ export interface AssistantMessage {
 }
 
 export interface AssistantResponse {
-  message?: string;
-  response?: string;
+  message: string;
   suggestedPlans?: MockInsurancePlan[];
-  category?: string;
-  userContext?: any;
-  needsMoreContext?: boolean;
-  suggestedQuestions?: string[];
 }
 
 /**
@@ -70,6 +65,10 @@ export async function generateAssistantResponse(
 
     // FIXED: Enhanced system prompt with real plan data and memory context
     const contextAnalysis = analyzeContextNeeds(userMessage, conversationHistory);
+
+    // B. Log resultado de analyzeContextNeeds
+    console.log('Context analysis result:', contextAnalysis);
+
     const systemMessage: AssistantMessage = {
       role: "system",
       content: createSystemPrompt(
@@ -87,15 +86,9 @@ export async function generateAssistantResponse(
       );
       // Generate fallback response with relevant plans
       const fallbackMessage = `¡Hola! Soy Briki, tu asistente de seguros. Entiendo que estás preguntando sobre: "${userMessage}". Te puedo ayudar con información sobre seguros y recomendarte los mejores planes disponibles.`;
-      const fallbackContextAnalysis = analyzeContextNeeds(userMessage, conversationHistory);
-      
       return {
         message: fallbackMessage,
-        response: fallbackMessage,
         suggestedPlans: relevantPlans.slice(0, 3),
-        category: detectInsuranceCategory(userMessage),
-        needsMoreContext: fallbackContextAnalysis.needsMoreContext,
-        suggestedQuestions: fallbackContextAnalysis.suggestedQuestions || [],
       };
     }
 
@@ -134,25 +127,29 @@ export async function generateAssistantResponse(
     } else {
       // Check if we need more context before showing plans
       const planContextAnalysis = analyzeContextNeeds(userMessage, conversationHistory);
+      console.log('Context analysis result:', planContextAnalysis);
       
       if (planContextAnalysis.needsMoreContext) {
         // Don't show plans when more context is needed
         console.log(`[OpenAI][${requestId}] More context needed for ${planContextAnalysis.category}, not showing plans yet`);
         suggestedPlans = [];
       } else {
-        // Show plans if context is sufficient
+        // Show plans if context is sufficient - but first detect category properly
         const category = detectInsuranceCategory(userMessage);
+        console.log(`🎯 Category detection: "${category}" from message: "${userMessage}"`);
 
-        if (category !== 'general' && relevantPlans.length > 0) {
+        // For travel category or if we detect travel intent, show travel plans
+        if (category === 'travel' && relevantPlans.length > 0) {
           suggestedPlans = findRelevantPlans(userMessage, relevantPlans);
-          console.log(
-            `[OpenAI][${requestId}] Category detected (${category}), showing ${suggestedPlans.length} relevant plans`,
-          );
+          console.log(`✅ Found ${suggestedPlans.length} travel plans (requested: default)`);
+        } else if (category !== 'general' && relevantPlans.length > 0) {
+          suggestedPlans = findRelevantPlans(userMessage, relevantPlans);
+          console.log(`[OpenAI][${requestId}] Category detected (${category}), showing ${suggestedPlans.length} relevant plans`);
         } else if (shouldShowInsurancePlans(userMessage)) {
           suggestedPlans = findRelevantPlans(userMessage, relevantPlans);
-          console.log(
-            `[OpenAI][${requestId}] Insurance intent detected, showing ${suggestedPlans.length} relevant plans`,
-          );
+          console.log(`[OpenAI][${requestId}] Insurance intent detected, showing ${suggestedPlans.length} relevant plans`);
+        } else {
+          console.log(`[OpenAI][${requestId}] No clear category or intent detected, no plans shown`);
         }
       }
     }
@@ -169,16 +166,9 @@ export async function generateAssistantResponse(
       timestamp: new Date().toISOString(),
     });
 
-    // Use the same context analysis from the plan logic
-    const finalContextAnalysis = analyzeContextNeeds(userMessage, conversationHistory);
-    
     return {
       message: assistantMessage,
-      response: assistantMessage, // Provide both for compatibility
       suggestedPlans: suggestedPlans.length > 0 ? suggestedPlans : undefined,
-      category: detectInsuranceCategory(userMessage),
-      needsMoreContext: finalContextAnalysis.needsMoreContext,
-      suggestedQuestions: finalContextAnalysis.suggestedQuestions || [],
     };
   } catch (error: any) {
     // Enhanced error handling with specific error types
@@ -344,7 +334,7 @@ function analyzeContextNeeds(userMessage: string, conversationHistory: Assistant
   for (const msg of conversationHistory) {
     if (msg.role === 'user') {
       // Simple extracción por regex (puedes mejorar con NLP si lo deseas)
-      if (/europa|asia|méxico|estados unidos|colombia|españa|francia|alemania|italia|brasil|chile|perú|usa|canadá|argentina/.test(msg.content.toLowerCase())) {
+      if (/europa|asia|méxico|estados unidos|colombia|españa|francia|alemania|italia|brasil|chile|perú|usa|canadá|argentina|tailandia|thailand|japón|japan|china|corea|korea|vietnam|singapur|singapore|malasia|malaysia|indonesia|filipinas|philippines|india|rusia|russia|reino unido|uk|irlanda|ireland|portugal|grecia|greece|turquía|turkey|egipto|egypt|marruecos|morocco|sudáfrica|australia|nueva zelanda|new zealand/.test(msg.content.toLowerCase())) {
         context.destination = true;
       }
       if (/(días?|semanas?|meses?|\d+\s*(días?|semanas?|meses?))/.test(msg.content.toLowerCase())) {
@@ -374,9 +364,12 @@ function analyzeContextNeeds(userMessage: string, conversationHistory: Assistant
     }
   }
 
+  // A. Log userContext (context) recibido
+  console.log('UserContext received:', context);
+
   // También analizar el mensaje actual
   const msg = lowerMessage;
-  if (/europa|asia|méxico|estados unidos|colombia|españa|francia|alemania|italia|brasil|chile|perú|usa|canadá|argentina/.test(msg)) {
+  if (/europa|asia|méxico|estados unidos|colombia|españa|francia|alemania|italia|brasil|chile|perú|usa|canadá|argentina|tailandia|thailand|japón|japan|china|corea|korea|vietnam|singapur|singapore|malasia|malaysia|indonesia|filipinas|philippines|india|rusia|russia|reino unido|uk|irlanda|ireland|portugal|grecia|greece|turquía|turkey|egipto|egypt|marruecos|morocco|sudáfrica|australia|nueva zelanda|new zealand/.test(msg)) {
     context.destination = true;
   }
   if (/(días?|semanas?|meses?|\d+\s*(días?|semanas?|meses?))/.test(msg)) {
@@ -406,7 +399,7 @@ function analyzeContextNeeds(userMessage: string, conversationHistory: Assistant
 
   // Detectar categoría
   let category = 'general';
-  if (/(viaj|trip|travel|europa|estados unidos|méxico|vacaciones|turismo|exterior|extranjero)/i.test(msg)) {
+  if (/(viaj|trip|travel|europa|estados unidos|méxico|vacaciones|turismo|exterior|extranjero|tailandia|thailand|japón|japan|china|corea|asia|destino|international)/i.test(msg)) {
     category = 'travel';
   } else if (/(auto|carro|vehicul|vehículo|moto|car|vehicle|motorcycle|scooter|vespa|automóvil)/i.test(msg)) {
     category = 'auto';
@@ -419,13 +412,9 @@ function analyzeContextNeeds(userMessage: string, conversationHistory: Assistant
   // Lógica por categoría
   if (category === 'travel') {
     const missingInfo = [];
-    const expressesUncertainty = /(no sé|no estoy seguro|qué necesito|ayuda|recomend|cual)/i.test(lowerMessage);
-    
-    // If user expresses uncertainty or lacks basic info, ask for more context
-    if (expressesUncertainty || (!context.destination && !context.duration)) {
-      if (!context.destination) missingInfo.push('destination');
-      if (!context.duration) missingInfo.push('duration');
-      
+    if (!context.destination) missingInfo.push('destination');
+    if (!context.duration) missingInfo.push('duration');
+    if (missingInfo.length > 0) {
       return {
         needsMoreContext: true,
         category: 'travel',
@@ -439,14 +428,10 @@ function analyzeContextNeeds(userMessage: string, conversationHistory: Assistant
   }
   if (category === 'auto') {
     const missingInfo = [];
-    const expressesUncertainty = /(no sé|no estoy seguro|qué necesito|ayuda|recomend|cual)/i.test(lowerMessage);
-    
-    // If user expresses uncertainty or asks for help, always ask for more context
-    if (expressesUncertainty || (!context.brand && !context.model && !context.year)) {
-      if (!context.brand) missingInfo.push('marca');
-      if (!context.model) missingInfo.push('modelo');
-      if (!context.year) missingInfo.push('año');
-      
+    if (!context.brand) missingInfo.push('marca');
+    if (!context.model) missingInfo.push('modelo');
+    if (!context.year) missingInfo.push('año');
+    if (missingInfo.length > 0) {
       return {
         needsMoreContext: true,
         category: 'auto',
@@ -825,8 +810,8 @@ function getTopRelevantPlans(userMessage: string, plans: MockInsurancePlan[], li
  */
 export async function getChatCompletionFromOpenAI(message: string): Promise<string> {
   try {
-    const response = await generateAssistantResponse(message, []);
-    return response.message || response.response || "No response generated";
+    const response = await generateAssistantResponse(message, [], [], "Colombia");
+    return response.message;
   } catch (error) {
     console.error("Error in getChatCompletionFromOpenAI:", error);
     throw error;
@@ -836,8 +821,8 @@ export async function getChatCompletionFromOpenAI(message: string): Promise<stri
 export async function generateInsuranceRecommendation(category: string, criteria: any): Promise<string> {
   try {
     const message = `I need ${category} insurance with these requirements: ${JSON.stringify(criteria)}`;
-    const response = await generateAssistantResponse(message, []);
-    return response.message || response.response || "No recommendation generated";
+    const response = await generateAssistantResponse(message, [], [], "Colombia");
+    return response.message;
   } catch (error) {
     console.error("Error in generateInsuranceRecommendation:", error);
     throw error;
@@ -847,8 +832,8 @@ export async function generateInsuranceRecommendation(category: string, criteria
 export async function explainInsuranceTerm(term: string): Promise<string> {
   try {
     const message = `Please explain the insurance term: ${term}`;
-    const response = await generateAssistantResponse(message, []);
-    return response.message || response.response || "No explanation generated";
+    const response = await generateAssistantResponse(message, [], [], "Colombia");
+    return response.message;
   } catch (error) {
     console.error("Error in explainInsuranceTerm:", error);
     throw error;
