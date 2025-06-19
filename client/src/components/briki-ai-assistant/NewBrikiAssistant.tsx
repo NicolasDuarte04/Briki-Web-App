@@ -163,6 +163,7 @@ const NewBrikiAssistant: React.FC = () => {
   const [showWelcomeCard, setShowWelcomeCard] = useState(true);
   const [showScrollIndicator, setShowScrollIndicator] = useState(false);
   const [userContext, setUserContext] = useState<any>({});
+  const [pendingQuestions, setPendingQuestions] = useState<string[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
@@ -204,8 +205,8 @@ const NewBrikiAssistant: React.FC = () => {
     const messageToSend = messageText || input;
     if (!messageToSend.trim()) return;
 
-    // Hide welcome card on first real message
     setShowWelcomeCard(false);
+    setPendingQuestions([]);
 
     // Accumulate context across multiple turns - preserve all previous context
     const newContext = extractContextFromMessage(messageToSend, userContext);
@@ -301,6 +302,11 @@ const NewBrikiAssistant: React.FC = () => {
         fullResponse: response
       });
 
+      // Nuevo: manejar preguntas sugeridas si falta contexto
+      if (response.needsMoreContext && response.suggestedQuestions?.length > 0) {
+        setPendingQuestions(response.suggestedQuestions);
+      }
+
       // Trust backend decision - if plans are returned, show them
       const finalSuggestedPlans = response.suggestedPlans;
 
@@ -330,7 +336,7 @@ const NewBrikiAssistant: React.FC = () => {
         description: "No pude procesar tu mensaje. Por favor intenta de nuevo.",
         variant: "destructive",
       });
-      
+
       // Remove loading message and show error
       setMessages(prev => prev.filter(msg => !msg.isLoading));
     } finally {
@@ -374,7 +380,19 @@ const NewBrikiAssistant: React.FC = () => {
       <ScrollArea ref={scrollAreaRef} className="flex-1 p-4">
         <div className="space-y-4">
           {showWelcomeCard && <WelcomeCard onSendMessage={handleSendMessage} />}
-          
+
+          {/* Bloque de preguntas sugeridas antes de SuggestedPlans */}
+          {pendingQuestions.length > 0 && (
+            <div className="bg-sky-50 p-4 rounded-md shadow-sm mb-4 border border-sky-200">
+              <p className="text-sky-700 font-medium mb-2">Solo unas preguntas rápidas antes de mostrarte opciones:</p>
+              <ul className="list-disc pl-5 text-sky-800">
+                {pendingQuestions.map((q, idx) => (
+                  <li key={idx}>{q}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           {messages.map((message) => (
             <div
               key={message.id}
