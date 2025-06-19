@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import AnimatedBackground from "@/components/animated-background";
-import GlassCard from "@/components/glass-card";
+import { GlassCard } from "@/components/auth/GlassCard";
 import GradientButton from "@/components/gradient-button";
 import { 
   ArrowRight, 

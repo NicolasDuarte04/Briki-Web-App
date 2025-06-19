@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Shield, Zap, Globe, Heart, Bot, MessageSquareText } from "lucide-react";
-import GlassCard from "@/components/glass-card";
+import { GlassCard } from "@/components/auth/GlassCard";
 
 /**
  * Consumer features section highlighting key Briki platform benefits
