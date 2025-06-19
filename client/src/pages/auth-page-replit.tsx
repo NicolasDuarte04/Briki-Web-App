@@ -6,7 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 
 // Import our components
 import AnimatedBackground from "@/components/animated-background";
-import GlassCard from "@/components/glass-card";
+import { GlassCard } from "@/components/auth/GlassCard";
 import GradientButton from "@/components/gradient-button";
 
 // Icons

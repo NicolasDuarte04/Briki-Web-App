@@ -22,7 +22,7 @@ import {
   Info 
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { InsuranceCategory } from "@/components/plans/PlanCard";
+import { InsurancePlan } from "@/components/briki-ai-assistant/PlanCard";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
