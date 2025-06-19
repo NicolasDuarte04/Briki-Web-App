@@ -12,6 +12,8 @@ export interface AIResponse {
   suggestedPlans?: any[];
   category?: string;
   userContext?: any;
+  needsMoreContext?: boolean;
+  suggestedQuestions?: string[];
 }
 
 /**

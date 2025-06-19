@@ -9,6 +9,52 @@ const router = express.Router();
 /**
  * Endpoint para generar respuestas del asistente IA
  */
+router.post('/chat', async (req, res) => {
+  try {
+    const { message, conversationHistory } = req.body;
+    
+    console.log(`[AI Chat Route] Request received:`, {
+      messageLength: message?.length || 0,
+      hasHistory: !!conversationHistory,
+      historyLength: conversationHistory?.length || 0,
+      timestamp: new Date().toISOString()
+    });
+
+    if (!message) {
+      return res.status(400).json({ error: 'Se requiere un mensaje' });
+    }
+
+    // Convert frontend APIMessage format to backend AssistantMessage format
+    const formattedHistory = (conversationHistory || []).map((msg: any) => ({
+      role: msg.role,
+      content: msg.content
+    }));
+
+    // Generate response using the updated service
+    const response = await generateAssistantResponse(message, formattedHistory);
+    
+    console.log(`[AI Chat Route] Response generated:`, {
+      hasMessage: !!response.message,
+      hasSuggestedPlans: !!response.suggestedPlans,
+      planCount: response.suggestedPlans?.length || 0,
+      needsMoreContext: response.needsMoreContext,
+      suggestedQuestionsCount: response.suggestedQuestions?.length || 0,
+      timestamp: new Date().toISOString()
+    });
+    
+    return res.json(response);
+  } catch (error: any) {
+    console.error('Error en el chat IA:', error);
+    res.status(500).json({ 
+      error: 'Error al procesar la solicitud',
+      details: error.message || 'Error desconocido'
+    });
+  }
+});
+
+/**
+ * Legacy endpoint - kept for backward compatibility
+ */
 router.post('/ask', async (req, res) => {
   try {
     const { message, history, useOpenAI = true, category } = req.body;
