@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Quote } from "lucide-react";
-import GlassCard from "@/components/ui/GlassCard";
+import GlassCard from "@/components/ui/glass-card";
 
 interface Testimonial {
   quote: string;
