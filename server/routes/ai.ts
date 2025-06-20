@@ -3,6 +3,10 @@ import { generateAssistantResponse, analyzeImageForInsurance } from '../services
 import { loadMockInsurancePlans, filterPlansByCategory, filterPlansByTags } from '../data-loader';
 import { generateMockResponse } from '../services/mock-assistant-responses';
 import { semanticSearch } from '../services/semantic-search';
+import { db } from '../db';
+import { conversationLogs, contextSnapshots } from '@shared/schema';
+import { v4 as uuidv4 } from 'uuid';
+import { desc } from 'drizzle-orm';
 
 const router = express.Router();
 
@@ -12,16 +16,30 @@ const router = express.Router();
 router.post('/chat', async (req, res) => {
   try {
     const { message, conversationHistory } = req.body;
-    
+    const sessionId = req.session.id || `anon_${uuidv4()}`;
+
     console.log(`[AI Chat Route] Request received:`, {
       messageLength: message?.length || 0,
       hasHistory: !!conversationHistory,
       historyLength: conversationHistory?.length || 0,
+      sessionId,
       timestamp: new Date().toISOString()
     });
 
     if (!message) {
       return res.status(400).json({ error: 'Se requiere un mensaje' });
+    }
+
+    // Log user message (non-blocking)
+    try {
+      await db.insert(conversationLogs).values({
+        id: uuidv4(),
+        sessionId,
+        role: 'user',
+        content: message,
+      });
+    } catch (err: any) {
+      console.warn('[AI Chat Route] Failed to write user log – continuing without DB logging:', err?.message || err);
     }
 
     // Convert frontend APIMessage format to backend AssistantMessage format
@@ -33,7 +51,29 @@ router.post('/chat', async (req, res) => {
     // Generate response using the updated service
     const response = await generateAssistantResponse(message, formattedHistory);
     
-    console.log(`[AI Chat Route] Response generated:`, {
+    // Log assistant response (non-blocking)
+    try {
+      await db.insert(conversationLogs).values({
+        id: uuidv4(),
+        sessionId,
+        role: 'assistant',
+        content: response.message,
+        contextJson: response.userContext, // Log context with assistant message
+      });
+
+      // Log context snapshot if available
+      if (response.userContext && Object.keys(response.userContext).length > 0) {
+        await db.insert(contextSnapshots).values({
+          id: uuidv4(),
+          sessionId,
+          context: response.userContext,
+        });
+      }
+    } catch (err: any) {
+      console.warn('[AI Chat Route] Failed to write assistant log – continuing without DB logging:', err?.message || err);
+    }
+
+    console.log(`[AI Chat Route] Response generated & logged:`, {
       hasMessage: !!response.message,
       hasSuggestedPlans: !!response.suggestedPlans,
       planCount: response.suggestedPlans?.length || 0,
@@ -164,6 +204,36 @@ router.post('/analyze-image', async (req, res) => {
     res.status(500).json({ 
       error: 'Error al analizar la imagen',
       details: error.message || 'Error desconocido'
+    });
+  }
+});
+
+/**
+ * Temporary debug endpoint to view latest logs
+ */
+router.get('/logs/test', async (req, res) => {
+  try {
+    const last10ConversationLogs = await db
+      .select()
+      .from(conversationLogs)
+      .orderBy(desc(conversationLogs.createdAt))
+      .limit(10);
+
+    const last10ContextSnapshots = await db
+      .select()
+      .from(contextSnapshots)
+      .orderBy(desc(contextSnapshots.createdAt))
+      .limit(10);
+
+    return res.json({
+      conversationLogs: last10ConversationLogs,
+      contextSnapshots: last10ContextSnapshots,
+    });
+  } catch (error: any) {
+    console.error('Error fetching logs:', error);
+    res.status(500).json({ 
+      error: 'Error fetching logs',
+      details: error.message || 'Unknown error'
     });
   }
 });

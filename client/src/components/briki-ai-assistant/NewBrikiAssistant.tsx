@@ -9,10 +9,11 @@ import { sendMessageToAI, getMockResponse, APIMessage } from '@/services/openai-
 import WelcomeCard from './WelcomeCard';
 import { InsurancePlan } from './PlanCard';
 import SuggestedQuestions from './SuggestedQuestions';
+import { detectInsuranceCategory, hasSufficientContext } from '@shared/context-utils';
+import { extractContextFromMessage } from "@/utils/context-utils";
 
 // Lazy load the SuggestedPlans component
 const SuggestedPlans = lazy(() => import('./SuggestedPlans'));
-import { formatUserContext, extractContextFromMessage, isGenericGreeting } from '@/utils/context-utils';
 
 interface Message {
   id: string;
@@ -40,86 +41,6 @@ const REQUIRED_CONTEXT: ContextRequirements = {
   health: ['age', 'familySize', 'conditions']
 };
 
-// NEW: Detect insurance category from user message
-function detectInsuranceCategory(message: string): string {
-  const lowerMessage = message.toLowerCase().trim();
-
-  const petKeywords = ['mascota', 'perro', 'gato', 'pet', 'dog', 'cat', 'animal', 'veterinario'];
-  const travelKeywords = ['viaje', 'travel', 'trip', 'internacional', 'europa', 'estados unidos', 'méxico', 'vacaciones'];
-  const autoKeywords = ['auto', 'carro', 'vehiculo', 'moto', 'car', 'vehicle', 'motorcycle', 'scooter'];
-  const healthKeywords = ['salud', 'health', 'médico', 'medical', 'hospital', 'doctor', 'medicina'];
-
-  if (petKeywords.some(keyword => lowerMessage.includes(keyword))) return 'pet';
-  if (travelKeywords.some(keyword => lowerMessage.includes(keyword))) return 'travel';
-  if (autoKeywords.some(keyword => lowerMessage.includes(keyword))) return 'auto';
-  if (healthKeywords.some(keyword => lowerMessage.includes(keyword))) return 'health';
-
-  return 'general';
-}
-
-// NEW: Check if user has provided sufficient context for plan recommendations
-function hasSufficientContext(userContext: any, conversationHistory: Message[], currentMessage: string): boolean {
-  const category = detectInsuranceCategory(currentMessage);
-
-  if (category === 'general') return false;
-
-  // Check if conversation history contains detailed context
-  const hasDetailedHistory = conversationHistory.some(msg => 
-    msg.role === 'user' && (
-      msg.content.length > 50 || // Detailed messages
-      /\d+/.test(msg.content) || // Contains numbers (ages, dates, etc.)
-      /(años?|meses?|días?|duración|países?|raza|modelo|marca)/i.test(msg.content)
-    )
-  );
-
-  // Check current message for detailed context
-  const hasDetailedCurrentMessage = currentMessage.length > 50 || 
-    /\d+/.test(currentMessage) ||
-    /(años?|meses?|días?|duración|países?|raza|modelo|marca)/i.test(currentMessage);
-
-  // Category-specific context validation
-  switch (category) {
-    case 'travel':
-      const travelDetails = {
-        destination: /(europa|asia|méxico|estados unidos|[a-z]+)/i.test(currentMessage),
-        duration: /(días?|semanas?|meses?|\d+)/i.test(currentMessage),
-        travelers: /(solo|familia|acompañant|personas?)/i.test(currentMessage)
-      };
-      const travelContextCount = Object.values(travelDetails).filter(Boolean).length;
-      return hasDetailedHistory || hasDetailedCurrentMessage || travelContextCount >= 2;
-
-    case 'pet':
-      const petDetails = {
-        type: /(perr|gat|dog|cat)/i.test(currentMessage),
-        age: /(\d+|años?|meses?|cachorro|adulto|mayor)/i.test(currentMessage),
-        breed: /(raza|labrador|golden|pastor|siamés)/i.test(currentMessage)
-      };
-      const petContextCount = Object.values(petDetails).filter(Boolean).length;
-      return hasDetailedHistory || hasDetailedCurrentMessage || petContextCount >= 2;
-
-    case 'auto':
-      const autoDetails = {
-        brand: /(marca|toyota|honda|ford|chevrolet|nissan)/i.test(currentMessage),
-        model: /(modelo|\d{4}|año)/i.test(currentMessage),
-        use: /(trabajo|personal|comercial|uber)/i.test(currentMessage)
-      };
-      const autoContextCount = Object.values(autoDetails).filter(Boolean).length;
-      return hasDetailedHistory || hasDetailedCurrentMessage || autoContextCount >= 2;
-
-    case 'health':
-      const healthDetails = {
-        age: /(\d+|años?|joven|adulto|mayor)/i.test(currentMessage),
-        family: /(familia|hijo|esposa|pareja)/i.test(currentMessage),
-        conditions: /(condición|enferm|diabetes|hipertens)/i.test(currentMessage)
-      };
-      const healthContextCount = Object.values(healthDetails).filter(Boolean).length;
-      return hasDetailedHistory || hasDetailedCurrentMessage || healthContextCount >= 2;
-
-    default:
-      return false;
-  }
-}
-
 // NEW: Check if message should trigger plan recommendations (aligned with backend logic)
 function shouldShowInsurancePlans(message: string, userContext: any, conversationHistory: Message[]): boolean {
   const lowerMessage = message.toLowerCase().trim();
@@ -137,7 +58,13 @@ function shouldShowInsurancePlans(message: string, userContext: any, conversatio
 
   const hasStrongIntent = strongIntentPatterns.some(pattern => pattern.test(lowerMessage));
 
-  if (hasStrongIntent && hasSufficientContext(userContext, conversationHistory, message)) {
+  const allUserText = [
+    ...conversationHistory.filter(msg => msg.role === 'user').map(msg => msg.content),
+    message
+  ].join(' ').toLowerCase();
+  const category = detectInsuranceCategory(message);
+
+  if (hasStrongIntent && hasSufficientContext(allUserText, category)) {
     return true;
   }
 
@@ -154,7 +81,7 @@ function shouldShowInsurancePlans(message: string, userContext: any, conversatio
   return hasInsuranceKeyword && 
          hasCategoryKeyword && 
          hasActionKeyword && 
-         hasSufficientContext(userContext, conversationHistory, message);
+         hasSufficientContext(allUserText, category);
 }
 
 const NewBrikiAssistant: React.FC = () => {
@@ -165,7 +92,6 @@ const NewBrikiAssistant: React.FC = () => {
   const [showScrollIndicator, setShowScrollIndicator] = useState(false);
   const [userContext, setUserContext] = useState<any>({});
   const [pendingQuestions, setPendingQuestions] = useState<string[]>([]);
-  const [suggestedPlans, setSuggestedPlans] = useState<InsurancePlan[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
@@ -239,12 +165,17 @@ const NewBrikiAssistant: React.FC = () => {
     try {
       // FIXED: Check if we should show plans based on context sufficiency
       const currentMessages = [...messages, userMessage];
+      const allUserText = [
+        ...currentMessages.filter(msg => msg.role === 'user').map(msg => msg.content),
+      ].join(' ');
+      const category = detectInsuranceCategory(messageToSend);
+      const sufficientContext = hasSufficientContext(allUserText, category);
       const shouldRequestPlans = shouldShowInsurancePlans(messageToSend, mergedContext, currentMessages);
 
       console.log('🔍 Context Analysis:', {
         message: messageToSend,
-        category: detectInsuranceCategory(messageToSend),
-        hasSufficientContext: hasSufficientContext(mergedContext, currentMessages, messageToSend),
+        category: category,
+        hasSufficientContext: sufficientContext,
         shouldShowPlans: shouldRequestPlans,
         contextData: mergedContext
       });
@@ -307,10 +238,8 @@ const NewBrikiAssistant: React.FC = () => {
       // Manejar preguntas sugeridas si falta contexto
       if (response.needsMoreContext && Array.isArray(response.suggestedQuestions) && response.suggestedQuestions.length > 0) {
         setPendingQuestions(response.suggestedQuestions);
-        setSuggestedPlans([]); // Limpiar planes si hay preguntas pendientes
       } else {
         setPendingQuestions([]); // Limpiar preguntas si ya no hay
-        setSuggestedPlans(response.suggestedPlans || []);
       }
 
       // Trust backend decision - if plans are returned, show them
@@ -412,13 +341,13 @@ const NewBrikiAssistant: React.FC = () => {
                 ) : (
                   <>
                     <p className="whitespace-pre-wrap">{message.content}</p>
-                    {/* Mostrar SuggestedPlans solo si no hay preguntas pendientes y hay planes */}
-                    {!pendingQuestions.length && suggestedPlans.length > 0 && (
-                      <div className="mt-3">
+                    {/* Mostrar SuggestedPlans solo si el mensaje del asistente tiene planes */}
+                    {message.role === 'assistant' && message.suggestedPlans && message.suggestedPlans.length > 0 && (
+                      <ScrollArea className="mt-3 max-h-80 pr-3">
                         <Suspense fallback={<div>Cargando planes...</div>}>
-                          <SuggestedPlans plans={suggestedPlans} />
+                          <SuggestedPlans plans={message.suggestedPlans} />
                         </Suspense>
-                      </div>
+                      </ScrollArea>
                     )}
                   </>
                 )}

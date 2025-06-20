@@ -55,8 +55,14 @@ const checkoutFormSchema = z.object({
 
 type CheckoutFormValues = z.infer<typeof checkoutFormSchema>;
 
-// Initialize Stripe
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+// Initialize Stripe only when a publishable key is configured
+// The Stripe SDK throws an error that surfaces as `pk.match` when the key is undefined.
+// To prevent the entire frontend from crashing in development environments where
+// the `VITE_STRIPE_PUBLIC_KEY` env variable may be missing, we guard the call.
+const stripePromise = (import.meta as any).env.VITE_STRIPE_PUBLIC_KEY
+  ? loadStripe((import.meta as any).env.VITE_STRIPE_PUBLIC_KEY as string)
+  // When no key is set we return `null` so that the checkout flow is disabled instead of crashing.
+  : null;
 
 // Stripe Checkout Form Component
 function StripeCheckoutForm({ 
@@ -231,7 +237,7 @@ export default function CheckoutPage() {
         setIsLoadingPaymentIntent(true);
 
         const res = await apiRequest("POST", "/api/create-payment-intent", {
-          planId: parseInt(planId),
+          planId: parseInt(planId, 10),
           amount: totalAmount
         });
 
@@ -248,7 +254,7 @@ export default function CheckoutPage() {
       }
     }
 
-    if (plan && latestTrip && !clientSecret) {
+    if (plan && latestTrip && !clientSecret && planId) {
       createPaymentIntent();
     }
   }, [planId, plan, latestTrip, user, totalAmount, toast, clientSecret, isLoadingPaymentIntent]);
@@ -514,11 +520,11 @@ export default function CheckoutPage() {
                 <Card className="mt-6">
                   <CardContent className="pt-6 pb-6">
                     <h2 className="text-xl font-semibold text-gray-900 mb-4">Payment Method</h2>
-                    {clientSecret ? (
+                    {clientSecret && planId ? (
                       <Elements stripe={stripePromise} options={{ clientSecret }}>
                         <StripeCheckoutForm 
                           totalAmount={totalAmount} 
-                          planId={parseInt(planId)} 
+                          planId={parseInt(planId!, 10)} 
                           onSuccess={handlePaymentSuccess}
                           tripId={latestTrip?.id || 0}
                           form={form}
@@ -543,7 +549,7 @@ export default function CheckoutPage() {
                         <div className="flex justify-between items-start pb-3 border-b border-gray-200">
                           <div>
                             <h3 className="font-medium">{plan?.name}</h3>
-                            <p className="text-sm text-gray-600">{plan?.coverageDetails}</p>
+                            <p className="text-sm text-gray-600">{plan?.description}</p>
                           </div>
                           <span className="font-medium">${plan?.basePrice}</span>
                         </div>
@@ -569,7 +575,7 @@ export default function CheckoutPage() {
                       </h2>
 
                       <div className="space-y-4 text-sm">
-                        {plan?.coverageHighlights?.map((highlight, idx) => (
+                        {plan?.features?.map((highlight: string, idx: number) => (
                           <div key={idx} className="flex gap-3">
                             <div className="text-primary">•</div>
                             <div>{highlight}</div>
@@ -617,10 +623,8 @@ export default function CheckoutPage() {
                     transition={{ delay: 0.5, duration: 0.3 }}
                   >
                     <AIAssistant
-                      iconType="bot"
-                      title="Checkout Tips"
                       tips={getCheckoutTips()}
-                      className="bg-indigo-50 border-indigo-200"
+                      helpMode={true}
                     />
                   </motion.div>
                 </div>

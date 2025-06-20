@@ -50,7 +50,7 @@ export function ComparisonCard({ category, planIds }: ComparisonCardProps) {
   
   // For demo purposes, generate random Yes/No for each comparison point
   // In a real implementation, this would come from actual plan data
-  const planFeatures = plans.map(plan => {
+  const planFeatures = plans.map((plan: any) => {
     const features: Record<string, boolean> = {};
     comparisonPoints[category].forEach(point => {
       // Simplified for demo: give 70% chance of a feature being included
@@ -75,7 +75,7 @@ export function ComparisonCard({ category, planIds }: ComparisonCardProps) {
                     <div className="flex flex-col items-center">
                       <span className="font-bold text-primary">{plan.name}</span>
                       <span className="text-gray-500 text-xs">{plan.provider}</span>
-                      <span className="mt-1 font-bold text-lg">${plan.price}<span className="text-xs font-normal text-gray-500">/mo</span></span>
+                      <span className="mt-1 font-bold text-lg">${plan.basePrice}<span className="text-xs font-normal text-gray-500">/mo</span></span>
                     </div>
                   </th>
                 ))}

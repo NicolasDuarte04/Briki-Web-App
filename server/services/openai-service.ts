@@ -1,3 +1,20 @@
+/**
+ * =================================================================
+ * SERVICE: OPENAI ASSISTANT
+ * =================================================================
+ * This service now integrates with real insurance plan data fetched
+ * directly from the Supabase database (`insurance_plans` table).
+ *
+ * The mock data loader (`data-loader.ts`) and the mock insurance
+ * data service (`insurance-data-service.ts`) are no longer used for
+ * generating assistant responses with plan suggestions.
+ *
+ * To extend or update the available plans, you should add or modify
+ * the records in the `insurance_plans` table in the database.
+ * The `scripts/seed-plans.ts` script can be used as a reference
+ * for populating this table.
+ * =================================================================
+ */
 import OpenAI from "openai";
 import {
   MockInsurancePlan,
@@ -5,6 +22,23 @@ import {
   loadMockInsurancePlans,
 } from "../data-loader";
 import { storage } from "../storage";
+import { db } from "../db";
+import { insurancePlans, InsuranceCategory } from "@shared/schema";
+import { analyzeContextNeeds, detectInsuranceCategory, ContextAnalysisResult } from "@shared/context-utils";
+
+// Define a simpler, unified plan type for the assistant's purpose
+interface InsurancePlan {
+  id: number;
+  name: string;
+  category: InsuranceCategory;
+  provider: string;
+  basePrice: number;
+  coverageAmount: number;
+  currency: string;
+  country: string;
+  benefits: string[];
+  description?: string; // Add optional description
+}
 
 // Initialize the OpenAI client with API key from environment variables
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -23,7 +57,7 @@ export interface AssistantMessage {
 export interface AssistantResponse {
   message?: string;
   response?: string;
-  suggestedPlans?: MockInsurancePlan[];
+  suggestedPlans?: InsurancePlan[];
   category?: string;
   userContext?: any;
   needsMoreContext?: boolean;
@@ -36,7 +70,7 @@ export interface AssistantResponse {
 export async function generateAssistantResponse(
   userMessage: string,
   conversationHistory: AssistantMessage[] = [],
-  insurancePlans: MockInsurancePlan[] = [],
+  insurancePlansParam: InsurancePlan[] = [],
   userCountry: string = "Colombia",
 ): Promise<AssistantResponse> {
   const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -52,24 +86,17 @@ export async function generateAssistantResponse(
   );
 
   try {
-    // FIXED: Get real plans from insurance data service
-    let allPlans: MockInsurancePlan[] = [];
-
-    // Use the new dynamic insurance data service
-    const { insuranceDataService } = await import(
-      "./insurance-data-service.js"
-    );
-    allPlans = await insuranceDataService.getAllPlans();
-    console.log(
-      `[OpenAI][${requestId}] Successfully loaded ${allPlans.length} insurance plans from dynamic service`,
-    );
+    // FIXED: Get real plans from the database
+    let allPlans: InsurancePlan[] = await db.select().from(insurancePlans);
 
     // Filter and get relevant plans
     const filteredPlans = filterPlansByCountry(allPlans, userCountry);
     const relevantPlans = getTopRelevantPlans(userMessage, filteredPlans, 6);
 
     // FIXED: Enhanced system prompt with real plan data and memory context
-    const contextAnalysis = analyzeContextNeeds(userMessage, conversationHistory);
+    const category = detectInsuranceCategory(userMessage);
+    const conversation = [...conversationHistory, { role: 'user', content: userMessage }].map(m => m.content).join(' ');
+    const contextAnalysis = analyzeContextNeeds(conversation, category);
     const systemMessage: AssistantMessage = {
       role: "system",
       content: createSystemPrompt(
@@ -87,13 +114,19 @@ export async function generateAssistantResponse(
       );
       // Generate fallback response with relevant plans
       const fallbackMessage = `¡Hola! Soy Briki, tu asistente de seguros. Entiendo que estás preguntando sobre: "${userMessage}". Te puedo ayudar con información sobre seguros y recomendarte los mejores planes disponibles.`;
-      const fallbackContextAnalysis = analyzeContextNeeds(userMessage, conversationHistory);
+      
+      const fallbackCategory = detectInsuranceCategory(userMessage);
+      const fallbackConversation = [...(conversationHistory || []), { role: 'user', content: userMessage }]
+        .filter(msg => msg.role === 'user')
+        .map(msg => msg.content)
+        .join(' ');
+      const fallbackContextAnalysis = analyzeContextNeeds(fallbackConversation, fallbackCategory);
       
       return {
         message: fallbackMessage,
         response: fallbackMessage,
         suggestedPlans: relevantPlans.slice(0, 3),
-        category: detectInsuranceCategory(userMessage),
+        category: fallbackCategory,
         needsMoreContext: fallbackContextAnalysis.needsMoreContext,
         suggestedQuestions: fallbackContextAnalysis.suggestedQuestions || [],
       };
@@ -119,7 +152,7 @@ export async function generateAssistantResponse(
       "Lo siento, no pude generar una respuesta.";
 
     // Enhanced insurance intent detection with follow-up question support
-    let suggestedPlans: MockInsurancePlan[] = [];
+    let suggestedPlans: InsurancePlan[] = [];
 
     // Check if this is a follow-up question about previously suggested plans
     const previousPlans = extractPreviousPlansFromHistory(conversationHistory);
@@ -133,10 +166,12 @@ export async function generateAssistantResponse(
       );
     } else {
       // Check if we need more context before showing plans
-      const planContextAnalysis = analyzeContextNeeds(
-        userMessage,
-        conversationHistory,
-      );
+      const category = detectInsuranceCategory(userMessage);
+      const conversation = [...conversationHistory, { role: 'user', content: userMessage }]
+        .filter(msg => msg.role === 'user')
+        .map(msg => msg.content)
+        .join(' ');
+      const planContextAnalysis = analyzeContextNeeds(conversation, category);
 
       if (planContextAnalysis.needsMoreContext) {
         // Don't show plans when more context is needed
@@ -175,13 +210,18 @@ export async function generateAssistantResponse(
     });
 
     // Use the same context analysis from the plan logic
-    const finalContextAnalysis = analyzeContextNeeds(userMessage, conversationHistory);
+    const finalContextCategory = detectInsuranceCategory(userMessage);
+    const finalConversation = [...conversationHistory, { role: 'user', content: userMessage }]
+        .filter(msg => msg.role === 'user')
+        .map(msg => msg.content)
+        .join(' ');
+    const finalContextAnalysis = analyzeContextNeeds(finalConversation, finalContextCategory);
     
     return {
       message: assistantMessage,
       response: assistantMessage, // Provide both for compatibility
       suggestedPlans: suggestedPlans.length > 0 ? suggestedPlans : undefined,
-      category: detectInsuranceCategory(userMessage),
+      category: finalContextCategory,
       needsMoreContext: finalContextAnalysis.needsMoreContext,
       suggestedQuestions: finalContextAnalysis.suggestedQuestions || [],
     };
@@ -287,7 +327,7 @@ function isFollowUpQuestion(message: string): boolean {
 /**
  * Extract previously suggested plans from conversation history
  */
-function extractPreviousPlansFromHistory(history: AssistantMessage[]): MockInsurancePlan[] {
+function extractPreviousPlansFromHistory(history: AssistantMessage[]): InsurancePlan[] {
   for (let i = history.length - 1; i >= 0; i--) {
     const message = history[i];
     if (message.role === 'assistant' && message.content.includes('[Planes previamente recomendados:')) {
@@ -304,27 +344,11 @@ function extractPreviousPlansFromHistory(history: AssistantMessage[]): MockInsur
 /**
  * Parse plan information from formatted string and return plan objects
  */
-function parsePlansFromString(planString: string): MockInsurancePlan[] {
+function parsePlansFromString(planString: string): InsurancePlan[] {
   try {
-    const allPlans = loadMockInsurancePlans();
-    const extractedPlans: MockInsurancePlan[] = [];
-    const planEntries = planString.split(', ');
-
-    for (const entry of planEntries) {
-      const nameMatch = entry.match(/^([^(]+?)\s+de\s+/);
-      if (nameMatch) {
-        const planName = nameMatch[1].trim();
-        const matchingPlan = allPlans.find(plan => 
-          plan.name.toLowerCase().includes(planName.toLowerCase()) ||
-          planName.toLowerCase().includes(plan.name.toLowerCase())
-        );
-        if (matchingPlan) {
-          extractedPlans.push(matchingPlan);
-        }
-      }
-    }
-
-    return extractedPlans;
+    // This function will need to be updated or replaced as it relies on mock data
+    // For now, it will return an empty array.
+    return [];
   } catch (error) {
     console.warn('Error parsing plans from string:', error);
     return [];
@@ -332,187 +356,13 @@ function parsePlansFromString(planString: string): MockInsurancePlan[] {
 }
 
 /**
- * Analyze if user message needs more context before showing plans
- */
-interface ContextAnalysis {
-  needsMoreContext: boolean;
-  category: string;
-  missingInfo: string[];
-  suggestedQuestions?: string[];
-}
-
-function analyzeContextNeeds(userMessage: string, conversationHistory: AssistantMessage[]): ContextAnalysis {
-  const lowerMessage = userMessage.toLowerCase().trim();
-
-  // Extraer contexto de mensajes previos
-  let context: any = {};
-  for (const msg of conversationHistory) {
-    if (msg.role === 'user') {
-      // Simple extracción por regex (puedes mejorar con NLP si lo deseas)
-      if (/europa|asia|méxico|estados unidos|colombia|españa|francia|alemania|italia|brasil|chile|perú|usa|canadá|argentina/.test(msg.content.toLowerCase())) {
-        context.destination = true;
-      }
-      if (/(días?|semanas?|meses?|\d+\s*(días?|semanas?|meses?))/.test(msg.content.toLowerCase())) {
-        context.duration = true;
-      }
-      if (/(toyota|honda|ford|chevrolet|nissan|mazda|kia|bmw|mercedes|marca)/.test(msg.content.toLowerCase())) {
-        context.brand = true;
-      }
-      if (/(modelo|\d{4})/.test(msg.content.toLowerCase())) {
-        context.model = true;
-      }
-      if (/(año|\d{4})/.test(msg.content.toLowerCase())) {
-        context.year = true;
-      }
-      if (/(perro|gato|mascota|dog|cat)/.test(msg.content.toLowerCase())) {
-        context.petType = true;
-      }
-      if (/(\d+\s*(años?|meses?)|cachorro|adulto|mayor|edad)/.test(msg.content.toLowerCase())) {
-        context.petAge = true;
-      }
-      if (/(\d+\s*(años?|edad|meses?)|joven|adulto|mayor)/.test(msg.content.toLowerCase())) {
-        context.healthAge = true;
-      }
-      if (/(diabetes|hipertens|asma|condición|enferm|preexist)/.test(msg.content.toLowerCase())) {
-        context.healthCondition = true;
-      }
-    }
-  }
-
-  // También analizar el mensaje actual
-  const msg = lowerMessage;
-  if (/europa|asia|méxico|estados unidos|colombia|españa|francia|alemania|italia|brasil|chile|perú|usa|canadá|argentina/.test(msg)) {
-    context.destination = true;
-  }
-  if (/(días?|semanas?|meses?|\d+\s*(días?|semanas?|meses?))/.test(msg)) {
-    context.duration = true;
-  }
-  if (/(toyota|honda|ford|chevrolet|nissan|mazda|kia|bmw|mercedes|marca)/.test(msg)) {
-    context.brand = true;
-  }
-  if (/(modelo|\d{4})/.test(msg)) {
-    context.model = true;
-  }
-  if (/(año|\d{4})/.test(msg)) {
-    context.year = true;
-  }
-  if (/(perro|gato|mascota|dog|cat)/.test(msg)) {
-    context.petType = true;
-  }
-  if (/(\d+\s*(años?|meses?)|cachorro|adulto|mayor|edad)/.test(msg)) {
-    context.petAge = true;
-  }
-  if (/(\d+\s*(años?|edad|meses?)|joven|adulto|mayor)/.test(msg)) {
-    context.healthAge = true;
-  }
-  if (/(diabetes|hipertens|asma|condición|enferm|preexist)/.test(msg)) {
-    context.healthCondition = true;
-  }
-
-  // Detectar categoría
-  let category = 'general';
-  if (/(viaj|trip|travel|europa|estados unidos|méxico|vacaciones|turismo|exterior|extranjero)/i.test(msg)) {
-    category = 'travel';
-  } else if (/(auto|carro|vehicul|vehículo|moto|car|vehicle|motorcycle|scooter|vespa|automóvil)/i.test(msg)) {
-    category = 'auto';
-  } else if (/(mascota|perro|gato|pet|dog|cat|animal|veterinario|cachorro|felino|canino)/i.test(msg)) {
-    category = 'pet';
-  } else if (/(salud|médic|health|hospitaliz|doctor|medicina|clínica)/i.test(msg)) {
-    category = 'health';
-  }
-
-  // Lógica por categoría
-  if (category === 'travel') {
-    const missingInfo = [];
-    const expressesUncertainty = /(no sé|no estoy seguro|qué necesito|ayuda|recomend|cual)/i.test(lowerMessage);
-    
-    // If user expresses uncertainty or lacks basic info, ask for more context
-    if (expressesUncertainty || (!context.destination && !context.duration)) {
-      if (!context.destination) missingInfo.push('destination');
-      if (!context.duration) missingInfo.push('duration');
-      return {
-        needsMoreContext: true,
-        category: 'travel',
-        missingInfo,
-        suggestedQuestions: [
-          ...(missingInfo.includes('destination') ? ["¿A qué país planeas viajar?"] : []),
-          ...(missingInfo.includes('duration') ? ["¿Cuántos días durará tu viaje?"] : [])
-        ]
-      };
-    }
-  }
-  if (category === 'auto') {
-    const missingInfo = [];
-    const expressesUncertainty = /(no sé|no estoy seguro|qué necesito|ayuda|recomend|cual)/i.test(lowerMessage);
-    
-    // If user expresses uncertainty or asks for help, always ask for more context
-    if (expressesUncertainty || (!context.brand && !context.model && !context.year)) {
-      if (!context.brand) missingInfo.push('marca');
-      if (!context.model) missingInfo.push('modelo');
-      if (!context.year) missingInfo.push('año');
-      
-      return {
-        needsMoreContext: true,
-        category: 'auto',
-        missingInfo,
-        suggestedQuestions: [
-          ...(missingInfo.includes('marca') ? ["¿Cuál es la marca de tu vehículo?"] : []),
-          ...(missingInfo.includes('modelo') ? ["¿Cuál es el modelo?"] : []),
-          ...(missingInfo.includes('año') ? ["¿De qué año es tu vehículo?"] : [])
-        ]
-      };
-    }
-  }
-  if (category === 'pet') {
-    const missingInfo = [];
-    if (!context.petType) missingInfo.push('tipo de mascota');
-    if (!context.petAge) missingInfo.push('edad');
-    if (missingInfo.length > 0) {
-      return {
-        needsMoreContext: true,
-        category: 'pet',
-        missingInfo,
-        suggestedQuestions: [
-          ...(missingInfo.includes('tipo de mascota') ? ["¿Qué tipo de mascota tienes? (perro, gato, etc.)"] : []),
-          ...(missingInfo.includes('edad') ? ["¿Qué edad tiene tu mascota?"] : [])
-        ]
-      };
-    }
-  }
-  if (category === 'health') {
-    const missingInfo = [];
-    if (!context.healthAge) missingInfo.push('edad');
-    if (!context.healthCondition) missingInfo.push('condiciones de salud');
-    if (missingInfo.length > 0) {
-      return {
-        needsMoreContext: true,
-        category: 'health',
-        missingInfo,
-        suggestedQuestions: [
-          ...(missingInfo.includes('edad') ? ["¿Qué edad tienes?"] : []),
-          ...(missingInfo.includes('condiciones de salud') ? ["¿Tienes alguna condición de salud preexistente?"] : [])
-        ]
-      };
-    }
-  }
-
-  // Si no falta nada relevante
-  return {
-    needsMoreContext: false,
-    category,
-    missingInfo: [],
-    suggestedQuestions: []
-  };
-}
-
-/**
  * FIXED: Enhanced system prompt with explicit conversation continuation instructions
  */
 function createSystemPrompt(
-  relevantPlans: MockInsurancePlan[],
+  relevantPlans: InsurancePlan[],
   userMessage: string,
   conversationHistory: AssistantMessage[],
-  contextAnalysis: ContextAnalysis,
+  contextAnalysis: ContextAnalysisResult,
 ): string {
   const hasHistory = conversationHistory.length > 0;
   const previousPlans = extractPreviousPlansFromHistory(conversationHistory);
@@ -645,43 +495,6 @@ function shouldShowInsurancePlans(message: string): boolean {
 }
 
 /**
- * Detect insurance category from user message with high precision
- */
-function detectInsuranceCategory(userMessage: string): string {
-  const message = userMessage.toLowerCase().trim();
-
-  // Enhanced keyword detection for all categories
-  const petKeywords = ['mascota', 'perro', 'gato', 'pet', 'dog', 'cat', 'animal', 'veterinario', 'cachorro', 'felino', 'canino'];
-  const travelKeywords = ['viaje', 'travel', 'trip', 'internacional', 'europa', 'estados unidos', 'méxico', 'vacaciones', 'turismo', 'exterior', 'extranjero'];
-  const autoKeywords = ['auto', 'carro', 'vehiculo', 'vehículo', 'moto', 'car', 'vehicle', 'motorcycle', 'scooter', 'vespa', 'motocicleta', 'automóvil'];
-  const healthKeywords = ['salud', 'health', 'médico', 'medical', 'hospital', 'doctor', 'medicina', 'hospitalización', 'clínica'];
-
-  if (petKeywords.some(keyword => message.includes(keyword))) {
-    return 'pet';
-  }
-
-  if (travelKeywords.some(keyword => message.includes(keyword))) {
-    return 'travel';
-  }
-
-  if (autoKeywords.some(keyword => message.includes(keyword))) {
-    return 'auto';
-  }
-
-  if (healthKeywords.some(keyword => message.includes(keyword))) {
-    return 'health';
-  }
-
-  // Check for insurance type patterns
-  if (/seguro.*(mascot|perr|gat)/i.test(message)) return 'pet';
-  if (/seguro.*(viaj|travel)/i.test(message)) return 'travel';
-  if (/seguro.*(auto|vehicul|carro)/i.test(message)) return 'auto';
-  if (/seguro.*(salud|medic)/i.test(message)) return 'health';
-
-  return 'general';
-}
-
-/**
  * Extract requested number of plans from user message
  */
 function extractRequestedPlanCount(message: string): number | null {
@@ -714,8 +527,8 @@ function extractRequestedPlanCount(message: string): number | null {
  */
 function findRelevantPlans(
   userMessage: string,
-  plans: MockInsurancePlan[],
-): MockInsurancePlan[] {
+  plans: InsurancePlan[],
+): InsurancePlan[] {
   if (!plans.length) return [];
 
   // STEP 1: Detect user intent and required category
@@ -760,10 +573,10 @@ function findRelevantPlans(
 /**
  * Calculate relevance score based on multiple factors
  */
-function calculateRelevanceScore(userMessage: string, plan: MockInsurancePlan): number {
+function calculateRelevanceScore(userMessage: string, plan: InsurancePlan): number {
   let score = 0;
   const message = userMessage.toLowerCase();
-  const planText = `${plan.name} ${plan.description} ${plan.features.join(' ')}`.toLowerCase();
+  const planText = `${plan.name} ${plan.description || ''} ${plan.benefits.join(' ')}`.toLowerCase();
 
   // Exact keyword matches
   const keywords = message.split(' ').filter(word => word.length > 3);
@@ -792,7 +605,7 @@ function calculateRelevanceScore(userMessage: string, plan: MockInsurancePlan): 
   }
 
   // Feature matching
-  plan.features.forEach(feature => {
+  plan.benefits.forEach(feature => {
     if (message.includes(feature.toLowerCase())) {
       score += 1;
     }
@@ -804,15 +617,15 @@ function calculateRelevanceScore(userMessage: string, plan: MockInsurancePlan): 
 /**
  * Filter plans by country (placeholder for country-specific filtering)
  */
-function filterPlansByCountry(plans: MockInsurancePlan[], country: string): MockInsurancePlan[] {
+function filterPlansByCountry(plans: InsurancePlan[], country: string): InsurancePlan[] {
   // For now, return all plans since we're focused on Colombia
-  return plans;
+  return plans.filter(p => p.country === country || p.country === 'WW'); // WW for worldwide
 }
 
 /**
  * Get top relevant plans with scoring
  */
-function getTopRelevantPlans(userMessage: string, plans: MockInsurancePlan[], limit: number): MockInsurancePlan[] {
+function getTopRelevantPlans(userMessage: string, plans: InsurancePlan[], limit: number): InsurancePlan[] {
   const scoredPlans = plans.map(plan => ({
     plan,
     score: calculateRelevanceScore(userMessage, plan)

@@ -13,6 +13,11 @@ export interface InsuranceDataService {
   getPlanById(id: string): Promise<MockInsurancePlan | null>;
   searchPlans(query: string): Promise<MockInsurancePlan[]>;
   getAvailableCategories(): Promise<string[]>;
+  getPlansByProvider(provider: string): Promise<MockInsurancePlan[]>;
+  getTopRatedPlans(limit: number): Promise<MockInsurancePlan[]>;
+  getMostEconomicalPlans(category?: string): Promise<MockInsurancePlan[]>;
+  getPremiumPlans(category?: string): Promise<MockInsurancePlan[]>;
+  getStatistics(): Promise<any>;
 }
 
 class InsuranceDataServiceImpl implements InsuranceDataService {
@@ -142,6 +147,40 @@ class InsuranceDataServiceImpl implements InsuranceDataService {
     
     console.log(`[Insurance Data Service] Available categories: ${categories.join(', ')}`);
     return categories;
+  }
+
+  async getPlansByProvider(provider: string): Promise<MockInsurancePlan[]> {
+    const allPlans = await this.getAllPlans();
+    return allPlans.filter(plan => plan.provider.toLowerCase() === provider.toLowerCase());
+  }
+
+  async getTopRatedPlans(limit: number = 5): Promise<MockInsurancePlan[]> {
+    const allPlans = await this.getAllPlans();
+    return allPlans.sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, limit);
+  }
+
+  async getMostEconomicalPlans(category?: string): Promise<MockInsurancePlan[]> {
+    let plans = await this.getAllPlans();
+    if (category) {
+      plans = plans.filter(plan => plan.category === category);
+    }
+    return plans.sort((a, b) => a.basePrice - b.basePrice).slice(0, 5);
+  }
+
+  async getPremiumPlans(category?: string): Promise<MockInsurancePlan[]> {
+    let plans = await this.getAllPlans();
+    if (category) {
+      plans = plans.filter(plan => plan.category === category);
+    }
+    return plans.sort((a, b) => b.basePrice - a.basePrice).slice(0, 5);
+  }
+
+  async getStatistics(): Promise<any> {
+    const plans = await this.getAllPlans();
+    const totalPlans = plans.length;
+    const categories = Array.from(new Set(plans.map(p => p.category)));
+    const providers = Array.from(new Set(plans.map(p => p.provider)));
+    return { totalPlans, categories, providers };
   }
 
   /**

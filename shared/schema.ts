@@ -6,6 +6,7 @@ import { z } from "zod";
 export const users = pgTable("users", {
   id: varchar("id").primaryKey(),
   email: varchar("email").unique(),
+  username: varchar("username").unique(),
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
@@ -84,9 +85,12 @@ export const quotes = pgTable("quotes", {
   userId: varchar("user_id").references(() => users.id),
   category: varchar("category").notNull(),
   details: jsonb("details").notNull(),
+  quoteReference: varchar("quote_reference").unique(),
+  status: varchar("status").default("draft"),
+  notificationSent: boolean("notification_sent").default(false),
+  expiresAt: timestamp("expires_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-  status: varchar("status").default("draft"),
 });
 
 export type Quote = typeof quotes.$inferSelect;
@@ -220,9 +224,9 @@ export type InsertCompanyPlan = z.infer<typeof insertCompanyPlanSchema>;
 export const planAnalytics = pgTable("plan_analytics", {
   id: serial("id").primaryKey(),
   planId: integer("plan_id").references(() => companyPlans.id).notNull(),
-  views: integer("views").default(0),
-  comparisons: integer("comparisons").default(0),
-  conversions: integer("conversions").default(0),
+  views: integer("views").default(0).notNull(),
+  comparisons: integer("comparisons").default(0).notNull(),
+  conversions: integer("conversions").default(0).notNull(),
   date: timestamp("date").defaultNow(),
 }, (table) => {
   return {
@@ -363,3 +367,61 @@ export type BlogPostWithRelations = BlogPost & {
   category: BlogCategory | null;
   tags: BlogTag[];
 };
+
+// Assistant Logging
+export const conversationRoleEnum = pgEnum('conversation_role', ['user', 'assistant', 'system']);
+
+export const conversationLogs = pgTable("conversation_logs", {
+  id: varchar("id").primaryKey(), // UUID generated in application
+  sessionId: varchar("session_id").notNull(),
+  role: conversationRoleEnum("role").notNull(),
+  content: text("content"),
+  contextJson: jsonb("context_json"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => {
+  return {
+    sessionIdIdx: index("conversation_logs_session_id_idx").on(table.sessionId),
+  }
+});
+
+export const contextSnapshots = pgTable("context_snapshots", {
+  id: varchar("id").primaryKey(), // UUID generated in application
+  sessionId: varchar("session_id").notNull(),
+  context: jsonb("context"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => {
+  return {
+    sessionIdIdx: index("context_snapshots_session_id_idx").on(table.sessionId),
+  }
+});
+
+// =================================================================
+// STAGE 3.1: REAL INSURANCE PLANS
+// =================================================================
+export const insurancePlans = pgTable("insurance_plans", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  category: varchar("category").$type<InsuranceCategory>().notNull(),
+  provider: varchar("provider", { length: 255 }).notNull(),
+  basePrice: integer("base_price").notNull(),
+  coverageAmount: integer("coverage_amount").notNull(),
+  currency: varchar("currency", { length: 3 }).default('USD').notNull(),
+  country: varchar("country", { length: 2 }).notNull(),
+  benefits: jsonb("benefits").$type<string[]>().notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Trip table
+export const trips = pgTable("trips", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  destination: varchar("destination").notNull(),
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type Trip = typeof trips.$inferSelect;
+export const insertTripSchema = createInsertSchema(trips);
+export type InsertTrip = z.infer<typeof insertTripSchema>;

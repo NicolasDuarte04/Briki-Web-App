@@ -1,7 +1,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
-import { isAuthenticated } from "./auth/local-auth";
+import { requireAuth } from "./auth/session";
 import { storage, mockStorage } from "./storage";
 import { pool } from "./db";
 import Stripe from "stripe";
@@ -33,6 +33,11 @@ import {
 } from "./services/openai-service";
 import { parseCSVFile, parseXLSXFile } from "./services/plan-upload";
 import { insuranceDataService } from "./services/insurance-data-service";
+import diagnosticRouter from './routes/diagnostic';
+import googleAuthRoutes from './routes/google-auth';
+import quotesRoutes from './routes/quotes';
+import aiRouter from './routes/ai';
+import insurancePlansRouter from './routes/insurance-plans';
 
 if (!process.env.STRIPE_SECRET_KEY) {
   console.warn('Warning: Missing STRIPE_SECRET_KEY environment variable');
@@ -55,56 +60,37 @@ const tripSchema = z.object({
   travelers: z.number().int().positive(),
 });
 
-// Import routes
-import googleAuthRoutes from './routes/google-auth';
-import quotesRoutes from './routes/quotes';
-import aiRouter from './routes/ai';
-import insurancePlansRouter from './routes/insurance-plans';
-
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Setup Replit authentication
   await setupAuth(app);
   
-  // Mount API routes
   app.use('/api/auth', googleAuthRoutes);
   app.use('/api/quotes', quotesRoutes);
   app.use('/api/ai', aiRouter);
   app.use('/api/insurance-plans', insurancePlansRouter);
+  app.use('/api/diagnostic', diagnosticRouter);
 
-  // Initialize database - using a more resilient approach
   try {
-    // Use a simple query to test database connection with timeout
     const dbCheckPromise = pool.query('SELECT 1');
-    
-    // Set a timeout to avoid hanging if the connection is problematic
     const timeoutPromise = new Promise((_, reject) => {
       setTimeout(() => reject(new Error('Database connection timeout')), 3000);
     });
-    
-    // Race the database query against the timeout
     await Promise.race([dbCheckPromise, timeoutPromise]);
     console.log("Database connection verified successfully");
   } catch (error) {
     console.error("Database connection check failed:", error);
-    // Continue app startup even if database check fails - the app will attempt
-    // to reconnect on actual database operations
   }
 
-  // Health check endpoint
   app.get("/api/health", (_req, res) => {
     res.json({ status: "ok" });
   });
   
-  // Database reset endpoint - ONLY FOR PRE-LAUNCH
   app.get("/api/admin/reset-users", async (req, res) => {
     const { confirm } = req.query;
-    
     if (confirm !== 'yes-reset-all-users') {
       return res.status(400).json({ 
         error: "Missing confirmation parameter. Add '?confirm=yes-reset-all-users' to confirm this action." 
       });
     }
-    
     try {
       await storage.resetUsers();
       res.json({ success: true, message: "All user data has been reset successfully" });
@@ -117,90 +103,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Trip Endpoints
-  app.post("/api/trips", isAuthenticated, async (req: AuthenticatedRequest, res) => {
+  app.post("/api/trips", requireAuth, async (req: AuthenticatedRequest, res) => {
+    const validationResult = tripSchema.safeParse(req.body);
+    if (!validationResult.success) {
+      return res.status(400).json({ message: "Invalid trip data", errors: validationResult.error.errors });
+    }
+    const tripData = validationResult.data;
+    const userId = req.user.claims.sub;
     try {
-      // Validate the request body
-      const validationResult = tripSchema.safeParse(req.body);
-      
-      if (!validationResult.success) {
-        console.log("POST /api/trips - Invalid data:", validationResult.error.errors);
-        return res.status(400).json({ 
-          message: "Invalid trip data", 
-          errors: validationResult.error.errors 
-        });
-      }
-      
-      // Get validated data
-      const tripData = validationResult.data;
-      
-      // Get user ID from Replit Auth session
-      const userId = req.user.claims.sub;
-      
-      // Create the trip record
-      const trip = await storage.createTrip({
-        ...tripData,
-        userId,
-      });
-      
-      console.log("POST /api/trips - Created trip for user:", userId);
-      res.status(201).json(trip);
-    } catch (error: any) {
-      console.error("POST /api/trips - Error creating trip:", error);
-      res.status(500).json({ message: "Failed to create trip", error: error.message });
+        const trip = await storage.createTrip({ ...tripData, userId });
+        res.status(201).json(trip);
+    } catch(error: any) {
+        res.status(500).json({ message: "Failed to create trip", error: error.message });
     }
   });
 
-  app.get("/api/trips", isAuthenticated, async (req: AuthenticatedRequest, res) => {
+  app.get("/api/trips", requireAuth, async (req: AuthenticatedRequest, res) => {
+    const userId = req.user.claims.sub;
     try {
-      // Get user ID from Replit Auth session
-      const userId = req.user.claims.sub;
-      
-      // Get trips for the authenticated user
-      const trips = await storage.getTripsByUserId(userId);
-      res.json(trips);
-    } catch (error: any) {
-      console.error("GET /api/trips - Error fetching trips:", error);
-      res.status(500).json({ message: "Failed to fetch trips", error: error.message });
+        const trips = await storage.getTripsByUserId(userId);
+        res.json(trips);
+    } catch(error: any) {
+        res.status(500).json({ message: "Failed to fetch trips", error: error.message });
     }
   });
 
-  // Insurance Plan Endpoints
   app.get("/api/plans", async (_req, res) => {
     try {
       const plans = await insuranceDataService.getAllPlans();
       res.json(plans);
     } catch (error: any) {
-      console.error("GET /api/plans - Error fetching plans:", error);
       res.status(500).json({ message: "Failed to fetch insurance plans", error: error.message });
     }
   });
 
-  // New insurance API endpoints to match frontend expectations
   app.get("/api/insurance/plans", async (_req, res) => {
     try {
       const plans = await insuranceDataService.getAllPlans();
       res.json(plans);
     } catch (error: any) {
-      console.error("GET /api/insurance/plans - Error fetching plans:", error);
       res.status(500).json({ message: "Failed to fetch insurance plans", error: error.message });
     }
   });
   
-  // Category-specific plan endpoints
   app.get("/api/plans/:category", async (req, res) => {
     try {
       const { category } = req.params;
-      if (!category || !['travel', 'auto', 'pet', 'health'].includes(category)) {
-        return res.status(400).json({ 
-          message: "Invalid insurance category. Must be one of: travel, auto, pet, health" 
-        });
+      if (!category || !Object.values(INSURANCE_CATEGORIES).includes(category as any)) {
+        return res.status(400).json({ message: "Invalid insurance category." });
       }
-      
-      const plans = await insuranceDataService.getPlansByCategory(category);
+      const plans = await insuranceDataService.getPlansByCategory(category as InsuranceCategory);
       res.json(plans);
     } catch (error: any) {
-      console.error(`GET /api/plans/${req.params.category} - Error:`, error);
       res.status(500).json({ message: "Failed to fetch insurance plans", error: error.message });
     }
   });
@@ -208,90 +162,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/insurance/plans/:category", async (req, res) => {
     try {
       const { category } = req.params;
-      if (!category || !['travel', 'auto', 'pet', 'health'].includes(category)) {
-        return res.status(400).json({ 
-          message: "Invalid insurance category. Must be one of: travel, auto, pet, health" 
-        });
+      if (!category || !Object.values(INSURANCE_CATEGORIES).includes(category as any)) {
+        return res.status(400).json({ message: "Invalid insurance category." });
       }
-      
-      const plans = await insuranceDataService.getPlansByCategory(category);
-      
-      // Generate metadata from the plans
+      const plans = await insuranceDataService.getPlansByCategory(category as InsuranceCategory);
       const providers = Array.from(new Set(plans.map(p => p.provider)));
-      const features = Array.from(new Set(plans.flatMap(p => p.features)));
-      const priceRange = plans.length > 0 ? [
-        Math.min(...plans.map(p => p.basePrice)),
-        Math.max(...plans.map(p => p.basePrice))
-      ] : [0, 1000];
-      const coverageRange = plans.length > 0 ? [
-        Math.min(...plans.map(p => p.coverageAmount)),
-        Math.max(...plans.map(p => p.coverageAmount))
-      ] : [0, 100000];
-      
-      const metadata = {
-        providers,
-        features,
-        priceRange,
-        coverageRange,
-        tags: []
-      };
-      
-      res.json({
-        plans,
-        metadata,
-        total: plans.length
-      });
+      const features = Array.from(new Set(plans.flatMap(p => p.features || [])));
+      const priceRange = plans.length > 0 ? [Math.min(...plans.map(p => p.basePrice)), Math.max(...plans.map(p => p.basePrice))] : [0, 1000];
+      const coverageRange = plans.length > 0 ? [Math.min(...plans.map(p => p.coverageAmount)), Math.max(...plans.map(p => p.coverageAmount))] : [0, 100000];
+      const metadata = { providers, features, priceRange, coverageRange, tags: [] };
+      res.json({ plans, metadata, total: plans.length });
     } catch (error: any) {
-      console.error(`GET /api/insurance/plans/${req.params.category} - Error:`, error);
       res.status(500).json({ message: "Failed to fetch insurance plans", error: error.message });
     }
   });
   
-  // Additional insurance endpoints
   app.get("/api/insurance/plan/:id", async (req, res) => {
     try {
-      const plans = await storage.getAllInsurancePlans();
-      res.json(plans);
+        const plans = await storage.getAllInsurancePlans();
+        res.json(plans);
     } catch (error: any) {
-      console.error("GET /api/insurance/plans - Error:", error);
-      res.status(500).json({ message: "Failed to fetch insurance plans", error: error.message });
+        res.status(500).json({ message: "Failed to fetch insurance plans", error: error.message });
     }
   });
   
   app.get("/api/insurance/plans/:category", async (req, res) => {
     try {
       const { category } = req.params;
-      const plans = await storage.getInsurancePlansByCategory(category);
+      const plans = await storage.getInsurancePlansByCategory(category as InsuranceCategory);
       res.json(plans);
     } catch (error: any) {
-      console.error(`GET /api/insurance/plans/${req.params.category} - Error:`, error);
       res.status(500).json({ message: "Failed to fetch insurance plans", error: error.message });
     }
   });
   
-  // Specialized search endpoint
   app.post("/api/insurance/:category/search", async (req, res) => {
     try {
       const { category } = req.params;
-      const { criteria } = req.body;
-      
-      // For now, just return all plans for that category
-      // In a real implementation, we'd filter based on criteria
-      const plans = await storage.getInsurancePlansByCategory(category);
+      const plans = await storage.getInsurancePlansByCategory(category as InsuranceCategory);
       res.json(plans);
     } catch (error: any) {
-      console.error(`POST /api/insurance/${req.params.category}/search - Error:`, error);
       res.status(500).json({ message: "Failed to search insurance plans", error: error.message });
     }
   });
 
-  // Set up the Stripe payment intent route
   if (stripe) {
     app.post("/api/create-payment-intent", async (req, res) => {
       try {
         const { amount } = req.body;
         const paymentIntent = await stripe.paymentIntents.create({
-          amount: Math.round(amount * 100), // Convert to cents
+          amount: Math.round(amount * 100),
           currency: "usd",
         });
         res.json({ clientSecret: paymentIntent.client_secret });
@@ -301,54 +221,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   }
   
-  // Company routes
-  // Get company profile
-  app.get("/api/company/profile", isAuthenticated, async (req: AuthenticatedRequest, res) => {
+  app.get("/api/company/profile", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
-      if (!req.user?.id) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
-      
+      if (!req.user?.id) return res.status(401).json({ message: "Unauthorized" });
       const profile = await storage.getCompanyProfile(req.user.id);
-      
-      if (!profile) {
-        return res.status(404).json({ message: "Company profile not found" });
-      }
-      
+      if (!profile) return res.status(404).json({ message: "Company profile not found" });
       res.json(profile);
     } catch (error: any) {
-      console.error("Error retrieving company profile:", error);
       res.status(500).json({ message: error.message || "Server error" });
     }
   });
   
-  // Plan management endpoints
-  
-  // Get all company plans
-  app.get("/api/company/plans", isAuthenticated, async (req: AuthenticatedRequest, res) => {
+  app.get("/api/company/plans", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
-      if (!req.user?.id) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
-      
-      // Get company profile to get company ID
+      if (!req.user?.id) return res.status(401).json({ message: "Unauthorized" });
       const profile = await storage.getCompanyProfile(req.user.id);
-      
-      if (!profile) {
-        return res.status(404).json({ message: "Company profile not found" });
-      }
-      
+      if (!profile) return res.status(404).json({ message: "Company profile not found" });
       const plans = await storage.getCompanyPlans(profile.id);
-      
       res.json(plans);
     } catch (error: any) {
-      console.error("Error retrieving company plans:", error);
       res.status(500).json({ message: error.message || "Server error" });
     }
   });
   
-  // Get company plans by category
-  app.get("/api/company/plans/category/:category", isAuthenticated, async (req: AuthenticatedRequest, res) => {
+  app.get("/api/company/plans/category/:category", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
       if (!req.user?.id) {
         return res.status(401).json({ message: "Unauthorized" });
@@ -378,8 +274,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Get a specific plan by ID
-  app.get("/api/company/plans/:id", isAuthenticated, async (req: AuthenticatedRequest, res) => {
+  app.get("/api/company/plans/:id", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
       if (!req.user?.id) {
         return res.status(401).json({ message: "Unauthorized" });
@@ -417,8 +312,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Update a specific plan by ID
-  app.put("/api/company/plans/:id", isAuthenticated, async (req: AuthenticatedRequest, res) => {
+  app.put("/api/company/plans/:id", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
       if (!req.user?.id) {
         return res.status(401).json({ message: "Unauthorized" });
@@ -472,8 +366,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Prevent changing the company ID
-      const updateData = validationResult.data;
-      delete updateData.companyId;
+      const updateData = validationResult.data as Partial<InsertCompanyPlan>;
+      if ('companyId' in updateData) {
+        delete (updateData as { companyId?: number }).companyId;
+      }
       
       // Update the plan
       const updatedPlan = await storage.updateCompanyPlan(planId, updateData);
@@ -485,8 +381,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Delete a plan (mark as archived)
-  app.delete("/api/company/plans/:id", isAuthenticated, async (req: AuthenticatedRequest, res) => {
+  app.delete("/api/company/plans/:id", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
       if (!req.user?.id) {
         return res.status(401).json({ message: "Unauthorized" });
@@ -531,8 +426,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Update plan marketplace visibility
-  app.patch("/api/company/plans/:id/visibility", isAuthenticated, async (req: AuthenticatedRequest, res) => {
+  app.patch("/api/company/plans/:id/visibility", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
       if (!req.user?.id) {
         return res.status(401).json({ message: "Unauthorized" });
@@ -592,8 +486,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Create new plan
-  app.post("/api/company/plans", isAuthenticated, async (req: AuthenticatedRequest, res) => {
+  app.post("/api/company/plans", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
       if (!req.user?.id) {
         return res.status(401).json({ message: "Unauthorized" });
@@ -622,8 +515,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Plan upload (CSV/Excel)
-  app.post("/api/company/plans/upload", isAuthenticated, async (req: AuthenticatedRequest, res) => {
+  app.post("/api/company/plans/upload", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
       if (!req.user?.id) {
         return res.status(401).json({ message: "Unauthorized" });
@@ -752,8 +644,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Get dashboard analytics
-  app.get("/api/company/analytics", isAuthenticated, async (req: AuthenticatedRequest, res) => {
+  app.get("/api/company/analytics", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
       if (!req.user?.id) {
         return res.status(401).json({ message: "Unauthorized" });
@@ -794,7 +685,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // ChatGPT integration endpoints
   app.post("/api/chat", async (req, res) => {
     try {
       const { message } = req.body;
@@ -863,7 +753,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // AI Assistant chat endpoint
   app.post("/api/ai/chat", async (req, res) => {
     try {
       const { message, conversationHistory } = req.body;
@@ -883,9 +772,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // ===== INSURANCE DATA API ENDPOINTS =====
-  
-  // Get all insurance plans
   app.get("/api/insurance/plans", async (req, res) => {
     try {
       const { insuranceDataService } = await import('./services/insurance-data-service.js');
@@ -898,18 +784,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get plans by category
   app.get("/api/insurance/plans/:category", async (req, res) => {
     try {
       const { category } = req.params;
       const { search, minPrice, maxPrice, features } = req.query;
       
-      let plans = insuranceDataService.getPlansByCategory(category);
+      let plans = await insuranceDataService.getPlansByCategory(category as InsuranceCategory);
       
       // Apply search filter
       if (search) {
-        const searchResults = insuranceDataService.searchPlans(search as string);
-        plans = plans.filter(plan => searchResults.some(result => result.id === plan.id));
+        const searchResults = await insuranceDataService.searchPlans(search as string);
+        plans = plans.filter((plan) => searchResults.some((result) => result.id === plan.id));
       }
       
       // Apply price filter
@@ -922,9 +807,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Apply features filter
       if (features) {
         const featureList = (features as string).split(',');
-        plans = plans.filter(plan => 
-          featureList.some(feature => 
-            plan.features.some(planFeature => 
+        plans = plans.filter((plan) => 
+          featureList.some((feature) => 
+            (plan.features || []).some((planFeature) => 
               planFeature.toLowerCase().includes(feature.toLowerCase())
             )
           )
@@ -938,11 +823,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get specific plan by ID
   app.get("/api/insurance/plan/:id", async (req, res) => {
     try {
       const { id } = req.params;
-      const plan = insuranceDataService.getPlanById(id);
+      const plan = await insuranceDataService.getPlanById(id);
       
       if (!plan) {
         return res.status(404).json({ error: "Plan not found" });
@@ -955,7 +839,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Search plans
   app.get("/api/insurance/search", async (req, res) => {
     try {
       const { q: query } = req.query;
@@ -964,7 +847,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Search query is required" });
       }
       
-      const plans = insuranceDataService.searchPlans(query as string);
+      const plans = await insuranceDataService.searchPlans(query as string);
       res.json(plans);
     } catch (error: any) {
       console.error("Error searching plans:", error);
@@ -972,11 +855,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get plans by provider
   app.get("/api/insurance/provider/:provider", async (req, res) => {
     try {
       const { provider } = req.params;
-      const plans = insuranceDataService.getPlansByProvider(provider);
+      const plans = await insuranceDataService.getPlansByProvider(provider);
       res.json(plans);
     } catch (error: any) {
       console.error("Error fetching plans by provider:", error);
@@ -984,11 +866,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get top-rated plans
   app.get("/api/insurance/top-rated", async (req, res) => {
     try {
       const { limit = "10" } = req.query;
-      const plans = insuranceDataService.getTopRatedPlans(parseInt(limit as string));
+      const plans = await insuranceDataService.getTopRatedPlans(parseInt(limit as string));
       res.json(plans);
     } catch (error: any) {
       console.error("Error fetching top-rated plans:", error);
@@ -996,11 +877,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get economical plans
   app.get("/api/insurance/economical", async (req, res) => {
     try {
       const { category } = req.query;
-      const plans = insuranceDataService.getMostEconomicalPlans(category as string);
+      const plans = await insuranceDataService.getMostEconomicalPlans(category as string | undefined);
       res.json(plans);
     } catch (error: any) {
       console.error("Error fetching economical plans:", error);
@@ -1008,11 +888,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get premium plans
   app.get("/api/insurance/premium", async (req, res) => {
     try {
       const { category } = req.query;
-      const plans = insuranceDataService.getPremiumPlans(category as string);
+      const plans = await insuranceDataService.getPremiumPlans(category as string | undefined);
       res.json(plans);
     } catch (error: any) {
       console.error("Error fetching premium plans:", error);
@@ -1020,10 +899,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get insurance statistics
   app.get("/api/insurance/stats", async (req, res) => {
     try {
-      const stats = insuranceDataService.getStatistics();
+      const stats = await insuranceDataService.getStatistics();
       res.json(stats);
     } catch (error: any) {
       console.error("Error fetching insurance statistics:", error);
@@ -1031,14 +909,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // ========== BLOG API ROUTES ==========
-
-  // Helper function to check if user is admin
   function isAdmin(user: any): boolean {
     return user && (user.role === 'admin' || (user.email && user.email.endsWith('@brikiapp.com')));
   }
 
-  // Get all published blog posts (public)
   app.get("/api/blog/posts", async (req, res) => {
     try {
       const { category, tag, featured, limit = "20", offset = "0" } = req.query;
@@ -1109,7 +983,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get single blog post by slug (public)
   app.get("/api/blog/posts/:slug", async (req, res) => {
     try {
       const { slug } = req.params;
@@ -1163,7 +1036,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get blog categories (public)
   app.get("/api/blog/categories", async (req, res) => {
     try {
       const result = await pool.query('SELECT * FROM blog_categories ORDER BY name');
@@ -1174,7 +1046,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get blog tags (public)
   app.get("/api/blog/tags", async (req, res) => {
     try {
       const result = await pool.query('SELECT * FROM blog_tags ORDER BY name');
@@ -1185,7 +1056,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // RSS feed for blog posts (public)
   app.get("/api/blog/rss", async (req, res) => {
     console.log("RSS feed endpoint called");
     try {
@@ -1250,7 +1120,7 @@ ${posts.map(post => {
       <pubDate>${publishedDate}</pubDate>
       <dc:creator><![CDATA[${post.author || 'Briki Team'}]]></dc:creator>
       ${post.category_name ? `<category><![CDATA[${post.category_name}]]></category>` : ''}
-      ${post.tags && post.tags.length > 0 ? post.tags.map(tag => `<category><![CDATA[${tag}]]></category>`).join('\n      ') : ''}
+      ${post.tags && post.tags.length > 0 ? post.tags.map((tag: any) => `<category><![CDATA[${tag}]]></category>`).join('\n      ') : ''}
     </item>`;
 }).join('\n')}
   </channel>
@@ -1268,9 +1138,6 @@ ${posts.map(post => {
     }
   });
 
-  // ========== ADMIN BLOG ROUTES ==========
-
-  // Admin middleware for blog management
   const requireBlogAdmin = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     if (!isAdmin(req.user)) {
       return res.status(403).json({ error: "Admin access required for blog management" });
@@ -1278,8 +1145,7 @@ ${posts.map(post => {
     next();
   };
 
-  // Get all blog posts for admin (including drafts)
-  app.get("/api/admin/blog/posts", isAuthenticated, requireBlogAdmin, async (req, res) => {
+  app.get("/api/admin/blog/posts", requireAuth, requireBlogAdmin, async (req, res) => {
     try {
       const { status, limit = "50", offset = "0" } = req.query;
       
@@ -1319,8 +1185,7 @@ ${posts.map(post => {
     }
   });
 
-  // Create new blog post (admin only)
-  app.post("/api/admin/blog/posts", isAuthenticated, requireBlogAdmin, async (req: AuthenticatedRequest, res) => {
+  app.post("/api/admin/blog/posts", requireAuth, requireBlogAdmin, async (req: AuthenticatedRequest, res) => {
     try {
       const { title, slug, excerpt, content, categoryId, status, featured, seoTitle, seoDescription, tags } = req.body;
       
@@ -1385,8 +1250,7 @@ ${posts.map(post => {
     }
   });
 
-  // Update blog post (admin only)
-  app.put("/api/admin/blog/posts/:id", isAuthenticated, requireBlogAdmin, async (req: AuthenticatedRequest, res) => {
+  app.put("/api/admin/blog/posts/:id", requireAuth, requireBlogAdmin, async (req: AuthenticatedRequest, res) => {
     try {
       const { id } = req.params;
       const { title, slug, excerpt, content, categoryId, status, featured, seoTitle, seoDescription, tags } = req.body;
@@ -1473,8 +1337,7 @@ ${posts.map(post => {
     }
   });
 
-  // Delete blog post (admin only)
-  app.delete("/api/admin/blog/posts/:id", isAuthenticated, requireBlogAdmin, async (req, res) => {
+  app.delete("/api/admin/blog/posts/:id", requireAuth, requireBlogAdmin, async (req, res) => {
     try {
       const { id } = req.params;
       
@@ -1491,6 +1354,29 @@ ${posts.map(post => {
     }
   });
 
-  const httpServer = createServer(app);
-  return httpServer;
+  app.post("/api/search", async (req, res) => {
+    try {
+      const { q, category } = req.query;
+      const allPlans = await storage.getAllInsurancePlans();
+      
+      let filteredPlans = allPlans;
+      if (category) {
+        filteredPlans = filteredPlans.filter(plan => plan.category === category);
+      }
+      
+      if (q) {
+        const { semanticSearch } = await import("./services/semantic-search.js");
+        const results = semanticSearch(q as string, filteredPlans, 10);
+        return res.json(results);
+      }
+      
+      res.json(filteredPlans);
+    } catch (error: any) {
+      console.error("GET /api/search - Error:", error);
+      res.status(500).json({ message: "Failed to search insurance plans", error: error.message });
+    }
+  });
+
+  const server = createServer(app);
+  return server;
 }
