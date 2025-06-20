@@ -97,7 +97,7 @@ export default function LoginPage() {
           transition={{ duration: 0.5 }}
           className="w-full max-w-md z-10"
         >
-          <GlassCard>
+          <GlassCard variant="auth">
             <CardHeader className="space-y-1 text-center">
               <CardTitle className="text-2xl font-bold tracking-tight text-white">Welcome back</CardTitle>
               <CardDescription className="text-gray-300">
