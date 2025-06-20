@@ -8,7 +8,7 @@ import { FadeIn, SlideIn, StaggerChildren } from "@/components/ui/transition-eff
 import PopularPlansSlider from "@/components/popular-plans-slider";
 import RecentlyViewedPlans from "@/components/recently-viewed-plans";
 import AnimatedBackground from "@/components/animated-background";
-import GlassCard from "@/components/glass-card";
+import GlassCard from "@/components/ui/GlassCard";
 import GradientButton from "@/components/gradient-button";
 import FeaturesGrid from "@/components/features-grid";
 import CTASection from "@/components/cta-section";
