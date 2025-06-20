@@ -132,21 +132,29 @@ export async function generateAssistantResponse(
         `🧠 [OpenAI][${requestId}] Follow-up question detected – reattaching ${suggestedPlans.length} previous plans`,
       );
     } else {
-      // SIMPLIFIED: Always show plans if we detect an insurance category
-      const category = detectInsuranceCategory(userMessage);
+      // Check if we need more context before showing plans
+      const planContextAnalysis = analyzeContextNeeds(userMessage, conversationHistory);
+      
+      if (planContextAnalysis.needsMoreContext) {
+        // Don't show plans when more context is needed
+        console.log(`[OpenAI][${requestId}] More context needed for ${planContextAnalysis.category}, not showing plans yet`);
+        suggestedPlans = [];
+      } else {
+        // Show plans if context is sufficient
+        const category = detectInsuranceCategory(userMessage);
 
-      if (category !== 'general' && relevantPlans.length > 0) {
-        // Show plans immediately for any detected insurance category
-        suggestedPlans = findRelevantPlans(userMessage, relevantPlans);
-        console.log(
-          `[OpenAI][${requestId}] Category detected (${category}), showing ${suggestedPlans.length} relevant plans`,
-        );
-      } else if (shouldShowInsurancePlans(userMessage)) {
-        // Fallback to intent-based detection
-        suggestedPlans = findRelevantPlans(userMessage, relevantPlans);
-        console.log(
-          `[OpenAI][${requestId}] Insurance intent detected, showing ${suggestedPlans.length} relevant plans`,
-        );
+        if (category !== 'general' && relevantPlans.length > 0) {
+          suggestedPlans = findRelevantPlans(userMessage, relevantPlans);
+          console.log(
+            `[OpenAI][${requestId}] Category detected (${category}), showing ${suggestedPlans.length} relevant plans`,
+          );
+        } else if (shouldShowInsurancePlans(userMessage)) {
+          suggestedPlans = findRelevantPlans(userMessage, relevantPlans);
+          console.log(
+            `[OpenAI][${requestId}] Insurance intent detected, showing ${suggestedPlans.length} relevant plans`,
+          );
+        }
+      }
       }
     }
 
@@ -162,7 +170,7 @@ export async function generateAssistantResponse(
       timestamp: new Date().toISOString(),
     });
 
-    // Analyze context and determine if more information is needed
+    // Use the same context analysis from the plan logic
     const finalContextAnalysis = analyzeContextNeeds(userMessage, conversationHistory);
     
     return {
@@ -412,9 +420,12 @@ function analyzeContextNeeds(userMessage: string, conversationHistory: Assistant
   // Lógica por categoría
   if (category === 'travel') {
     const missingInfo = [];
-    if (!context.destination) missingInfo.push('destination');
-    if (!context.duration) missingInfo.push('duration');
-    if (missingInfo.length > 0) {
+    const expressesUncertainty = /(no sé|no estoy seguro|qué necesito|ayuda|recomend|cual)/i.test(lowerMessage);
+    
+    // If user expresses uncertainty or lacks basic info, ask for more context
+    if (expressesUncertainty || (!context.destination && !context.duration)) {
+      if (!context.destination) missingInfo.push('destination');
+      if (!context.duration) missingInfo.push('duration');
       return {
         needsMoreContext: true,
         category: 'travel',
@@ -428,10 +439,17 @@ function analyzeContextNeeds(userMessage: string, conversationHistory: Assistant
   }
   if (category === 'auto') {
     const missingInfo = [];
-    if (!context.brand) missingInfo.push('marca');
-    if (!context.model) missingInfo.push('modelo');
-    if (!context.year) missingInfo.push('año');
-    if (missingInfo.length > 0) {
+    const expressesUncertainty = /(no sé|no estoy seguro|qué necesito|ayuda|recomend|cual)/i.test(lowerMessage);
+    
+    // If user expresses uncertainty or asks for help, always ask for more context
+    if (expressesUncertainty || (!context.brand && !context.model && !context.year)) {
+      if (!context.brand) missingInfo.push('marca');
+      if (!context.model) missingInfo.push('modelo');
+      if (!context.year) missingInfo.push('año');
+      if (!context.model) missingInfo.push('modelo');
+      if (!context.year) missingInfo.push('año');
+      
+>>>>>>> 02c1ce3
       return {
         needsMoreContext: true,
         category: 'auto',

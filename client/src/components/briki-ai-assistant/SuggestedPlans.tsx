@@ -1,5 +1,5 @@
 import React from 'react';
-import PlanCard, { InsurancePlan } from './PlanCard';
+import PlanCard, { InsurancePlan } from '@/components/briki-ai-assistant/PlanCard';
 import { useToast } from '@/hooks/use-toast';
 import { useLocation } from 'wouter';
 
@@ -24,7 +24,6 @@ const SuggestedPlans: React.FC<SuggestedPlansProps> = ({ plans }) => {
     console.log('❌ SuggestedPlans - No plans to render, returning null');
     return null;
   }
-
   const handleViewDetails = (planId: string) => {
     // Por ahora solo mostraremos un toast, pero podríamos navegar a una página de detalles
     toast({
@@ -49,7 +48,7 @@ const SuggestedPlans: React.FC<SuggestedPlansProps> = ({ plans }) => {
           <PlanCard
             key={plan.id}
             plan={plan}
-            highlighted={index === 0} // Destacar el primer plan como el más recomendado
+            highlighted={index === 0}
             onViewDetails={handleViewDetails}
             onQuote={handleQuote}
           />
