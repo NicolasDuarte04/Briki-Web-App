@@ -13,7 +13,7 @@ if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
   // Set up production or development callback URL
   const callbackURL = process.env.NODE_ENV === "production"
     ? `${process.env.PUBLIC_URL || 'https://brikiapp.com'}/api/auth/callback/google`
-    : "http://localhost:5000/api/auth/callback/google";
+    : "http://localhost:5050/api/auth/callback/google";
 
   // Configure Google Strategy
   passport.use(new GoogleStrategy({

@@ -133,17 +133,22 @@ export async function generateAssistantResponse(
       );
     } else {
       // Check if we need more context before showing plans
-      const planContextAnalysis = analyzeContextNeeds(userMessage, conversationHistory);
-      
+      const planContextAnalysis = analyzeContextNeeds(
+        userMessage,
+        conversationHistory,
+      );
+
       if (planContextAnalysis.needsMoreContext) {
         // Don't show plans when more context is needed
-        console.log(`[OpenAI][${requestId}] More context needed for ${planContextAnalysis.category}, not showing plans yet`);
+        console.log(
+          `[OpenAI][${requestId}] More context needed for ${planContextAnalysis.category}, not showing plans yet`,
+        );
         suggestedPlans = [];
       } else {
         // Show plans if context is sufficient
         const category = detectInsuranceCategory(userMessage);
 
-        if (category !== 'general' && relevantPlans.length > 0) {
+        if (category !== "general" && relevantPlans.length > 0) {
           suggestedPlans = findRelevantPlans(userMessage, relevantPlans);
           console.log(
             `[OpenAI][${requestId}] Category detected (${category}), showing ${suggestedPlans.length} relevant plans`,
@@ -154,7 +159,6 @@ export async function generateAssistantResponse(
             `[OpenAI][${requestId}] Insurance intent detected, showing ${suggestedPlans.length} relevant plans`,
           );
         }
-      }
       }
     }
 
@@ -446,10 +450,7 @@ function analyzeContextNeeds(userMessage: string, conversationHistory: Assistant
       if (!context.brand) missingInfo.push('marca');
       if (!context.model) missingInfo.push('modelo');
       if (!context.year) missingInfo.push('año');
-      if (!context.model) missingInfo.push('modelo');
-      if (!context.year) missingInfo.push('año');
       
->>>>>>> 02c1ce3
       return {
         needsMoreContext: true,
         category: 'auto',
@@ -862,7 +863,7 @@ export async function comparePlans(plans: any[]): Promise<string> {
   try {
     const message = `Please compare these insurance plans: ${JSON.stringify(plans)}`;
     const response = await generateAssistantResponse(message, [], [], "Colombia");
-    return response.message;
+    return response.message || "No comparison generated";
   } catch (error) {
     console.error("Error in comparePlans:", error);
     throw error;

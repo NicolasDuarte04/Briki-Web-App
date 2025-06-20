@@ -26,8 +26,11 @@ export const initializeDb = () => {
       connectionString: process.env.DATABASE_URL,
       max: 2, // Limit concurrent connections
       idleTimeoutMillis: 30000, // Close idle connections after 30 seconds
-      connectionTimeoutMillis: 5000, // Connection timeout after 5 seconds
-      allowExitOnIdle: true // Allow pool to cleanup on idle
+      connectionTimeoutMillis: 15000, // Increased from 5s to 15s for Neon cold start
+      allowExitOnIdle: true, // Allow pool to cleanup on idle
+      ssl: {
+        rejectUnauthorized: false, // Accept self-signed / Neon certificates
+      },
     });
     
     // Test pool connection once to catch early errors

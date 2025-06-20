@@ -1,17 +1,6 @@
 import { promises as fs } from 'fs';
 import path from 'path';
-// Import the type from the existing mockPlans file
-export interface MockInsurancePlan {
-  id: string;
-  name: string;
-  provider: string;
-  category: 'travel' | 'auto' | 'pet' | 'health';
-  basePrice: number;
-  coverageAmount: number;
-  description?: string;
-  features?: string[];
-  [key: string]: any;
-}
+import { MockInsurancePlan } from '../data-loader';
 
 /**
  * Insurance Data Service
@@ -149,7 +138,7 @@ class InsuranceDataServiceImpl implements InsuranceDataService {
    */
   async getAvailableCategories(): Promise<string[]> {
     const allPlans = await this.getAllPlans();
-    const categories = [...new Set(allPlans.map(plan => plan.category))];
+    const categories = Array.from(new Set(allPlans.map(plan => plan.category)));
     
     console.log(`[Insurance Data Service] Available categories: ${categories.join(', ')}`);
     return categories;
