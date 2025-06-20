@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { motion } from "framer-motion";
-import GlassCard from "@/components/glass-card";
+import GlassCard from "@/components/ui/GlassCard";
 
 export interface Feature {
   title: string;

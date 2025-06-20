@@ -14,7 +14,7 @@ import { PublicLayout } from "@/components/layout/public-layout";
 
 // Import our enhanced components
 import AnimatedBackground from "@/components/animated-background";
-import GlassCard from "@/components/glass-card";
+import GlassCard from "@/components/ui/GlassCard";
 import EnhancedInput from "@/components/enhanced-input";
 import GradientButton from "@/components/gradient-button";
 

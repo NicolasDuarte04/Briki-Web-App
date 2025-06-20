@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { COUNTDOWN_DATE, FEATURES } from "@/config";
-import GlassCard from "@/components/glass-card";
+import GlassCard from "@/components/ui/GlassCard";
 
 interface TimeLeft {
   days: number;
