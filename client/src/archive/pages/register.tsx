@@ -109,7 +109,7 @@ export default function RegisterPage() {
           transition={{ duration: 0.5 }}
           className="w-full max-w-md z-10"
         >
-          <GlassCard>
+          <GlassCard variant="auth">
             <CardHeader className="space-y-1 text-center">
               <CardTitle className="text-2xl font-bold tracking-tight text-white">Create an account</CardTitle>
               <CardDescription className="text-gray-300">
