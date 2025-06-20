@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import AnimatedBackground from "@/components/animated-background";
-import GlassCard from "@/components/ui/GlassCard";
+import GlassCard from "@/components/ui/glass-card";
 import GradientButton from "@/components/gradient-button";
 import { ArrowRightIcon, BellIcon, LockIcon, ShieldCheckIcon, StarIcon } from "lucide-react";
 

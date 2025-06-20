@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 
 // Import components
-import GlassCard from "@/components/ui/GlassCard";
+import GlassCard from "@/components/ui/glass-card";
 import GradientButton from "@/components/gradient-button";
 
 // Icons
