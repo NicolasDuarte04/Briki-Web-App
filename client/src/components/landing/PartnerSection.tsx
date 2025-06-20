@@ -3,7 +3,7 @@ import { ArrowRight, PieChart, LineChart, BarChart3, Database } from "lucide-rea
 import { useLocation } from "wouter";
 import { COLORS } from "@/config";
 import GradientButton from "@/components/gradient-button";
-import GlassCard from "@/components/ui/GlassCard";
+import GlassCard from "@/components/ui/glass-card";
 
 /**
  * The insurance partner section for the B2B audience
