@@ -1,5 +1,5 @@
 import React from 'react';
-import PlanCard, { InsurancePlan } from '@/components/briki-ai-assistant/PlanCard';
+import NewPlanCard, { InsurancePlan } from '@/components/briki-ai-assistant/NewPlanCard';
 import { useToast } from '@/hooks/use-toast';
 import { useLocation } from 'wouter';
 
@@ -24,16 +24,21 @@ const SuggestedPlans: React.FC<SuggestedPlansProps> = ({ plans }) => {
     console.log('❌ SuggestedPlans - No plans to render, returning null');
     return null;
   }
-  const handleViewDetails = (planId: string) => {
+  
+  const handleViewDetails = (planId: number) => {
     // Por ahora solo mostraremos un toast, pero podríamos navegar a una página de detalles
     toast({
-      title: "Detalles del plan",
-      description: `Viendo detalles del plan ${planId}`,
+      title: "Viendo detalles del plan",
+      description: `Esta acción te llevaría a la página de detalles del plan con ID: ${planId}.`,
     });
   };
 
-  const handleQuote = (planId: string) => {
+  const handleQuote = (planId: number) => {
     // Navegar a la página de cotización con el ID del plan
+    toast({
+      title: "Iniciando cotización",
+      description: `Navegando a la página de cotización para el plan ID: ${planId}.`,
+    });
     navigate(`/quote?planId=${planId}`);
   };
 
@@ -43,12 +48,11 @@ const SuggestedPlans: React.FC<SuggestedPlansProps> = ({ plans }) => {
         <div className="w-1 h-4 bg-gradient-to-b from-blue-500 to-cyan-500 rounded-full"></div>
         Planes recomendados para ti:
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {plans.map((plan, index) => (
-          <PlanCard
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {plans.map((plan) => (
+          <NewPlanCard
             key={plan.id}
             plan={plan}
-            highlighted={index === 0}
             onViewDetails={handleViewDetails}
             onQuote={handleQuote}
           />

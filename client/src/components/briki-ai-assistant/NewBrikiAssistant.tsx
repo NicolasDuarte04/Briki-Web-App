@@ -7,7 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { sendMessageToAI, getMockResponse, APIMessage } from '@/services/openai-service';
 import WelcomeCard from './WelcomeCard';
-import { InsurancePlan } from './PlanCard';
+import { InsurancePlan } from './NewPlanCard';
 import SuggestedQuestions from './SuggestedQuestions';
 import { detectInsuranceCategory, hasSufficientContext } from '@shared/context-utils';
 import { extractContextFromMessage } from "@/utils/context-utils";
