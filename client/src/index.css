@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Satoshi:wght@400;500;600;700&display=swap');
 
@@ -30,33 +30,33 @@
 
 :root {
   /* Core color palette - bright AI-first approach */
-  --background: 220 60% 99%; /* Very light blue-gray background */
-  --foreground: 224 71% 4%; /* Deep navy text (not pure black) */
-  --muted: 220 14% 96%;
-  --muted-foreground: 220 8% 46%;
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
   --popover: 0 0% 100%;
-  --popover-foreground: 224 71% 4%;
+  --popover-foreground: 222.2 84% 4.9%;
   --card: 0 0% 100%;
-  --card-foreground: 224 71% 4%;
-  --border: 220 13% 91%;
-  --input: 220 13% 91%;
+  --card-foreground: 222.2 84% 4.9%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
   
   /* Primary color scheme from design spec */
-  --primary: 224 100% 65%; /* #4C6EFF - Main brand color */
-  --primary-foreground: 0 0% 100%;
+  --primary: 221.2 83.2% 53.3%;
+  --primary-foreground: 210 40% 98%;
   --primary-hover: 225 95% 68%; /* Slightly brighter on hover */
   --primary-active: 224 90% 62%; /* Slightly darker on active */
   
   /* Supporting colors */
-  --secondary: 196 100% 50%; /* Soft electric aqua accent #00C2FF */
-  --secondary-foreground: 0 0% 100%;
-  --accent: 195 80% 50%; /* Subtle aqua flair */
-  --accent-foreground: 0 0% 100%;
-  --destructive: 0 84% 60%;
-  --destructive-foreground: 0 0% 100%;
+  --secondary: 210 40% 96.1%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  --accent: 210 40% 96.1%;
+  --accent-foreground: 222.2 47.4% 11.2%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
   --success: 160 84% 39%;
-  --ring: 224 100% 65%;
-  --radius: 0.85rem; /* Slightly increased corner radius for modern feel */
+  --ring: 221.2 83.2% 53.3%;
+  --radius: 0.5rem; /* Slightly increased corner radius for modern feel */
   
   /* Enhanced gradient system */
   --glow-primary: 0 0 30px rgba(76, 110, 255, 0.25);
@@ -106,33 +106,33 @@
 
 .dark {
   /* Futuristic dark mode for company/partner portal - sleek, glassy, data-focused theme */
-  --background: 226 30% 8%; /* Deep navy background */
-  --foreground: 213 31% 95%; /* Bright white text */
-  --muted: 225 25% 12%;
-  --muted-foreground: 215 20% 70%;
-  --popover: 224 71% 7%;
-  --popover-foreground: 215 20% 75%;
-  --border: 216 34% 17%;
-  --input: 216 34% 17%;
-  --card: 226 35% 10%;
-  --card-foreground: 213 31% 95%;
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+  --popover: 222.2 84% 4.9%;
+  --popover-foreground: 210 40% 98%;
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --card: 222.2 84% 4.9%;
+  --card-foreground: 210 40% 98%;
   
   /* More vibrant primary colors for dark mode */
-  --primary: 224 85% 70%; /* Brighter blue for dark backgrounds */
-  --primary-foreground: 0 0% 100%;
+  --primary: 217.2 91.2% 59.8%;
+  --primary-foreground: 222.2 47.4% 11.2%;
   --primary-hover: 225 90% 75%;
   --primary-active: 224 80% 65%;
   
   /* Supporting colors */
-  --secondary: 196 90% 60%; /* Brighter aqua for dark mode */
-  --secondary-foreground: 0 0% 100%;
-  --accent: 225 70% 60%;
-  --accent-foreground: 0 0% 100%;
-  --destructive: 0 84% 60%;
-  --destructive-foreground: 0 0% 100%;
-  --ring: 224 85% 70%;
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+  --accent: 217.2 32.6% 17.5%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 210 40% 98%;
+  --ring: 224.3 76.3% 48%;
   --success: 160 84% 50%;
-  --radius: 0.85rem;
+  --radius: 0.5rem;
   
   /* Futuristic company portal gradients */
   --gradient-primary: linear-gradient(135deg, #4C6EFF, #5F9FFF); /* Match the light mode gradient */
@@ -174,6 +174,12 @@
   background-size: var(--grid-size) var(--grid-size);
 }
 
+/* Dot pattern for backgrounds */
+.bg-dot-pattern {
+  background-image: radial-gradient(circle, currentColor 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
 /* Animation for slow pulsing effects */
 @keyframes pulse-slow {
   0%, 100% { opacity: 0.3; }
@@ -192,8 +198,8 @@
   /* Modern typography system with Inter and DM Sans as specified */
   body {
     @apply antialiased bg-background text-foreground;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
@@ -1138,3 +1144,164 @@
     @apply relative inline-block px-2 text-xs text-muted-foreground bg-white;
   }
 }
+
+@layer utilities {
+  /* Gradient radial utility */
+  .bg-gradient-radial {
+    background: radial-gradient(circle, var(--tw-gradient-from) 0%, var(--tw-gradient-to) 100%);
+  }
+  
+  /* Enhanced text rendering */
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  /* Smooth animations with GPU acceleration */
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+    will-change: transform;
+  }
+  
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px) translateZ(0);
+    }
+    50% {
+      transform: translateY(-20px) translateZ(0);
+    }
+  }
+  
+  /* Glass effect utilities */
+  .glass-effect {
+    @apply bg-white/10 backdrop-blur-2xl border border-white/20;
+    will-change: backdrop-filter;
+    -webkit-backdrop-filter: blur(24px);
+  }
+  
+  .glass-effect-strong {
+    @apply bg-white/20 backdrop-blur-3xl border border-white/30;
+    will-change: backdrop-filter;
+    -webkit-backdrop-filter: blur(36px);
+  }
+  
+  /* Gradient text animation */
+  .gradient-text-animate {
+    background-size: 200% 200%;
+    animation: gradient-shift 3s ease infinite;
+  }
+  
+  @keyframes gradient-shift {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+  
+  /* Glow effects - updated for Briki colors */
+  .glow-sm {
+    box-shadow: 0 0 20px rgba(0, 199, 196, 0.3);
+  }
+  
+  .glow-md {
+    box-shadow: 0 0 40px rgba(0, 199, 196, 0.4);
+  }
+  
+  .glow-lg {
+    box-shadow: 0 0 60px rgba(0, 199, 196, 0.5);
+  }
+  
+  /* Improved scrollbar for chat */
+  .chat-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .chat-scrollbar::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  
+  .chat-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 rounded-full;
+  }
+  
+  .chat-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-400;
+  }
+  
+  /* Performance optimizations */
+  .gpu-accelerated {
+    transform: translateZ(0);
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+  
+  /* Smooth scroll for chat */
+  .smooth-scroll {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Prevent layout shifts */
+  .layout-stable {
+    contain: layout style;
+  }
+  
+  /* Optimize backdrop filters */
+  @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+    .backdrop-blur-optimized {
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+    }
+  }
+}
+
+/* Premium hover effects */
+@layer components {
+  .hover-lift {
+    @apply transition-all duration-200 hover:-translate-y-1 hover:shadow-xl;
+    will-change: transform;
+  }
+  
+  .hover-glow {
+    @apply transition-all duration-200 hover:shadow-[0_0_30px_rgba(0,199,196,0.3)];
+  }
+  
+  .card-premium {
+    @apply bg-white/95 backdrop-blur-xl border-gray-100 shadow-lg hover:shadow-2xl transition-all duration-200;
+  }
+  
+  /* Stripe-style elevation */
+  .elevation-1 {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  }
+  
+  .elevation-2 {
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  }
+  
+  .elevation-3 {
+    box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+  }
+  
+  .elevation-4 {
+    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+  }
+  
+  .elevation-5 {
+    box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22);
+  }
+}
+
+/* Custom font weights for Inter */
+.font-light { font-weight: 300; }
+.font-normal { font-weight: 400; }
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+.font-extrabold { font-weight: 800; }
+.font-black { font-weight: 900; }

@@ -5,3 +5,4 @@ export { default as PartnerSection } from './PartnerSection';
 export { default as Testimonials } from './Testimonials';
 export { default as CTASection } from './CTASection';
 export { default as CountdownComponent } from './CountdownComponent';
+export { default as AboutSection } from './AboutSection';

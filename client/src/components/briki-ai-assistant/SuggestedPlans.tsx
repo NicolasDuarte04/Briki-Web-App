@@ -1,10 +1,12 @@
 import React from 'react';
 import NewPlanCard, { InsurancePlan } from '@/components/briki-ai-assistant/NewPlanCard';
+import { Skeleton } from '@/components/ui/skeleton';
+import EmptyState from '@/components/empty-state';
 import { useToast } from '@/hooks/use-toast';
 import { useLocation } from 'wouter';
 
 interface SuggestedPlansProps {
-  plans: InsurancePlan[];
+  plans?: InsurancePlan[]; // undefined while loading
 }
 
 const SuggestedPlans: React.FC<SuggestedPlansProps> = ({ plans }) => {
@@ -19,10 +21,25 @@ const SuggestedPlans: React.FC<SuggestedPlansProps> = ({ plans }) => {
     fullPlans: plans
   });
 
-  // Si no hay planes, no renderizar nada
-  if (!plans || plans.length === 0) {
-    console.log('❌ SuggestedPlans - No plans to render, returning null');
-    return null;
+  // Loading state – show skeletons while plans are undefined
+  if (typeof plans === 'undefined') {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 mb-3" data-testid="plan-skeletons">
+        {[1, 2].map((i) => (
+          <Skeleton key={i} className="h-60 rounded-2xl" />
+        ))}
+      </div>
+    );
+  }
+
+  // Empty state when no plans found
+  if (plans.length === 0) {
+    return (
+      <EmptyState
+        title="No encontramos planes"
+        description="Intenta ajustar tus preferencias o proporcionar más información para mostrar recomendaciones."
+      />
+    );
   }
   
   const handleViewDetails = (planId: number) => {

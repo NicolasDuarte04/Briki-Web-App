@@ -44,8 +44,8 @@ const NewPlanCard: React.FC<NewPlanCardProps> = ({ plan, onViewDetails, onQuote 
       animate="visible"
       transition={{ duration: 0.5, ease: "easeOut" }}
     >
-      <Card className="flex flex-col h-full overflow-hidden rounded-2xl bg-white dark:bg-gray-800 shadow-md hover:shadow-xl transition-shadow duration-300 border border-gray-200 dark:border-gray-700">
-        <CardHeader className="p-5">
+      <Card className="flex flex-col h-full overflow-hidden rounded-2xl bg-white dark:bg-gray-800 shadow-md hover:shadow-xl hover:scale-[1.02] transform-gpu transition-all duration-300 border border-gray-200 dark:border-gray-700">
+        <CardHeader className="p-6">
           <div className="flex justify-between items-start">
             <CardTitle className="text-lg font-bold text-gray-900 dark:text-white leading-tight">
               {plan.name}
@@ -57,7 +57,7 @@ const NewPlanCard: React.FC<NewPlanCardProps> = ({ plan, onViewDetails, onQuote 
           <p className="text-sm text-gray-500 dark:text-gray-400 pt-1">{plan.provider}</p>
         </CardHeader>
         
-        <CardContent className="flex-grow p-5">
+        <CardContent className="flex-grow p-6">
           <div className="mb-4">
             <span className="text-3xl font-extrabold text-gray-900 dark:text-white">
               {formatPrice(plan.basePrice, plan.currency)}
@@ -67,17 +67,22 @@ const NewPlanCard: React.FC<NewPlanCardProps> = ({ plan, onViewDetails, onQuote 
           
           <Separator className="my-4" />
 
-          <ul className="space-y-3 text-sm">
-            {plan.benefits.slice(0, 3).map((benefit, index) => (
-              <li key={index} className="flex items-start">
-                <CheckCircle className="h-5 w-5 text-emerald-500 mr-3 flex-shrink-0 mt-0.5" />
-                <span className="text-gray-700 dark:text-gray-300">{benefit}</span>
-              </li>
-            ))}
-          </ul>
+          {/* Defensive fallback when benefits are missing */}
+          {Array.isArray(plan.benefits) && plan.benefits.length > 0 ? (
+            <ul className="space-y-3 text-sm">
+              {plan.benefits.slice(0, 3).map((benefit, index) => (
+                <li key={index} className="flex items-start">
+                  <CheckCircle className="h-5 w-5 text-emerald-500 mr-3 flex-shrink-0 mt-0.5" />
+                  <span className="text-gray-700 dark:text-gray-300">{benefit}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-muted-foreground italic">No hay beneficios listados para este plan.</p>
+          )}
         </CardContent>
 
-        <CardFooter className="p-4 bg-gray-50 dark:bg-gray-800/50 border-t">
+        <CardFooter className="p-6 bg-gray-50 dark:bg-gray-800/50 border-t">
           <div className="flex w-full gap-3">
             <Button 
               variant="outline" 

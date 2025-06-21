@@ -322,8 +322,11 @@ const NewBrikiAssistant: React.FC = () => {
           )}
 
           {messages.map((message) => (
-            <div
+            <motion.div
               key={message.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
               className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} mb-4`}
             >
               <div
@@ -342,9 +345,17 @@ const NewBrikiAssistant: React.FC = () => {
                   <>
                     <p className="whitespace-pre-wrap">{message.content}</p>
                     {/* Mostrar SuggestedPlans solo si el mensaje del asistente tiene planes */}
-                    {message.role === 'assistant' && message.suggestedPlans && message.suggestedPlans.length > 0 && (
+                    {message.role === 'assistant' && typeof message.suggestedPlans !== 'undefined' && (
                       <ScrollArea className="mt-3 max-h-80 pr-3">
-                        <Suspense fallback={<div>Cargando planes...</div>}>
+                        <Suspense
+                          fallback={
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 mb-3">
+                              {[1, 2].map((i) => (
+                                <div key={i} className="h-60 w-full animate-pulse rounded-2xl bg-muted" />
+                              ))}
+                            </div>
+                          }
+                        >
                           <SuggestedPlans plans={message.suggestedPlans} />
                         </Suspense>
                       </ScrollArea>
@@ -352,7 +363,7 @@ const NewBrikiAssistant: React.FC = () => {
                   </>
                 )}
               </div>
-            </div>
+            </motion.div>
           ))}
           <div ref={messagesEndRef} />
         </div>

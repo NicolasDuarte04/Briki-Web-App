@@ -1,348 +1,335 @@
-import { motion } from "framer-motion";
-import { ArrowRight, Bot, MessageCircle, LightbulbIcon, Sparkles, Shield, Zap } from "lucide-react";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
+import { ArrowRight, Bot, Sparkles, Send } from "lucide-react";
 import { useLocation } from "wouter";
-import GradientButton from "@/components/gradient-button";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { useEffect, useState, useRef } from "react";
 
 /**
  * New section highlighting the Briki AI Assistant
  */
 export default function AiAssistantSection() {
   const [, navigate] = useLocation();
-
-  const handleTryAssistant = () => {
-    navigate('/ask-briki-ai');
-  };
+  const [messages, setMessages] = useState<Array<{id: number, type: 'user' | 'bot', text: string}>>([]);
+  const [isTyping, setIsTyping] = useState(false);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
   
-  const handlePreTestClick = () => {
-    navigate('/home');
-  };
+  // Parallax effect for depth
+  const { scrollY } = useScroll();
+  const y1 = useTransform(scrollY, [0, 300], [0, -50]);
+  const y2 = useTransform(scrollY, [0, 300], [0, -100]);
+
+  const handleTryAssistant = () => navigate('/ask-briki-ai');
+  const handleLearnMore = () => navigate('/features');
+
+  // Auto-scroll chat to bottom when new messages appear
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
+
+  // Simulate realistic chat conversation
+  useEffect(() => {
+    const conversation = [
+      { delay: 1000, type: 'user' as const, text: "I need health insurance for my family of 4" },
+      { delay: 2200, typing: true },
+      { delay: 3500, type: 'bot' as const, text: "I'd be happy to help you find the perfect family health plan! To give you the best recommendations, could you tell me your approximate budget?" },
+      { delay: 4800, type: 'user' as const, text: "Around $400-500 per month" },
+      { delay: 5800, typing: true },
+      { delay: 7200, type: 'bot' as const, text: "Great! Based on your budget, I found 3 excellent family plans that offer comprehensive coverage. Let me show you the highlights..." },
+    ];
+
+    const timers: NodeJS.Timeout[] = [];
+
+    conversation.forEach((item) => {
+      if ('typing' in item) {
+        timers.push(setTimeout(() => setIsTyping(true), item.delay));
+      } else {
+        timers.push(setTimeout(() => {
+          setIsTyping(false);
+          setMessages(prev => [...prev, {
+            id: Date.now(),
+            type: item.type,
+            text: item.text
+          }]);
+        }, item.delay));
+      }
+    });
+
+    return () => timers.forEach(timer => clearTimeout(timer));
+  }, []);
+
+  const features = [
+    {
+      icon: Sparkles,
+      title: "Instant Expert Answers",
+      description: "Get clear responses in seconds",
+    },
+    {
+      icon: Sparkles,
+      title: "Personalized Plans",
+      description: "Tailored to your needs & budget",
+    },
+    {
+      icon: Sparkles,
+      title: "Easy Navigation",
+      description: "Complex terms made simple",
+    },
+  ];
 
   return (
-    <section className="w-full py-16 md:py-24 bg-gradient-to-br from-blue-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900 overflow-hidden relative">
-      {/* Animated dot pattern */}
-      <div className="absolute inset-0 -z-10 opacity-5">
-        <div className="absolute inset-0" style={{ 
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23000000' fill-opacity='0.2'%3E%3Ccircle cx='2' cy='2' r='1'/%3E%3C/g%3E%3C/svg%3E")`,
-          backgroundSize: '20px 20px'
-        }}></div>
-      </div>
+    <section ref={sectionRef} className="relative min-h-screen overflow-hidden bg-white">
+      {/* Layer 1: Base neutral background */}
+      <div className="absolute inset-0 bg-gradient-to-b from-gray-50/50 to-white" />
       
-      {/* Animated floating elements */}
-      <motion.div
-        className="absolute h-12 w-12 rounded-full bg-blue-200 opacity-30 -z-10 blur-sm"
-        animate={{
-          y: [0, -15, 0],
-          x: [0, 10, 0],
-          scale: [1, 1.1, 1],
-        }}
-        transition={{
-          duration: 5,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-        style={{ top: '15%', left: '15%' }}
-      />
-      
-      <motion.div
-        className="absolute h-8 w-8 rounded-full bg-cyan-300 opacity-30 -z-10 blur-sm"
-        animate={{
-          y: [0, 20, 0],
-          x: [0, -10, 0],
-          scale: [1, 1.15, 1],
-        }}
-        transition={{
-          duration: 6,
-          repeat: Infinity,
-          ease: "easeInOut",
-          delay: 1,
-        }}
-        style={{ bottom: '25%', right: '20%' }}
-      />
-      
-      <div className="container px-4 md:px-6 mx-auto">
-        {/* Section heading with animated highlight */}
-        <div className="text-center mb-16">
-          <motion.div 
-            className="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-800 dark:from-blue-900/40 dark:to-cyan-900/40 dark:text-blue-300 mb-4"
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-          >
-            <Sparkles className="h-4 w-4 mr-1.5" />
-            <span>Introducing</span>
-          </motion.div>
-          
-          <motion.h2 
-            className="text-4xl md:text-5xl font-bold tracking-tight mb-3"
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-          >
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-500">Briki AI Assistant</span>
-          </motion.h2>
-          
-          <motion.p 
-            className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto"
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            Your personal insurance guide — built with real intelligence
-          </motion.p>
+      {/* Layer 2: Decorative gradient overlay (Stripe-style) */}
+      <motion.div 
+        className="absolute inset-0 opacity-40"
+        style={{ y: y1 }}
+      >
+        {/* Glass-like gradient ribbon */}
+        <div className="absolute top-0 left-0 right-0 h-[120%] overflow-hidden">
+          <div className="absolute -top-1/4 -left-1/4 w-[150%] h-[150%] bg-gradient-to-br from-[#00C7C4]/30 via-transparent to-[#0077B6]/20 blur-3xl" />
+          <div className="absolute top-1/3 -right-1/4 w-[80%] h-[80%] bg-gradient-to-bl from-[#0077B6]/25 via-transparent to-[#00C7C4]/15 blur-2xl" />
         </div>
         
-        <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
-          {/* Text content */}
+        {/* Mesh pattern for texture */}
+        <div 
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%230077B6' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+          }}
+        />
+      </motion.div>
+
+      {/* Layer 3: Content - Asymmetric layout */}
+      <div className="relative z-10 container mx-auto px-6 lg:px-8">
+        <div className="grid lg:grid-cols-2 gap-16 items-center min-h-screen py-24 lg:py-32">
+          
+          {/* Left side: Text content */}
           <motion.div 
-            className="flex-1 space-y-8"
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
+            className="max-w-xl"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
           >
-            {/* Feature cards */}
-            <div className="grid gap-6">
-              <motion.div 
-                className="flex p-4 rounded-xl bg-white/80 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 shadow-sm backdrop-blur-sm"
-                whileHover={{ y: -5, transition: { duration: 0.2 } }}
-              >
-                <div className="mr-4 rounded-full w-12 h-12 bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
-                  <Bot className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-lg mb-1 text-gray-900 dark:text-gray-100">Instant Expert Answers</h3>
-                  <p className="text-gray-600 dark:text-gray-400">Get clear, immediate responses to any insurance question, explained in simple terms.</p>
-                </div>
-              </motion.div>
-              
-              <motion.div 
-                className="flex p-4 rounded-xl bg-white/80 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 shadow-sm backdrop-blur-sm"
-                whileHover={{ y: -5, transition: { duration: 0.2 } }}
-              >
-                <div className="mr-4 rounded-full w-12 h-12 bg-green-100 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0">
-                  <Zap className="h-6 w-6 text-green-600 dark:text-green-400" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-lg mb-1 text-gray-900 dark:text-gray-100">Personalized Recommendations</h3>
-                  <p className="text-gray-600 dark:text-gray-400">Receive tailored insurance plans that match your specific needs and budget.</p>
-                </div>
-              </motion.div>
-              
-              <motion.div 
-                className="flex p-4 rounded-xl bg-white/80 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 shadow-sm backdrop-blur-sm"
-                whileHover={{ y: -5, transition: { duration: 0.2 } }}
-              >
-                <div className="mr-4 rounded-full w-12 h-12 bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center flex-shrink-0">
-                  <Shield className="h-6 w-6 text-purple-600 dark:text-purple-400" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-lg mb-1 text-gray-900 dark:text-gray-100">Easy Policy Navigation</h3>
-                  <p className="text-gray-600 dark:text-gray-400">Understand complex terms and coverage options with visual comparisons and plain language.</p>
-                </div>
-              </motion.div>
-            </div>
+            {/* Badge with proper spacing */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.1 }}
+              className="mb-8"
+            >
+              <Badge className="px-4 py-2 bg-gradient-to-r from-[#00C7C4]/10 to-[#0077B6]/10 text-[#0077B6] border-[#00C7C4]/20 backdrop-blur-sm">
+                <Sparkles className="w-3.5 h-3.5 mr-2" />
+                New: AI-Powered Insurance
+              </Badge>
+            </motion.div>
             
-            {/* CTA buttons - now featuring both options */}
+            {/* Title with improved spacing */}
+            <motion.h1 
+              className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.2 }}
+            >
+              Find your perfect
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#00C7C4] to-[#0077B6]">
+                insurance match
+              </span>
+            </motion.h1>
+            
+            {/* Subtitle with better contrast */}
+            <motion.p 
+              className="text-xl text-gray-600 mb-10 leading-relaxed"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.3 }}
+            >
+              Briki's AI assistant helps you navigate insurance options, compare plans, 
+              and make confident decisions — all in one conversation.
+            </motion.p>
+
+            {/* CTAs with proper spacing */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.4 }}
+              className="flex flex-col sm:flex-row gap-4"
+            >
+              <Button 
+                size="lg" 
+                onClick={handleTryAssistant}
+                className="h-12 px-6 bg-gradient-to-r from-[#00C7C4] to-[#0077B6] text-white hover:shadow-lg transition-all duration-200 font-medium"
+              >
+                Start with AI Assistant
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+              <Button 
+                size="lg" 
+                variant="outline"
+                onClick={handleLearnMore}
+                className="h-12 px-6 border-gray-300 text-gray-700 hover:bg-gray-50 font-medium"
+              >
+                Learn more
+              </Button>
+            </motion.div>
+
+            {/* Trust indicators */}
             <motion.div
               initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.6 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center mt-4"
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.4, delay: 0.5 }}
+              className="mt-12 flex items-center gap-8 text-sm text-gray-500"
             >
-              <GradientButton
-                onClick={handleTryAssistant}
-                className="text-base py-6 px-8 font-medium shadow-lg"
-                gradientFrom="from-blue-600"
-                gradientTo="to-cyan-500"
-                icon={<ArrowRight className="ml-2 h-5 w-5" />}
-              >
-                Try the AI Assistant
-              </GradientButton>
-              
-              <GradientButton
-                onClick={handlePreTestClick}
-                className="text-base py-6 px-8 font-medium shadow-lg"
-                gradientFrom="from-indigo-600"
-                gradientTo="to-blue-500"
-                icon={<ArrowRight className="ml-2 h-5 w-5" />}
-              >
-                Pre-Test the App
-              </GradientButton>
-            </motion.div>
-            <motion.p 
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.8 }}
-              className="mt-3 text-sm text-center text-slate-600 dark:text-slate-400"
-            >
-              Beta access now open.
-            </motion.p>
-          </motion.div>
-          
-          {/* Assistant preview mockup */}
-          <motion.div 
-            className="flex-1 relative"
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-          >
-            <div className="max-w-md mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-xl overflow-hidden border border-gray-200 dark:border-gray-700">
-              {/* Header */}
-              <div className="px-5 py-4 bg-gradient-to-r from-blue-600 to-cyan-500">
-                <div className="flex items-center">
-                  <Bot className="h-6 w-6 mr-2 text-white" />
-                  <h3 className="font-semibold text-white">Briki AI Assistant</h3>
-                </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full" />
+                <span>No credit card required</span>
               </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full" />
+                <span>Free to use</span>
+              </div>
+            </motion.div>
+          </motion.div>
+
+          {/* Right side: Floating assistant preview */}
+          <motion.div 
+            className="relative lg:pl-8"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+            style={{ y: y2 }}
+          >
+            {/* Glass morphism container */}
+            <div className="relative">
+              {/* Glow effect */}
+              <div className="absolute -inset-4 bg-gradient-to-r from-[#00C7C4]/20 to-[#0077B6]/20 blur-2xl opacity-70" />
               
-              {/* Chat area - relative/absolute positioning ensures scroll area doesn't affect input bar */}
-              <div className="relative">
-                <div className="p-5 bg-gray-50 dark:bg-gray-900 h-[340px] overflow-y-auto pb-16">
-                  {/* User message */}
-                  <div className="flex justify-end mb-8">
-                    <div className="bg-blue-600 rounded-2xl py-3 px-4 shadow-sm max-w-xs">
-                      <p className="text-white leading-relaxed">I'm freelance and need health insurance that covers emergencies and checkups.</p>
+              {/* Assistant card */}
+              <div className="relative bg-white/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/50 overflow-hidden">
+                {/* Header */}
+                <div className="bg-gradient-to-r from-[#00C7C4] to-[#0077B6] p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                        <Bot className="h-5 w-5 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-white">Briki Assistant</h3>
+                        <p className="text-xs text-white/80">Always here to help</p>
+                      </div>
                     </div>
-                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center ml-3 flex-shrink-0 border-2 border-white dark:border-gray-800 shadow-sm">
-                      <MessageCircle className="h-5 w-5 text-gray-600" />
+                    <div className="flex gap-1">
+                      <div className="w-2 h-2 rounded-full bg-white/40" />
+                      <div className="w-2 h-2 rounded-full bg-white/40" />
+                      <div className="w-2 h-2 rounded-full bg-white/40" />
                     </div>
                   </div>
-                  
-                  {/* Typing indicator */}
-                  <div className="flex mb-2 items-end">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center mr-3 flex-shrink-0 border-2 border-white dark:border-gray-800 shadow-sm">
-                      <span className="text-white font-bold text-xs">B</span>
-                    </div>
-                    <motion.div 
-                      className="bg-gray-200 dark:bg-gray-700 rounded-full h-8 px-4 flex items-center justify-center"
-                      initial={{ opacity: 1 }}
-                      animate={{ 
-                        opacity: [1, 0.5, 1],
-                      }}
-                      transition={{
-                        repeat: Infinity,
-                        duration: 1.5,
-                      }}
-                    >
-                      <div className="flex space-x-1.5">
-                        <motion.div className="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full"
-                          animate={{ y: [0, -4, 0] }}
-                          transition={{ repeat: Infinity, duration: 1, delay: 0 }}
-                        />
-                        <motion.div className="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full"
-                          animate={{ y: [0, -4, 0] }}
-                          transition={{ repeat: Infinity, duration: 1, delay: 0.2 }}
-                        />
-                        <motion.div className="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full"
-                          animate={{ y: [0, -4, 0] }}
-                          transition={{ repeat: Infinity, duration: 1, delay: 0.4 }}
-                        />
-                      </div>
-                    </motion.div>
-                  </div>
-                  
-                  {/* Assistant response */}
-                  <motion.div 
-                    className="flex mb-4"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 1.5 }}
-                  >
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center mr-3 flex-shrink-0 border-2 border-white dark:border-gray-800 shadow-sm">
-                      <span className="text-white font-bold text-xs">B</span>
-                    </div>
-                    <div className="bg-white dark:bg-gray-800 rounded-2xl py-3 px-4 shadow-sm max-w-xs border border-gray-100 dark:border-gray-700">
-                      <p className="text-gray-700 dark:text-gray-300 leading-relaxed">Great — I found two flexible plans that include ER visits, virtual care, and no long-term contracts. Want to see them?</p>
-                    </div>
-                  </motion.div>
-                  
-                  {/* Recommendation card */}
-                  <motion.div 
-                    className="ml-[54px] mb-8 overflow-hidden"
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    transition={{ delay: 2.5, duration: 0.4 }}
-                  >
-                    <div className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl border border-blue-100 dark:border-blue-800/30 p-4 shadow-sm">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center">
-                          <Shield className="h-5 w-5 text-blue-600 dark:text-blue-400 mr-2" />
-                          <h4 className="font-semibold text-sm text-blue-800 dark:text-blue-300">RECOMMENDED PLAN</h4>
-                        </div>
-                        <span className="text-xs bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-400 px-2 py-1 rounded-full font-medium">Freelancer Friendly</span>
-                      </div>
-                      
-                      <div className="bg-white/80 dark:bg-gray-800/80 rounded-lg p-3 backdrop-blur-sm">
-                        <div className="flex items-center justify-between mb-1">
-                          <h3 className="font-bold text-gray-900 dark:text-gray-100">FlexHealth Basic</h3>
-                          <div className="text-green-600 dark:text-green-400 font-bold">$195<span className="text-xs font-normal text-gray-500 dark:text-gray-400">/mo</span></div>
-                        </div>
-                        
-                        <div className="text-xs text-gray-600 dark:text-gray-400 mb-3">
-                          Flexible coverage with no annual commitment
-                        </div>
-                        
-                        <div className="space-y-1.5">
-                          <div className="flex items-center text-sm">
-                            <div className="w-3 h-3 rounded-full bg-blue-500 mr-2 flex-shrink-0"></div>
-                            <span className="text-gray-700 dark:text-gray-300">Unlimited virtual visits</span>
-                          </div>
-                          <div className="flex items-center text-sm">
-                            <div className="w-3 h-3 rounded-full bg-cyan-500 mr-2 flex-shrink-0"></div>
-                            <span className="text-gray-700 dark:text-gray-300">Emergency room coverage</span>
-                          </div>
-                          <div className="flex items-center text-sm">
-                            <div className="w-3 h-3 rounded-full bg-indigo-500 mr-2 flex-shrink-0"></div>
-                            <span className="text-gray-700 dark:text-gray-300">4 preventive checkups/year</span>
-                          </div>
-                          <div className="flex items-center text-sm">
-                            <div className="w-3 h-3 rounded-full bg-purple-500 mr-2 flex-shrink-0"></div>
-                            <span className="text-gray-700 dark:text-gray-300">Monthly billing option</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
                 </div>
                 
-                {/* Input area - absolute positioning to keep it fixed at the bottom */}
-                <div className="absolute bottom-0 left-0 right-0 p-4 border-t dark:border-gray-700 bg-white dark:bg-gray-800">
-                  <div className="bg-gray-100 dark:bg-gray-700 rounded-full flex items-center px-4 py-3 shadow-inner">
-                    <input type="text" className="bg-transparent flex-1 outline-none text-gray-700 dark:text-gray-300 text-sm" placeholder="Type your insurance question..." disabled />
-                    <button className="ml-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white p-2 rounded-full">
-                      <ArrowRight className="h-4 w-4" />
-                    </button>
+                {/* Chat content - scrollable and alive */}
+                <div 
+                  ref={chatContainerRef}
+                  className="h-[400px] overflow-y-auto bg-gray-50/50 scroll-smooth chat-scrollbar"
+                  style={{ scrollBehavior: 'smooth' }}
+                >
+                  <div className="p-4 space-y-3">
+                    <AnimatePresence mode="popLayout">
+                      {messages.map((message) => (
+                        <motion.div
+                          key={message.id}
+                          layout
+                          initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: -20, scale: 0.9 }}
+                          transition={{ 
+                            type: "spring",
+                            stiffness: 500,
+                            damping: 30
+                          }}
+                          className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+                        >
+                          <motion.div 
+                            className={`max-w-[80%] ${
+                              message.type === 'user' 
+                                ? 'bg-gradient-to-r from-[#00C7C4] to-[#0077B6] text-white rounded-2xl rounded-br-sm' 
+                                : 'bg-white rounded-2xl rounded-bl-sm shadow-sm'
+                            } py-3 px-4`}
+                            whileHover={{ scale: 1.02 }}
+                            transition={{ type: "spring", stiffness: 400 }}
+                          >
+                            <p className={`text-sm ${message.type === 'user' ? 'text-white' : 'text-gray-700'}`}>
+                              {message.text}
+                            </p>
+                          </motion.div>
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
+                    
+                    {/* Typing indicator */}
+                    <AnimatePresence>
+                      {isTyping && (
+                        <motion.div 
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          className="flex justify-start"
+                        >
+                          <div className="bg-white rounded-2xl py-3 px-4 shadow-sm">
+                            <div className="flex gap-1.5">
+                              {[0, 0.2, 0.4].map((delay, i) => (
+                                <motion.div
+                                  key={i}
+                                  className="w-2 h-2 bg-gray-400 rounded-full"
+                                  animate={{ 
+                                    y: [0, -8, 0],
+                                    opacity: [0.4, 1, 0.4]
+                                  }}
+                                  transition={{ 
+                                    repeat: Infinity, 
+                                    duration: 1.4,
+                                    delay,
+                                    ease: "easeInOut"
+                                  }}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </div>
+                
+                {/* Input area */}
+                <div className="p-4 bg-white border-t border-gray-100">
+                  <div className="flex items-center gap-3">
+                    <input 
+                      type="text" 
+                      className="flex-1 px-4 py-2.5 bg-gray-50 rounded-full text-sm text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00C7C4]/50 transition-all" 
+                      placeholder="Ask about insurance plans..." 
+                      disabled 
+                    />
+                    <Button 
+                      size="sm" 
+                      className="h-10 w-10 rounded-full bg-gradient-to-r from-[#00C7C4] to-[#0077B6] hover:shadow-md transition-all duration-200 p-0"
+                    >
+                      <Send className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
               </div>
             </div>
-            
-            {/* Decorative elements */}
-            <div className="absolute -z-10 w-64 h-64 bg-blue-300/20 dark:bg-blue-700/10 rounded-full -bottom-12 -right-12 blur-3xl"></div>
-            <div className="absolute -z-10 w-40 h-40 bg-cyan-300/20 dark:bg-cyan-700/10 rounded-full -top-10 -left-10 blur-2xl"></div>
           </motion.div>
         </div>
       </div>
-      
-      {/* Trust badge banner */}
-      <motion.div 
-        className="max-w-4xl mx-auto mt-16 bg-white/70 dark:bg-gray-800/40 rounded-xl border border-gray-200 dark:border-gray-700 py-4 px-6 backdrop-blur-sm shadow-sm flex items-center justify-center space-x-3 text-center"
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5, delay: 0.7 }}
-      >
-        <Sparkles className="h-5 w-5 text-yellow-500" />
-        <p className="text-gray-700 dark:text-gray-300 font-medium">
-          Powered by advanced AI technology and trained by insurance experts
-        </p>
-      </motion.div>
+
+      {/* Bottom fade to white */}
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent pointer-events-none" />
     </section>
   );
 }

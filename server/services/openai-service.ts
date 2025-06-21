@@ -603,9 +603,21 @@ function findRelevantPlans(
     }
   }
 
-  // STEP 3: If no clear category detected, return empty array (no random plans)
-  console.log(`❓ No clear category detected, not showing any plans`);
-  return [];
+  // STEP 3: If no clear category is detected, fall back to general relevance scoring
+  console.log(`❓ No clear category detected, scoring all available plans based on message content.`);
+  const scoredPlans = plans.map((plan) => ({
+    plan,
+    score: calculateRelevanceScore(userMessage, plan),
+  }));
+
+  const sortedPlans = scoredPlans
+    .filter(item => item.score > 0) // Only include plans with some relevance
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 4) // Default to a smaller limit for general queries
+    .map(item => item.plan);
+  
+  console.log(`✅ Found ${sortedPlans.length} relevant plans from general search.`);
+  return sortedPlans;
 }
 
 /**

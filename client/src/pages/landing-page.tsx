@@ -1,109 +1,109 @@
 import { motion } from "framer-motion";
-import { useEffect } from "react";
-import { 
-  Hero, 
-  AiAssistantSection,
-  Features, 
-  PartnerSection, 
-  Testimonials, 
-  CTASection 
-} from "@/components/landing";
-import { FEATURES } from "@/config";
-import { Link, useLocation } from "wouter";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/use-auth";
-import { useLanguage } from "@/components/language-selector";
+import { Badge } from "@/components/ui/badge";
+import { ArrowRight, Star, Users, Shield, Zap } from "lucide-react";
+import AiAssistantSection from "@/components/landing/AiAssistantSection";
+import Features from "@/components/landing/Features";
+import PartnerSection from "@/components/landing/PartnerSection";
+import Testimonials from "@/components/landing/Testimonials";
+import AboutSection from "@/components/landing/AboutSection";
 import { PublicLayout } from "@/components/layout/public-layout";
+import { Card, CardContent } from "@/components/ui/card";
 
 /**
- * The new dual-audience landing page for Briki
- * Features sections for both B2C and B2B audiences
+ * Landing Page Component
+ * 
+ * The main entry point for the Briki platform, showcasing:
+ * - Hero section with AI Assistant preview
+ * - Key features and benefits
+ * - Partner integrations
+ * - Customer testimonials
+ * - About section with company information
+ * 
+ * This page serves as the primary marketing and onboarding interface
+ * for new users discovering the Briki insurance platform.
  */
 export default function LandingPage() {
   const [, navigate] = useLocation();
-  const { user, isLoading } = useAuth();
-  const { t } = useLanguage();
-
-  // Track page view
-  useEffect(() => {
-    console.log("Landing page viewed");
-  }, []);
-
-  // Navigation handler
-  const handleGetStarted = () => {
-    if (user) {
-      navigate("/trip-info");
-    } else {
-      navigate("/auth");
-    }
-  };
-
-  // Main scroll animation for when elements come into view
-  const fadeInUpVariants = {
-    hidden: { 
-      opacity: 0, 
-      y: 40 
-    },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: {
-        duration: 0.8,
-        ease: "easeOut"
-      }
-    }
-  };
 
   return (
     <PublicLayout>
       <main className="flex-grow">
-        {/* AI Assistant Section - Our main value proposition */}
+        {/* Hero Section with AI Assistant */}
         <AiAssistantSection />
-
-        {/* Features Section - Consumer Benefits */}
+        
+        {/* Features Section */}
         <Features />
-
-        {/* Partner Section - B2B focused */}
+        
+        {/* Partners Section */}
         <PartnerSection />
-
-        {/* Testimonials from both consumers and partners */}
+        
+        {/* Testimonials */}
         <Testimonials />
-
-        {/* CTA with Countdown */}
-        {FEATURES.SHOW_COUNTDOWN && <CTASection />}
-
-        {/* SEO and Accessibility Enhancements */}
-        <motion.section
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeInUpVariants}
-          className="py-16 bg-white dark:bg-gray-950"
-        >
-          <div className="container px-4 mx-auto">
-            <div className="max-w-4xl mx-auto prose dark:prose-invert prose-lg">
-              <h2 className="text-center text-3xl font-bold tracking-tight mb-8">
-                About Briki Insurance Platform
+        
+        {/* About Section */}
+        <AboutSection />
+        
+        {/* CTA Section with gradient background */}
+        <section className="py-24 bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 relative overflow-hidden">
+          <div className="absolute inset-0 bg-grid-white/10" />
+          <div className="container px-4 md:px-6 mx-auto relative z-10">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="text-center max-w-3xl mx-auto"
+            >
+              <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+                Ready to Find Your Perfect Coverage?
               </h2>
-              <p>
-                Briki is a cutting-edge insurance marketplace designed to make insurance accessible, 
-                understandable, and tailored to your unique needs. Operating across Colombia and Mexico, 
-                our platform uses intelligent technology to compare insurance options across multiple categories, 
-                including travel, auto, pet, and health.
+              <p className="text-xl text-white/90 mb-10">
+                Join thousands of Colombians who've simplified their insurance journey with Briki
               </p>
-              <p>
-                For consumers, Briki provides a human-centered experience that simplifies the complex world 
-                of insurance. Our AI-powered tools analyze your specific needs and preferences to match you 
-                with the perfect coverage options, ensuring you're never over or under-insured.
-              </p>
-              <p>
-                For insurance companies and partners, Briki offers a sophisticated distribution channel to 
-                connect with qualified customers. Our advanced analytics platform provides valuable market 
-                insights while streamlining the process of showcasing your products to the right audience.
-              </p>
-            </div>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button 
+                  size="lg" 
+                  variant="secondary"
+                  onClick={() => navigate('/ask-briki-ai')}
+                  className="h-14 px-8 text-base bg-white text-blue-600 hover:bg-gray-100"
+                >
+                  Start with AI Assistant
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+                <Button 
+                  size="lg" 
+                  variant="outline"
+                  onClick={() => navigate('/home')}
+                  className="h-14 px-8 text-base bg-transparent text-white border-white hover:bg-white/10"
+                >
+                  Browse Insurance Plans
+                </Button>
+              </div>
+              
+              {/* Trust indicators */}
+              <div className="mt-12 flex flex-wrap justify-center gap-8 text-white/80">
+                <div className="flex items-center gap-2">
+                  <Shield className="h-5 w-5" />
+                  <span>Secure & Private</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Users className="h-5 w-5" />
+                  <span>50,000+ Users</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Star className="h-5 w-5" />
+                  <span>4.8/5 Rating</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Zap className="h-5 w-5" />
+                  <span>Instant Quotes</span>
+                </div>
+              </div>
+            </motion.div>
           </div>
-        </motion.section>
+        </section>
       </main>
     </PublicLayout>
   );
