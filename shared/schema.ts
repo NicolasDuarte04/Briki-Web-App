@@ -369,29 +369,28 @@ export type BlogPostWithRelations = BlogPost & {
 };
 
 // Assistant Logging
-export const conversationRoleEnum = pgEnum('conversation_role', ['user', 'assistant', 'system']);
-
 export const conversationLogs = pgTable("conversation_logs", {
-  id: varchar("id").primaryKey(), // UUID generated in application
-  sessionId: varchar("session_id").notNull(),
-  role: conversationRoleEnum("role").notNull(),
-  content: text("content"),
-  contextJson: jsonb("context_json"),
-  createdAt: timestamp("created_at").defaultNow(),
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").references(() => users.id), // Nullable
+  category: varchar("category", { length: 100 }), // e.g., 'plan-recommender', 'term-explainer'
+  input: text("input").notNull(),
+  output: text("output"),
+  timestamp: timestamp("timestamp").defaultNow().notNull(),
 }, (table) => {
   return {
-    sessionIdIdx: index("conversation_logs_session_id_idx").on(table.sessionId),
+    userIdIdx: index("conv_logs_user_id_idx").on(table.userId),
+    categoryIdx: index("conv_logs_category_idx").on(table.category),
   }
 });
 
 export const contextSnapshots = pgTable("context_snapshots", {
-  id: varchar("id").primaryKey(), // UUID generated in application
-  sessionId: varchar("session_id").notNull(),
-  context: jsonb("context"),
-  createdAt: timestamp("created_at").defaultNow(),
+  id: serial("id").primaryKey(),
+  conversationId: integer("conversation_id").references(() => conversationLogs.id, { onDelete: 'cascade' }).notNull(),
+  memoryJson: jsonb("memory_json").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 }, (table) => {
   return {
-    sessionIdIdx: index("context_snapshots_session_id_idx").on(table.sessionId),
+    convIdIdx: index("context_snapshots_conv_id_idx").on(table.conversationId),
   }
 });
 

@@ -38,6 +38,7 @@ import googleAuthRoutes from './routes/google-auth';
 import quotesRoutes from './routes/quotes';
 import aiRouter from './routes/ai';
 import insurancePlansRouter from './routes/insurance-plans';
+import vehicleLookupRouter from './routes/vehicle-lookup';
 
 if (!process.env.STRIPE_SECRET_KEY) {
   console.warn('Warning: Missing STRIPE_SECRET_KEY environment variable');
@@ -68,6 +69,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use('/api/ai', aiRouter);
   app.use('/api/insurance-plans', insurancePlansRouter);
   app.use('/api/diagnostic', diagnosticRouter);
+  app.use('/api/lookup-plate', vehicleLookupRouter);
 
   try {
     const dbCheckPromise = pool.query('SELECT 1');

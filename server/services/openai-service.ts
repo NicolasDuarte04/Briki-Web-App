@@ -25,6 +25,8 @@ import { storage } from "../storage";
 import { db } from "../db";
 import { insurancePlans, InsuranceCategory } from "@shared/schema";
 import { analyzeContextNeeds, detectInsuranceCategory, ContextAnalysisResult } from "@shared/context-utils";
+import fetch from 'node-fetch';
+import { AssistantMemory } from "@shared/types/assistant";
 
 // Define a simpler, unified plan type for the assistant's purpose
 interface InsurancePlan {
@@ -59,7 +61,7 @@ export interface AssistantResponse {
   response?: string;
   suggestedPlans?: InsurancePlan[];
   category?: string;
-  userContext?: any;
+  memory?: AssistantMemory;
   needsMoreContext?: boolean;
   suggestedQuestions?: string[];
 }
@@ -70,10 +72,11 @@ export interface AssistantResponse {
 export async function generateAssistantResponse(
   userMessage: string,
   conversationHistory: AssistantMessage[] = [],
-  insurancePlansParam: InsurancePlan[] = [],
+  memory: AssistantMemory = {},
   userCountry: string = "Colombia",
 ): Promise<AssistantResponse> {
   const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  let updatedMemory = { ...memory };
 
   console.log(
     `[OpenAI][${requestId}] Starting request with real data integration:`,
@@ -86,17 +89,37 @@ export async function generateAssistantResponse(
   );
 
   try {
-    // FIXED: Get real plans from the database
+    // Detect category first to decide on special actions
+    const category = detectInsuranceCategory(userMessage);
+
+    // If auto insurance, check for license plate and lookup if needed
+    if (category === 'auto' && !updatedMemory.vehicle) {
+      const plate = extractPlate(userMessage);
+      if (plate) {
+        console.log(`[Vehicle Lookup][${requestId}] Plate detected: ${plate}. Fetching details...`);
+        try {
+          const vehicleData = await lookupVehicleByPlate(plate);
+          if (vehicleData) {
+            updatedMemory.vehicle = vehicleData;
+            console.log(`[Vehicle Lookup][${requestId}] Success. Vehicle data injected into memory.`);
+          }
+        } catch (error: any) {
+          console.warn(`[Vehicle Lookup][${requestId}] Failed: ${error.message}`);
+          // Fallback: continue without vehicle data, context analysis will ask for it
+        }
+      }
+    }
+
+    // Get real plans from the database
     let allPlans: InsurancePlan[] = await db.select().from(insurancePlans);
 
     // Filter and get relevant plans
     const filteredPlans = filterPlansByCountry(allPlans, userCountry);
     const relevantPlans = getTopRelevantPlans(userMessage, filteredPlans, 6);
 
-    // FIXED: Enhanced system prompt with real plan data and memory context
-    const category = detectInsuranceCategory(userMessage);
+    // Enhanced system prompt with real plan data and memory context
     const conversation = [...conversationHistory, { role: 'user', content: userMessage }].map(m => m.content).join(' ');
-    const contextAnalysis = analyzeContextNeeds(conversation, category);
+    const contextAnalysis = analyzeContextNeeds(conversation, category, updatedMemory);
     const systemMessage: AssistantMessage = {
       role: "system",
       content: createSystemPrompt(
@@ -104,6 +127,7 @@ export async function generateAssistantResponse(
         userMessage,
         conversationHistory,
         contextAnalysis,
+        updatedMemory
       ),
     };
 
@@ -120,13 +144,14 @@ export async function generateAssistantResponse(
         .filter(msg => msg.role === 'user')
         .map(msg => msg.content)
         .join(' ');
-      const fallbackContextAnalysis = analyzeContextNeeds(fallbackConversation, fallbackCategory);
+      const fallbackContextAnalysis = analyzeContextNeeds(fallbackConversation, fallbackCategory, updatedMemory);
       
       return {
         message: fallbackMessage,
         response: fallbackMessage,
         suggestedPlans: relevantPlans.slice(0, 3),
         category: fallbackCategory,
+        memory: updatedMemory,
         needsMoreContext: fallbackContextAnalysis.needsMoreContext,
         suggestedQuestions: fallbackContextAnalysis.suggestedQuestions || [],
       };
@@ -171,7 +196,7 @@ export async function generateAssistantResponse(
         .filter(msg => msg.role === 'user')
         .map(msg => msg.content)
         .join(' ');
-      const planContextAnalysis = analyzeContextNeeds(conversation, category);
+      const planContextAnalysis = analyzeContextNeeds(conversation, category, updatedMemory);
 
       if (planContextAnalysis.needsMoreContext) {
         // Don't show plans when more context is needed
@@ -215,13 +240,14 @@ export async function generateAssistantResponse(
         .filter(msg => msg.role === 'user')
         .map(msg => msg.content)
         .join(' ');
-    const finalContextAnalysis = analyzeContextNeeds(finalConversation, finalContextCategory);
+    const finalContextAnalysis = analyzeContextNeeds(finalConversation, finalContextCategory, updatedMemory);
     
     return {
       message: assistantMessage,
       response: assistantMessage, // Provide both for compatibility
       suggestedPlans: suggestedPlans.length > 0 ? suggestedPlans : undefined,
       category: finalContextCategory,
+      memory: updatedMemory,
       needsMoreContext: finalContextAnalysis.needsMoreContext,
       suggestedQuestions: finalContextAnalysis.suggestedQuestions || [],
     };
@@ -363,13 +389,25 @@ function createSystemPrompt(
   userMessage: string,
   conversationHistory: AssistantMessage[],
   contextAnalysis: ContextAnalysisResult,
+  memory: AssistantMemory,
 ): string {
   const hasHistory = conversationHistory.length > 0;
   const previousPlans = extractPreviousPlansFromHistory(conversationHistory);
   const isFollowUp = isFollowUpQuestion(userMessage) && previousPlans.length > 0;
 
-  return `Eres Briki, un asistente especializado en seguros que ayuda a usuarios en Colombia a encontrar el mejor seguro. 
+  const vehicleContext = memory.vehicle 
+    ? `
+## VEHICLE DATA (no mostrar al usuario)
+- Placa: ${memory.vehicle.plate}
+- Marca: ${memory.vehicle.make}
+- Modelo: ${memory.vehicle.model}
+- Año: ${memory.vehicle.year}
+- Combustible: ${memory.vehicle.fuel}
+`
+    : '';
 
+  return `Eres Briki, un asistente especializado en seguros que ayuda a usuarios en Colombia a encontrar el mejor seguro. 
+${vehicleContext}
 IMPORTANTE: NUNCA termines la conversación después de mostrar planes. SIEMPRE invita al usuario a hacer más preguntas.
 
 ## INSTRUCCIONES DE MEMORIA Y CONTINUIDAD:
@@ -675,7 +713,7 @@ export async function explainInsuranceTerm(term: string): Promise<string> {
 export async function comparePlans(plans: any[]): Promise<string> {
   try {
     const message = `Please compare these insurance plans: ${JSON.stringify(plans)}`;
-    const response = await generateAssistantResponse(message, [], [], "Colombia");
+    const response = await generateAssistantResponse(message, [], {}, "Colombia");
     return response.message || "No comparison generated";
   } catch (error) {
     console.error("Error in comparePlans:", error);
@@ -714,4 +752,28 @@ export async function analyzeImageForInsurance(imageData: string, prompt?: strin
     console.error("Error in analyzeImageForInsurance:", error);
     throw error;
   }
+}
+
+/**
+ * Utility functions for plate detection and lookup
+ */
+const PLATE_REGEX = /[A-Z]{3}[-\s]?[0-9]{3}|[A-Z]{3}[-\s]?[0-9]{2}[A-Z]/i;
+
+function extractPlate(message: string): string | null {
+  const match = message.match(PLATE_REGEX);
+  return match ? match[0].replace(/[-\s]/g, '').toUpperCase() : null;
+}
+
+async function lookupVehicleByPlate(plate: string): Promise<any> {
+  const response = await fetch('http://localhost:5050/api/lookup-plate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ plate }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Vehicle lookup failed with status: ${response.status}`);
+  }
+
+  return response.json();
 }

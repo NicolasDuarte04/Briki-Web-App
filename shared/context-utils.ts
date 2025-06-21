@@ -40,6 +40,8 @@
  * -----------------------------------------------------------------
  */
 
+import { AssistantMemory } from "./types/assistant";
+
 // Interfaz para los mensajes, compatible con frontend y backend
 export interface SimpleMessage {
   role: 'user' | 'assistant' | 'system';
@@ -140,7 +142,11 @@ export interface ContextAnalysisResult {
  * @param category - La categoría de seguro detectada.
  * @returns Un objeto `ContextAnalysisResult`.
  */
-export function analyzeContextNeeds(conversation: string, category: InsuranceCategory): ContextAnalysisResult {
+export function analyzeContextNeeds(
+  conversation: string, 
+  category: InsuranceCategory,
+  memory?: AssistantMemory
+): ContextAnalysisResult {
     const lowerConversation = conversation.toLowerCase();
     const result: ContextAnalysisResult = {
         needsMoreContext: false,
@@ -164,8 +170,8 @@ export function analyzeContextNeeds(conversation: string, category: InsuranceCat
             petAge: /(\d+|años?|meses?|cachorro|adulto|mayor)/i.test(lowerConversation),
         },
         auto: {
-            brand: /(marca|toyota|honda|ford|chevrolet|nissan)/i.test(lowerConversation),
-            model: /(modelo|\d{4}|año)/i.test(lowerConversation),
+            brand: !!memory?.vehicle?.make || /(marca|toyota|honda|ford|chevrolet|nissan)/i.test(lowerConversation),
+            model: !!memory?.vehicle?.model || /(modelo|\d{4}|año)/i.test(lowerConversation),
         },
         health: {
             age: /(\d+|años?|joven|adulto|mayor)/i.test(lowerConversation),

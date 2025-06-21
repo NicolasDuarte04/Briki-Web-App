@@ -1,85 +1,67 @@
 import express from 'express';
 import { generateAssistantResponse, analyzeImageForInsurance } from '../services/openai-service';
-import { loadMockInsurancePlans, filterPlansByCategory, filterPlansByTags } from '../data-loader';
+import { loadMockInsurancePlans, filterPlansByCategory } from '../data-loader';
 import { generateMockResponse } from '../services/mock-assistant-responses';
 import { semanticSearch } from '../services/semantic-search';
 import { db } from '../db';
 import { conversationLogs, contextSnapshots } from '@shared/schema';
-import { v4 as uuidv4 } from 'uuid';
-import { desc } from 'drizzle-orm';
+import { desc, eq } from 'drizzle-orm';
 
 const router = express.Router();
+
+// Helper function for logging conversations
+const logConversation = async (logData: {
+  userId: string | null;
+  category: string;
+  input: string;
+  output: string | null;
+  memoryJson?: object;
+}) => {
+  try {
+    const [conversation] = await db.insert(conversationLogs).values({
+      userId: logData.userId,
+      category: logData.category,
+      input: logData.input,
+      output: logData.output,
+    }).returning();
+
+    if (conversation && logData.memoryJson && Object.keys(logData.memoryJson).length > 0) {
+      await db.insert(contextSnapshots).values({
+        conversationId: conversation.id,
+        memoryJson: logData.memoryJson,
+      });
+    }
+  } catch (error) {
+    console.warn('[AI Logging] Failed to write conversation log:', error);
+  }
+};
 
 /**
  * Endpoint para generar respuestas del asistente IA
  */
 router.post('/chat', async (req, res) => {
   try {
-    const { message, conversationHistory } = req.body;
-    const sessionId = req.session.id || `anon_${uuidv4()}`;
-
-    console.log(`[AI Chat Route] Request received:`, {
-      messageLength: message?.length || 0,
-      hasHistory: !!conversationHistory,
-      historyLength: conversationHistory?.length || 0,
-      sessionId,
-      timestamp: new Date().toISOString()
-    });
+    const { message, conversationHistory, memory, category = 'general' } = req.body;
+    const userId = req.session.user?.id || null;
 
     if (!message) {
       return res.status(400).json({ error: 'Se requiere un mensaje' });
     }
 
-    // Log user message (non-blocking)
-    try {
-      await db.insert(conversationLogs).values({
-        id: uuidv4(),
-        sessionId,
-        role: 'user',
-        content: message,
-      });
-    } catch (err: any) {
-      console.warn('[AI Chat Route] Failed to write user log – continuing without DB logging:', err?.message || err);
-    }
-
-    // Convert frontend APIMessage format to backend AssistantMessage format
     const formattedHistory = (conversationHistory || []).map((msg: any) => ({
       role: msg.role,
       content: msg.content
     }));
 
-    // Generate response using the updated service
-    const response = await generateAssistantResponse(message, formattedHistory);
+    const response = await generateAssistantResponse(message, formattedHistory, memory);
     
-    // Log assistant response (non-blocking)
-    try {
-      await db.insert(conversationLogs).values({
-        id: uuidv4(),
-        sessionId,
-        role: 'assistant',
-        content: response.message,
-        contextJson: response.userContext, // Log context with assistant message
-      });
-
-      // Log context snapshot if available
-      if (response.userContext && Object.keys(response.userContext).length > 0) {
-        await db.insert(contextSnapshots).values({
-          id: uuidv4(),
-          sessionId,
-          context: response.userContext,
-        });
-      }
-    } catch (err: any) {
-      console.warn('[AI Chat Route] Failed to write assistant log – continuing without DB logging:', err?.message || err);
-    }
-
-    console.log(`[AI Chat Route] Response generated & logged:`, {
-      hasMessage: !!response.message,
-      hasSuggestedPlans: !!response.suggestedPlans,
-      planCount: response.suggestedPlans?.length || 0,
-      needsMoreContext: response.needsMoreContext,
-      suggestedQuestionsCount: response.suggestedQuestions?.length || 0,
-      timestamp: new Date().toISOString()
+    // Log the interaction
+    logConversation({
+      userId,
+      category,
+      input: message,
+      output: response.message || null,
+      memoryJson: response.memory,
     });
     
     return res.json(response);
@@ -97,7 +79,8 @@ router.post('/chat', async (req, res) => {
  */
 router.post('/ask', async (req, res) => {
   try {
-    const { message, history, useOpenAI = true, category } = req.body;
+    const { message, history, useOpenAI = true, category = 'legacy-ask', memory } = req.body;
+    const userId = req.session.user?.id || null;
     
     console.log(`[AI Route] Request received:`, {
       messageLength: message?.length || 0,
@@ -122,13 +105,15 @@ router.post('/ask', async (req, res) => {
     // Si el modo OpenAI está activado, intentar usar la API
     if (useOpenAI) {
       try {
-        const response = await generateAssistantResponse(message, history || [], plans);
+        const response = await generateAssistantResponse(message, history || [], memory);
         
-        console.log(`[AI Route] OpenAI response generated successfully:`, {
-          responseLength: response.message?.length || 0,
-          hasSuggestedPlans: !!response.suggestedPlans,
-          planCount: response.suggestedPlans?.length || 0,
-          timestamp: new Date().toISOString()
+        // Log the interaction
+        logConversation({
+          userId,
+          category,
+          input: message,
+          output: response.message || null,
+          memoryJson: response.memory,
         });
         
         return res.json(response);
@@ -172,6 +157,7 @@ router.post('/ask', async (req, res) => {
 router.post('/analyze-image', async (req, res) => {
   try {
     const { image, prompt, useOpenAI = true } = req.body;
+    const userId = req.session.user?.id || null;
 
     if (!image) {
       return res.status(400).json({ error: 'Se requiere una imagen' });
@@ -185,6 +171,16 @@ router.post('/analyze-image', async (req, res) => {
     if (useOpenAI) {
       try {
         const response = await analyzeImageForInsurance(base64Data, prompt);
+        
+        // For now, image analysis doesn't use structured memory, but we log its output.
+        logConversation({
+          userId,
+          category: 'image-analysis',
+          input: prompt || 'Image analysis task',
+          output: response.message || null,
+          // No memoryJson for this endpoint yet
+        });
+
         return res.json(response);
       } catch (error: any) {
         console.warn("Error al usar OpenAI para análisis de imagen, usando respuesta mock como fallback:", error.message);
@@ -216,19 +212,15 @@ router.get('/logs/test', async (req, res) => {
     const last10ConversationLogs = await db
       .select()
       .from(conversationLogs)
-      .orderBy(desc(conversationLogs.createdAt))
+      .orderBy(desc(conversationLogs.timestamp))
       .limit(10);
 
-    const last10ContextSnapshots = await db
-      .select()
-      .from(contextSnapshots)
-      .orderBy(desc(contextSnapshots.createdAt))
-      .limit(10);
+    const logsWithContext = await Promise.all(last10ConversationLogs.map(async (log) => {
+      const context = await db.select().from(contextSnapshots).where(eq(contextSnapshots.conversationId, log.id));
+      return { ...log, context };
+    }));
 
-    return res.json({
-      conversationLogs: last10ConversationLogs,
-      contextSnapshots: last10ContextSnapshots,
-    });
+    return res.json({ conversationLogs: logsWithContext });
   } catch (error: any) {
     console.error('Error fetching logs:', error);
     res.status(500).json({ 
