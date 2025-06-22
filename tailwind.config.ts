@@ -71,6 +71,16 @@ export default {
             transform: 'translateX(100%)',
           },
         },
+        gradient: {
+          '0%, 100%': {
+            'background-size': '200% 200%',
+            'background-position': 'left center'
+          },
+          '50%': {
+            'background-size': '200% 200%',
+            'background-position': 'right center'
+          }
+        },
         float: {
           '0%, 100%': { transform: 'translateY(0px)' },
           '50%': { transform: 'translateY(-20px)' },
@@ -84,6 +94,7 @@ export default {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         shimmer: 'shimmer 2s linear infinite',
+        gradient: 'gradient 4s ease infinite',
         float: 'float 6s ease-in-out infinite',
         pulse: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
       },

@@ -1,5 +1,5 @@
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
-import { ArrowRight, Bot, Sparkles, Send } from "lucide-react";
+import { ArrowRight, Bot, Sparkles, Send, Check, Shield, Heart, Users } from "lucide-react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -11,7 +11,7 @@ import { useEffect, useState, useRef } from "react";
  */
 export default function AiAssistantSection() {
   const [, navigate] = useLocation();
-  const [messages, setMessages] = useState<Array<{id: number, type: 'user' | 'bot', text: string}>>([]);
+  const [messages, setMessages] = useState<Array<{id: number, type: 'user' | 'bot' | 'card', text?: string, card?: any}>>([]);
   const [isTyping, setIsTyping] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
@@ -31,7 +31,7 @@ export default function AiAssistantSection() {
     }
   }, [messages]);
 
-  // Simulate realistic chat conversation
+  // Simulate realistic chat conversation with card recommendations
   useEffect(() => {
     const conversation = [
       { delay: 1000, type: 'user' as const, text: "I need health insurance for my family of 4" },
@@ -39,7 +39,33 @@ export default function AiAssistantSection() {
       { delay: 3500, type: 'bot' as const, text: "I'd be happy to help you find the perfect family health plan! To give you the best recommendations, could you tell me your approximate budget?" },
       { delay: 4800, type: 'user' as const, text: "Around $400-500 per month" },
       { delay: 5800, typing: true },
-      { delay: 7200, type: 'bot' as const, text: "Great! Based on your budget, I found 3 excellent family plans that offer comprehensive coverage. Let me show you the highlights..." },
+      { delay: 7200, type: 'bot' as const, text: "Great! Based on your budget, I found 3 excellent family plans. Here are my top recommendations:" },
+      { delay: 8000, type: 'card' as const, card: {
+        name: "FlexHealth Basic",
+        provider: "Suramericana",
+        price: "$420",
+        period: "/month",
+        badge: "Best Value",
+        summary: "Comprehensive coverage for families with predictable healthcare needs",
+        features: [
+          "Zero deductible for preventive care",
+          "24/7 telemedicine included",
+          "$500 individual deductible"
+        ]
+      }},
+      { delay: 8500, type: 'card' as const, card: {
+        name: "Family Shield Plus",
+        provider: "Sura",
+        price: "$485",
+        period: "/month",
+        badge: "Most Popular",
+        summary: "Enhanced protection with prescription benefits and dental coverage",
+        features: [
+          "Full prescription coverage",
+          "Dental & vision included",
+          "5,000+ doctors network"
+        ]
+      }},
     ];
 
     const timers: NodeJS.Timeout[] = [];
@@ -53,7 +79,8 @@ export default function AiAssistantSection() {
           setMessages(prev => [...prev, {
             id: Date.now(),
             type: item.type,
-            text: item.text
+            text: item.text,
+            card: item.card
           }]);
         }, item.delay));
       }
@@ -90,10 +117,12 @@ export default function AiAssistantSection() {
         className="absolute inset-0 opacity-40"
         style={{ y: y1 }}
       >
-        {/* Glass-like gradient ribbon */}
+        {/* Glass-like gradient ribbon with enhanced Briki colors */}
         <div className="absolute top-0 left-0 right-0 h-[120%] overflow-hidden">
-          <div className="absolute -top-1/4 -left-1/4 w-[150%] h-[150%] bg-gradient-to-br from-[#00C7C4]/30 via-transparent to-[#0077B6]/20 blur-3xl" />
-          <div className="absolute top-1/3 -right-1/4 w-[80%] h-[80%] bg-gradient-to-bl from-[#0077B6]/25 via-transparent to-[#00C7C4]/15 blur-2xl" />
+          <div className="absolute -top-1/4 -left-1/4 w-[150%] h-[150%] bg-gradient-to-br from-[#00C7C4]/40 via-transparent to-[#0098C1]/30 blur-3xl" />
+          <div className="absolute top-1/3 -right-1/4 w-[80%] h-[80%] bg-gradient-to-bl from-[#0077B6]/35 via-transparent to-[#00C7C4]/25 blur-2xl" />
+          {/* Additional Briki teal accent */}
+          <div className="absolute top-1/2 left-1/3 w-[60%] h-[60%] bg-gradient-radial from-[#00C7C4]/20 to-transparent blur-3xl animate-pulse" />
         </div>
         
         {/* Mesh pattern for texture */}
@@ -107,7 +136,7 @@ export default function AiAssistantSection() {
 
       {/* Layer 3: Content - Asymmetric layout */}
       <div className="relative z-10 container mx-auto px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-16 items-center min-h-screen py-24 lg:py-32">
+        <div className="grid lg:grid-cols-2 gap-16 items-center min-h-screen py-32 lg:py-36">
           
           {/* Left side: Text content */}
           <motion.div 
@@ -116,29 +145,33 @@ export default function AiAssistantSection() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
           >
-            {/* Badge with proper spacing */}
+            {/* Badge positioned above title with proper spacing */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.1 }}
-              className="mb-8"
+              className="mb-6"
             >
-              <Badge className="px-4 py-2 bg-gradient-to-r from-[#00C7C4]/10 to-[#0077B6]/10 text-[#0077B6] border-[#00C7C4]/20 backdrop-blur-sm">
+              <Badge className="inline-flex px-4 py-2 bg-gradient-to-r from-[#00C7C4]/10 to-[#0077B6]/10 text-[#0077B6] border-[#00C7C4]/20 backdrop-blur-sm shadow-sm">
                 <Sparkles className="w-3.5 h-3.5 mr-2" />
                 New: AI-Powered Insurance
               </Badge>
             </motion.div>
-            
-            {/* Title with improved spacing */}
+
+            {/* Title with Briki branding matching navbar gradient */}
             <motion.h1 
               className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.2 }}
             >
-              Find your perfect
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#00C7C4] to-[#0077B6]">
-                insurance match
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00C7C4] to-[#0077B6] font-bold">Briki</span> — Find your perfect
+              <span className="block relative overflow-hidden">
+                <span className="relative text-transparent bg-clip-text bg-gradient-to-r from-[#00C7C4] via-[#0098C1] to-[#0077B6] bg-[length:200%_auto] animate-gradient">
+                  insurance match
+                </span>
+                {/* Shimmer effect overlay */}
+                <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12 animate-shimmer" />
               </span>
             </motion.h1>
             
@@ -204,10 +237,10 @@ export default function AiAssistantSection() {
             transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
             style={{ y: y2 }}
           >
-            {/* Glass morphism container */}
-            <div className="relative">
+            {/* Glass morphism container with enhanced shadow */}
+            <div className="relative group">
               {/* Glow effect */}
-              <div className="absolute -inset-4 bg-gradient-to-r from-[#00C7C4]/20 to-[#0077B6]/20 blur-2xl opacity-70" />
+              <div className="absolute -inset-4 bg-gradient-to-r from-[#00C7C4]/30 to-[#0077B6]/30 blur-2xl opacity-70 group-hover:opacity-90 transition-opacity" />
               
               {/* Assistant card */}
               <div className="relative bg-white/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/50 overflow-hidden">
@@ -231,12 +264,25 @@ export default function AiAssistantSection() {
                   </div>
                 </div>
                 
-                {/* Chat content - scrollable and alive */}
+                {/* Chat content - scrollable with cards */}
                 <div 
                   ref={chatContainerRef}
-                  className="h-[400px] overflow-y-auto bg-gray-50/50 scroll-smooth chat-scrollbar"
+                  className="h-[420px] overflow-y-auto bg-gray-50/50 scroll-smooth chat-scrollbar relative"
                   style={{ scrollBehavior: 'smooth' }}
                 >
+                  {/* Scroll indicator */}
+                  {messages.length > 3 && (
+                    <div className="absolute bottom-2 right-2 z-10 pointer-events-none">
+                      <motion.div
+                        animate={{ y: [0, 5, 0] }}
+                        transition={{ repeat: Infinity, duration: 1.5 }}
+                        className="text-gray-400 text-xs opacity-60"
+                      >
+                        ↓
+                      </motion.div>
+                    </div>
+                  )}
+
                   <div className="p-4 space-y-3">
                     <AnimatePresence mode="popLayout">
                       {messages.map((message) => (
@@ -253,19 +299,71 @@ export default function AiAssistantSection() {
                           }}
                           className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
                         >
-                          <motion.div 
-                            className={`max-w-[80%] ${
-                              message.type === 'user' 
-                                ? 'bg-gradient-to-r from-[#00C7C4] to-[#0077B6] text-white rounded-2xl rounded-br-sm' 
-                                : 'bg-white rounded-2xl rounded-bl-sm shadow-sm'
-                            } py-3 px-4`}
-                            whileHover={{ scale: 1.02 }}
-                            transition={{ type: "spring", stiffness: 400 }}
-                          >
-                            <p className={`text-sm ${message.type === 'user' ? 'text-white' : 'text-gray-700'}`}>
-                              {message.text}
-                            </p>
-                          </motion.div>
+                          {message.type === 'card' ? (
+                            <motion.div 
+                              className="w-full max-w-sm"
+                              whileHover={{ scale: 1.02, y: -2 }}
+                              transition={{ type: "spring", stiffness: 300 }}
+                            >
+                              <Card className="bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
+                                <div className="p-4">
+                                  {/* Card Header */}
+                                  <div className="flex items-start justify-between mb-3">
+                                    <div>
+                                      <div className="flex items-center gap-2 mb-1">
+                                        <h4 className="font-semibold text-gray-900">{message.card.name}</h4>
+                                        {message.card.badge && (
+                                          <Badge className="px-2 py-0.5 text-xs bg-gradient-to-r from-[#00C7C4]/10 to-[#0077B6]/10 text-[#0077B6] border-0">
+                                            {message.card.badge}
+                                          </Badge>
+                                        )}
+                                      </div>
+                                      <p className="text-xs text-gray-500">{message.card.provider}</p>
+                                    </div>
+                                    <div className="text-right">
+                                      <div className="text-2xl font-bold text-[#0077B6]">{message.card.price}</div>
+                                      <div className="text-xs text-gray-500">{message.card.period}</div>
+                                    </div>
+                                  </div>
+
+                                  {/* Summary */}
+                                  <p className="text-sm text-gray-600 mb-3">{message.card.summary}</p>
+
+                                  {/* Features */}
+                                  <div className="space-y-2">
+                                    {message.card.features.map((feature: string, idx: number) => (
+                                      <div key={idx} className="flex items-start gap-2">
+                                        <Check className="w-4 h-4 text-[#00C7C4] mt-0.5 flex-shrink-0" />
+                                        <span className="text-xs text-gray-700">{feature}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+
+                                  {/* Action Button */}
+                                  <Button 
+                                    size="sm" 
+                                    className="w-full mt-4 bg-gradient-to-r from-[#00C7C4] to-[#0077B6] text-white hover:shadow-md transition-all duration-200"
+                                  >
+                                    View Details
+                                  </Button>
+                                </div>
+                              </Card>
+                            </motion.div>
+                          ) : (
+                            <motion.div 
+                              className={`max-w-[80%] ${
+                                message.type === 'user' 
+                                  ? 'bg-gradient-to-r from-[#00C7C4] to-[#0077B6] text-white rounded-2xl rounded-br-sm' 
+                                  : 'bg-white rounded-2xl rounded-bl-sm shadow-sm'
+                              } py-3 px-4`}
+                              whileHover={{ scale: 1.02 }}
+                              transition={{ type: "spring", stiffness: 400 }}
+                            >
+                              <p className={`text-sm ${message.type === 'user' ? 'text-white' : 'text-gray-700'}`}>
+                                {message.text}
+                              </p>
+                            </motion.div>
+                          )}
                         </motion.div>
                       ))}
                     </AnimatePresence>

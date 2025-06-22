@@ -46,59 +46,85 @@ export default function LandingPage() {
         <AboutSection />
         
         {/* CTA Section with gradient background */}
-        <section className="py-24 bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 relative overflow-hidden">
-          <div className="absolute inset-0 bg-grid-white/10" />
+        <section id="cta" className="py-32 bg-gradient-to-br from-[#0077B6] via-[#0098C1] to-[#00C7C4] relative overflow-hidden">
+          <div className="absolute inset-0 bg-grid-white/5" />
+          {/* Additional decoration */}
+          <div className="absolute top-0 left-0 w-full h-full">
+            <div className="absolute top-1/4 -right-48 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
+            <div className="absolute bottom-1/4 -left-48 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
+          </div>
+          
           <div className="container px-4 md:px-6 mx-auto relative z-10">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
-              className="text-center max-w-3xl mx-auto"
+              className="text-center max-w-4xl mx-auto"
             >
-              <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+              <h2 className="text-5xl md:text-6xl font-bold text-white mb-8">
                 Ready to Find Your Perfect Coverage?
               </h2>
-              <p className="text-xl text-white/90 mb-10">
+              <p className="text-xl text-white/90 mb-12 leading-relaxed">
                 Join thousands of Colombians who've simplified their insurance journey with Briki
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button 
-                  size="lg" 
-                  variant="secondary"
-                  onClick={() => navigate('/ask-briki-ai')}
-                  className="h-14 px-8 text-base bg-white text-blue-600 hover:bg-gray-100"
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ type: "spring", stiffness: 300 }}
                 >
-                  Start with AI Assistant
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-                <Button 
-                  size="lg" 
-                  variant="outline"
-                  onClick={() => navigate('/home')}
-                  className="h-14 px-8 text-base bg-transparent text-white border-white hover:bg-white/10"
+                  <Button 
+                    size="lg" 
+                    variant="secondary"
+                    onClick={() => navigate('/ask-briki-ai')}
+                    className="h-14 px-8 text-base bg-white text-[#0077B6] hover:bg-gray-50 hover:shadow-xl hover:shadow-white/20 font-semibold group"
+                  >
+                    Start with AI Assistant
+                    <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </motion.div>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ type: "spring", stiffness: 300 }}
                 >
-                  Browse Insurance Plans
-                </Button>
+                  <Button 
+                    size="lg" 
+                    variant="outline"
+                    onClick={() => navigate('/home')}
+                    className="h-14 px-8 text-base bg-transparent text-white border-2 border-white/50 hover:bg-white/10 hover:border-white font-medium"
+                  >
+                    Browse Insurance Plans
+                  </Button>
+                </motion.div>
               </div>
               
               {/* Trust indicators */}
-              <div className="mt-12 flex flex-wrap justify-center gap-8 text-white/80">
-                <div className="flex items-center gap-2">
-                  <Shield className="h-5 w-5" />
-                  <span>Secure & Private</span>
+              <div className="mt-16 flex flex-wrap justify-center gap-12 text-white/90">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                    <Shield className="h-5 w-5" />
+                  </div>
+                  <span className="text-lg">Secure & Private</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Users className="h-5 w-5" />
-                  <span>50,000+ Users</span>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                    <Users className="h-5 w-5" />
+                  </div>
+                  <span className="text-lg">50,000+ Users</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Star className="h-5 w-5" />
-                  <span>4.8/5 Rating</span>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                    <Star className="h-5 w-5" />
+                  </div>
+                  <span className="text-lg">4.8/5 Rating</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Zap className="h-5 w-5" />
-                  <span>Instant Quotes</span>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                    <Zap className="h-5 w-5" />
+                  </div>
+                  <span className="text-lg">Instant Quotes</span>
                 </div>
               </div>
             </motion.div>

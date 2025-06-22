@@ -17,14 +17,14 @@ export default function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 backdrop-blur-md bg-white/60 dark:bg-gray-900/60 shadow transition border-b border-gray-200 dark:border-gray-800">
+    <header className="sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-gray-900/60 shadow-sm transition border-b border-gray-200/50 dark:border-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
+        <div className="flex justify-between h-20">
           {/* Logo */}
-          <div className="flex">
-            <Link href="/" className="flex-shrink-0 flex items-center">
-              <h1 className="briki-logo text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-500">
-                briki
+          <div className="flex items-center -ml-2">
+            <Link href="/" className="flex-shrink-0 flex items-center px-3 py-2 hover:opacity-90 transition-opacity">
+              <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#00C7C4] to-[#0077B6] tracking-tight">
+                Briki
               </h1>
             </Link>
           </div>
