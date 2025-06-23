@@ -1,8 +1,25 @@
+import React from 'react';
 import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
-import { User, Shield, FileText, Bell, Settings } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { 
+  Shield, 
+  TrendingUp, 
+  FileCheck, 
+  AlertCircle,
+  Sparkles,
+  MessageSquare
+} from "lucide-react";
+import { SectionContainer } from "@/components/ui/section-container";
+import { GradientButton } from "@/components/ui/gradient-button";
+import { 
+  WelcomeHero,
+  DashboardStatCard,
+  QuickActions,
+  ActivityTimeline,
+  PolicyGrid
+} from "@/components/dashboard";
+import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 export default function DashboardAuthenticated() {
   const { user } = useAuth();
@@ -14,146 +31,233 @@ export default function DashboardAuthenticated() {
     return user?.email?.split('@')[0] || 'User';
   };
 
-  // Quick action items for authenticated users
-  const quickActions = [
+  // Mock data - in real app, this would come from API
+  const stats = [
     {
-      title: "View Policies",
-      description: "Manage your active insurance policies",
-      icon: <Shield className="w-6 h-6 text-blue-600" />,
-      path: "/policies",
-      bgColor: "bg-blue-50",
-      borderColor: "border-blue-200"
+      title: "Active Policies",
+      value: "3",
+      subtitle: "All up to date",
+      icon: Shield,
+      trend: { value: 0, label: "vs last month" },
+      variant: "primary" as const
     },
     {
-      title: "Submit Claim",
-      description: "File a new insurance claim",
-      icon: <FileText className="w-6 h-6 text-emerald-600" />,
-      path: "/claims/new",
-      bgColor: "bg-emerald-50",
-      borderColor: "border-emerald-200"
+      title: "Total Saved",
+      value: "$1,847",
+      subtitle: "This year",
+      icon: TrendingUp,
+      trend: { value: 23, label: "vs last year" },
+      variant: "success" as const
     },
     {
-      title: "Account Settings",
-      description: "Update your profile and preferences",
-      icon: <Settings className="w-6 h-6 text-gray-600" />,
-      path: "/settings",
-      bgColor: "bg-gray-50",
-      borderColor: "border-gray-200"
+      title: "Coverage Score",
+      value: "92%",
+      subtitle: "Excellent protection",
+      icon: FileCheck,
+      trend: { value: 5, label: "improvement" },
+      variant: "success" as const
+    },
+    {
+      title: "Actions Needed",
+      value: "1",
+      subtitle: "Review required",
+      icon: AlertCircle,
+      variant: "warning" as const
     }
   ];
 
+  const mockPolicies = [
+    {
+      id: "1",
+      type: "auto" as const,
+      name: "Comprehensive Auto",
+      provider: "SecureShield Insurance",
+      status: "active" as const,
+      premium: "$127/mo",
+      nextPayment: "Mar 15"
+    },
+    {
+      id: "2",
+      type: "health" as const,
+      name: "Premium Health Plus",
+      provider: "HealthGuard Co.",
+      status: "active" as const,
+      premium: "$340/mo",
+      nextPayment: "Mar 1"
+    }
+  ];
+
+  const fadeInUp = {
+    initial: { opacity: 0, y: 20 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.6 }
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Welcome header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="bg-blue-100 rounded-full p-3">
-                <User className="w-8 h-8 text-blue-600" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">
-                  Welcome back, {getUserName()}
-                </h1>
-                <p className="text-lg text-gray-600">
-                  Manage your insurance policies and account
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+      {/* Hero Section */}
+      <SectionContainer variant="default" className="pt-8 pb-12 lg:pt-12 lg:pb-16">
+        <motion.div {...fadeInUp}>
+          <WelcomeHero 
+            userName={getUserName()}
+            policies={3}
+            savedAmount={1847}
+          />
+        </motion.div>
+      </SectionContainer>
+
+      {/* Stats Grid */}
+      <SectionContainer variant="light" className="py-8 lg:py-12">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6"
+        >
+          {stats.map((stat, index) => (
+            <motion.div
+              key={stat.title}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 * index }}
+            >
+              <DashboardStatCard {...stat} />
+            </motion.div>
+          ))}
+        </motion.div>
+      </SectionContainer>
+
+      {/* Quick Actions */}
+      <SectionContainer variant="default" className="py-8 lg:py-12">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+        >
+          <QuickActions />
+        </motion.div>
+      </SectionContainer>
+
+      {/* Main Content Grid */}
+      <SectionContainer variant="light" className="py-8 lg:py-16">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left Column - Activity Timeline */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="lg:col-span-2"
+          >
+            <ActivityTimeline />
+          </motion.div>
+
+          {/* Right Column - AI Insights */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+            className="space-y-6"
+          >
+            {/* AI Recommendation Card */}
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#003f5c] to-[#0077B6] p-6 text-white">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-3xl" />
+              <div className="relative z-10">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                    <Sparkles className="h-6 w-6 text-white" />
+                  </div>
+                  <h3 className="text-lg font-semibold">AI Insights</h3>
+                </div>
+                <p className="text-white/90 mb-4">
+                  Based on your profile, you could save up to $320/year by bundling your auto and health policies.
                 </p>
+                <GradientButton
+                  variant="secondary"
+                  size="base"
+                  onClick={() => navigate('/ask-briki-ai')}
+                  className="w-full bg-white/20 hover:bg-white/30 text-white border-white/20"
+                >
+                  Explore Savings
+                </GradientButton>
               </div>
             </div>
-            <Button 
-              variant="outline"
-              onClick={() => navigate('/ask-briki')}
-              className="hidden md:flex items-center gap-2"
-            >
-              <Bell className="w-4 h-4" />
-              Get Help
-            </Button>
-          </div>
-        </div>
-      </div>
 
-      {/* Main content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Coming soon notice */}
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg p-8 text-center text-white mb-12">
-          <Shield className="w-16 h-16 mx-auto mb-4 opacity-80" />
-          <h2 className="text-2xl font-bold mb-4">Personalized Dashboard Coming Soon</h2>
-          <p className="text-blue-100 mb-6 max-w-2xl mx-auto">
-            We're building an enhanced dashboard experience just for you. Soon you'll be able to view your policies, 
-            track claims, and get personalized insurance recommendations all in one place.
-          </p>
-          <Button 
-            variant="secondary"
-            onClick={() => navigate('/ask-briki')}
-            className="bg-white text-blue-600 hover:bg-blue-50"
-          >
-            Chat with AI Assistant
-          </Button>
-        </div>
-
-        {/* Quick actions */}
-        <div className="mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Quick Actions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {quickActions.map((action) => (
-              <Card 
-                key={action.title}
-                className={`${action.bgColor} ${action.borderColor} border-2 hover:shadow-lg transition-all cursor-pointer group`}
-                onClick={() => navigate(action.path)}
-              >
-                <CardHeader className="text-center pb-4">
-                  <div className="flex justify-center mb-3">
-                    {action.icon}
+            {/* Trust Indicators */}
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-4">
+                Why Trust Briki?
+              </h3>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                    <span className="text-green-600 dark:text-green-400 text-sm font-semibold">✓</span>
                   </div>
-                  <CardTitle className="text-lg">{action.title}</CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0 text-center">
-                  <p className="text-gray-600 text-sm mb-4">{action.description}</p>
-                  <Button variant="ghost" size="sm" className="group-hover:bg-white/50">
-                    Access
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
+                  <span className="text-sm text-gray-600 dark:text-gray-400">50K+ Happy Users</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                    <span className="text-green-600 dark:text-green-400 text-sm font-semibold">✓</span>
+                  </div>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">98% Satisfaction Rate</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                    <span className="text-green-600 dark:text-green-400 text-sm font-semibold">✓</span>
+                  </div>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">AI-Powered Savings</span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </SectionContainer>
+
+      {/* Policies Section */}
+      <SectionContainer variant="default" className="py-8 lg:py-16">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.6 }}
+        >
+          <PolicyGrid policies={mockPolicies} />
+        </motion.div>
+      </SectionContainer>
+
+      {/* CTA Section */}
+      <SectionContainer variant="gradient" decoration="dots" className="py-16 lg:py-24">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, delay: 0.7 }}
+          className="text-center max-w-3xl mx-auto"
+        >
+          <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">
+            Need Help with Your Insurance?
+          </h2>
+          <p className="text-xl text-white/80 mb-8">
+            Our AI assistant is available 24/7 to answer your questions and help you find the perfect coverage.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <GradientButton
+              variant="secondary"
+              size="lg"
+              onClick={() => navigate('/ask-briki-ai')}
+              className="bg-white text-[#0077B6] hover:bg-gray-100"
+            >
+              <MessageSquare className="mr-2 h-5 w-5" />
+              Chat with AI Assistant
+            </GradientButton>
+            <GradientButton
+              variant="outline"
+              size="lg"
+              onClick={() => navigate('/insurance/travel')}
+              className="border-white text-white hover:bg-white/10"
+            >
+              Get New Quote
+            </GradientButton>
           </div>
-        </div>
-
-        {/* Placeholder sections for future features */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Policies overview placeholder */}
-          <Card className="border border-gray-200">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="w-5 h-5 text-blue-600" />
-                Your Policies
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8 text-gray-500">
-                <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <p>Policy management features coming soon</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Recent activity placeholder */}
-          <Card className="border border-gray-200">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Bell className="w-5 h-5 text-emerald-600" />
-                Recent Activity
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8 text-gray-500">
-                <Bell className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <p>Activity tracking features coming soon</p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </main>
+        </motion.div>
+      </SectionContainer>
     </div>
   );
 }

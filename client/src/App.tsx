@@ -23,7 +23,7 @@ import NotFound from "@/pages/not-found";
 import LandingPage from "@/pages/landing-page";
 import DashboardRouter from "@/components/dashboard-router";
 // Import our new unified authentication screen
-import AuthPage from "@/pages/AuthPage";
+import AuthPage from "@/pages/auth-page-enhanced";
 import TripInfoPage from "@/pages/trip-info-page";
 import InsuranceCategoriesPage from "@/pages/insurance-categories-page";
 import CheckoutPage from "@/pages/checkout-page";
@@ -123,6 +123,14 @@ function Router() {
         <Route path="/home" component={DashboardRouter} />
         <Route path="/dashboard" component={DashboardRouter} />
         <Route path="/auth" component={AuthPage} />
+        <Route path="/sign-in" component={() => {
+          window.location.replace("/auth");
+          return null;
+        }} />
+        <Route path="/sign-up" component={() => {
+          window.location.replace("/auth");
+          return null;
+        }} />
         <Route path="/categories" component={InsuranceCategoriesPage} />
         <Route path="/trip-info" component={TripInfoPage} />
         <Route path="/checkout/:planId" component={CheckoutPage} />

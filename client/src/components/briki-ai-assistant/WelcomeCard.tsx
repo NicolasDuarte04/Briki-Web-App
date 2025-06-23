@@ -44,18 +44,18 @@ const WelcomeCard: React.FC<WelcomeCardProps> = ({ onSendMessage }) => {
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="mb-6 p-6 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-gray-800 dark:to-gray-700 rounded-2xl border border-blue-200 dark:border-gray-600 shadow-md"
+      className="mb-6 p-6 bg-gray-50 rounded-2xl"
     >
       <div className="text-center mb-6">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+        <h2 className="text-xl font-semibold text-gray-900 mb-2">
           ¡Bienvenido a Briki!
         </h2>
-        <p className="text-gray-600 dark:text-gray-400 text-base max-w-md mx-auto">
+        <p className="text-gray-600 text-sm max-w-md mx-auto">
           Encuentra el seguro perfecto. ¿Por dónde empezamos?
         </p>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {quickOptions.map((option, index) => (
           <motion.div
             key={index}
@@ -66,17 +66,17 @@ const WelcomeCard: React.FC<WelcomeCardProps> = ({ onSendMessage }) => {
             <Button
               onClick={() => onSendMessage(option.question)}
               variant="outline"
-              className="w-full p-4 h-auto text-left border-2 hover:border-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200 group hover:shadow-md"
+              className="w-full p-4 h-auto text-left border border-gray-200 hover:border-[#00C7C4] hover:bg-[#00C7C4]/5 transition-all duration-200 group"
             >
               <div className="flex items-center space-x-3">
-                <div className={`w-10 h-10 rounded-lg bg-gradient-to-r ${option.color} flex items-center justify-center group-hover:scale-105 transition-transform duration-200 shadow-sm`}>
+                <div className={`w-10 h-10 rounded-lg bg-gradient-to-r ${option.color} flex items-center justify-center group-hover:scale-105 transition-transform duration-200`}>
                   <option.icon className="h-5 w-5 text-white" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white text-base">
+                  <h3 className="font-medium text-gray-900 text-sm">
                     {option.title}
                   </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  <p className="text-xs text-gray-500 mt-0.5">
                     {option.description}
                   </p>
                 </div>
@@ -86,8 +86,8 @@ const WelcomeCard: React.FC<WelcomeCardProps> = ({ onSendMessage }) => {
         ))}
       </div>
       
-      <div className="mt-6 text-center">
-        <p className="text-sm text-gray-500 dark:text-gray-400">
+      <div className="mt-4 text-center">
+        <p className="text-xs text-gray-500">
           O simplemente escribe tu pregunta en el campo de abajo
         </p>
       </div>

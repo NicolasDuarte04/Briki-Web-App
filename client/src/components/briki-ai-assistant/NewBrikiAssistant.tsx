@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, Suspense, lazy } from 'react';
 import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
+import { GradientButton } from '@/components/ui';
 import { Input } from '@/components/ui/input';
 import { Loader2, Send, Bot } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -11,6 +11,8 @@ import { InsurancePlan } from './NewPlanCard';
 import SuggestedQuestions from './SuggestedQuestions';
 import { detectInsuranceCategory, hasSufficientContext } from '@shared/context-utils';
 import { extractContextFromMessage } from "@/utils/context-utils";
+import ChatBubble from './ChatBubble';
+import ConversationContainer from './ConversationContainer';
 
 // Lazy load the SuggestedPlans component
 const SuggestedPlans = lazy(() => import('./SuggestedPlans'));
@@ -95,6 +97,14 @@ const NewBrikiAssistant: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+
+  // Suggested prompts
+  const suggestedPrompts = [
+    "I bought a Vespa in Bogotá, what insurance do you recommend?",
+    "Traveling to Europe in July, need travel insurance",
+    "My Golden Retriever needs pet insurance",
+    "Looking for health insurance for a family of 4"
+  ];
 
   // Initialize with welcome message
   useEffect(() => {
@@ -290,122 +300,130 @@ const NewBrikiAssistant: React.FC = () => {
     scrollToBottom(true);
   }, [messages]);
 
-  return (
-    <div className="flex flex-col h-full max-h-[600px] bg-white rounded-lg border border-gray-200 shadow-sm">
-      {/* Enhanced Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 via-blue-700 to-cyan-600 shadow-lg">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center ring-2 ring-white/30">
-            <Bot className="h-5 w-5 text-white" />
-          </div>
-          <div>
-            <h3 className="font-semibold text-lg text-white">Briki AI</h3>
-            <p className="text-xs text-blue-100">Tu asistente personal de seguros</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full">
-            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-            <span className="text-xs font-medium text-white">En línea</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Messages */}
-      <ScrollArea ref={scrollAreaRef} className="flex-1 p-4">
-        <div className="space-y-4">
-          {showWelcomeCard && <WelcomeCard onSendMessage={handleSendMessage} />}
-
-          {/* Bloque de preguntas sugeridas antes de SuggestedPlans */}
-          {pendingQuestions.length > 0 && (
-            <SuggestedQuestions questions={pendingQuestions} />
-          )}
-
-          {messages.map((message) => (
-            <motion.div
-              key={message.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.25, ease: 'easeOut' }}
-              className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} mb-4`}
+  // Input area component
+  const inputArea = (
+    <div className="space-y-3">
+      {/* Prompt Chips */}
+      {messages.length <= 1 && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="flex flex-wrap gap-2"
+        >
+          {suggestedPrompts.map((prompt, index) => (
+            <motion.button
+              key={index}
+              onClick={() => setInput(prompt)}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="px-3 py-1 text-sm bg-gray-100 rounded-full hover:bg-blue-100 transition duration-200 ease-in cursor-pointer"
             >
-              <div
-                className={`max-w-[85%] rounded-2xl p-4 shadow-sm ${
-                  message.role === 'user'
-                    ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white ml-auto'
-                    : 'bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-600'
-                }`}
-              >
-                {message.isLoading ? (
-                  <div className="flex items-center gap-2">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>Pensando...</span>
-                  </div>
-                ) : (
-                  <>
-                    <p className="whitespace-pre-wrap">{message.content}</p>
-                    {/* Mostrar SuggestedPlans solo si el mensaje del asistente tiene planes */}
-                    {message.role === 'assistant' && typeof message.suggestedPlans !== 'undefined' && (
-                      <ScrollArea className="mt-3 max-h-80 pr-3">
-                        <Suspense
-                          fallback={
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 mb-3">
-                              {[1, 2].map((i) => (
-                                <div key={i} className="h-60 w-full animate-pulse rounded-2xl bg-muted" />
-                              ))}
-                            </div>
-                          }
-                        >
-                          <SuggestedPlans plans={message.suggestedPlans} />
-                        </Suspense>
-                      </ScrollArea>
-                    )}
-                  </>
-                )}
-              </div>
-            </motion.div>
+              {prompt}
+            </motion.button>
           ))}
-          <div ref={messagesEndRef} />
-        </div>
-      </ScrollArea>
+        </motion.div>
+      )}
 
-      {/* Enhanced Input Area */}
-      <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-        <div className="flex gap-3 items-end">
-          <div className="flex-1 relative">
-            <Input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Escribe tu pregunta sobre seguros..."
-              disabled={isLoading}
-              className="flex-1 pr-12 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 focus:border-blue-500 transition-all duration-200 bg-white dark:bg-gray-900"
-            />
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-gray-400">
-              {input.length}/500
-            </div>
+      {/* Input Field */}
+      <div className="flex gap-3 items-end">
+        <div className="flex-1 relative">
+          <Input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="Ask me about insurance..."
+            disabled={isLoading}
+            className="flex-1 pr-12 py-4 text-base rounded-2xl border-2 border-gray-200 focus:border-[#00C7C4] focus:ring-4 focus:ring-[#00C7C4]/10 transition-all duration-200 bg-white"
+          />
+          <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-xs text-gray-400">
+            {input.length}/500
           </div>
-          <Button
-            onClick={() => handleSendMessage()}
-            disabled={isLoading || !input.trim()}
-            size="icon"
-            className="h-12 w-12 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 transition-all duration-200 shadow-lg"
-          >
-            {isLoading ? (
-              <Loader2 className="h-5 w-5 animate-spin" />
-            ) : (
-              <Send className="h-5 w-5" />
-            )}
-          </Button>
         </div>
-        {isLoading && (
-          <div className="flex items-center gap-2 mt-2 text-sm text-gray-500">
-            <Loader2 className="h-3 w-3 animate-spin" />
-            <span>Briki está escribiendo...</span>
-          </div>
-        )}
+        <GradientButton
+          onClick={() => handleSendMessage()}
+          disabled={isLoading || !input.trim()}
+          size="lg"
+          loading={isLoading}
+          icon={!isLoading && <Send className="h-5 w-5" />}
+          className="rounded-2xl px-6"
+        >
+          {isLoading ? "Sending..." : "Send"}
+        </GradientButton>
       </div>
     </div>
+  );
+
+  return (
+    <ConversationContainer
+      className="h-full max-h-[700px] lg:max-h-[800px]"
+      input={inputArea}
+    >
+      {showWelcomeCard && <WelcomeCard onSendMessage={handleSendMessage} />}
+
+      {/* Suggested questions block */}
+      {pendingQuestions.length > 0 && (
+        <SuggestedQuestions questions={pendingQuestions} />
+      )}
+
+      {/* Messages */}
+      {messages.map((message) => (
+        <ChatBubble
+          key={message.id}
+          role={message.role}
+          content={message.content}
+          isLoading={message.isLoading}
+          timestamp={message.timestamp}
+        >
+          {/* Show SuggestedPlans if message has plans */}
+          {message.role === 'assistant' && message.suggestedPlans && message.suggestedPlans.length > 0 && (
+            <ScrollArea className="mt-4 max-h-96">
+              <Suspense
+                fallback={
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {[1, 2].map((i) => (
+                      <div key={i} className="h-60 w-full animate-pulse rounded-2xl bg-gray-100" />
+                    ))}
+                  </div>
+                }
+              >
+                <SuggestedPlans plans={message.suggestedPlans} />
+              </Suspense>
+            </ScrollArea>
+          )}
+        </ChatBubble>
+      ))}
+      
+      <div ref={messagesEndRef} />
+      
+      {/* Typing indicator */}
+      {isLoading && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center gap-2 text-sm text-gray-500 px-2"
+        >
+          <div className="flex gap-1">
+            <motion.div
+              animate={{ y: [0, -5, 0] }}
+              transition={{ duration: 0.6, repeat: Infinity, delay: 0 }}
+              className="w-2 h-2 bg-[#0077B6] rounded-full"
+            />
+            <motion.div
+              animate={{ y: [0, -5, 0] }}
+              transition={{ duration: 0.6, repeat: Infinity, delay: 0.2 }}
+              className="w-2 h-2 bg-[#0077B6] rounded-full"
+            />
+            <motion.div
+              animate={{ y: [0, -5, 0] }}
+              transition={{ duration: 0.6, repeat: Infinity, delay: 0.4 }}
+              className="w-2 h-2 bg-[#0077B6] rounded-full"
+            />
+          </div>
+          <span>Briki is typing...</span>
+        </motion.div>
+      )}
+    </ConversationContainer>
   );
 };
 
