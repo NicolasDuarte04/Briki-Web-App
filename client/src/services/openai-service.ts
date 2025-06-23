@@ -33,7 +33,7 @@ export async function sendMessageToAI(
     });
 
     console.log('✅ API response received, status:', response.status);
-    
+
     if (!response.ok) {
       console.error('❌ API response not ok:', response.status, response.statusText);
       throw new Error(`API error: ${response.status}`);

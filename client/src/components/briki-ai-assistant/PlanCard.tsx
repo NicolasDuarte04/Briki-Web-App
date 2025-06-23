@@ -7,23 +7,18 @@ import { Separator } from "@/components/ui/separator";
 
 // Interfaz para los planes de seguro
 export interface InsurancePlan {
-  id: string;
+  id: number;
+  name: string;
   category: string;
   provider: string;
-  name: string;
-  description: string;
   basePrice: number;
-  currency: string;
-  duration: string;
   coverageAmount: number;
-  coverage: Record<string, any>;
-  features: string[];
-  deductible: number;
-  exclusions: string[];
-  addOns: string[];
-  tags: string[];
-  rating: number;
-  status: string;
+  currency: string;
+  country: string;
+  benefits: string[];
+  description?: string;
+  duration?: string;
+  tags?: string[];
 }
 
 interface PlanCardProps {
@@ -39,6 +34,25 @@ const PlanCard: React.FC<PlanCardProps> = ({
   onViewDetails,
   onQuote
 }) => {
+  // Debug logging
+  console.log('DEBUG - PlanCard render:', {
+    planId: plan.id,
+    planName: plan.name,
+    hasRequiredFields: !!(
+      plan.id && 
+      plan.name && 
+      plan.category && 
+      plan.provider && 
+      typeof plan.basePrice === 'number' && 
+      plan.currency
+    ),
+    optionalFields: {
+      hasTags: Array.isArray(plan.tags),
+      hasBenefits: Array.isArray(plan.benefits),
+      hasDuration: !!plan.duration
+    }
+  });
+
   // Generar etiqueta según las características del plan
   const getBadge = () => {
     const tags = plan.tags || [];
@@ -60,7 +74,7 @@ const PlanCard: React.FC<PlanCardProps> = ({
   };
 
   // Obtener características destacadas (máximo 3)
-  const highlightedFeatures = (plan.features || []).slice(0, 3);
+  const highlightedFeatures = (plan.benefits || []).slice(0, 3);
 
   // Verificar si el plan es para un tipo específico
   const isSpecificPlan = () => {
@@ -100,17 +114,21 @@ const PlanCard: React.FC<PlanCardProps> = ({
       <CardContent className="pb-2">
         <div className="flex items-baseline mb-3">
           <span className="text-xl font-bold text-primary">{formatPrice()}</span>
-          <span className="text-sm text-muted-foreground ml-1">{plan.duration}</span>
+          {plan.duration && (
+            <span className="text-sm text-muted-foreground ml-1">{plan.duration}</span>
+          )}
         </div>
 
-        <div className="space-y-1 mb-3">
-          {highlightedFeatures.map((feature, index) => (
-            <div key={index} className="flex items-start">
-              <CheckCircle className="h-4 w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-              <span className="text-sm">{feature}</span>
-            </div>
-          ))}
-        </div>
+        {highlightedFeatures.length > 0 && (
+          <div className="space-y-1 mb-3">
+            {highlightedFeatures.map((feature, index) => (
+              <div key={index} className="flex items-start">
+                <CheckCircle className="h-4 w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                <span className="text-sm">{feature}</span>
+              </div>
+            ))}
+          </div>
+        )}
       </CardContent>
 
       <Separator />
@@ -120,14 +138,14 @@ const PlanCard: React.FC<PlanCardProps> = ({
           variant="outline" 
           size="sm"
           className="flex-1"
-          onClick={() => onViewDetails && onViewDetails(plan.id)}
+          onClick={() => onViewDetails && onViewDetails(plan.id.toString())}
         >
           Detalles
         </Button>
         <Button 
           size="sm"
           className="flex-1"
-          onClick={() => onQuote && onQuote(plan.id)}
+          onClick={() => onQuote && onQuote(plan.id.toString())}
         >
           Cotizar <ArrowRight className="ml-1 h-4 w-4" />
         </Button>

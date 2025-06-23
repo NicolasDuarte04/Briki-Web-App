@@ -13,20 +13,28 @@ const SuggestedPlans: React.FC<SuggestedPlansProps> = ({ plans }) => {
 
   // Debug logging for plan rendering
   console.log('🎯 SuggestedPlans - Component rendered with:', {
-    plansReceived: !!plans,
+    receivedPlans: !!plans,
     planCount: plans?.length || 0,
-    planNames: plans?.map(p => p.name) || [],
-    fullPlans: plans
+    planDetails: plans?.map(p => ({
+      id: p.id,
+      name: p.name,
+      category: p.category,
+      provider: p.provider,
+      basePrice: p.basePrice,
+      currency: p.currency,
+      hasBenefits: Array.isArray(p.benefits),
+      benefitsCount: p.benefits?.length || 0
+    })) || []
   });
 
   // Si no hay planes, no renderizar nada
   if (!plans || plans.length === 0) {
-    console.log('❌ SuggestedPlans - No plans to render, returning null');
+    console.log('❌ SuggestedPlans - No plans to render');
     return null;
   }
 
   const handleViewDetails = (planId: string) => {
-    // Por ahora solo mostraremos un toast, pero podríamos navegar a una página de detalles
+    console.log('👆 View details clicked:', { planId });
     toast({
       title: "Detalles del plan",
       description: `Viendo detalles del plan ${planId}`,
@@ -34,7 +42,7 @@ const SuggestedPlans: React.FC<SuggestedPlansProps> = ({ plans }) => {
   };
 
   const handleQuote = (planId: string) => {
-    // Navegar a la página de cotización con el ID del plan
+    console.log('🎯 Quote clicked:', { planId });
     navigate(`/quote?planId=${planId}`);
   };
 
@@ -42,15 +50,23 @@ const SuggestedPlans: React.FC<SuggestedPlansProps> = ({ plans }) => {
     <div className="mt-3 mb-2">
       <div className="text-sm font-medium mb-2">Planes recomendados:</div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-        {plans.map((plan, index) => (
-          <PlanCard
-            key={plan.id}
-            plan={plan}
-            highlighted={index === 0} // Destacar el primer plan como el más recomendado
-            onViewDetails={handleViewDetails}
-            onQuote={handleQuote}
-          />
-        ))}
+        {plans.map((plan, index) => {
+          console.log('📦 Rendering plan card:', {
+            planId: plan.id,
+            planName: plan.name,
+            isHighlighted: index === 0
+          });
+          
+          return (
+            <PlanCard
+              key={plan.id}
+              plan={plan}
+              highlighted={index === 0}
+              onViewDetails={handleViewDetails}
+              onQuote={handleQuote}
+            />
+          );
+        })}
       </div>
     </div>
   );

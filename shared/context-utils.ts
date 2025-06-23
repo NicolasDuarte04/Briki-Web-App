@@ -57,7 +57,7 @@ export type InsuranceCategory = 'travel' | 'auto' | 'pet' | 'health' | 'general'
 const categoryKeywords: Record<Exclude<InsuranceCategory, 'general'>, string[]> = {
   pet: ['mascota', 'perro', 'gato', 'pet', 'dog', 'cat', 'animal', 'veterinario', 'cachorro', 'felino', 'canino'],
   travel: ['viaje', 'travel', 'trip', 'internacional', 'europa', 'estados unidos', 'méxico', 'vacaciones', 'turismo', 'exterior', 'extranjero'],
-  auto: ['auto', 'carro', 'vehiculo', 'vehículo', 'moto', 'car', 'vehicle', 'motorcycle', 'scooter', 'vespa', 'motocicleta', 'automóvil'],
+  auto: ['auto', 'carro', 'vehiculo', 'vehículo', 'moto', 'car', 'vehicle', 'motorcycle', 'scooter', 'vespa', 'motocicleta', 'automóvil', 'coche', 'mazda', 'bmw', 'mercedes', 'audi', 'kia', 'hyundai', 'volkswagen', 'vw', 'peugeot', 'renault', 'fiat', 'jeep', 'subaru', 'mitsubishi', 'suzuki', 'lexus', 'chevy'],
   health: ['salud', 'health', 'médico', 'medical', 'hospital', 'doctor', 'medicina', 'hospitalización', 'clínica', 'eps'],
 };
 
@@ -170,7 +170,7 @@ export function analyzeContextNeeds(
             petAge: /(\d+|años?|meses?|cachorro|adulto|mayor)/i.test(lowerConversation),
         },
         auto: {
-            brand: !!memory?.vehicle?.make || /(marca|toyota|honda|ford|chevrolet|nissan)/i.test(lowerConversation),
+            brand: !!memory?.vehicle?.make || /(marca|toyota|honda|ford|chevrolet|nissan|mazda|kia|hyundai|bmw|mercedes|audi|volkswagen|vw|renault|fiat)/i.test(lowerConversation),
             model: !!memory?.vehicle?.model || /(modelo|\d{4}|año)/i.test(lowerConversation),
         },
         health: {

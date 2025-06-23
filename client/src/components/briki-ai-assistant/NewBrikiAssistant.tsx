@@ -24,7 +24,6 @@ interface Message {
   timestamp: Date;
   isLoading?: boolean;
   suggestedPlans?: InsurancePlan[];
-  // NEW: Add summary for memory
   plansSummary?: string;
 }
 
@@ -236,7 +235,8 @@ const NewBrikiAssistant: React.FC = () => {
       const response = await sendMessageToAI(messageToSend, conversationHistory);
 
       // Debug logging for data flow analysis
-      console.log('🔍 NewBrikiAssistant - AI Response received:', {
+      console.log('DEBUG - Plans assignment:', {
+        rawResponse: response,
         hasMessage: !!(response.message || response.response),
         hasSuggestedPlans: !!response.suggestedPlans,
         planCount: response.suggestedPlans?.length || 0,
@@ -252,18 +252,32 @@ const NewBrikiAssistant: React.FC = () => {
         setPendingQuestions([]); // Limpiar preguntas si ya no hay
       }
 
+      // Inside handleSendMessage, after getting AI response
+      console.log('🔍 AI Response:', {
+        rawResponse: response,
+        hasPlans: !!response.suggestedPlans,
+        planCount: response.suggestedPlans?.length || 0,
+        plans: response.suggestedPlans
+      });
+
       // Trust backend decision - if plans are returned, show them
-      const finalSuggestedPlans = response.suggestedPlans;
+      const finalSuggestedPlans = response.suggestedPlans || [];
+
+      console.log('✅ Final plans state:', {
+        plans: finalSuggestedPlans,
+        count: finalSuggestedPlans.length,
+        firstPlan: finalSuggestedPlans[0]
+      });
 
       // Update loading message with response and memory
-      setMessages(prev => 
-        prev.map(msg => 
+      setMessages(prev => {
+        const newMessages = prev.map(msg => 
           msg.isLoading 
             ? {
                 ...msg,
                 id: `assistant-${Date.now()}`,
                 content: response.message || response.response || "No pude generar una respuesta.",
-                suggestedPlans: finalSuggestedPlans || [],
+                suggestedPlans: finalSuggestedPlans,
                 isLoading: false,
                 timestamp: new Date(),
                 plansSummary: (finalSuggestedPlans && finalSuggestedPlans.length > 0) 
@@ -271,8 +285,14 @@ const NewBrikiAssistant: React.FC = () => {
                   : undefined
               }
             : msg
-        )
-      );
+        );
+        console.log('🔄 Updated messages:', newMessages.map(m => ({
+          id: m.id,
+          hasPlans: !!m.suggestedPlans,
+          planCount: m.suggestedPlans?.length || 0
+        })));
+        return newMessages;
+      });
 
     } catch (error) {
       console.error('Error sending message:', error);
@@ -367,32 +387,33 @@ const NewBrikiAssistant: React.FC = () => {
           )}
 
       {/* Messages */}
-          {messages.map((message) => (
-        <ChatBubble
-              key={message.id}
-          role={message.role}
-          content={message.content}
-          isLoading={message.isLoading}
-          timestamp={message.timestamp}
-        >
-          {/* Show SuggestedPlans if message has plans */}
-          {message.role === 'assistant' && message.suggestedPlans && message.suggestedPlans.length > 0 && (
-            <ScrollArea className="mt-4 max-h-96">
-                        <Suspense
-                          fallback={
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                              {[1, 2].map((i) => (
-                      <div key={i} className="h-60 w-full animate-pulse rounded-2xl bg-gray-100" />
-                              ))}
-                            </div>
-                          }
-                        >
-                          <SuggestedPlans plans={message.suggestedPlans} />
-                        </Suspense>
-                      </ScrollArea>
-                    )}
-        </ChatBubble>
-          ))}
+          {messages.map((message) => {
+            console.log("🔍 Message from AI:", message);
+            return (
+              <ChatBubble
+                key={message.id}
+                role={message.role}
+                content={message.content}
+                isLoading={message.isLoading}
+                timestamp={message.timestamp}
+              >
+                {/* Show SuggestedPlans if message has plans */}
+                {message.role === 'assistant' && message.suggestedPlans && message.suggestedPlans.length > 0 && (
+                  <ScrollArea className="mt-4 max-h-96">
+                    <Suspense fallback={
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {[1, 2].map((i) => (
+                          <div key={i} className="h-60 w-full animate-pulse rounded-2xl bg-gray-100" />
+                        ))}
+                      </div>
+                    }>
+                      <SuggestedPlans plans={message.suggestedPlans} />
+                    </Suspense>
+                  </ScrollArea>
+                )}
+              </ChatBubble>
+            );
+          })}
       
           <div ref={messagesEndRef} />
       
