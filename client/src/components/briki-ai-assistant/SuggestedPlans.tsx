@@ -1,12 +1,10 @@
 import React from 'react';
-import NewPlanCard, { InsurancePlan } from '@/components/briki-ai-assistant/NewPlanCard';
-import { Skeleton } from '@/components/ui/skeleton';
-import EmptyState from '@/components/empty-state';
+import PlanCard, { InsurancePlan } from './PlanCard';
 import { useToast } from '@/hooks/use-toast';
 import { useLocation } from 'wouter';
 
 interface SuggestedPlansProps {
-  plans?: InsurancePlan[]; // undefined while loading
+  plans: InsurancePlan[];
 }
 
 const SuggestedPlans: React.FC<SuggestedPlansProps> = ({ plans }) => {
@@ -21,55 +19,34 @@ const SuggestedPlans: React.FC<SuggestedPlansProps> = ({ plans }) => {
     fullPlans: plans
   });
 
-  // Loading state – show skeletons while plans are undefined
-  if (typeof plans === 'undefined') {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 mb-3" data-testid="plan-skeletons">
-        {[1, 2].map((i) => (
-          <Skeleton key={i} className="h-60 rounded-2xl" />
-        ))}
-      </div>
-    );
+  // Si no hay planes, no renderizar nada
+  if (!plans || plans.length === 0) {
+    console.log('❌ SuggestedPlans - No plans to render, returning null');
+    return null;
   }
 
-  // Empty state when no plans found
-  if (plans.length === 0) {
-    return (
-      <EmptyState
-        title="No encontramos planes"
-        description="Intenta ajustar tus preferencias o proporcionar más información para mostrar recomendaciones."
-      />
-    );
-  }
-  
-  const handleViewDetails = (planId: number) => {
+  const handleViewDetails = (planId: string) => {
     // Por ahora solo mostraremos un toast, pero podríamos navegar a una página de detalles
     toast({
-      title: "Viendo detalles del plan",
-      description: `Esta acción te llevaría a la página de detalles del plan con ID: ${planId}.`,
+      title: "Detalles del plan",
+      description: `Viendo detalles del plan ${planId}`,
     });
   };
 
-  const handleQuote = (planId: number) => {
+  const handleQuote = (planId: string) => {
     // Navegar a la página de cotización con el ID del plan
-    toast({
-      title: "Iniciando cotización",
-      description: `Navegando a la página de cotización para el plan ID: ${planId}.`,
-    });
     navigate(`/quote?planId=${planId}`);
   };
 
   return (
-    <div className="mt-4 mb-3">
-      <div className="flex items-center gap-2 text-sm font-medium mb-3 text-gray-700 dark:text-gray-300">
-        <div className="w-1 h-4 bg-gradient-to-b from-blue-500 to-cyan-500 rounded-full"></div>
-        Planes recomendados para ti:
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {plans.map((plan) => (
-          <NewPlanCard
+    <div className="mt-3 mb-2">
+      <div className="text-sm font-medium mb-2">Planes recomendados:</div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+        {plans.map((plan, index) => (
+          <PlanCard
             key={plan.id}
             plan={plan}
+            highlighted={index === 0} // Destacar el primer plan como el más recomendado
             onViewDetails={handleViewDetails}
             onQuote={handleQuote}
           />
