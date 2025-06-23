@@ -359,17 +359,17 @@ const NewBrikiAssistant: React.FC = () => {
       className="h-full max-h-[700px] lg:max-h-[800px]"
       input={inputArea}
     >
-      {showWelcomeCard && <WelcomeCard onSendMessage={handleSendMessage} />}
+          {showWelcomeCard && <WelcomeCard onSendMessage={handleSendMessage} />}
 
       {/* Suggested questions block */}
-      {pendingQuestions.length > 0 && (
-        <SuggestedQuestions questions={pendingQuestions} />
-      )}
+          {pendingQuestions.length > 0 && (
+            <SuggestedQuestions questions={pendingQuestions} />
+          )}
 
       {/* Messages */}
-      {messages.map((message) => (
+          {messages.map((message) => (
         <ChatBubble
-          key={message.id}
+              key={message.id}
           role={message.role}
           content={message.content}
           isLoading={message.isLoading}
@@ -378,23 +378,23 @@ const NewBrikiAssistant: React.FC = () => {
           {/* Show SuggestedPlans if message has plans */}
           {message.role === 'assistant' && message.suggestedPlans && message.suggestedPlans.length > 0 && (
             <ScrollArea className="mt-4 max-h-96">
-              <Suspense
-                fallback={
+                        <Suspense
+                          fallback={
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {[1, 2].map((i) => (
+                              {[1, 2].map((i) => (
                       <div key={i} className="h-60 w-full animate-pulse rounded-2xl bg-gray-100" />
-                    ))}
-                  </div>
-                }
-              >
-                <SuggestedPlans plans={message.suggestedPlans} />
-              </Suspense>
-            </ScrollArea>
-          )}
+                              ))}
+                            </div>
+                          }
+                        >
+                          <SuggestedPlans plans={message.suggestedPlans} />
+                        </Suspense>
+                      </ScrollArea>
+                    )}
         </ChatBubble>
-      ))}
+          ))}
       
-      <div ref={messagesEndRef} />
+          <div ref={messagesEndRef} />
       
       {/* Typing indicator */}
       {isLoading && (
@@ -422,7 +422,7 @@ const NewBrikiAssistant: React.FC = () => {
           </div>
           <span>Briki is typing...</span>
         </motion.div>
-      )}
+            )}
     </ConversationContainer>
   );
 };

@@ -167,7 +167,7 @@ export default function DashboardAuthenticated() {
                     <Sparkles className="h-6 w-6 text-white" />
                   </div>
                   <h3 className="text-lg font-semibold">AI Insights</h3>
-                </div>
+              </div>
                 <p className="text-white/90 mb-4">
                   Based on your profile, you could save up to $320/year by bundling your auto and health policies.
                 </p>
@@ -191,23 +191,23 @@ export default function DashboardAuthenticated() {
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
                     <span className="text-green-600 dark:text-green-400 text-sm font-semibold">✓</span>
-                  </div>
+          </div>
                   <span className="text-sm text-gray-600 dark:text-gray-400">50K+ Happy Users</span>
-                </div>
+        </div>
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
                     <span className="text-green-600 dark:text-green-400 text-sm font-semibold">✓</span>
-                  </div>
+      </div>
                   <span className="text-sm text-gray-600 dark:text-gray-400">98% Satisfaction Rate</span>
-                </div>
+        </div>
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
                     <span className="text-green-600 dark:text-green-400 text-sm font-semibold">✓</span>
                   </div>
                   <span className="text-sm text-gray-600 dark:text-gray-400">AI-Powered Savings</span>
-                </div>
+        </div>
               </div>
-            </div>
+              </div>
           </motion.div>
         </div>
       </SectionContainer>

@@ -175,8 +175,8 @@ export default function AuthPageEnhanced() {
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
+              transition={{ duration: 0.6 }}
+            >
             <h1 className="text-5xl font-bold mb-2">Briki</h1>
             <p className="text-xl text-white/80">AI-Powered Insurance, Simplified</p>
           </motion.div>
@@ -197,8 +197,8 @@ export default function AuthPageEnhanced() {
               ].map((feature, index) => (
                 <motion.div
                   key={index}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3 + (index * 0.1) }}
                   className="flex items-start gap-4"
                 >
@@ -211,11 +211,11 @@ export default function AuthPageEnhanced() {
                   </div>
                 </motion.div>
               ))}
-            </div>
+          </div>
           </motion.div>
 
           {/* Testimonial */}
-          <motion.div
+          <motion.div 
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.5 }}
@@ -224,7 +224,7 @@ export default function AuthPageEnhanced() {
             <Quote className="h-8 w-8 text-white/50 mb-4" />
             <p className="text-lg italic mb-4">
               "Briki helped me save 30% on my car insurance while getting better coverage. The AI assistant made everything so simple!"
-            </p>
+              </p>
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
                 <User className="h-5 w-5 text-white" />
@@ -235,7 +235,7 @@ export default function AuthPageEnhanced() {
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} className="h-4 w-4 fill-[#00C7C4] text-[#00C7C4]" />
                   ))}
-                </div>
+              </div>
               </div>
             </div>
           </motion.div>
@@ -257,7 +257,7 @@ export default function AuthPageEnhanced() {
         </motion.button>
 
         {/* Form Container */}
-        <motion.div
+        <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
@@ -287,7 +287,7 @@ export default function AuthPageEnhanced() {
                   <span className="px-4 bg-white text-gray-500">Or continue with</span>
                 </div>
               </div>
-            </div>
+          </div>
 
             {/* Tabs */}
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -302,40 +302,40 @@ export default function AuthPageEnhanced() {
 
               {/* Login Form */}
               <TabsContent value="login">
-                <Form {...loginForm}>
+                    <Form {...loginForm}>
                   <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
-                    <FormField
-                      control={loginForm.control}
-                      name="username"
-                      render={({ field }) => (
-                        <FormItem>
+                        <FormField
+                          control={loginForm.control}
+                          name="username"
+                          render={({ field }) => (
+                            <FormItem>
                           <FormLabel>Username or Email</FormLabel>
-                          <FormControl>
-                            <div className="relative">
+                              <FormControl>
+                                <div className="relative">
                               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                              <Input
-                                {...field}
+                                  <Input 
+                                    {...field} 
                                 placeholder="john@example.com"
                                 className="pl-10 h-12 border-gray-300 focus:border-[#00C7C4] focus:ring-[#00C7C4]"
-                              />
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                                  />
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
 
-                    <FormField
-                      control={loginForm.control}
-                      name="password"
-                      render={({ field }) => (
-                        <FormItem>
+                        <FormField
+                          control={loginForm.control}
+                          name="password"
+                          render={({ field }) => (
+                            <FormItem>
                           <FormLabel>Password</FormLabel>
-                          <FormControl>
-                            <div className="relative">
-                              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                              <Input
-                                {...field}
+                              <FormControl>
+                                <div className="relative">
+                                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                                  <Input 
+                                    {...field} 
                                 type={showPassword ? "text" : "password"}
                                 placeholder="••••••••"
                                 className="pl-10 pr-10 h-12 border-gray-300 focus:border-[#00C7C4] focus:ring-[#00C7C4]"
@@ -347,38 +347,38 @@ export default function AuthPageEnhanced() {
                               >
                                 {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                               </button>
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
 
-                    <div className="flex items-center justify-between">
-                      <FormField
-                        control={loginForm.control}
-                        name="rememberMe"
-                        render={({ field }) => (
+                        <div className="flex items-center justify-between">
+                          <FormField
+                            control={loginForm.control}
+                            name="rememberMe"
+                            render={({ field }) => (
                           <FormItem className="flex items-center space-x-2">
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                              />
-                            </FormControl>
+                                <FormControl>
+                                  <Checkbox
+                                    checked={field.value}
+                                    onCheckedChange={field.onChange}
+                                  />
+                                </FormControl>
                             <FormLabel className="text-sm font-normal cursor-pointer">
-                              Remember me
-                            </FormLabel>
-                          </FormItem>
-                        )}
-                      />
+                                  Remember me
+                                </FormLabel>
+                              </FormItem>
+                            )}
+                          />
                       <a href="/forgot-password" className="text-sm text-[#0077B6] hover:text-[#00C7C4]">
-                        Forgot password?
+                            Forgot password?
                       </a>
-                    </div>
+                        </div>
 
                     <GradientButton
-                      type="submit"
+                          type="submit"
                       variant="primary"
                       size="lg"
                       className="w-full"
@@ -387,68 +387,68 @@ export default function AuthPageEnhanced() {
                       <span>Sign In</span>
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </GradientButton>
-                  </form>
-                </Form>
-              </TabsContent>
+                      </form>
+                    </Form>
+                </TabsContent>
 
               {/* Register Form */}
               <TabsContent value="register">
-                <Form {...registerForm}>
+                    <Form {...registerForm}>
                   <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-4">
-                    <FormField
-                      control={registerForm.control}
-                      name="username"
-                      render={({ field }) => (
-                        <FormItem>
+                        <FormField
+                          control={registerForm.control}
+                          name="username"
+                          render={({ field }) => (
+                            <FormItem>
                           <FormLabel>Username</FormLabel>
-                          <FormControl>
-                            <div className="relative">
-                              <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                              <Input
-                                {...field}
+                              <FormControl>
+                                <div className="relative">
+                                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                                  <Input 
+                                    {...field} 
                                 placeholder="johndoe"
                                 className="pl-10 h-12 border-gray-300 focus:border-[#00C7C4] focus:ring-[#00C7C4]"
-                              />
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                                  />
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
 
-                    <FormField
-                      control={registerForm.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
+                        <FormField
+                          control={registerForm.control}
+                          name="email"
+                          render={({ field }) => (
+                            <FormItem>
                           <FormLabel>Email</FormLabel>
-                          <FormControl>
-                            <div className="relative">
-                              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                              <Input
+                              <FormControl>
+                                <div className="relative">
+                                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                                  <Input 
                                 {...field}
-                                type="email"
+                                    type="email"
                                 placeholder="john@example.com"
                                 className="pl-10 h-12 border-gray-300 focus:border-[#00C7C4] focus:ring-[#00C7C4]"
-                              />
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                                  />
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
 
-                    <FormField
-                      control={registerForm.control}
-                      name="password"
-                      render={({ field }) => (
-                        <FormItem>
+                        <FormField
+                          control={registerForm.control}
+                          name="password"
+                          render={({ field }) => (
+                            <FormItem>
                           <FormLabel>Password</FormLabel>
-                          <FormControl>
-                            <div className="relative">
-                              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                              <Input
-                                {...field}
+                              <FormControl>
+                                <div className="relative">
+                                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                                  <Input 
+                                    {...field} 
                                 type={showPassword ? "text" : "password"}
                                 placeholder="••••••••"
                                 className="pl-10 pr-10 h-12 border-gray-300 focus:border-[#00C7C4] focus:ring-[#00C7C4]"
@@ -460,63 +460,63 @@ export default function AuthPageEnhanced() {
                               >
                                 {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                               </button>
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
 
-                    <FormField
-                      control={registerForm.control}
-                      name="confirmPassword"
-                      render={({ field }) => (
-                        <FormItem>
+                        <FormField
+                          control={registerForm.control}
+                          name="confirmPassword"
+                          render={({ field }) => (
+                            <FormItem>
                           <FormLabel>Confirm Password</FormLabel>
-                          <FormControl>
-                            <div className="relative">
-                              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                              <Input
+                              <FormControl>
+                                <div className="relative">
+                                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                                  <Input 
                                 {...field}
-                                type="password"
+                                    type="password"
                                 placeholder="••••••••"
                                 className="pl-10 h-12 border-gray-300 focus:border-[#00C7C4] focus:ring-[#00C7C4]"
-                              />
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                                  />
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
 
-                    <FormField
-                      control={registerForm.control}
-                      name="terms"
-                      render={({ field }) => (
+                        <FormField
+                          control={registerForm.control}
+                          name="terms"
+                          render={({ field }) => (
                         <FormItem className="flex items-start space-x-2">
-                          <FormControl>
-                            <Checkbox
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
                               className="mt-1"
-                            />
-                          </FormControl>
+                                />
+                              </FormControl>
                           <FormLabel className="text-sm font-normal leading-relaxed">
-                            I agree to the{" "}
+                                  I agree to the{" "}
                             <a href="/terms" className="text-[#0077B6] hover:text-[#00C7C4]">
                               Terms and Conditions
-                            </a>{" "}
-                            and{" "}
+                                  </a>{" "}
+                                  and{" "}
                             <a href="/privacy" className="text-[#0077B6] hover:text-[#00C7C4]">
-                              Privacy Policy
-                            </a>
-                          </FormLabel>
-                        </FormItem>
-                      )}
-                    />
+                                    Privacy Policy
+                                  </a>
+                                </FormLabel>
+                            </FormItem>
+                          )}
+                        />
 
                     <GradientButton
-                      type="submit"
+                          type="submit"
                       variant="primary"
                       size="lg"
                       className="w-full"
@@ -525,12 +525,12 @@ export default function AuthPageEnhanced() {
                       <span>Create Account</span>
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </GradientButton>
-                  </form>
-                </Form>
-              </TabsContent>
+                      </form>
+                    </Form>
+                </TabsContent>
             </Tabs>
 
-            {/* Footer */}
+          {/* Footer */}
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
                 {activeTab === "login" ? (
@@ -572,7 +572,7 @@ export default function AuthPageEnhanced() {
             <div className="flex items-center gap-2">
               <Shield className="h-4 w-4 text-blue-500" />
               <span>Data Protected</span>
-            </div>
+          </div>
           </motion.div>
         </motion.div>
       </div>

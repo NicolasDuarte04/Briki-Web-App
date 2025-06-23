@@ -25,7 +25,7 @@ export default function AskBrikiAIPage() {
             className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden"
           >
             <div className="h-[700px] lg:h-[800px]">
-              <NewBrikiAssistant />
+            <NewBrikiAssistant />
             </div>
           </motion.div>
         </div>

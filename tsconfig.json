@@ -30,5 +30,9 @@
     "shared/**/*.ts",
     "server/**/*.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    "client/src/archive/**/*",
+    "client/src/hooks/use-auth-simple.ts"
+  ]
 }
