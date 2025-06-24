@@ -25,7 +25,9 @@ function shouldShowInsurancePlans(userMessage: string): boolean {
     'seguro', 'seguros', 'asegurar', 'proteger', 'cobertura', 'proteccion',
     'compre', 'tengo un', 'tengo una', 'mi carro', 'mi auto', 'mi perro', 'mi gato',
     'viajo', 'viaje', 'viajar', 'vacaciones', 'mascota', 'vespa', 'moto', 'vehiculo',
-    'necesito', 'busco', 'quiero', 'recomienda', 'opciones', 'planes'
+    'necesito', 'busco', 'quiero', 'recomienda', 'opciones', 'planes',
+    // Add car brands for better auto detection
+    'mazda', 'toyota', 'chevrolet', 'nissan', 'honda', 'ford', 'hyundai', 'kia', 'volkswagen', 'renault'
   ];
   
   return insuranceIntentKeywords.some(keyword => message.includes(keyword));
@@ -55,8 +57,12 @@ export function generateMockResponse(
   if (!category) {
     const lowerQuery = query.toLowerCase();
     
-    if (lowerQuery.includes('moto') || lowerQuery.includes('carro') || lowerQuery.includes('auto') || 
-        lowerQuery.includes('vehículo') || lowerQuery.includes('coche') || lowerQuery.includes('scooter')) {
+    // Enhanced auto detection with car brands
+    const autoKeywords = ['moto', 'carro', 'auto', 'vehículo', 'coche', 'scooter', 'vehiculo'];
+    const carBrands = ['mazda', 'toyota', 'chevrolet', 'nissan', 'honda', 'ford', 'hyundai', 'kia', 'volkswagen', 'renault'];
+    
+    if (autoKeywords.some(keyword => lowerQuery.includes(keyword)) || 
+        carBrands.some(brand => lowerQuery.includes(brand))) {
       category = 'auto';
     } else if (lowerQuery.includes('viaje') || lowerQuery.includes('viajar') || lowerQuery.includes('vacaciones') || 
                lowerQuery.includes('turismo') || lowerQuery.includes('hotel')) {
