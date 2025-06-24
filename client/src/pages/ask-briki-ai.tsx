@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet';
 import NewBrikiAssistant from '@/components/briki-ai-assistant/NewBrikiAssistant';
 import { PublicLayout } from '@/components/layout/public-layout';
+import { ComparisonSidebar } from '@/components/comparison/ComparisonSidebar';
 
 export default function AskBrikiAIPage() {
   return (
@@ -16,18 +17,25 @@ export default function AskBrikiAIPage() {
       </Helmet>
 
       <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Simplified Chat Component */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.4 }}
-            className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden"
-          >
-            <div className="h-[700px] lg:h-[800px]">
-            <NewBrikiAssistant />
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            {/* Briki Assistant (Left Column) */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="lg:col-span-2 bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden"
+            >
+              <div className="h-[800px] lg:h-[850px]">
+                <NewBrikiAssistant />
+              </div>
+            </motion.div>
+
+            {/* Comparison Sidebar (Right Column) */}
+            <div className="hidden lg:block">
+              <ComparisonSidebar />
             </div>
-          </motion.div>
+          </div>
         </div>
       </main>
     </PublicLayout>

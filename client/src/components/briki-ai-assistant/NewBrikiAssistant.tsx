@@ -2,10 +2,11 @@ import React, { useState, useEffect, useRef, Suspense, lazy } from 'react';
 import { motion } from 'framer-motion';
 import { GradientButton } from '@/components/ui';
 import { Input } from '@/components/ui/input';
-import { Loader2, Send, Bot } from 'lucide-react';
+import { Loader2, Send, Bot, RefreshCw, CornerDownLeft, X } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
-import { sendMessageToAI, getMockResponse, APIMessage } from '@/services/openai-service';
+import { apiRequest } from '@/lib/api';
+import type { APIMessage, AIResponse, AssistantMemory } from '@/types/chat';
 import WelcomeCard from './WelcomeCard';
 import { InsurancePlan } from './PlanCard';
 import SuggestedQuestions from './SuggestedQuestions';
@@ -13,6 +14,11 @@ import { detectInsuranceCategory, hasSufficientContext } from '@shared/context-u
 import { extractContextFromMessage } from "@/utils/context-utils";
 import ChatBubble from './ChatBubble';
 import ConversationContainer from './ConversationContainer';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/hooks/use-auth';
+import { useCompareStore } from '@/store/compare-store';
+import { AssistantEmptyState } from './AssistantEmptyState';
+import { ComparisonSidebar } from '../comparison/ComparisonSidebar';
 
 // Lazy load the SuggestedPlans component
 const SuggestedPlans = lazy(() => import('./SuggestedPlans'));
@@ -96,6 +102,11 @@ const NewBrikiAssistant: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  const [isAfterReset, setIsAfterReset] = useState(true);
+  const [showEmptyState, setShowEmptyState] = useState<'welcome' | 'no-plans' | 'fallback' | null>('welcome');
+  
+  const inputRef = useRef<HTMLInputElement>(null);
+  const plansToCompare = useCompareStore(state => state.plansToCompare);
 
   // Suggested prompts
   const suggestedPrompts = [
@@ -138,12 +149,29 @@ const NewBrikiAssistant: React.FC = () => {
     }
   };
 
+  const handleReset = () => {
+    setMessages([]);
+    setUserContext({});
+    setIsLoading(false);
+    setPendingQuestions([]);
+    setIsAfterReset(true);
+    setShowEmptyState('welcome');
+    if (inputRef.current) {
+      inputRef.current.value = '';
+    }
+    toast({
+      title: "Conversación reiniciada",
+      description: "Puedes empezar de nuevo.",
+    });
+  };
+
   const handleSendMessage = async (messageText?: string) => {
     const messageToSend = messageText || input;
     if (!messageToSend.trim()) return;
 
     setShowWelcomeCard(false);
     setPendingQuestions([]);
+    setShowEmptyState(null);
 
     // Accumulate context across multiple turns - preserve all previous context
     const newContext = extractContextFromMessage(messageToSend, userContext);
@@ -232,7 +260,7 @@ const NewBrikiAssistant: React.FC = () => {
       }
 
       // Get AI response with conversation history
-      const response = await sendMessageToAI(messageToSend, conversationHistory);
+      const response = await sendMessageToAI(messageToSend, conversationHistory, mergedContext, isAfterReset);
 
       // Debug logging for data flow analysis
       console.log('DEBUG - Plans assignment:', {
@@ -248,6 +276,7 @@ const NewBrikiAssistant: React.FC = () => {
       // Manejar preguntas sugeridas si falta contexto
       if (response.needsMoreContext && Array.isArray(response.suggestedQuestions) && response.suggestedQuestions.length > 0) {
         setPendingQuestions(response.suggestedQuestions);
+        setShowEmptyState('fallback');
       } else {
         setPendingQuestions([]); // Limpiar preguntas si ya no hay
       }
@@ -293,6 +322,10 @@ const NewBrikiAssistant: React.FC = () => {
         })));
         return newMessages;
       });
+
+      if (response.memory) {
+        setUserContext(prev => ({ ...prev, ...response.memory }));
+      }
 
     } catch (error) {
       console.error('Error sending message:', error);
@@ -375,76 +408,113 @@ const NewBrikiAssistant: React.FC = () => {
   );
 
   return (
-    <ConversationContainer
-      className="h-full max-h-[700px] lg:max-h-[800px]"
-      input={inputArea}
-    >
-          {showWelcomeCard && <WelcomeCard onSendMessage={handleSendMessage} />}
-
-      {/* Suggested questions block */}
-          {pendingQuestions.length > 0 && (
-            <SuggestedQuestions questions={pendingQuestions} />
-          )}
-
-      {/* Messages */}
-          {messages.map((message) => {
-            console.log("🔍 Message from AI:", message);
-            return (
-              <ChatBubble
-                key={message.id}
-                role={message.role}
-                content={message.content}
-                isLoading={message.isLoading}
-                timestamp={message.timestamp}
-              >
-                {/* Show SuggestedPlans if message has plans */}
-                {message.role === 'assistant' && message.suggestedPlans && message.suggestedPlans.length > 0 && (
-                  <ScrollArea className="mt-4 max-h-96">
-                    <Suspense fallback={
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {[1, 2].map((i) => (
-                          <div key={i} className="h-60 w-full animate-pulse rounded-2xl bg-gray-100" />
-                        ))}
-                      </div>
-                    }>
-                      <SuggestedPlans plans={message.suggestedPlans} />
-                    </Suspense>
-                  </ScrollArea>
-                )}
-              </ChatBubble>
-            );
-          })}
-      
-          <div ref={messagesEndRef} />
-      
-      {/* Typing indicator */}
-      {isLoading && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-2 text-sm text-gray-500 px-2"
-        >
-          <div className="flex gap-1">
-            <motion.div
-              animate={{ y: [0, -5, 0] }}
-              transition={{ duration: 0.6, repeat: Infinity, delay: 0 }}
-              className="w-2 h-2 bg-[#0077B6] rounded-full"
-            />
-            <motion.div
-              animate={{ y: [0, -5, 0] }}
-              transition={{ duration: 0.6, repeat: Infinity, delay: 0.2 }}
-              className="w-2 h-2 bg-[#0077B6] rounded-full"
-            />
-            <motion.div
-              animate={{ y: [0, -5, 0] }}
-              transition={{ duration: 0.6, repeat: Infinity, delay: 0.4 }}
-              className="w-2 h-2 bg-[#0077B6] rounded-full"
-            />
+    <div className="flex h-full bg-gray-50">
+      <div className="flex flex-col flex-1">
+        <div className="relative flex-1 flex flex-col h-full max-h-full bg-white rounded-lg shadow-sm border m-4">
+          <div className="flex items-center justify-between p-3 border-b">
+            <h3 className="text-base font-semibold text-gray-800">Asistente Briki</h3>
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="sm" onClick={handleReset}>
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Comenzar de nuevo
+              </Button>
+              {plansToCompare.length > 0 && (
+                <Button variant="ghost" size="sm" onClick={() => {
+                  // Implement the logic to open the comparison sidebar
+                }}>
+                  Comparar Planes
+                </Button>
+              )}
+            </div>
           </div>
-          <span>Briki is typing...</span>
-        </motion.div>
-            )}
-    </ConversationContainer>
+
+          <ScrollArea className="flex-1">
+            <ConversationContainer
+              className="h-full max-h-[700px] lg:max-h-[800px] mx-auto max-w-5xl"
+              input={inputArea}
+            >
+              {showWelcomeCard && <WelcomeCard onSendMessage={handleSendMessage} />}
+
+              {/* Suggested questions block */}
+              {pendingQuestions.length > 0 && (
+                <SuggestedQuestions questions={pendingQuestions} />
+              )}
+
+              {/* Messages */}
+              {messages.map((message) => {
+                console.log("🔍 Message from AI:", message);
+                return (
+                  <ChatBubble
+                    key={message.id}
+                    role={message.role}
+                    content={message.content}
+                    isLoading={message.isLoading}
+                    timestamp={message.timestamp}
+                  >
+                    {/* Show SuggestedPlans if message has plans */}
+                    {message.role === 'assistant' && message.suggestedPlans && message.suggestedPlans.length > 0 && (
+                      <ScrollArea className="mt-4 max-h-96">
+                        <Suspense fallback={
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {[1, 2].map((i) => (
+                              <div key={i} className="h-60 w-full animate-pulse rounded-2xl bg-gray-100" />
+                            ))}
+                          </div>
+                        }>
+                          <SuggestedPlans plans={message.suggestedPlans} />
+                        </Suspense>
+                      </ScrollArea>
+                    )}
+                  </ChatBubble>
+                );
+              })}
+
+              {showEmptyState && (
+                <AssistantEmptyState
+                  type={showEmptyState}
+                  onAction={(query) => {
+                    if (inputRef.current) {
+                      inputRef.current.value = query;
+                      handleSendMessage(query);
+                    }
+                  }}
+                />
+              )}
+            </ConversationContainer>
+          </ScrollArea>
+
+          <div className="p-4 border-t bg-white">
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              handleSendMessage();
+            }} className="flex items-center space-x-2">
+              <Input
+                ref={inputRef}
+                type="text"
+                placeholder="Escribe tu consulta aquí..."
+                className="flex-1"
+                disabled={isLoading}
+              />
+              <GradientButton
+                type="submit"
+                disabled={isLoading || !input.trim()}
+                size="lg"
+                loading={isLoading}
+                icon={!isLoading && <Send className="h-5 w-5" />}
+                className="rounded-2xl px-6"
+              >
+                {isLoading ? 'Pensando...' : 'Enviar'}
+              </GradientButton>
+            </form>
+          </div>
+        </div>
+      </div>
+      {plansToCompare.length > 0 && (
+        <div className="w-1/3 max-w-md hidden lg:block">
+          <ComparisonSidebar />
+        </div>
+      )}
+    </div>
   );
 };
 

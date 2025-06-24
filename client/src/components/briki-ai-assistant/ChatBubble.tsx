@@ -61,7 +61,7 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({
 
       {/* Message Bubble */}
       <div className={cn(
-        "flex flex-col gap-1 max-w-[70%]",
+        "flex flex-col gap-1 max-w-[80%]",
         isUser && "items-end"
       )}>
         {/* Message Content */}
@@ -69,7 +69,7 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({
           <motion.div
             initial={{ x: 20 }}
             animate={{ x: 0 }}
-            className="bg-gradient-to-r from-[#00C7C4] to-[#0077B6] text-white rounded-2xl rounded-tr-sm px-4 py-3 shadow-md"
+            className="bg-gradient-to-r from-[#00C7C4] to-[#0077B6] text-white rounded-2xl rounded-tr-sm px-4 py-2 shadow-md"
           >
             {isLoading ? (
               <div className="flex items-center gap-2">
@@ -77,11 +77,11 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({
                 <span className="text-sm">Sending...</span>
               </div>
             ) : (
-              <p className="text-sm leading-relaxed whitespace-pre-wrap">{content}</p>
+              <p className="text-sm leading-normal whitespace-pre-wrap">{content}</p>
             )}
           </motion.div>
         ) : (
-          <div className="bg-gray-50 rounded-2xl rounded-tl-sm px-4 py-3">
+          <div className="bg-gray-50 rounded-2xl rounded-tl-sm px-4 py-2">
             {isLoading ? (
               <div className="flex items-center gap-3">
                 <div className="flex gap-1">
@@ -105,7 +105,7 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({
               </div>
             ) : (
               <div>
-                <p className="text-sm leading-relaxed text-gray-700 whitespace-pre-wrap">
+                <p className="text-sm leading-normal text-gray-700 whitespace-pre-wrap">
                   {content}
                 </p>
                 {/* Additional content like plan cards */}

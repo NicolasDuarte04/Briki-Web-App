@@ -27,6 +27,7 @@ import { insurancePlans, InsuranceCategory } from "@shared/schema";
 import { analyzeContextNeeds, detectInsuranceCategory, ContextAnalysisResult } from "@shared/context-utils";
 import fetch from 'node-fetch';
 import { AssistantMemory } from "@shared/types/assistant";
+import { getLatestUserContext } from "./context-service";
 
 // Define a simpler, unified plan type for the assistant's purpose
 interface InsurancePlan {
@@ -74,9 +75,25 @@ export async function generateAssistantResponse(
   conversationHistory: AssistantMessage[] = [],
   memory: AssistantMemory = {},
   userCountry: string = "Colombia",
+  userId?: string | null,
+  resetContext: boolean = false,
 ): Promise<AssistantResponse> {
   const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   let updatedMemory = { ...memory };
+
+  // Detect category first to decide on special actions
+  const category = detectInsuranceCategory(userMessage);
+
+  // --- PERSISTENT MEMORY REHYDRATION ---
+  // If this is the start of a conversation, try to load the last known context.
+  if (userId && !resetContext && (!conversationHistory || conversationHistory.length === 0)) {
+    console.log(`[Memory Rehydration][${requestId}] New conversation started for user ${userId}. Checking for persistent context...`);
+    const rehydratedMemory = await getLatestUserContext(userId, category);
+    if (rehydratedMemory) {
+      updatedMemory = { ...updatedMemory, ...rehydratedMemory };
+      console.log(`[Memory Rehydration][${requestId}] Context successfully rehydrated for user ${userId}.`);
+    }
+  }
 
   console.log(
     `[OpenAI][${requestId}] Starting request with real data integration:`,
@@ -89,18 +106,28 @@ export async function generateAssistantResponse(
   );
 
   try {
-    // Detect category first to decide on special actions
-    const category = detectInsuranceCategory(userMessage);
-
     // If auto insurance, check for license plate and lookup if needed
     if (category === 'auto' && !updatedMemory.vehicle) {
       const plate = extractPlate(userMessage);
       if (plate) {
         console.log(`[Vehicle Lookup][${requestId}] Plate detected: ${plate}. Fetching details...`);
         try {
-          const vehicleData = await lookupVehicleByPlate(plate);
+          // Use the new, centralized vehicle lookup endpoint
+          const response = await fetch(`http://localhost:5050/api/vehicle/lookup?plate=${plate}`);
+          if (!response.ok) {
+            throw new Error(`Vehicle lookup failed with status: ${response.status}`);
+          }
+          const vehicleData = await response.json();
+
           if (vehicleData) {
-            updatedMemory.vehicle = vehicleData;
+            // Standardize the memory structure
+            updatedMemory.vehicle = {
+              plate: vehicleData.plate,
+              make: vehicleData.brand,
+              model: vehicleData.model,
+              year: vehicleData.year,
+              fuel: vehicleData.fuel,
+            };
             console.log(`[Vehicle Lookup][${requestId}] Success. Vehicle data injected into memory.`);
           }
         } catch (error: any) {
@@ -112,10 +139,25 @@ export async function generateAssistantResponse(
 
     // Get real plans from the database
     let allPlans: InsurancePlan[] = await db.select().from(insurancePlans);
+    console.log(`[OpenAI][${requestId}] Loaded ${allPlans.length} total plans from database`);
+
+    // DEV FALLBACK: if the database is empty, fall back to the JSON mock plans
+    if (allPlans.length === 0) {
+      console.warn(`[OpenAI][${requestId}] DB returned 0 plans — falling back to mock plans from JSON.`);
+      allPlans = loadMockInsurancePlans().map((p: any) => ({
+        ...p,
+        // Map 'features' -> 'benefits' so downstream code works without changes
+        benefits: Array.isArray(p.features) ? p.features : [],
+      })) as unknown as InsurancePlan[];
+      console.log(`[OpenAI][${requestId}] Loaded ${allPlans.length} mock plans from JSON fallback`);
+    }
 
     // Filter and get relevant plans
     const filteredPlans = filterPlansByCountry(allPlans, userCountry);
+    console.log(`[OpenAI][${requestId}] After country filtering: ${filteredPlans.length} plans (country: ${userCountry})`);
+    
     const relevantPlans = getTopRelevantPlans(userMessage, filteredPlans, 6);
+    console.log(`[OpenAI][${requestId}] After relevance scoring: ${relevantPlans.length} relevant plans`);
 
     // Enhanced system prompt with real plan data and memory context
     const conversation = [...conversationHistory, { role: 'user', content: userMessage }].map(m => m.content).join(' ');
@@ -175,6 +217,38 @@ export async function generateAssistantResponse(
     const assistantMessage =
       response.choices[0].message.content ||
       "Lo siento, no pude generar una respuesta.";
+
+    // --- GRACEFUL FALLBACK FOR MISUNDERSTOOD INPUT ---
+    const isMisunderstood = (msg: string): boolean => {
+      if (!msg.trim() || msg === "Lo siento, no pude generar una respuesta.") {
+        return true;
+      }
+      const misunderstoodPhrases = [
+        "no entiendo",
+        "no sé cómo ayudarte",
+        "puedes reformular",
+        "no comprendo",
+      ];
+      const lowerMsg = msg.toLowerCase();
+      return misunderstoodPhrases.some(phrase => lowerMsg.includes(phrase));
+    };
+
+    if (isMisunderstood(assistantMessage)) {
+      console.log(`[Fallback][${requestId}] Assistant response was generic or empty. Triggering fallback.`);
+      return {
+        message: "Lo siento, no entendí eso. ¿Puedes reformular tu pregunta o darme más detalles?",
+        response: "Lo siento, no entendí eso. ¿Puedes reformular tu pregunta o darme más detalles?",
+        suggestedPlans: undefined,
+        category: 'general',
+        memory: updatedMemory,
+        needsMoreContext: true,
+        suggestedQuestions: [
+            "¿Qué cubre un seguro de auto?",
+            "Cotízame un seguro de viaje para dos semanas",
+            "Compara los planes de salud",
+        ],
+      };
+    }
 
     // Enhanced insurance intent detection with follow-up question support
     let suggestedPlans: InsurancePlan[] = [];
@@ -508,6 +582,9 @@ function shouldShowInsurancePlans(message: string): boolean {
     "car",
     "pet",
     "health",
+    // Add car brands for better auto detection
+    "mazda", "toyota", "chevrolet", "nissan", "honda", "ford", "hyundai", "kia", "volkswagen", "renault",
+    "bmw", "mercedes", "audi", "peugeot", "fiat", "jeep", "subaru", "mitsubishi", "suzuki", "lexus"
   ];
   const actionKeywords = [
     "necesito",
@@ -519,13 +596,13 @@ function shouldShowInsurancePlans(message: string): boolean {
   ];
 
   const hasInsuranceKeyword = insuranceKeywords.some((keyword) =>
-    message.includes(keyword),
+    lowerMessage.includes(keyword),
   );
   const hasCategoryKeyword = categoryKeywords.some((keyword) =>
-    message.includes(keyword),
+    lowerMessage.includes(keyword),
   );
   const hasActionKeyword = actionKeywords.some((keyword) =>
-    message.includes(keyword),
+    lowerMessage.includes(keyword),
   );
 
   // Show plans only with clear intent AND context
@@ -668,8 +745,9 @@ function calculateRelevanceScore(userMessage: string, plan: InsurancePlan): numb
  * Filter plans by country (placeholder for country-specific filtering)
  */
 function filterPlansByCountry(plans: InsurancePlan[], country: string): InsurancePlan[] {
-  // For now, return all plans since we're focused on Colombia
-  return plans.filter(p => p.country === country || p.country === 'WW'); // WW for worldwide
+  // FIXED: Handle null country values properly
+  // For now, include all plans since most plans have null country or are universal
+  return plans.filter(p => !p.country || p.country === country || p.country === 'WW' || p.country === null);
 }
 
 /**
@@ -776,6 +854,9 @@ function extractPlate(message: string): string | null {
   return match ? match[0].replace(/[-\s]/g, '').toUpperCase() : null;
 }
 
+// This function is now deprecated and will be removed.
+// The logic has been moved to the /api/vehicle/lookup endpoint.
+/*
 async function lookupVehicleByPlate(plate: string): Promise<any> {
   const response = await fetch('http://localhost:5050/api/lookup-plate', {
     method: 'POST',
@@ -789,3 +870,4 @@ async function lookupVehicleByPlate(plate: string): Promise<any> {
 
   return response.json();
 }
+*/

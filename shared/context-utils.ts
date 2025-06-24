@@ -159,32 +159,31 @@ export function analyzeContextNeeds(
         return result;
     }
 
-    const checks: Record<string, boolean> = {
+    const checks = {
         travel: {
             destination: /(europa|asia|méxico|estados unidos|colombia|españa|francia|alemania|italia|brasil|chile|perú|usa|canadá|argentina|viajar a)/i.test(lowerConversation),
-            origin: /(desde|de|partiendo de|salgo de|origen)/i.test(lowerConversation),
-            duration: /(días?|semanas?|meses?|\d+)/i.test(lowerConversation),
+            startDate: /(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre|\d{1,2}\/\d{1,2}\/\d{2,4})/i.test(lowerConversation)
         },
         pet: {
-            petType: /(perr|gat|dog|cat)/i.test(lowerConversation),
+            petType: /(perro|gato|dog|cat)/i.test(lowerConversation),
             petAge: /(\d+|años?|meses?|cachorro|adulto|mayor)/i.test(lowerConversation),
         },
         auto: {
             brand: !!memory?.vehicle?.make || /(marca|toyota|honda|ford|chevrolet|nissan|mazda|kia|hyundai|bmw|mercedes|audi|volkswagen|vw|renault|fiat)/i.test(lowerConversation),
-            model: !!memory?.vehicle?.model || /(modelo|\d{4}|año)/i.test(lowerConversation),
+            year: !!memory?.vehicle?.year || /(año|\d{4})/i.test(lowerConversation),
+            country: /(colombia|méxico|perú|chile|argentina)/i.test(lowerConversation)
         },
         health: {
             age: /(\d+|años?|joven|adulto|mayor)/i.test(lowerConversation),
             gender: /(hombre|mujer|masculino|femenino)/i.test(lowerConversation),
-            location: /(vivo en|resido en|en colombia|en méxico|en perú)/i.test(lowerConversation),
+            country: /(colombia|méxico|perú|chile|argentina)/i.test(lowerConversation)
         }
     }[category];
 
     const questions: Record<string, Record<string, string>> = {
         travel: {
-            destination: "¿A qué país o ciudad planeas viajar?",
-            origin: "¿Desde dónde iniciarás tu viaje?",
-            duration: "¿Cuántos días durará tu viaje?",
+            destination: "¿A qué país o continente planeas viajar?",
+            startDate: "¿Cuándo es la fecha de inicio de tu viaje?",
         },
         pet: {
             petType: "¿Qué tipo de mascota tienes? (perro, gato, etc.)",
@@ -192,17 +191,18 @@ export function analyzeContextNeeds(
         },
         auto: {
             brand: "¿Cuál es la marca de tu vehículo?",
-            model: "¿Cuál es el modelo y año?",
+            year: "¿De qué año es tu carro?",
+            country: "¿En qué país está registrado el vehículo (ej. Colombia, México)?"
         },
         health: {
             age: "¿Qué edad tienes?",
             gender: "¿Cuál es tu género?",
-            location: "¿En qué país vives actualmente?",
+            country: "¿En qué país resides actualmente (ej. Colombia, México)?"
         }
     };
     
     for (const key in checks) {
-        if (!checks[key]) {
+        if (!(checks as any)[key]) {
             result.missingInfo.push(key);
             result.suggestedQuestions.push(questions[category][key]);
         }

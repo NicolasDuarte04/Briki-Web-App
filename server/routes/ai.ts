@@ -41,7 +41,7 @@ const logConversation = async (logData: {
  */
 router.post('/chat', async (req, res) => {
   try {
-    const { message, conversationHistory, memory, category = 'general' } = req.body;
+    const { message, conversationHistory, memory, category = 'general', resetContext = false } = req.body;
     const userId = req.session.user?.id || null;
 
     if (!message) {
@@ -53,7 +53,7 @@ router.post('/chat', async (req, res) => {
       content: msg.content
     }));
 
-    const response = await generateAssistantResponse(message, formattedHistory, memory);
+    const response = await generateAssistantResponse(message, formattedHistory, memory, "Colombia", userId, resetContext);
     
     // Log the interaction
     logConversation({

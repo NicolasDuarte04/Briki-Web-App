@@ -122,3 +122,29 @@ export const formatArray = (array: any[]): string => {
   
   return array.join(', ');
 };
+
+export function formatCurrency(
+  amount: number,
+  currency: string = 'USD',
+  locale: string = 'en-US'
+): string {
+  try {
+    // Special handling for COP and MXN for better formatting
+    if (currency === 'COP') {
+      locale = 'es-CO';
+    } else if (currency === 'MXN') {
+      locale = 'es-MX';
+    }
+    
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: currency,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(amount);
+  } catch (error) {
+    console.warn(`Could not format currency for ${currency}:`, error);
+    // Fallback for unknown currencies
+    return `$${Math.round(amount).toLocaleString()} ${currency}`;
+  }
+}

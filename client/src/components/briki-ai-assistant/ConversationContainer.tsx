@@ -42,7 +42,7 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
 
       {/* Messages Area */}
       <ScrollArea className="flex-1 px-4 sm:px-6 py-4">
-        <div className="space-y-4">
+        <div className="space-y-3">
           {children}
         </div>
       </ScrollArea>

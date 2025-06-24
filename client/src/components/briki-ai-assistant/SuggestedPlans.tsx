@@ -49,14 +49,15 @@ const SuggestedPlans: React.FC<SuggestedPlansProps> = ({ plans }) => {
   return (
     <div className="mt-3 mb-2">
       <div className="text-sm font-medium mb-2">Planes recomendados:</div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+      {/* Vertical stacked container */}
+      <div className="w-full space-y-4">
         {plans.map((plan, index) => {
           console.log('📦 Rendering plan card:', {
             planId: plan.id,
             planName: plan.name,
             isHighlighted: index === 0
           });
-          
+
           return (
             <PlanCard
               key={plan.id}

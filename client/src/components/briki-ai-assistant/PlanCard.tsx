@@ -1,11 +1,14 @@
-import React from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useState } from 'react';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Award, ArrowRight } from "lucide-react";
+import { CheckCircle, Award, ArrowRight, PlusCircle, MinusCircle, ShieldCheck, DollarSign, Calendar, ChevronDown } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { useCompareStore } from '@/store/compare-store';
+import { useToast } from '@/hooks/use-toast';
+import { formatCurrency } from '@/utils/format';
 
-// Interfaz para los planes de seguro
+// Updated interface with more specific fields
 export interface InsurancePlan {
   id: number;
   name: string;
@@ -19,6 +22,9 @@ export interface InsurancePlan {
   description?: string;
   duration?: string;
   tags?: string[];
+  deductible?: number;
+  copay?: string;
+  validity?: string;
 }
 
 interface PlanCardProps {
@@ -28,126 +34,113 @@ interface PlanCardProps {
   onQuote?: (planId: string) => void;
 }
 
-const PlanCard: React.FC<PlanCardProps> = ({ 
-  plan, 
-  highlighted = false,
-  onViewDetails,
-  onQuote
-}) => {
-  // Debug logging
-  console.log('DEBUG - PlanCard render:', {
-    planId: plan.id,
-    planName: plan.name,
-    hasRequiredFields: !!(
-      plan.id && 
-      plan.name && 
-      plan.category && 
-      plan.provider && 
-      typeof plan.basePrice === 'number' && 
-      plan.currency
-    ),
-    optionalFields: {
-      hasTags: Array.isArray(plan.tags),
-      hasBenefits: Array.isArray(plan.benefits),
-      hasDuration: !!plan.duration
-    }
-  });
+const PlanCard: React.FC<PlanCardProps> = ({ plan, highlighted = false, onQuote }) => {
+  const [showAllBenefits, setShowAllBenefits] = useState(false);
+  const { toast } = useToast();
+  const { addPlan, removePlan, isPlanSelected } = useCompareStore();
+  const isSelected = isPlanSelected(plan.id);
 
-  // Generar etiqueta según las características del plan
-  const getBadge = () => {
-    const tags = plan.tags || [];
-    if (tags.includes('premium') || tags.includes('exclusivo')) {
-      return { text: 'Premium', variant: 'default' } as const;
+  const handleCompareClick = () => {
+    if (isSelected) {
+      removePlan(plan.id);
+      toast({ title: "Plan Removed", description: `${plan.name} removed from comparison.` });
+    } else {
+      const success = addPlan(plan);
+      if (success) {
+        toast({ title: "Plan Added", description: `${plan.name} added to comparison.` });
+      } else {
+        toast({
+          title: "Comparison Limit Reached",
+          description: "You can only compare up to 3 plans at a time.",
+          variant: "destructive",
+        });
+      }
     }
-    if (tags.includes('económico') || tags.includes('básico')) {
-      return { text: 'Económico', variant: 'secondary' } as const;
-    }
-    if (tags.includes('completo')) {
-      return { text: 'Completo', variant: 'outline' } as const;
-    }
-    return null;
   };
 
-  // Formatear precio
-  const formatPrice = () => {
-    return `${plan.currency === 'USD' ? '$' : ''}${plan.basePrice} ${plan.currency === 'USD' ? '' : plan.currency}`;
-  };
-
-  // Obtener características destacadas (máximo 3)
-  const highlightedFeatures = (plan.benefits || []).slice(0, 3);
-
-  // Verificar si el plan es para un tipo específico
-  const isSpecificPlan = () => {
-    const tags = plan.tags || [];
-    if (tags.includes('scooter') || tags.includes('vespa') || tags.includes('moto ligera')) {
-      return 'Especial para scooters/motos';
-    }
-    if (tags.includes('familia') || tags.includes('familiar')) {
-      return 'Plan familiar';
-    }
-    if (tags.includes('latinoamérica') || tags.includes('latam')) {
-      return 'Especializado Latinoamérica';
-    }
-    return null;
-  };
-
-  const badge = getBadge();
-  const specificType = isSpecificPlan();
+  const benefitsToShow = showAllBenefits ? plan.benefits : (plan.benefits || []).slice(0, 4);
 
   return (
-    <Card className={`w-full overflow-hidden transition-all ${highlighted ? 'border-primary shadow-md' : ''}`}>
-      <CardHeader className="pb-2">
-        {badge && (
-          <Badge variant={badge.variant as any} className="mb-1 self-start">
-            {badge.text}
-          </Badge>
-        )}
-        <CardTitle className="text-lg font-bold flex items-center gap-2">
-          {plan.name}
-          {highlighted && <Award className="h-4 w-4 text-amber-500" />}
-        </CardTitle>
-        <CardDescription className="line-clamp-2">
-          {plan.provider} • {specificType || `Seguro de ${plan.category}`}
-        </CardDescription>
+    <Card className={`w-full overflow-hidden transition-all rounded-xl border shadow-md ${highlighted ? 'border-primary' : 'border-gray-200'}`}>
+      <CardHeader className="p-4 bg-gray-50/70">
+        <div className="flex justify-between items-start">
+          <div>
+            <CardTitle className="text-base font-bold text-gray-800">{plan.name}</CardTitle>
+            <p className="text-xs text-gray-500">{plan.provider}</p>
+          </div>
+          {highlighted && <Badge variant="default">Recommended</Badge>}
+        </div>
+        <div className="pt-2">
+          <span className="text-2xl font-bold text-primary">{formatCurrency(plan.basePrice, plan.currency)}</span>
+          {plan.duration && <span className="text-sm text-muted-foreground ml-1">/ {plan.duration}</span>}
+        </div>
       </CardHeader>
 
-      <CardContent className="pb-2">
-        <div className="flex items-baseline mb-3">
-          <span className="text-xl font-bold text-primary">{formatPrice()}</span>
-          {plan.duration && (
-            <span className="text-sm text-muted-foreground ml-1">{plan.duration}</span>
+      <CardContent className="p-4">
+        <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs mb-4">
+          <div className="flex items-center gap-1.5">
+            <ShieldCheck className="h-4 w-4 text-gray-400" />
+            <div>
+              <p className="font-semibold text-gray-600">Max Coverage</p>
+              <p>{formatCurrency(plan.coverageAmount, plan.currency)}</p>
+            </div>
+          </div>
+          {plan.deductible && (
+            <div className="flex items-center gap-1.5">
+              <DollarSign className="h-4 w-4 text-gray-400" />
+              <div>
+                <p className="font-semibold text-gray-600">Deductible</p>
+                <p>{formatCurrency(plan.deductible, plan.currency)}</p>
+              </div>
+            </div>
+          )}
+          {plan.validity && (
+            <div className="flex items-center gap-1.5">
+              <Calendar className="h-4 w-4 text-gray-400" />
+              <div>
+                <p className="font-semibold text-gray-600">Validity</p>
+                <p>{plan.validity}</p>
+              </div>
+            </div>
           )}
         </div>
-
-        {highlightedFeatures.length > 0 && (
-          <div className="space-y-1 mb-3">
-            {highlightedFeatures.map((feature, index) => (
-              <div key={index} className="flex items-start">
-                <CheckCircle className="h-4 w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                <span className="text-sm">{feature}</span>
-              </div>
-            ))}
-          </div>
+        
+        <Separator className="mb-4" />
+        
+        <p className="text-sm font-semibold mb-2 text-gray-700">Top Benefits</p>
+        <div className="space-y-2">
+          {benefitsToShow.map((benefit, index) => (
+            <div key={index} className="flex items-start">
+              <CheckCircle className="h-4 w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+              <span className="text-sm text-gray-600">{benefit}</span>
+            </div>
+          ))}
+        </div>
+        
+        {(plan.benefits || []).length > 4 && (
+          <Button variant="link" size="sm" className="p-0 h-auto mt-2 text-primary" onClick={() => setShowAllBenefits(!showAllBenefits)}>
+            {showAllBenefits ? 'Show less' : 'Show more'}
+            <ChevronDown className={`ml-1 h-4 w-4 transition-transform ${showAllBenefits ? 'rotate-180' : ''}`} />
+          </Button>
         )}
       </CardContent>
 
-      <Separator />
-
-      <CardFooter className="pt-3 flex gap-2">
+      <CardFooter className="bg-gray-50/70 p-4 flex gap-2">
         <Button 
-          variant="outline" 
+          variant={isSelected ? "secondary" : "outline"}
           size="sm"
           className="flex-1"
-          onClick={() => onViewDetails && onViewDetails(plan.id.toString())}
+          onClick={handleCompareClick}
         >
-          Detalles
+          {isSelected ? <MinusCircle className="mr-2 h-4 w-4" /> : <PlusCircle className="mr-2 h-4 w-4" />}
+          {isSelected ? 'Remove' : 'Compare'}
         </Button>
         <Button 
           size="sm"
           className="flex-1"
           onClick={() => onQuote && onQuote(plan.id.toString())}
         >
-          Cotizar <ArrowRight className="ml-1 h-4 w-4" />
+          Quote <ArrowRight className="ml-1 h-4 w-4" />
         </Button>
       </CardFooter>
     </Card>
