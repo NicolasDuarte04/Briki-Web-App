@@ -31,3 +31,41 @@ export async function sendMessageToAI(
     throw error;
   }
 }
+
+/**
+ * Fetch conversation history for the authenticated user
+ */
+export async function fetchConversationHistory(page: number = 1, limit: number = 20): Promise<any> {
+  try {
+    console.log('📡 Fetching conversation history...');
+
+    const data = await apiRequest(`/api/ai/conversations?page=${page}&limit=${limit}`, {
+      method: 'GET',
+    });
+
+    console.log('✅ Conversation history received', data);
+    return data;
+  } catch (error) {
+    console.error('💥 Error fetching conversation history:', error);
+    throw error;
+  }
+}
+
+/**
+ * Fetch a specific conversation with its context
+ */
+export async function fetchConversation(conversationId: number): Promise<any> {
+  try {
+    console.log('📡 Fetching conversation:', conversationId);
+
+    const data = await apiRequest(`/api/ai/conversations/${conversationId}`, {
+      method: 'GET',
+    });
+
+    console.log('✅ Conversation received', data);
+    return data;
+  } catch (error) {
+    console.error('💥 Error fetching conversation:', error);
+    throw error;
+  }
+}

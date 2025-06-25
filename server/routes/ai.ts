@@ -205,6 +205,121 @@ router.post('/analyze-image', async (req, res) => {
 });
 
 /**
+ * Get conversation history for authenticated user
+ */
+router.get('/conversations', async (req, res) => {
+  try {
+    const userId = req.session.user?.id;
+    
+    if (!userId) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 20;
+    const offset = (page - 1) * limit;
+
+    // Get conversations for this user, grouped by conversation sessions
+    // For now, we'll treat each individual message as a conversation entry
+    // In the future, you might want to group by conversation sessions
+    const conversations = await db
+      .select({
+        id: conversationLogs.id,
+        input: conversationLogs.input,
+        output: conversationLogs.output,
+        category: conversationLogs.category,
+        timestamp: conversationLogs.timestamp,
+      })
+      .from(conversationLogs)
+      .where(eq(conversationLogs.userId, userId))
+      .orderBy(desc(conversationLogs.timestamp))
+      .limit(limit)
+      .offset(offset);
+
+    // Get total count for pagination
+    const totalCountResult = await db
+      .select({ count: conversationLogs.id })
+      .from(conversationLogs)
+      .where(eq(conversationLogs.userId, userId));
+    
+    const totalCount = totalCountResult.length;
+    const totalPages = Math.ceil(totalCount / limit);
+
+    return res.json({
+      conversations,
+      pagination: {
+        page,
+        limit,
+        totalCount,
+        totalPages,
+        hasNext: page < totalPages,
+        hasPrev: page > 1,
+      }
+    });
+  } catch (error: any) {
+    console.error('Error fetching conversation history:', error);
+    res.status(500).json({ 
+      error: 'Error fetching conversation history',
+      details: error.message || 'Unknown error'
+    });
+  }
+});
+
+/**
+ * Get a specific conversation with its context
+ */
+router.get('/conversations/:id', async (req, res) => {
+  try {
+    const userId = req.session.user?.id;
+    const conversationId = parseInt(req.params.id);
+    
+    if (!userId) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    if (!conversationId || isNaN(conversationId)) {
+      return res.status(400).json({ error: 'Invalid conversation ID' });
+    }
+
+    // Get the specific conversation
+    const conversation = await db
+      .select()
+      .from(conversationLogs)
+      .where(
+        eq(conversationLogs.id, conversationId)
+      )
+      .then(rows => rows[0]);
+
+    if (!conversation) {
+      return res.status(404).json({ error: 'Conversation not found' });
+    }
+
+    // Verify ownership
+    if (conversation.userId !== userId) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+
+    // Get associated context snapshots
+    const contextSnapshotsList = await db
+      .select()
+      .from(contextSnapshots)
+      .where(eq(contextSnapshots.conversationId, conversationId))
+      .orderBy(desc(contextSnapshots.createdAt));
+
+    return res.json({
+      conversation,
+      contextSnapshots: contextSnapshotsList
+    });
+  } catch (error: any) {
+    console.error('Error fetching conversation:', error);
+    res.status(500).json({ 
+      error: 'Error fetching conversation',
+      details: error.message || 'Unknown error'
+    });
+  }
+});
+
+/**
  * Temporary debug endpoint to view latest logs
  */
 router.get('/logs/test', async (req, res) => {

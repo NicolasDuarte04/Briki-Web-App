@@ -24,6 +24,7 @@ import {
   Bell,
   Bot,
   ChevronDown,
+  History,
 } from "lucide-react";
 import {
   Sheet,
@@ -195,6 +196,13 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
                     >
                       <Bot className="mr-2 h-4 w-4" />
                       <span>AI Assistant</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      className="cursor-pointer" 
+                      onClick={() => navigate("/conversation-history")}
+                    >
+                      <History className="mr-2 h-4 w-4" />
+                      <span>Conversation History</span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem 
@@ -387,6 +395,18 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
                             >
                               <Bot className="mr-2 h-4 w-4" />
                               AI Assistant
+                            </Button>
+                            
+                            <Button 
+                              variant="ghost" 
+                              className="w-full justify-start text-gray-500"
+                              onClick={() => {
+                                navigate("/conversation-history");
+                                setIsOpen(false);
+                              }}
+                            >
+                              <History className="mr-2 h-4 w-4" />
+                              Conversation History
                             </Button>
                             
                             <Button 
