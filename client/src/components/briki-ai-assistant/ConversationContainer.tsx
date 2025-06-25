@@ -40,17 +40,21 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
         </div>
       </div>
 
-      {/* Messages Area */}
-      <ScrollArea className="flex-1 px-4 sm:px-6 py-4">
-        <div className="space-y-3">
-          {children}
+      {/* Messages Area with max-width constraint */}
+      <ScrollArea className="flex-1">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-4">
+          <div className="space-y-6">
+            {children}
+          </div>
         </div>
       </ScrollArea>
 
-      {/* Input Area */}
+      {/* Fixed Input Area */}
       {input && (
-        <div className="border-t border-gray-100 bg-gray-50/50 px-4 sm:px-6 py-4">
-          {input}
+        <div className="border-t border-gray-100 bg-gray-50/50 sticky bottom-0">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 py-4">
+            {input}
+          </div>
         </div>
       )}
     </div>

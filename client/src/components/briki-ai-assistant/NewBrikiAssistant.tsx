@@ -230,7 +230,7 @@ const NewBrikiAssistant: React.FC = () => {
         .map(msg => {
           if (msg.role === 'assistant' && msg.suggestedPlans && msg.suggestedPlans.length > 0) {
             // Include detailed plan context for memory with proper formatting
-            const planDetails = msg.suggestedPlans.map(plan => 
+            const planDetails = msg.suggestedPlans.map((plan: InsurancePlan) => 
               `${plan.name} de ${plan.provider} por ${plan.basePrice} ${plan.currency}`
             ).join(', ');
 
@@ -275,7 +275,7 @@ const NewBrikiAssistant: React.FC = () => {
         hasMessage: !!(response.message || response.response),
         hasSuggestedPlans: !!response.suggestedPlans,
         planCount: response.suggestedPlans?.length || 0,
-        planNames: response.suggestedPlans?.map(p => p.name) || [],
+        planNames: response.suggestedPlans?.map((p: InsurancePlan) => p.name) || [],
         shouldHaveShownPlans: shouldRequestPlans,
         fullResponse: response
       });
@@ -306,7 +306,7 @@ const NewBrikiAssistant: React.FC = () => {
       });
 
       // Update loading message with response and memory
-      setMessages(prev => {
+      setMessages((prev: Message[]) => {
         const newMessages = prev.map(msg => 
           msg.isLoading 
             ? {
@@ -331,7 +331,7 @@ const NewBrikiAssistant: React.FC = () => {
       });
 
       if (response.memory) {
-        setUserContext(prev => ({ ...prev, ...response.memory }));
+        setUserContext((prev: any) => ({ ...prev, ...response.memory }));
       }
 
     } catch (error) {
@@ -362,14 +362,14 @@ const NewBrikiAssistant: React.FC = () => {
 
   // Input area component
   const inputArea = (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {/* Prompt Chips */}
       {messages.length <= 1 && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="flex flex-wrap gap-2"
+          className="flex flex-wrap gap-2 mb-4"
         >
           {suggestedPrompts.map((prompt, index) => (
             <motion.button
@@ -377,7 +377,7 @@ const NewBrikiAssistant: React.FC = () => {
               onClick={() => setInput(prompt)}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="px-3 py-1 text-sm bg-gray-100 rounded-full hover:bg-blue-100 transition duration-200 ease-in cursor-pointer"
+              className="px-3 py-2 text-sm bg-gray-100 rounded-full hover:bg-blue-100 transition duration-200 ease-in cursor-pointer"
             >
               {prompt}
             </motion.button>
@@ -386,7 +386,7 @@ const NewBrikiAssistant: React.FC = () => {
       )}
 
       {/* Input Field */}
-      <div className="flex gap-3 items-end">
+      <div className="flex gap-3 items-end bg-white">
         <div className="flex-1 relative">
           <Input
             value={input}
@@ -394,7 +394,7 @@ const NewBrikiAssistant: React.FC = () => {
             onKeyPress={handleKeyPress}
             placeholder="Ask me about insurance..."
             disabled={isLoading}
-            className="flex-1 pr-12 py-4 text-base rounded-2xl border-2 border-gray-200 focus:border-[#00C7C4] focus:ring-4 focus:ring-[#00C7C4]/10 transition-all duration-200 bg-white"
+            className="flex-1 pr-12 py-4 text-base rounded-2xl border-2 border-gray-200 focus:border-[#00C7C4] focus:ring-4 focus:ring-[#00C7C4]/10 transition-all duration-200 bg-white shadow-sm"
           />
           <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-xs text-gray-400">
             {input.length}/500
@@ -406,7 +406,7 @@ const NewBrikiAssistant: React.FC = () => {
           size="lg"
           loading={isLoading}
           icon={!isLoading && <Send className="h-5 w-5" />}
-          className="rounded-2xl px-6"
+          className="rounded-2xl px-6 shadow-sm"
         >
           {isLoading ? "Sending..." : "Send"}
         </GradientButton>

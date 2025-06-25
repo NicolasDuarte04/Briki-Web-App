@@ -110,7 +110,7 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({
                 </p>
                 {/* Additional content like plan cards */}
                 {children && (
-                  <div className="mt-3">
+                  <div className="mt-4 pt-3 border-t border-gray-100">
                     {children}
                   </div>
                 )}
