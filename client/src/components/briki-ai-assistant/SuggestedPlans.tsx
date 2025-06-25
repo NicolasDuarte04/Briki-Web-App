@@ -35,15 +35,51 @@ const SuggestedPlans: React.FC<SuggestedPlansProps> = ({ plans }) => {
 
   const handleViewDetails = (planId: string) => {
     console.log('👆 View details clicked:', { planId });
+    const plan = plans.find(p => p.id.toString() === planId);
+    if (plan) {
+      // Navigate to plan details page with plan data
+      navigate(`/plan/${planId}`, { state: { plan } });
+    }
     toast({
       title: "Detalles del plan",
-      description: `Viendo detalles del plan ${planId}`,
+      description: `Viendo detalles del plan ${plan?.name || planId}`,
     });
   };
 
   const handleQuote = (planId: string) => {
     console.log('🎯 Quote clicked:', { planId });
-    navigate(`/quote?planId=${planId}`);
+    const plan = plans.find(p => p.id.toString() === planId);
+    
+    if (plan) {
+      // Store plan data in sessionStorage for access on next page
+      sessionStorage.setItem('selectedPlan', JSON.stringify(plan));
+      
+      // Try different routing options based on what exists
+      // Priority: checkout -> cotizar -> quote -> fallback
+      const routeOptions = [
+        `/checkout/${planId}`,
+        `/cotizar/${planId}`,
+        `/quote?planId=${planId}`,
+        `/insurance/${plan.category}/quote?planId=${planId}`
+      ];
+      
+      // Use the first route option for now, we'll create the pages
+      const targetRoute = `/cotizar/${planId}`;
+      
+      console.log('🎯 Navigating to:', targetRoute);
+      navigate(targetRoute);
+      
+      toast({
+        title: "Iniciando cotización",
+        description: `Cotizando ${plan.name} de ${plan.provider}`,
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: "No se pudo encontrar el plan seleccionado",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
