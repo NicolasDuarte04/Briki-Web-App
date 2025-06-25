@@ -18,6 +18,7 @@ import FilterSidebar, { type FilterOptions } from "@/components/insurance/Filter
 import PlanSort, { type SortOption, applySorting } from "@/components/insurance/PlanSort";
 import PlanPagination from "@/components/insurance/PlanPagination";
 import { useInsurancePlans } from "@/hooks/useInsurancePlans";
+import { MobileComparisonDrawer } from "@/components/comparison/MobileComparisonDrawer";
 
 export default function PetInsurancePage() {
   const [, navigate] = useLocation();
@@ -547,6 +548,8 @@ export default function PetInsurancePage() {
           )}
         </div>
       </div>
+
+      <MobileComparisonDrawer />
     </div>
   );
 }

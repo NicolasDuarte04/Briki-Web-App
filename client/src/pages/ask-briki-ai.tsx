@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet';
 import NewBrikiAssistant from '@/components/briki-ai-assistant/NewBrikiAssistant';
 import { PublicLayout } from '@/components/layout/public-layout';
 import { ComparisonSidebar } from '@/components/comparison/ComparisonSidebar';
+import { MobileComparisonDrawer } from '@/components/comparison/MobileComparisonDrawer';
 
 export default function AskBrikiAIPage() {
   return (
@@ -31,12 +32,15 @@ export default function AskBrikiAIPage() {
               </div>
             </motion.div>
 
-            {/* Comparison Sidebar (Right Column) */}
+            {/* Comparison Sidebar (Right Column) - Desktop Only */}
             <div className="hidden lg:block">
               <ComparisonSidebar />
             </div>
           </div>
         </div>
+        
+        {/* Mobile Comparison Drawer */}
+        <MobileComparisonDrawer />
       </main>
     </PublicLayout>
   );
