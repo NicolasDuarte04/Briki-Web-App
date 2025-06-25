@@ -6,7 +6,8 @@ import { Loader2, Send, Bot, RefreshCw, CornerDownLeft, X } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/api';
-import type { APIMessage, AIResponse, AssistantMemory } from '@/types/chat';
+import { sendMessageToAI } from '@/services/openai-service';
+// import type { APIMessage, AIResponse, AssistantMemory } from '@/types/chat';
 import WelcomeCard from './WelcomeCard';
 import { InsurancePlan } from './PlanCard';
 import SuggestedQuestions from './SuggestedQuestions';
@@ -90,6 +91,12 @@ function shouldShowInsurancePlans(message: string, userContext: any, conversatio
          hasActionKeyword && 
          hasSufficientContext(allUserText, category);
 }
+
+// Minimal shape of messages sent to backend
+type APIMessage = {
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+};
 
 const NewBrikiAssistant: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -483,37 +490,9 @@ const NewBrikiAssistant: React.FC = () => {
             </ConversationContainer>
           </ScrollArea>
 
-          <div className="p-4 border-t bg-white">
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              handleSendMessage();
-            }} className="flex items-center space-x-2">
-              <Input
-                ref={inputRef}
-                type="text"
-                placeholder="Escribe tu consulta aquí..."
-                className="flex-1"
-                disabled={isLoading}
-              />
-              <GradientButton
-                type="submit"
-                disabled={isLoading || !input.trim()}
-                size="lg"
-                loading={isLoading}
-                icon={!isLoading && <Send className="h-5 w-5" />}
-                className="rounded-2xl px-6"
-              >
-                {isLoading ? 'Pensando...' : 'Enviar'}
-              </GradientButton>
-            </form>
-          </div>
+          {/* Removed duplicate bottom input field to avoid two input boxes */}
         </div>
       </div>
-      {plansToCompare.length > 0 && (
-        <div className="w-1/3 max-w-md hidden lg:block">
-          <ComparisonSidebar />
-        </div>
-      )}
     </div>
   );
 };

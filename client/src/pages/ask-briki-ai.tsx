@@ -5,8 +5,11 @@ import NewBrikiAssistant from '@/components/briki-ai-assistant/NewBrikiAssistant
 import { PublicLayout } from '@/components/layout/public-layout';
 import { ComparisonSidebar } from '@/components/comparison/ComparisonSidebar';
 import { MobileComparisonDrawer } from '@/components/comparison/MobileComparisonDrawer';
+import { useCompareStore } from '@/store/compare-store';
 
 export default function AskBrikiAIPage() {
+  const plansToCompare = useCompareStore(state => state.plansToCompare);
+
   return (
     <PublicLayout>
       <Helmet>
@@ -19,7 +22,7 @@ export default function AskBrikiAIPage() {
 
       <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+          <div className={`grid grid-cols-1 ${plansToCompare.length > 0 ? 'lg:grid-cols-3' : ''} gap-8 items-start`}>
             {/* Briki Assistant (Left Column) */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -33,9 +36,11 @@ export default function AskBrikiAIPage() {
             </motion.div>
 
             {/* Comparison Sidebar (Right Column) - Desktop Only */}
-            <div className="hidden lg:block">
-              <ComparisonSidebar />
-            </div>
+            {plansToCompare.length > 0 && (
+              <div className="hidden lg:block">
+                <ComparisonSidebar />
+              </div>
+            )}
           </div>
         </div>
         
