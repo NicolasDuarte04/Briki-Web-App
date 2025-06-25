@@ -34,7 +34,7 @@ import ProfilePage from "@/pages/profile-page";
 import SettingsPage from "@/pages/settings-page";
 import ApiSettingsPage from "@/pages/api-settings-page";
 // Import comparison screens
-import ComparePlansPage from "@/pages/compare-plans";  // Original comparison component
+// Removed legacy ComparePlansPage import - using ComparePlansFixed instead
 import ComparePlansFixed from "@/pages/compare-plans-fixed";  // Fixed version of comparison component
 
 // Import new public site pages
@@ -150,8 +150,7 @@ function Router() {
         {/* Use the fixed version of the comparison page */}
         <Route path="/compare-plans" component={ComparePlansFixed} />
         
-        {/* Keep old version accessible for testing */}
-        <Route path="/compare-plans-original" component={ComparePlansPage} />
+        {/* Legacy route removed - using ComparePlansFixed for all comparison needs */}
         
         {/* Public-facing explore pages (for SEO and non-authenticated users) */}
         <Route path="/explore/travel" component={ExploreTravelInsurance} />
