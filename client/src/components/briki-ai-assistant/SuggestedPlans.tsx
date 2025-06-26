@@ -1,7 +1,10 @@
-import React from 'react';
-import PlanCard, { InsurancePlan } from './PlanCard';
+import React, { useEffect } from 'react';
+import PlanCard from './PlanCard';
 import { useToast } from '@/hooks/use-toast';
 import { useLocation } from 'wouter';
+import { logPlanAnalytics } from '@/lib/analytics';
+import { useAuth } from '@/hooks/use-auth';
+import { InsurancePlan } from '@/types/insurance';
 
 interface SuggestedPlansProps {
   plans: InsurancePlan[];
@@ -10,6 +13,15 @@ interface SuggestedPlansProps {
 const SuggestedPlans: React.FC<SuggestedPlansProps> = ({ plans }) => {
   const [location, navigate] = useLocation();
   const { toast } = useToast();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (plans && plans.length > 0) {
+      plans.forEach(plan => {
+        logPlanAnalytics('plan_shown', plan, user?.id ? String(user.id) : null);
+      });
+    }
+  }, [plans, user]);
 
   // Debug logging for plan rendering
   console.log('🎯 SuggestedPlans - Component rendered with:', {

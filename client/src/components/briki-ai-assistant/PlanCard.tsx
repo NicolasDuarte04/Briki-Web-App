@@ -8,25 +8,9 @@ import { Separator } from "@/components/ui/separator";
 import { useCompareStore } from '@/store/compare-store';
 import { useToast } from '@/hooks/use-toast';
 import { formatCurrency } from '@/utils/format';
-
-// Updated interface with more specific fields
-export interface InsurancePlan {
-  id: number;
-  name: string;
-  category: string;
-  provider: string;
-  basePrice: number;
-  coverageAmount: number;
-  currency: string;
-  country: string;
-  benefits: string[];
-  description?: string;
-  duration?: string;
-  tags?: string[];
-  deductible?: number;
-  copay?: string;
-  validity?: string;
-}
+import { InsurancePlan } from '@/types/insurance';
+import { logPlanAnalytics } from '@/lib/analytics';
+import { useAuth } from '@/hooks/use-auth';
 
 interface PlanCardProps {
   plan: InsurancePlan;
@@ -40,9 +24,11 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan, highlighted = false, onQuote 
   const [isHovered, setIsHovered] = useState(false);
   const { toast } = useToast();
   const { addPlan, removePlan, isPlanSelected } = useCompareStore();
+  const { user } = useAuth();
   const isSelected = isPlanSelected(plan.id);
 
   const handleCompareClick = () => {
+    logPlanAnalytics('plan_clicked', plan, user?.id ? String(user.id) : null);
     if (isSelected) {
       removePlan(plan.id);
       toast({ title: "Plan Removed", description: `${plan.name} removed from comparison.` });
@@ -61,6 +47,7 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan, highlighted = false, onQuote 
   };
 
   const handleQuoteClick = () => {
+    logPlanAnalytics('plan_clicked', plan, user?.id ? String(user.id) : null);
     console.log('🎯 Quote button clicked for plan:', plan.id);
     if (onQuote) {
       onQuote(plan.id.toString());

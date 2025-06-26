@@ -1,4 +1,5 @@
 import { EventCategory } from '../constants/analytics';
+import { InsurancePlan } from '@/types/insurance';
 
 // Define the gtag function globally
 declare global {
@@ -88,4 +89,35 @@ export const trackAnalyticsDashboardView = (companyId: number) => {
 
 export const trackMarketplaceView = (companyId: number) => {
   trackEvent('marketplace_view', EventCategory.Marketplace, `company_${companyId}`);
+};
+
+/**
+ * Tracks AI assistant plan interactions.
+ * @param eventType - The type of interaction ('shown', 'clicked', 'purchased').
+ * @param plan - The insurance plan object.
+ * @param userId - Optional user ID.
+ */
+export const logPlanAnalytics = (
+  eventType: 'plan_shown' | 'plan_clicked' | 'plan_purchased',
+  plan: any,
+  userId?: string | null
+) => {
+  const eventName = `assistant_${eventType}`;
+  const metadata = {
+    planId: plan.id,
+    providerName: plan.provider,
+    price: plan.basePrice || plan.price,
+    category: plan.category,
+    userId: userId || 'anonymous',
+  };
+
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', eventName, {
+      event_category: 'AI Assistant',
+      event_label: plan.name,
+      ...metadata,
+    });
+  } else {
+    console.log(`[Analytics] Event: ${eventName}`, metadata);
+  }
 };

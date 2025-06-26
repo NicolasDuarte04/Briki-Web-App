@@ -1,5 +1,7 @@
+import { InsuranceCategory as SharedInsuranceCategory } from '@shared/schema';
+
 // Insurance category types
-export type InsuranceCategory = 'travel' | 'auto' | 'pet' | 'health';
+export type InsuranceCategory = SharedInsuranceCategory | 'general';
 
 // Base plan fields that all insurance plans should have
 export interface BasePlanFields {
@@ -9,18 +11,29 @@ export interface BasePlanFields {
   coverageAmount: number;
 }
 
-// Insurance plan interface
-export interface InsurancePlan extends BasePlanFields {
+// Insurance plan interface based on the shared schema
+export interface InsurancePlan {
+  id: number | string;
+  name: string;
   category: InsuranceCategory;
-  id: string;
-  title: string;
   provider: string;
-  price: number;
+  basePrice: number;
+  coverageAmount: number;
+  currency: string;
+  country: string;
+  benefits: string[];
   description?: string;
-  features: string[];
+  duration?: string;
+  tags?: string[];
+  deductible?: number;
+  copay?: string;
+  validity?: string;
+  // Deprecated/optional fields
+  title?: string;
+  price?: number;
+  features?: string[];
   badge?: string;
   rating?: string;
-  country?: string;
   sourceLink?: string;
   coverageHighlights?: string;
   priceRange?: string;

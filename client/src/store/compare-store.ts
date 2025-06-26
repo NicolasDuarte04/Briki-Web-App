@@ -1,12 +1,12 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { InsurancePlan as Plan } from '@/components/briki-ai-assistant/PlanCard';
+import type { InsurancePlan } from '@/types/insurance';
 
 interface CompareState {
-  plansToCompare: Plan[];
-  addPlan: (plan: Plan) => boolean;
-  removePlan: (planId: number) => void;
-  isPlanSelected: (planId: number) => boolean;
+  plansToCompare: InsurancePlan[];
+  addPlan: (plan: InsurancePlan) => boolean;
+  removePlan: (planId: number | string) => void;
+  isPlanSelected: (planId: number | string) => boolean;
   clearCompare: () => void;
 }
 

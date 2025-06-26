@@ -15,6 +15,7 @@ import {
   companyPlans,
   planAnalytics,
   InsertCompanyPlan,
+  CompanyPlan,
   INSURANCE_CATEGORIES,
   InsuranceCategory,
   blogPosts,
@@ -659,28 +660,118 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Company profile not found" });
       }
       
-      // Mock analytics data for now
-      // In a real implementation, this would come from aggregations of user interactions and conversions
-      const analyticsData = {
-        totalPlans: 12,
-        planCategoryCounts: {
-          travel: 5,
-          auto: 3,
-          pet: 2,
-          health: 2
-        },
-        marketplaceVisits: 324,
-        planComparisons: 187,
-        quoteRequests: 65,
-        conversionRate: 0.13,
-        topPerformingPlans: [
-          { id: 1, name: "Premium Travel Insurance", category: "travel", views: 124, conversions: 14 },
-          { id: 2, name: "Comprehensive Auto Coverage", category: "auto", views: 95, conversions: 9 },
-          { id: 3, name: "Pet Insurance Plus", category: "pet", views: 67, conversions: 5 }
-        ]
+      // Get dashboard analytics data efficiently
+      const { plans, analytics } = await storage.getDashboardAnalytics(profile.id);
+      
+      // Aggregate analytics by plan and date
+      const planAnalyticsMap = new Map<number, {
+        planName: string;
+        category: string;
+        provider: string;
+        totalViews: number;
+        totalComparisons: number;
+        totalConversions: number;
+        timeSeries: Array<{ date: string; views: number; comparisons: number; conversions: number }>;
+      }>();
+      
+      // Initialize plan data
+      plans.forEach((plan: CompanyPlan) => {
+        planAnalyticsMap.set(plan.id, {
+          planName: plan.name,
+          category: plan.category,
+          provider: plan.provider || profile.name,
+          totalViews: 0,
+          totalComparisons: 0,
+          totalConversions: 0,
+          timeSeries: []
+        });
+      });
+      
+      // Group analytics by plan and date
+      const timeSeriesByPlan = new Map<number, Map<string, { views: number; comparisons: number; conversions: number }>>();
+      
+      analytics.forEach((analytic: any) => {
+        const planData = planAnalyticsMap.get(analytic.planId);
+        if (!planData) return;
+        
+        // Update totals
+        planData.totalViews += analytic.views || 0;
+        planData.totalComparisons += analytic.comparisons || 0;
+        planData.totalConversions += analytic.conversions || 0;
+        
+        // Group by date for time series
+        const dateKey = analytic.date ? new Date(analytic.date).toISOString().split('T')[0] : '';
+        if (!timeSeriesByPlan.has(analytic.planId)) {
+          timeSeriesByPlan.set(analytic.planId, new Map());
+        }
+        const planTimeSeries = timeSeriesByPlan.get(analytic.planId)!;
+        
+        if (!planTimeSeries.has(dateKey)) {
+          planTimeSeries.set(dateKey, { views: 0, comparisons: 0, conversions: 0 });
+        }
+        const dateData = planTimeSeries.get(dateKey)!;
+        dateData.views += analytic.views || 0;
+        dateData.comparisons += analytic.comparisons || 0;
+        dateData.conversions += analytic.conversions || 0;
+      });
+      
+      // Convert time series maps to arrays
+      timeSeriesByPlan.forEach((timeSeries, planId) => {
+        const planData = planAnalyticsMap.get(planId);
+        if (planData) {
+          planData.timeSeries = Array.from(timeSeries.entries())
+            .map(([date, data]) => ({ date, ...data }))
+            .sort((a, b) => a.date.localeCompare(b.date));
+        }
+      });
+      
+      // Convert to array format
+      const plansWithAnalytics = Array.from(planAnalyticsMap.entries()).map(([planId, data]) => ({
+        planId,
+        planName: data.planName,
+        category: data.category,
+        provider: data.provider,
+        views: data.totalViews,
+        comparisons: data.totalComparisons,
+        conversions: data.totalConversions,
+        conversionRate: data.totalViews > 0 ? (data.totalConversions / data.totalViews) : 0,
+        timeSeries: data.timeSeries
+      }));
+      
+      // Calculate summary statistics
+      const summaryStats = {
+        totalViews: plansWithAnalytics.reduce((sum, p) => sum + p.views, 0),
+        totalComparisons: plansWithAnalytics.reduce((sum, p) => sum + p.comparisons, 0),
+        totalConversions: plansWithAnalytics.reduce((sum, p) => sum + p.conversions, 0),
+        totalPlans: plans.length,
+        averageConversionRate: plansWithAnalytics.length > 0 
+          ? plansWithAnalytics.reduce((sum, p) => sum + p.conversionRate, 0) / plansWithAnalytics.length 
+          : 0,
+        plansByCategory: plans.reduce((acc: Record<string, number>, plan: CompanyPlan) => {
+          acc[plan.category] = (acc[plan.category] || 0) + 1;
+          return acc;
+        }, {} as Record<string, number>)
       };
       
-      res.json(analyticsData);
+      // Get top performing plans
+      const topPerformingPlans = [...plansWithAnalytics]
+        .sort((a, b) => b.conversions - a.conversions)
+        .slice(0, 5)
+        .map(p => ({
+          id: p.planId,
+          name: p.planName,
+          category: p.category,
+          views: p.views,
+          conversions: p.conversions,
+          conversionRate: p.conversionRate
+        }));
+      
+      res.json({
+        summaryStats,
+        plans: plansWithAnalytics,
+        topPerformingPlans,
+        lastUpdated: new Date().toISOString()
+      });
     } catch (error: any) {
       console.error("Error retrieving analytics:", error);
       res.status(500).json({ message: error.message || "Server error" });
@@ -1376,6 +1467,55 @@ ${posts.map(post => {
     } catch (error: any) {
       console.error("GET /api/search - Error:", error);
       res.status(500).json({ message: "Failed to search insurance plans", error: error.message });
+    }
+  });
+
+  // Analytics recording endpoints
+  app.post("/api/company/analytics/view/:planId", async (req, res) => {
+    try {
+      const planId = parseInt(req.params.planId, 10);
+      
+      if (isNaN(planId)) {
+        return res.status(400).json({ message: "Invalid plan ID format" });
+      }
+      
+      const analytic = await storage.recordPlanView(planId);
+      res.json({ success: true, analytic });
+    } catch (error: any) {
+      console.error("Error recording plan view:", error);
+      res.status(500).json({ message: error.message || "Server error" });
+    }
+  });
+  
+  app.post("/api/company/analytics/comparison/:planId", async (req, res) => {
+    try {
+      const planId = parseInt(req.params.planId, 10);
+      
+      if (isNaN(planId)) {
+        return res.status(400).json({ message: "Invalid plan ID format" });
+      }
+      
+      const analytic = await storage.recordPlanComparison(planId);
+      res.json({ success: true, analytic });
+    } catch (error: any) {
+      console.error("Error recording plan comparison:", error);
+      res.status(500).json({ message: error.message || "Server error" });
+    }
+  });
+  
+  app.post("/api/company/analytics/conversion/:planId", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const planId = parseInt(req.params.planId, 10);
+      
+      if (isNaN(planId)) {
+        return res.status(400).json({ message: "Invalid plan ID format" });
+      }
+      
+      const analytic = await storage.recordPlanConversion(planId);
+      res.json({ success: true, analytic });
+    } catch (error: any) {
+      console.error("Error recording plan conversion:", error);
+      res.status(500).json({ message: error.message || "Server error" });
     }
   });
 

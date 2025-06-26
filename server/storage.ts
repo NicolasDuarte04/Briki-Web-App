@@ -196,22 +196,62 @@ export class DatabaseStorage implements IStorage {
         return plan;
     }
     async getPlanAnalytics(planId: number): Promise<PlanAnalytic[]> {
-        return await db.select().from(planAnalytics).where(eq(planAnalytics.planId, planId));
+        return await db.select().from(planAnalytics).where(eq(planAnalytics.planId, planId)).orderBy(desc(planAnalytics.date));
     }
     async recordPlanView(planId: number): Promise<PlanAnalytic> {
-        const [analytic] = await db.update(planAnalytics).set({ views: sql`${planAnalytics.views} + 1` }).where(eq(planAnalytics.planId, planId)).returning();
+        const [analytic] = await db.insert(planAnalytics).values({ 
+            planId, 
+            views: 1, 
+            comparisons: 0, 
+            conversions: 0,
+            date: new Date()
+        }).returning();
         return analytic;
     }
     async recordPlanComparison(planId: number): Promise<PlanAnalytic> {
-        const [analytic] = await db.update(planAnalytics).set({ comparisons: sql`${planAnalytics.comparisons} + 1` }).where(eq(planAnalytics.planId, planId)).returning();
+        const [analytic] = await db.insert(planAnalytics).values({ 
+            planId, 
+            views: 0, 
+            comparisons: 1, 
+            conversions: 0,
+            date: new Date()
+        }).returning();
         return analytic;
     }
     async recordPlanConversion(planId: number): Promise<PlanAnalytic> {
-        const [analytic] = await db.update(planAnalytics).set({ conversions: sql`${planAnalytics.conversions} + 1` }).where(eq(planAnalytics.planId, planId)).returning();
+        const [analytic] = await db.insert(planAnalytics).values({ 
+            planId, 
+            views: 0, 
+            comparisons: 0, 
+            conversions: 1,
+            date: new Date()
+        }).returning();
         return analytic;
     }
     async getDashboardAnalytics(companyId: number): Promise<any> {
-        return {}; // Placeholder
+        // Get all plans for this company
+        const plans = await db.select().from(companyPlans).where(eq(companyPlans.companyId, companyId));
+        
+        // Get analytics for all plans in a single query with joins
+        const analyticsWithPlans = await db
+            .select({
+                planId: planAnalytics.planId,
+                planName: companyPlans.name,
+                planCategory: companyPlans.category,
+                views: planAnalytics.views,
+                comparisons: planAnalytics.comparisons,
+                conversions: planAnalytics.conversions,
+                date: planAnalytics.date,
+            })
+            .from(planAnalytics)
+            .innerJoin(companyPlans, eq(planAnalytics.planId, companyPlans.id))
+            .where(eq(companyPlans.companyId, companyId))
+            .orderBy(desc(planAnalytics.date));
+        
+        return {
+            plans,
+            analytics: analyticsWithPlans
+        };
     }
     async createTrip(tripData: any): Promise<any> {
         return { id: 'trip123', ...tripData };
@@ -238,7 +278,7 @@ export class DatabaseStorage implements IStorage {
         const plans = loadMockInsurancePlans();
         return Promise.resolve(filterPlansByAttributes(plans, filters));
     }
-    semanticSearchPlans(query: string, limit: number = 5): Promise<MockInsurancePlan[]> {
+    semanticSearchPlans(query: string, limit?: number): Promise<MockInsurancePlan[]> {
         const plans = loadMockInsurancePlans();
         const { semanticSearch } = require("./services/semantic-search");
         return Promise.resolve(semanticSearch(query, plans, limit));

@@ -40,6 +40,7 @@ import { Loader2, ShieldCheck, Calendar, Briefcase, HelpCircle } from "lucide-re
 import { FuturisticBackground } from "@/components/ui/futuristic-background";
 import { AIAssistant, getCheckoutTips } from "@/components/ui/ai-assistant";
 import { AuthenticatedLayout } from "@/components/layout";
+import { logPlanAnalytics } from "@/lib/analytics";
 
 const checkoutFormSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -197,12 +198,26 @@ export default function CheckoutPage() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [isLoadingPaymentIntent, setIsLoadingPaymentIntent] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<InsurancePlan | null>(null);
+
+  useEffect(() => {
+    const storedPlan = sessionStorage.getItem('selectedPlan');
+    if (storedPlan) {
+      setSelectedPlan(JSON.parse(storedPlan));
+    }
+  }, []);
 
   // Fetch selected insurance plan
   const { data: plan, isLoading: planLoading } = useQuery<InsurancePlan>({
     queryKey: [`/api/insurance-plans/${planId}`],
     enabled: !!planId,
   });
+
+  useEffect(() => {
+    if (plan) {
+      logPlanAnalytics('plan_purchased', plan, user?.id ? String(user.id) : null);
+    }
+  }, [plan, user]);
 
   // Fetch latest trip data
   const { data: trips, isLoading: tripsLoading } = useQuery<Trip[]>({
@@ -288,6 +303,9 @@ export default function CheckoutPage() {
     },
     onSuccess: (data) => {
       if (data) {
+        if (plan) {
+          logPlanAnalytics('plan_purchased', plan, user?.id ? String(user.id) : null);
+        }
         queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
         setShowSuccess(true);
       }
