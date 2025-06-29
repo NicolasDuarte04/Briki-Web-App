@@ -54,8 +54,8 @@ export default function FeaturesPage() {
         <section className="relative overflow-hidden" aria-labelledby="hero-heading">
           {/* Ambient Background Effect */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-0 left-1/4 w-1/2 h-1/2 bg-blue-400/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 w-1/2 h-1/2 bg-indigo-400/10 rounded-full blur-3xl" />
+          <div className="absolute top-0 left-1/4 w-1/2 h-1/2 bg-blue-600/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-1/2 h-1/2 bg-cyan-500/10 rounded-full blur-3xl" />
         </div>
 
         <div className="relative max-w-7xl mx-auto py-20 md:py-28 px-4 sm:px-6 lg:px-8">
@@ -66,7 +66,7 @@ export default function FeaturesPage() {
             variants={fadeIn}
           >
             <h1 id="hero-heading" className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              Understand Insurance <span className="text-primary">in Seconds</span>
+              Understand Insurance <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">in Seconds</span>
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-10">
               No jargon. No confusion. Just crystal-clear insurance comparisons powered by AI that actually make sense.
@@ -114,7 +114,7 @@ export default function FeaturesPage() {
               className="bg-white rounded-xl shadow-md p-8 hover:shadow-lg transition-shadow"
               variants={fadeIn}
             >
-              <div className="h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
+              <div className="h-12 w-12 bg-gradient-to-r from-blue-600/10 to-cyan-500/10 rounded-lg flex items-center justify-center mb-6">
                 <Sparkles className="h-6 w-6 text-blue-600" />
               </div>
               <h3 className="text-xl font-semibold mb-4">Briki Compares, So You Don't Have To</h3>
@@ -128,8 +128,8 @@ export default function FeaturesPage() {
               className="bg-white rounded-xl shadow-md p-8 hover:shadow-lg transition-shadow"
               variants={fadeIn}
             >
-              <div className="h-12 w-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-6">
-                <LineChart className="h-6 w-6 text-indigo-600" />
+              <div className="h-12 w-12 bg-gradient-to-r from-blue-600/10 to-cyan-500/10 rounded-lg flex items-center justify-center mb-6">
+                <LineChart className="h-6 w-6 text-blue-600" />
               </div>
               <h3 className="text-xl font-semibold mb-4">See What You're Actually Buying</h3>
               <p className="text-gray-600">
@@ -142,8 +142,8 @@ export default function FeaturesPage() {
               className="bg-white rounded-xl shadow-md p-8 hover:shadow-lg transition-shadow"
               variants={fadeIn}
             >
-              <div className="h-12 w-12 bg-purple-100 rounded-lg flex items-center justify-center mb-6">
-                <Clock className="h-6 w-6 text-purple-600" />
+              <div className="h-12 w-12 bg-gradient-to-r from-blue-600/10 to-cyan-500/10 rounded-lg flex items-center justify-center mb-6">
+                <Clock className="h-6 w-6 text-blue-600" />
               </div>
               <h3 className="text-xl font-semibold mb-4">Covered in Clicks, Not Days</h3>
               <p className="text-gray-600">
@@ -187,7 +187,7 @@ export default function FeaturesPage() {
                 variants={fadeIn}
               >
                 <div className="bg-white p-6 rounded-xl shadow-md relative z-10">
-                  <div className="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center mb-4 mx-auto">
+                  <div className="h-12 w-12 bg-gradient-to-r from-blue-600/10 to-cyan-500/10 rounded-full flex items-center justify-center mb-4 mx-auto">
                     <span className="text-blue-600 font-bold">1</span>
                   </div>
                   <h3 className="text-xl font-semibold mb-3 text-center">Quick Chat, Not a Questionnaire</h3>
@@ -203,8 +203,8 @@ export default function FeaturesPage() {
                 variants={fadeIn}
               >
                 <div className="bg-white p-6 rounded-xl shadow-md relative z-10">
-                  <div className="h-12 w-12 bg-indigo-100 rounded-full flex items-center justify-center mb-4 mx-auto">
-                    <span className="text-indigo-600 font-bold">2</span>
+                  <div className="h-12 w-12 bg-gradient-to-r from-blue-600/10 to-cyan-500/10 rounded-full flex items-center justify-center mb-4 mx-auto">
+                    <span className="text-blue-600 font-bold">2</span>
                   </div>
                   <h3 className="text-xl font-semibold mb-3 text-center">See the Full Picture</h3>
                   <p className="text-gray-600 text-center">
@@ -219,8 +219,8 @@ export default function FeaturesPage() {
                 variants={fadeIn}
               >
                 <div className="bg-white p-6 rounded-xl shadow-md relative z-10">
-                  <div className="h-12 w-12 bg-purple-100 rounded-full flex items-center justify-center mb-4 mx-auto">
-                    <span className="text-purple-600 font-bold">3</span>
+                  <div className="h-12 w-12 bg-gradient-to-r from-blue-600/10 to-cyan-500/10 rounded-full flex items-center justify-center mb-4 mx-auto">
+                    <span className="text-blue-600 font-bold">3</span>
                   </div>
                   <h3 className="text-xl font-semibold mb-3 text-center">Protected in Minutes</h3>
                   <p className="text-gray-600 text-center">
@@ -317,7 +317,7 @@ export default function FeaturesPage() {
 
       {/* CTA Section */}
       <section className="relative py-20 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 opacity-90"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-cyan-500 opacity-90"></div>
         <div className="absolute inset-0 opacity-30">
           <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-white/10 rounded-full blur-3xl transform translate-x-1/4 -translate-y-1/4" />
           <div className="absolute bottom-0 left-0 w-1/2 h-1/2 bg-white/10 rounded-full blur-3xl transform -translate-x-1/4 translate-y-1/4" />

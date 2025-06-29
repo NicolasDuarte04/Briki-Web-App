@@ -90,10 +90,10 @@ export default function BlogPage() {
       
       <main id="main-content">
         {/* Hero Section */}
-        <section className="relative overflow-hidden bg-gradient-to-b from-blue-50 to-white" aria-labelledby="blog-heading">
+        <section className="relative overflow-hidden bg-gradient-to-b from-gray-50 to-white" aria-labelledby="blog-heading">
           <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-100 rounded-full opacity-70 blur-3xl" />
-            <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-indigo-100 rounded-full opacity-70 blur-3xl" />
+            <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-r from-blue-600/10 to-cyan-500/10 rounded-full opacity-70 blur-3xl" />
+            <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-r from-blue-600/10 to-cyan-500/10 rounded-full opacity-70 blur-3xl" />
           </div>
           
           <div className="relative max-w-7xl mx-auto px-4 py-16 sm:py-24">
@@ -104,7 +104,7 @@ export default function BlogPage() {
               className="text-center"
             >
               <h1 id="blog-heading" className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
-                Insurance <span className="text-blue-600">Insights</span>
+                Insurance <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">Insights</span>
               </h1>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
                 Expert advice, tips, and insights to help you make informed insurance decisions. 
@@ -128,7 +128,7 @@ export default function BlogPage() {
                     <Button
                       variant={selectedCategory === '' ? 'default' : 'outline'}
                       onClick={() => setSelectedCategory('')}
-                      className="whitespace-nowrap"
+                      className={`whitespace-nowrap ${selectedCategory === '' ? 'bg-gradient-to-r from-blue-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-blue-600/25' : ''}`}
                     >
                       All
                     </Button>
@@ -137,8 +137,7 @@ export default function BlogPage() {
                         key={category.id}
                         variant={selectedCategory === category.slug ? 'default' : 'outline'}
                         onClick={() => setSelectedCategory(category.slug)}
-                        className="whitespace-nowrap"
-                        style={selectedCategory === category.slug ? { backgroundColor: category.color } : {}}
+                        className={`whitespace-nowrap ${selectedCategory === category.slug ? 'bg-gradient-to-r from-blue-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-blue-600/25' : ''}`}
                       >
                         {category.name}
                       </Button>
@@ -224,7 +223,7 @@ export default function BlogPage() {
         </section>
 
         {/* Call to Action */}
-        <section className="py-16 bg-gradient-to-r from-blue-600 to-indigo-600">
+        <section className="py-16 bg-gradient-to-r from-blue-600 to-cyan-500">
           <div className="max-w-4xl mx-auto px-4 text-center">
             <motion.div
               initial="hidden"
@@ -233,7 +232,7 @@ export default function BlogPage() {
               className="text-white"
             >
               <h2 className="text-3xl font-bold mb-4">Ready to Find Your Perfect Insurance?</h2>
-              <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+              <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
                 Get personalized recommendations from our AI assistant and compare plans from top providers.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -241,7 +240,7 @@ export default function BlogPage() {
                   size="lg" 
                   variant="secondary"
                   onClick={() => navigate('/ask-briki')}
-                  className="bg-white text-blue-600 hover:bg-blue-50"
+                  className="bg-white text-blue-600 hover:bg-gray-50 hover:shadow-lg hover:shadow-white/25"
                 >
                   Get AI Recommendations
                 </Button>
@@ -249,7 +248,7 @@ export default function BlogPage() {
                   size="lg" 
                   variant="outline"
                   onClick={() => navigate('/insurance')}
-                  className="border-white text-white hover:bg-white hover:text-blue-600"
+                  className="border-white text-white hover:bg-white/10 hover:border-white"
                 >
                   Compare Plans
                 </Button>
@@ -289,7 +288,7 @@ function BlogCard({ post, featured, index }: BlogCardProps) {
       animate="visible"
       className={`
         bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden cursor-pointer group
-        ${featured ? 'ring-2 ring-blue-100' : ''}
+        ${featured ? 'ring-2 ring-blue-600/20' : ''}
       `}
       onClick={() => navigate(`/blog/${post.slug}`)}
       role="button"
@@ -308,14 +307,13 @@ function BlogCard({ post, featured, index }: BlogCardProps) {
           <div className="flex items-center gap-2">
             {post.category_name && (
               <span 
-                className="px-3 py-1 rounded-full text-xs font-medium text-white"
-                style={{ backgroundColor: post.category_color || '#3B82F6' }}
+                className="px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-blue-600 to-cyan-500 text-white"
               >
                 {post.category_name}
               </span>
             )}
             {featured && (
-              <span className="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-medium">
+              <span className="px-3 py-1 bg-gradient-to-r from-blue-600/10 to-cyan-500/10 text-blue-600 rounded-full text-xs font-medium">
                 Featured
               </span>
             )}

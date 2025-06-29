@@ -1,52 +1,23 @@
-import React from 'react';
-import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet';
-import NewBrikiAssistant from '@/components/briki-ai-assistant/NewBrikiAssistant';
-import { PublicLayout } from '@/components/layout/public-layout';
-import { ComparisonSidebar } from '@/components/comparison/ComparisonSidebar';
-import { MobileComparisonDrawer } from '@/components/comparison/MobileComparisonDrawer';
-import { useCompareStore } from '@/store/compare-store';
+import { CleanBrikiAssistant } from '@/components/briki-ai-assistant/CleanBrikiAssistant';
+import Navbar from '@/components/layout/navbar';
 
 export default function AskBrikiAIPage() {
-  const plansToCompare = useCompareStore(state => state.plansToCompare);
-
   return (
-    <PublicLayout>
+    <div className="min-h-screen flex flex-col bg-gray-50">
       <Helmet>
-        <title>Ask Briki AI - Your Insurance Assistant | Briki</title>
-        <meta
-          name="description"
-          content="Chat with Briki AI to get personalized insurance recommendations. Our AI assistant helps you find the perfect coverage for your needs."
+        <title>Briki AI - Tu Asistente Personal de Seguros</title>
+        <meta 
+          name="description" 
+          content="Chatea con Briki AI para obtener recomendaciones personalizadas de seguros. Cotiza al instante seguros de viaje, auto, salud y mascotas en Colombia." 
         />
       </Helmet>
 
-      <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className={`grid grid-cols-1 ${plansToCompare.length > 0 ? 'lg:grid-cols-3' : ''} gap-8 items-start`}>
-            {/* Briki Assistant (Left Column) */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="lg:col-span-2 bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden"
-            >
-              <div className="h-[800px] lg:h-[850px]">
-                <NewBrikiAssistant />
-              </div>
-            </motion.div>
-
-            {/* Comparison Sidebar (Right Column) - Desktop Only */}
-            {plansToCompare.length > 0 && (
-              <div className="hidden lg:block">
-                <ComparisonSidebar />
-              </div>
-            )}
-          </div>
-        </div>
-        
-        {/* Mobile Comparison Drawer */}
-        <MobileComparisonDrawer />
+      <Navbar />
+      
+      <main className="flex-grow">
+        <CleanBrikiAssistant />
       </main>
-    </PublicLayout>
+    </div>
   );
 }

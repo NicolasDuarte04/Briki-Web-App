@@ -23,7 +23,7 @@ export interface RealInsurancePlan {
   priceRange?: string;
   
   // External redirect fields
-  externalLink: string;
+  externalLink: string | null;
   isExternal: boolean;
   
   // Additional fields for comparison
@@ -93,6 +93,93 @@ export const realPlans: RealInsurancePlan[] = [
       "Cobertura completa (daños, hurto, accesorios especiales, llaves, etc.)",
       "Asistencias premium: conductor y cerrajería ilimitados, grúa de amplio alcance, vehículo sustituto hasta 20 días"
     ]
+  },
+  // ----------------- MAPFRE Colombia  -----------------
+  {
+    id: "mapfre-auto-tradicional",
+    provider: "MAPFRE",
+    category: "auto",
+    name: "Seguro de automóvil Tradicional",
+    summary: "Póliza todo riesgo estándar para vehículos particulares. Ofrece protección integral contra accidentes, robo y daños a terceros.",
+    price: "Cotización disponible en línea",
+    externalLink: "https://www.mapfre.com.co/seguros-carros/tradicional/",
+    isExternal: true,
+    features: [
+      "Cobertura todo riesgo estándar",
+      "Asistencia en carretera 24/7",
+      "Responsabilidad civil extracontractual"
+    ]
+  },
+  {
+    id: "mapfre-auto-familiar",
+    provider: "MAPFRE",
+    category: "auto",
+    name: "Seguro de automóvil Familiar",
+    summary: "Seguro todo riesgo para familias, con beneficios especiales como descuentos por hijos y asistencia familiar.",
+    price: "Cotización disponible en línea",
+    externalLink: "https://www.mapfre.com.co/seguros-carros/familiar/",
+    isExternal: true,
+    features: [
+      "Beneficios y descuentos para grupos familiares",
+      "Cobertura de responsabilidad civil y daños parciales/totales",
+      "Asistencia en viaje y carro taller"
+    ]
+  },
+  {
+    id: "mapfre-auto-mujer",
+    provider: "MAPFRE",
+    category: "auto",
+    name: "Seguro de automóvil Mujer",
+    summary: "Póliza exclusiva para mujeres con beneficios únicos como cirugía plástica facial y cobertura de vidrios sin deducible.",
+    price: "Cotización disponible en línea",
+    externalLink: "https://www.mapfre.com.co/seguros-carros/mujer/",
+    isExternal: true,
+    features: [
+      "Beneficios exclusivos para conductoras",
+      "Cobertura de cosmetología facial tras accidentes",
+      "Reposición de vidrios sin deducible"
+    ]
+  },
+  {
+    id: "mapfre-auto-cero-km",
+    provider: "MAPFRE",
+    category: "auto",
+    name: "Seguro de automóvil Cero Kilómetros",
+    summary: "Seguro todo riesgo diseñado para vehículos nuevos o de alta gama, con máxima protección desde el primer día.",
+    price: "Cotización disponible en línea",
+    externalLink: "https://www.mapfre.com.co/seguros-carros/cero-kilometros/",
+    isExternal: true,
+    features: [
+      "Cobertura todo riesgo sin depreciación inicial",
+      "Gastos de matrícula y traspaso en caso de pérdida total",
+      "Reposición a nuevo del vehículo"
+    ]
+  },
+  {
+    id: "mapfre-auto-carga",
+    provider: "MAPFRE",
+    category: "auto",
+    name: "Seguro para Vehículos Pesados",
+    summary: "Cobertura todo riesgo para camiones y vehículos de carga, incluyendo asistencia en carretera y protección de mercancía.",
+    price: "Cotización disponible en línea",
+    externalLink: "https://www.mapfre.com.co/seguros-carros/vehiculos-de-carga/",
+    isExternal: true,
+    features: [
+      "Cobertura de daños parciales y totales",
+      "Protección de carga y asistencia en ruta",
+      "Responsabilidad civil alta capacidad"
+    ]
+  },
+  {
+    id: "mapfre-soat",
+    provider: "MAPFRE",
+    category: "auto",
+    name: "SOAT (no disponible)",
+    summary: "MAPFRE Colombia no comercializa el Seguro Obligatorio de Accidentes de Tránsito (SOAT).",
+    price: "No disponible",
+    externalLink: null,
+    isExternal: false,
+    features: []
   }
 ];
 

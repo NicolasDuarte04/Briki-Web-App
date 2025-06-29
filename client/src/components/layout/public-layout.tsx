@@ -1,8 +1,8 @@
 import React from 'react';
-import Navbar from '@/components/navbar';
 import { useNavigation } from '@/lib/navigation';
 import { Link } from 'wouter';
 import { motion } from 'framer-motion';
+import Navbar from './navbar';
 
 interface PublicLayoutProps {
   children: React.ReactNode;
@@ -13,7 +13,7 @@ export function PublicLayout({ children }: PublicLayoutProps) {
   
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Standardized navbar component */}
+      {/* Add the new navbar */}
       {location !== '/auth' && <Navbar />}
       
       {/* Main content */}

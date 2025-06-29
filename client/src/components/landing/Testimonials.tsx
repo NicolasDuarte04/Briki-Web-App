@@ -70,13 +70,13 @@ export default function Testimonials() {
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          <Badge className="mb-8 px-4 py-2 bg-gradient-to-r from-[#00C7C4]/10 to-[#0077B6]/10 text-[#0077B6] border-[#00C7C4]/20 backdrop-blur-sm shadow-sm">
+          <Badge className="mb-8 px-4 py-2 bg-gradient-to-r from-blue-600/10 to-cyan-500/10 text-blue-600 border-blue-600/20 backdrop-blur-sm shadow-sm">
             <Star className="w-3.5 h-3.5 mr-2" />
             Customer Stories
           </Badge>
           
           <h2 className="text-5xl md:text-6xl font-bold tracking-tight mb-6">
-            Trusted by <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00C7C4] to-[#0077B6]">Users & Partners</span>
+            Trusted by <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">Users & Partners</span>
           </h2>
           <p className="text-xl text-gray-600 leading-relaxed">
             See what our community has to say about their experience with Briki.
@@ -97,14 +97,14 @@ export default function Testimonials() {
               }}
               className="h-full"
             >
-              <Card className="group h-full flex flex-col p-8 bg-white backdrop-blur-sm border border-gray-200/60 rounded-2xl hover:shadow-2xl hover:shadow-[#00C7C4]/10 hover:scale-[1.02] hover:-translate-y-1 transition-all duration-300">
+              <Card className="group h-full flex flex-col p-8 bg-white backdrop-blur-sm border border-gray-200/60 rounded-2xl hover:shadow-2xl hover:shadow-blue-600/10 hover:scale-[1.02] hover:-translate-y-1 transition-all duration-300">
                 <CardContent className="flex-grow p-0">
                   <div className="flex items-center justify-between mb-6">
-                    <Quote className="h-8 w-8 text-[#00C7C4]/20 group-hover:text-[#00C7C4]/30 transition-colors" />
+                    <Quote className="h-8 w-8 text-blue-600/20 group-hover:text-blue-600/30 transition-colors" />
                     {testimonial.rating && (
                       <div className="flex gap-0.5">
                         {Array.from({ length: testimonial.rating }).map((_, i) => (
-                          <Star key={i} className="w-4 h-4 fill-[#00C7C4] text-[#00C7C4]" />
+                          <Star key={i} className="w-4 h-4 fill-blue-600 text-blue-600" />
                         ))}
                       </div>
                     )}
@@ -115,8 +115,8 @@ export default function Testimonials() {
                 </CardContent>
                 <CardFooter className="p-0 pt-6 mt-auto">
                   <div className="flex items-center">
-                    <Avatar className="h-12 w-12 mr-4 ring-2 ring-[#00C7C4]/20 group-hover:ring-[#00C7C4]/40 transition-all">
-                      <AvatarFallback className="bg-gradient-to-br from-[#00C7C4] to-[#0077B6] text-white font-semibold">
+                    <Avatar className="h-12 w-12 mr-4 ring-2 ring-blue-600/20 group-hover:ring-blue-600/40 transition-all">
+                      <AvatarFallback className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-semibold">
                         {testimonial.avatar}
                       </AvatarFallback>
                     </Avatar>

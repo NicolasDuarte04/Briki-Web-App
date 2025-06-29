@@ -1,187 +1,165 @@
-import React from 'react';
-import { PublicLayout } from '@/components/layout/public-layout';
 import { motion } from 'framer-motion';
-import { useNavigation } from '@/lib/navigation';
-import { Button } from '@/components/ui/button';
-import GradientButton from '@/components/gradient-button';
 import { Helmet } from 'react-helmet';
-import { ArrowRight, Bot, Shield, MessageCircle } from 'lucide-react';
-import NewBrikiAssistant from '@/components/briki-ai-assistant/NewBrikiAssistant';
+import { Bot, Shield, MessageCircle, ArrowRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useLocation } from 'wouter';
+import Navbar from '@/components/layout/navbar';
 
 export default function AskBrikiPage() {
-  const { navigate } = useNavigation();
-
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { 
-      opacity: 1,
-      transition: { 
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: { duration: 0.6 }
-    }
-  };
-
-  const ctaVariants = {
-    hidden: { opacity: 0, scale: 0.95 },
-    visible: { 
-      opacity: 1, 
-      scale: 1,
-      transition: { duration: 0.5, delay: 0.3 }
-    }
-  };
+  const [, navigate] = useLocation();
 
   return (
-    <PublicLayout>
+    <div className="min-h-screen flex flex-col">
       <Helmet>
-        <title>Ask Briki - AI Insurance Assistant | Briki</title>
-        <meta 
-          name="description" 
-          content="Chat with Briki AI to get personalized insurance recommendations. Get instant quotes for travel, auto, health, and pet insurance in Colombia." 
-        />
-        <meta name="keywords" content="insurance AI, chat bot, insurance quotes, Colombia insurance, travel insurance, auto insurance" />
+        <title>Ask Briki - Tu Asistente de Seguros Inteligente</title>
+        <meta name="description" content="Briki AI te ayuda a encontrar el seguro perfecto para ti, comparando planes y respondiendo todas tus preguntas sobre seguros." />
       </Helmet>
 
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50">
-        {/* Hero Section */}
-        <section className="pt-12 pb-8 md:pt-20 md:pb-12">
-          <motion.div
-            className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            <motion.div 
-              className="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium mb-6"
-              variants={itemVariants}
-            >
-              <Bot className="w-4 h-4 mr-2" />
-              Asistente IA Disponible 24/7
-            </motion.div>
+      <Navbar />
 
-            <motion.h1 
-              className="text-4xl md:text-6xl font-bold text-gray-900 mb-6"
-              variants={itemVariants}
-            >
-              Pregúntale a{' '}
-              <span className="bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
-                Briki
-              </span>
-            </motion.h1>
-
-            <motion.p 
-              className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed"
-              variants={itemVariants}
-            >
-              Tu asistente personal de seguros con inteligencia artificial. 
-              Obtén recomendaciones personalizadas sin complicaciones.
-            </motion.p>
-
-            <motion.div 
-              className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12"
-              variants={ctaVariants}
-            >
-              <div className="flex items-center text-sm text-gray-500">
-                <Shield className="w-4 h-4 mr-2 text-green-500" />
-                Seguro y confiable
-              </div>
-              <div className="flex items-center text-sm text-gray-500">
-                <MessageCircle className="w-4 h-4 mr-2 text-blue-500" />
-                Respuestas instantáneas
-              </div>
-            </motion.div>
-          </motion.div>
-        </section>
-
-        {/* Chat UI Section */}
-        <section className="py-12 md:py-20" aria-labelledby="chat-demo-heading">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 id="chat-demo-heading" className="sr-only">Chat with Briki AI Assistant</h2>
-            
-            {/* Interactive AI Chat Component */}
+      <div className="flex-grow bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20">
+          {/* Hero Section */}
+          <div className="text-center space-y-8 mb-16">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
+              transition={{ duration: 0.6 }}
             >
-              <NewBrikiAssistant />
+              <h1 className="text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-500">
+                Tu Asistente de Seguros Inteligente
+              </h1>
+              <p className="mt-4 text-xl text-gray-600 dark:text-gray-300">
+                Encuentra el seguro perfecto con la ayuda de Briki AI
+              </p>
             </motion.div>
 
-            {/* Questions People Ask */}
-            <motion.div 
-              className="mt-16 text-center"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.5 }}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="flex flex-col sm:flex-row gap-4 justify-center"
             >
-              <h3 className="text-2xl font-bold text-gray-900 mb-8">
-                Preguntas que la gente hace
-              </h3>
-              
-              <div className="grid md:grid-cols-2 gap-4 max-w-3xl mx-auto">
-                {[
-                  "¿Qué seguro necesito para mi Vespa en Bogotá?",
-                  "¿Cuánto cuesta un seguro de viaje a Europa?",
-                  "¿Hay seguros para perros en Colombia?",
-                  "¿Qué cubre un seguro de salud familiar?"
-                ].map((question, index) => (
-                  <motion.div
-                    key={index}
-                    className="p-4 bg-white rounded-lg shadow-sm border border-gray-200 text-left"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: 0.6 + index * 0.1 }}
-                  >
-                    <p className="text-gray-700 text-sm">{question}</p>
-                  </motion.div>
-                ))}
+              <Button
+                size="lg"
+                className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:shadow-lg hover:shadow-blue-600/25 text-white transition-all"
+                onClick={() => navigate('/ask-briki-ai')}
+              >
+                Comenzar Ahora
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </motion.div>
+          </div>
+
+          {/* Features Grid */}
+          <div className="grid md:grid-cols-3 gap-8 mb-16">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg"
+            >
+              <div className="bg-gradient-to-r from-blue-600/10 to-cyan-500/10 p-3 rounded-lg inline-block mb-4">
+                <Bot className="h-12 w-12 text-blue-600" />
               </div>
+              <h3 className="text-xl font-semibold mb-2">Asistente Inteligente</h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                Respuestas instantáneas a todas tus preguntas sobre seguros
+              </p>
             </motion.div>
 
-            {/* CTA Section */}
-            <motion.div 
-              className="mt-16 text-center"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.8 }}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg"
             >
-              <div className="bg-gradient-to-r from-blue-600 to-cyan-500 rounded-2xl p-8 text-white">
-                <h3 className="text-2xl font-bold mb-4">
-                  ¿Listo para encontrar tu seguro ideal?
-                </h3>
-                <p className="text-blue-100 mb-6">
-                  Únete a miles de colombianos que ya confían en Briki
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <GradientButton
-                    onClick={() => navigate('/register')}
-                    className="bg-white text-blue-600 hover:bg-gray-50"
-                  >
-                    Crear cuenta gratis
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </GradientButton>
-                  <Button
-                    variant="outline"
-                    onClick={() => navigate('/plans')}
-                    className="border-white text-white hover:bg-white/10"
-                  >
-                    Ver todos los planes
-                  </Button>
+              <div className="bg-gradient-to-r from-blue-600/10 to-cyan-500/10 p-3 rounded-lg inline-block mb-4">
+                <Shield className="h-12 w-12 text-blue-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Comparación Inteligente</h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                Compara planes de diferentes aseguradoras en segundos
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+              className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg"
+            >
+              <div className="bg-gradient-to-r from-blue-600/10 to-cyan-500/10 p-3 rounded-lg inline-block mb-4">
+                <MessageCircle className="h-12 w-12 text-blue-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Recomendaciones Personalizadas</h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                Recibe sugerencias adaptadas a tus necesidades específicas
+              </p>
+            </motion.div>
+          </div>
+
+          {/* How It Works Section */}
+          <div className="text-center mb-16">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+            >
+              <h2 className="text-3xl font-bold mb-8">¿Cómo Funciona?</h2>
+              <div className="grid md:grid-cols-3 gap-8">
+                <div>
+                  <div className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500 mb-4">1</div>
+                  <h3 className="text-xl font-semibold mb-2">Describe tus Necesidades</h3>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    Cuéntale a Briki qué tipo de seguro buscas
+                  </p>
+                </div>
+                <div>
+                  <div className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500 mb-4">2</div>
+                  <h3 className="text-xl font-semibold mb-2">Recibe Recomendaciones</h3>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    Obtén sugerencias personalizadas de planes
+                  </p>
+                </div>
+                <div>
+                  <div className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500 mb-4">3</div>
+                  <h3 className="text-xl font-semibold mb-2">Cotiza al Instante</h3>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    Conecta directamente con las aseguradoras
+                  </p>
                 </div>
               </div>
             </motion.div>
           </div>
-        </section>
+
+          {/* CTA Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.7 }}
+            className="text-center"
+          >
+            <div className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-2xl p-8 md:p-12">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                ¿Listo para encontrar tu seguro ideal?
+              </h2>
+              <p className="text-xl mb-8">
+                Deja que Briki AI te ayude a tomar la mejor decisión
+              </p>
+              <Button
+                size="lg"
+                variant="secondary"
+                className="bg-white text-blue-600 hover:bg-gray-50 hover:shadow-lg hover:shadow-white/25 transition-all"
+                onClick={() => navigate('/ask-briki-ai')}
+              >
+                Comenzar Ahora
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </div>
+          </motion.div>
+        </div>
       </div>
-    </PublicLayout>
+    </div>
   );
 }

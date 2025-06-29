@@ -13,35 +13,35 @@ const forumCategories = [
     name: "Travel Insurance",
     description: "Discussions about travel coverage, international policies, and trip protection",
     postsCount: 145,
-    icon: <MessageCircle className="h-5 w-5 text-blue-500" />
+    icon: <MessageCircle className="h-5 w-5 text-blue-600" />
   },
   {
     id: 2,
     name: "Auto Insurance",
     description: "Topics on car insurance, rates, claims, and coverage options",
     postsCount: 289,
-    icon: <MessageCircle className="h-5 w-5 text-green-500" />
+    icon: <MessageCircle className="h-5 w-5 text-blue-600" />
   },
   {
     id: 3,
     name: "Pet Insurance",
     description: "Conversations about insuring your pets, breed-specific coverage, and claims",
     postsCount: 103,
-    icon: <MessageCircle className="h-5 w-5 text-purple-500" />
+    icon: <MessageCircle className="h-5 w-5 text-blue-600" />
   },
   {
     id: 4,
     name: "Health Insurance",
     description: "Discussions about health plans, providers, and coverage details",
     postsCount: 256,
-    icon: <MessageCircle className="h-5 w-5 text-red-500" />
+    icon: <MessageCircle className="h-5 w-5 text-blue-600" />
   },
   {
     id: 5,
     name: "General Questions",
     description: "Ask anything insurance-related that doesn't fit elsewhere",
     postsCount: 321,
-    icon: <MessageCircle className="h-5 w-5 text-indigo-500" />
+    icon: <MessageCircle className="h-5 w-5 text-blue-600" />
   }
 ];
 
@@ -112,10 +112,10 @@ export default function ForumPage() {
       
       <main id="main-content">
         {/* Hero Section */}
-        <section className="relative overflow-hidden bg-gradient-to-b from-blue-50 to-white" aria-labelledby="forum-heading">
+        <section className="relative overflow-hidden bg-gradient-to-b from-gray-50 to-white" aria-labelledby="forum-heading">
           <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-100 rounded-full opacity-70 blur-3xl" />
-            <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-indigo-100 rounded-full opacity-70 blur-3xl" />
+            <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-r from-blue-600/10 to-cyan-500/10 rounded-full opacity-70 blur-3xl" />
+            <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-r from-blue-600/10 to-cyan-500/10 rounded-full opacity-70 blur-3xl" />
           </div>
 
           <div className="relative max-w-7xl mx-auto py-16 md:py-20 px-4 sm:px-6 lg:px-8 text-center">
@@ -125,7 +125,7 @@ export default function ForumPage() {
               variants={fadeIn}
             >
               <h1 id="forum-heading" className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-                Community <span className="text-primary">Forum</span>
+                Community <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">Forum</span>
               </h1>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
                 Share experiences, get advice, and learn from others in our insurance community. 
@@ -136,13 +136,13 @@ export default function ForumPage() {
                   <input
                     type="text"
                     placeholder="Search the forum..."
-                    className="pl-10 pr-4 py-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="pl-10 pr-4 py-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
                     aria-label="Search the forum"
                   />
                 </div>
                 <Button
                   onClick={() => navigate("/auth")}
-                  className="bg-blue-600 hover:bg-blue-700 py-3 px-6"
+                  className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:shadow-lg hover:shadow-blue-600/25 text-white"
                 >
                   Join the Discussion
                 </Button>
@@ -157,28 +157,28 @@ export default function ForumPage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
               <div className="p-4">
                 <div className="flex items-center justify-center mb-2">
-                  <Users className="h-6 w-6 text-blue-500 mr-2" aria-hidden="true" />
+                  <Users className="h-6 w-6 text-blue-600 mr-2" aria-hidden="true" />
                   <span className="text-2xl font-bold text-gray-900">2,458</span>
                 </div>
                 <p className="text-gray-600">Active Members</p>
               </div>
               <div className="p-4">
                 <div className="flex items-center justify-center mb-2">
-                  <MessageCircle className="h-6 w-6 text-indigo-500 mr-2" aria-hidden="true" />
+                  <MessageCircle className="h-6 w-6 text-blue-600 mr-2" aria-hidden="true" />
                   <span className="text-2xl font-bold text-gray-900">12,984</span>
                 </div>
                 <p className="text-gray-600">Forum Posts</p>
               </div>
               <div className="p-4">
                 <div className="flex items-center justify-center mb-2">
-                  <ThumbsUp className="h-6 w-6 text-green-500 mr-2" aria-hidden="true" />
+                  <ThumbsUp className="h-6 w-6 text-blue-600 mr-2" aria-hidden="true" />
                   <span className="text-2xl font-bold text-gray-900">5,248</span>
                 </div>
                 <p className="text-gray-600">Helpful Answers</p>
               </div>
               <div className="p-4">
                 <div className="flex items-center justify-center mb-2">
-                  <Award className="h-6 w-6 text-amber-500 mr-2" aria-hidden="true" />
+                  <Award className="h-6 w-6 text-blue-600 mr-2" aria-hidden="true" />
                   <span className="text-2xl font-bold text-gray-900">43</span>
                 </div>
                 <p className="text-gray-600">Insurance Experts</p>
@@ -243,7 +243,7 @@ export default function ForumPage() {
                 </motion.div>
               ))}
               <div className="text-center mt-8">
-                <Button variant="outline" onClick={() => navigate("/auth")} className="text-blue-600 border-blue-200">
+                <Button variant="outline" onClick={() => navigate("/auth")} className="text-blue-600 border-blue-200 hover:bg-blue-50">
                   View More Discussions <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </div>
@@ -304,7 +304,7 @@ export default function ForumPage() {
         </section>
 
         {/* Join Community CTA */}
-        <section className="py-16 bg-gradient-to-r from-blue-600 to-indigo-600 text-white" aria-labelledby="join-community-heading">
+        <section className="py-16 bg-gradient-to-r from-blue-600 to-cyan-500 text-white" aria-labelledby="join-community-heading">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -312,13 +312,13 @@ export default function ForumPage() {
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
             >
-              <Lock className="h-10 w-10 mx-auto mb-4 text-blue-300" aria-hidden="true" />
+              <Lock className="h-10 w-10 mx-auto mb-4 text-white/80" aria-hidden="true" />
               <h2 id="join-community-heading" className="text-3xl font-bold mb-4">Join Our Insurance Community</h2>
               <p className="text-xl mb-8 max-w-2xl mx-auto">
                 Sign up to participate in discussions, ask questions, and get personalized advice from our community of users and insurance experts.
               </p>
               <Button
-                className="bg-white text-blue-600 hover:bg-white/90 py-3 px-8 text-lg font-medium rounded-lg"
+                className="bg-white text-blue-600 hover:bg-gray-50 hover:shadow-lg hover:shadow-white/25 py-3 px-8 text-lg font-medium rounded-lg"
                 onClick={() => navigate("/auth")}
                 aria-label="Sign up to join community"
               >

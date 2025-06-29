@@ -112,24 +112,24 @@ export default function AiAssistantSection() {
       {/* Layer 1: Base neutral background */}
       <div className="absolute inset-0 bg-gradient-to-b from-gray-50/50 to-white" />
       
-      {/* Layer 2: Decorative gradient overlay (Stripe-style) */}
+      {/* Layer 2: Decorative gradient overlay */}
       <motion.div 
         className="absolute inset-0 opacity-40"
         style={{ y: y1 }}
       >
-        {/* Glass-like gradient ribbon with enhanced Briki colors */}
+        {/* Glass-like gradient ribbon */}
         <div className="absolute top-0 left-0 right-0 h-[120%] overflow-hidden">
-          <div className="absolute -top-1/4 -left-1/4 w-[150%] h-[150%] bg-gradient-to-br from-[#00C7C4]/40 via-transparent to-[#0098C1]/30 blur-3xl" />
-          <div className="absolute top-1/3 -right-1/4 w-[80%] h-[80%] bg-gradient-to-bl from-[#0077B6]/35 via-transparent to-[#00C7C4]/25 blur-2xl" />
-          {/* Additional Briki teal accent */}
-          <div className="absolute top-1/2 left-1/3 w-[60%] h-[60%] bg-gradient-radial from-[#00C7C4]/20 to-transparent blur-3xl animate-pulse" />
+          <div className="absolute -top-1/4 -left-1/4 w-[150%] h-[150%] bg-gradient-to-br from-cyan-500/40 via-transparent to-blue-500/30 blur-3xl" />
+          <div className="absolute top-1/3 -right-1/4 w-[80%] h-[80%] bg-gradient-to-bl from-blue-600/35 via-transparent to-cyan-500/25 blur-2xl" />
+          {/* Additional accent */}
+          <div className="absolute top-1/2 left-1/3 w-[60%] h-[60%] bg-gradient-radial from-blue-500/20 to-transparent blur-3xl animate-pulse" />
         </div>
         
         {/* Mesh pattern for texture */}
         <div 
           className="absolute inset-0 opacity-[0.03]"
           style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%230077B6' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%232563eb' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
           }}
         />
       </motion.div>
@@ -145,29 +145,29 @@ export default function AiAssistantSection() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
           >
-            {/* Badge positioned above title with proper spacing */}
+            {/* Badge positioned above title */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.1 }}
               className="mb-6"
             >
-              <Badge className="inline-flex px-4 py-2 bg-gradient-to-r from-[#00C7C4]/10 to-[#0077B6]/10 text-[#0077B6] border-[#00C7C4]/20 backdrop-blur-sm shadow-sm">
+              <Badge className="inline-flex px-4 py-2 bg-gradient-to-r from-blue-600/10 to-cyan-500/10 text-blue-600 border-blue-600/20 backdrop-blur-sm shadow-sm">
                 <Sparkles className="w-3.5 h-3.5 mr-2" />
                 New: AI-Powered Insurance
               </Badge>
             </motion.div>
 
-            {/* Title with Briki branding matching navbar gradient */}
+            {/* Title with Briki branding */}
             <motion.h1 
               className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.2 }}
             >
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00C7C4] to-[#0077B6] font-bold">Briki</span> — Find your perfect
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500 font-bold">briki</span> — Find your perfect
               <span className="block relative overflow-hidden">
-                <span className="relative text-transparent bg-clip-text bg-gradient-to-r from-[#00C7C4] via-[#0098C1] to-[#0077B6] bg-[length:200%_auto] animate-gradient">
+                <span className="relative text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500 bg-[length:200%_auto] animate-gradient">
                   insurance match
                 </span>
                 {/* Shimmer effect overlay */}
@@ -175,7 +175,7 @@ export default function AiAssistantSection() {
               </span>
             </motion.h1>
             
-            {/* Subtitle with better contrast */}
+            {/* Subtitle */}
             <motion.p 
               className="text-xl text-gray-600 mb-10 leading-relaxed"
               initial={{ opacity: 0, y: 10 }}
@@ -186,7 +186,7 @@ export default function AiAssistantSection() {
               and make confident decisions — all in one conversation.
             </motion.p>
 
-            {/* CTAs with proper spacing */}
+            {/* CTAs */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -196,7 +196,7 @@ export default function AiAssistantSection() {
               <Button 
                 size="lg" 
                 onClick={handleTryAssistant}
-                className="h-12 px-6 bg-gradient-to-r from-[#00C7C4] to-[#0077B6] text-white hover:shadow-lg transition-all duration-200 font-medium"
+                className="h-12 px-6 bg-gradient-to-r from-blue-600 to-cyan-500 text-white hover:shadow-lg transition-all duration-200 font-medium"
               >
                 Start with AI Assistant
                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -237,15 +237,15 @@ export default function AiAssistantSection() {
             transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
             style={{ y: y2 }}
           >
-            {/* Glass morphism container with enhanced shadow */}
+            {/* Glass morphism container */}
             <div className="relative group">
               {/* Glow effect */}
-              <div className="absolute -inset-4 bg-gradient-to-r from-[#00C7C4]/30 to-[#0077B6]/30 blur-2xl opacity-70 group-hover:opacity-90 transition-opacity" />
+              <div className="absolute -inset-4 bg-gradient-to-r from-blue-600/30 to-cyan-500/30 blur-2xl opacity-70 group-hover:opacity-90 transition-opacity" />
               
               {/* Assistant card */}
               <div className="relative bg-white/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/50 overflow-hidden">
                 {/* Header */}
-                <div className="bg-gradient-to-r from-[#00C7C4] to-[#0077B6] p-4">
+                <div className="bg-gradient-to-r from-blue-600 to-cyan-500 p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
@@ -313,7 +313,7 @@ export default function AiAssistantSection() {
                                       <div className="flex items-center gap-2 mb-1">
                                         <h4 className="font-semibold text-gray-900">{message.card.name}</h4>
                                         {message.card.badge && (
-                                          <Badge className="px-2 py-0.5 text-xs bg-gradient-to-r from-[#00C7C4]/10 to-[#0077B6]/10 text-[#0077B6] border-0">
+                                          <Badge className="px-2 py-0.5 text-xs bg-gradient-to-r from-blue-600/10 to-cyan-500/10 text-blue-600 border-0">
                                             {message.card.badge}
                                           </Badge>
                                         )}
@@ -321,7 +321,7 @@ export default function AiAssistantSection() {
                                       <p className="text-xs text-gray-500">{message.card.provider}</p>
                                     </div>
                                     <div className="text-right">
-                                      <div className="text-2xl font-bold text-[#0077B6]">{message.card.price}</div>
+                                      <div className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">{message.card.price}</div>
                                       <div className="text-xs text-gray-500">{message.card.period}</div>
                                     </div>
                                   </div>
@@ -333,7 +333,7 @@ export default function AiAssistantSection() {
                                   <div className="space-y-2">
                                     {message.card.features.map((feature: string, idx: number) => (
                                       <div key={idx} className="flex items-start gap-2">
-                                        <Check className="w-4 h-4 text-[#00C7C4] mt-0.5 flex-shrink-0" />
+                                        <Check className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
                                         <span className="text-xs text-gray-700">{feature}</span>
                                       </div>
                                     ))}
@@ -342,7 +342,7 @@ export default function AiAssistantSection() {
                                   {/* Action Button */}
                                   <Button 
                                     size="sm" 
-                                    className="w-full mt-4 bg-gradient-to-r from-[#00C7C4] to-[#0077B6] text-white hover:shadow-md transition-all duration-200"
+                                    className="w-full mt-4 bg-gradient-to-r from-blue-600 to-cyan-500 text-white hover:shadow-md transition-all duration-200"
                                   >
                                     View Details
                                   </Button>
@@ -353,7 +353,7 @@ export default function AiAssistantSection() {
                             <motion.div 
                               className={`max-w-[80%] ${
                                 message.type === 'user' 
-                                  ? 'bg-gradient-to-r from-[#00C7C4] to-[#0077B6] text-white rounded-2xl rounded-br-sm' 
+                                  ? 'bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-2xl rounded-br-sm' 
                                   : 'bg-white rounded-2xl rounded-bl-sm shadow-sm'
                               } py-3 px-4`}
                               whileHover={{ scale: 1.02 }}
@@ -408,13 +408,13 @@ export default function AiAssistantSection() {
                   <div className="flex items-center gap-3">
                     <input 
                       type="text" 
-                      className="flex-1 px-4 py-2.5 bg-gray-50 rounded-full text-sm text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00C7C4]/50 transition-all" 
+                      className="flex-1 px-4 py-2.5 bg-gray-50 rounded-full text-sm text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600/50 transition-all" 
                       placeholder="Ask about insurance plans..." 
                       disabled 
                     />
                     <Button 
                       size="sm" 
-                      className="h-10 w-10 rounded-full bg-gradient-to-r from-[#00C7C4] to-[#0077B6] hover:shadow-md transition-all duration-200 p-0"
+                      className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 hover:shadow-md transition-all duration-200 p-0"
                     >
                       <Send className="h-4 w-4" />
                     </Button>

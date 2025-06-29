@@ -18,7 +18,7 @@ export interface GradientButtonProps extends React.ButtonHTMLAttributes<HTMLButt
 const GradientButton = ({
   children,
   gradientFrom = "from-blue-600",
-  gradientTo = "to-indigo-600",
+  gradientTo = "to-cyan-500",
   className,
   icon,
   iconPosition = "left",

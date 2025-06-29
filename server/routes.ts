@@ -1519,6 +1519,32 @@ ${posts.map(post => {
     }
   });
 
+  // External redirect logging endpoint
+  app.post("/api/log/external-redirect", async (req, res) => {
+    try {
+      const { planId, provider, category, userId, timestamp } = req.body;
+      
+      // Log to console for now - in production, this would go to a database
+      console.log("[External Redirect]", {
+        planId,
+        provider,
+        category,
+        userId: userId || 'anonymous',
+        timestamp: timestamp || new Date().toISOString(),
+        userAgent: req.headers['user-agent'],
+        referer: req.headers.referer
+      });
+      
+      // In production, you would save this to a database:
+      // await storage.logExternalRedirect({ planId, provider, category, userId, timestamp });
+      
+      res.json({ success: true, message: "External redirect logged successfully" });
+    } catch (error: any) {
+      console.error("Error logging external redirect:", error);
+      res.status(500).json({ message: error.message || "Failed to log external redirect" });
+    }
+  });
+
   const server = createServer(app);
   return server;
 }

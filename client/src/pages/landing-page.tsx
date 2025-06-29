@@ -46,7 +46,7 @@ export default function LandingPage() {
         <AboutSection />
         
         {/* CTA Section with gradient background */}
-        <section id="cta" className="py-32 bg-gradient-to-br from-[#0077B6] via-[#0098C1] to-[#00C7C4] relative overflow-hidden">
+        <section id="cta" className="py-32 bg-gradient-to-r from-blue-600 to-cyan-500 relative overflow-hidden">
           <div className="absolute inset-0 bg-grid-white/5" />
           {/* Additional decoration */}
           <div className="absolute top-0 left-0 w-full h-full">
@@ -66,7 +66,7 @@ export default function LandingPage() {
                 Ready to Find Your Perfect Coverage?
               </h2>
               <p className="text-xl text-white/90 mb-12 leading-relaxed">
-                Join thousands of Colombians who've simplified their insurance journey with Briki
+                Join thousands of Colombians who've simplified their insurance journey with <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">briki</span>
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <motion.div
@@ -78,7 +78,7 @@ export default function LandingPage() {
                     size="lg" 
                     variant="secondary"
                     onClick={() => navigate('/ask-briki-ai')}
-                    className="h-14 px-8 text-base bg-white text-[#0077B6] hover:bg-gray-50 hover:shadow-xl hover:shadow-white/20 font-semibold group"
+                    className="h-14 px-8 text-base bg-white text-blue-600 hover:bg-gray-50 hover:shadow-xl hover:shadow-white/20 font-semibold group"
                   >
                     Start with AI Assistant
                     <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
@@ -103,25 +103,25 @@ export default function LandingPage() {
               {/* Trust indicators */}
               <div className="mt-16 flex flex-wrap justify-center gap-12 text-white/90">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-600/20 to-cyan-500/20 backdrop-blur-sm flex items-center justify-center">
                     <Shield className="h-5 w-5" />
                   </div>
                   <span className="text-lg">Secure & Private</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-600/20 to-cyan-500/20 backdrop-blur-sm flex items-center justify-center">
                     <Users className="h-5 w-5" />
                   </div>
                   <span className="text-lg">50,000+ Users</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-600/20 to-cyan-500/20 backdrop-blur-sm flex items-center justify-center">
                     <Star className="h-5 w-5" />
                   </div>
                   <span className="text-lg">4.8/5 Rating</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-600/20 to-cyan-500/20 backdrop-blur-sm flex items-center justify-center">
                     <Zap className="h-5 w-5" />
                   </div>
                   <span className="text-lg">Instant Quotes</span>

@@ -65,9 +65,9 @@ export default function CareersPage() {
       {/* Hero Section with Ambient Background */}
       <section className="relative overflow-hidden">
         {/* Ambient Background Effect */}
-        <div className="absolute inset-0 bg-gradient-to-b from-blue-50 to-white">
+        <div className="absolute inset-0 bg-gradient-to-b from-gray-50 to-white">
           <motion.div 
-            className="absolute top-0 right-0 w-1/2 h-96 bg-blue-100/30 rounded-full blur-3xl"
+            className="absolute top-0 right-0 w-1/2 h-96 bg-gradient-to-r from-blue-600/10 to-cyan-500/10 rounded-full blur-3xl"
             animate={{
               y: [0, 30, 0],
               opacity: [0.3, 0.5, 0.3],
@@ -79,7 +79,7 @@ export default function CareersPage() {
             }}
           />
           <motion.div 
-            className="absolute bottom-0 left-0 w-1/2 h-96 bg-indigo-100/30 rounded-full blur-3xl"
+            className="absolute bottom-0 left-0 w-1/2 h-96 bg-gradient-to-r from-blue-600/10 to-cyan-500/10 rounded-full blur-3xl"
             animate={{
               y: [0, -30, 0],
               opacity: [0.3, 0.5, 0.3],
@@ -100,7 +100,7 @@ export default function CareersPage() {
             variants={fadeIn}
           >
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              Join the Briki Team
+              Join the <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">Briki Team</span>
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-10">
               Help us revolutionize the insurance industry with technology and make insurance accessible to everyone.
@@ -137,7 +137,7 @@ export default function CareersPage() {
               className="bg-white rounded-xl shadow-md p-8 text-center hover:shadow-lg transition-shadow"
               variants={fadeIn}
             >
-              <div className="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center mb-6 mx-auto">
+              <div className="h-12 w-12 bg-gradient-to-r from-blue-600/10 to-cyan-500/10 rounded-full flex items-center justify-center mb-6 mx-auto">
                 <LightbulbIcon className="h-6 w-6 text-blue-600" />
               </div>
               <h3 className="text-xl font-semibold mb-4">Innovation</h3>
@@ -151,8 +151,8 @@ export default function CareersPage() {
               className="bg-white rounded-xl shadow-md p-8 text-center hover:shadow-lg transition-shadow"
               variants={fadeIn}
             >
-              <div className="h-12 w-12 bg-indigo-100 rounded-full flex items-center justify-center mb-6 mx-auto">
-                <HeartIcon className="h-6 w-6 text-indigo-600" />
+              <div className="h-12 w-12 bg-gradient-to-r from-blue-600/10 to-cyan-500/10 rounded-full flex items-center justify-center mb-6 mx-auto">
+                <HeartIcon className="h-6 w-6 text-blue-600" />
               </div>
               <h3 className="text-xl font-semibold mb-4">Customer First</h3>
               <p className="text-gray-600">
@@ -165,8 +165,8 @@ export default function CareersPage() {
               className="bg-white rounded-xl shadow-md p-8 text-center hover:shadow-lg transition-shadow"
               variants={fadeIn}
             >
-              <div className="h-12 w-12 bg-purple-100 rounded-full flex items-center justify-center mb-6 mx-auto">
-                <GlobeIcon className="h-6 w-6 text-purple-600" />
+              <div className="h-12 w-12 bg-gradient-to-r from-blue-600/10 to-cyan-500/10 rounded-full flex items-center justify-center mb-6 mx-auto">
+                <GlobeIcon className="h-6 w-6 text-blue-600" />
               </div>
               <h3 className="text-xl font-semibold mb-4">Diversity</h3>
               <p className="text-gray-600">
@@ -179,8 +179,8 @@ export default function CareersPage() {
               className="bg-white rounded-xl shadow-md p-8 text-center hover:shadow-lg transition-shadow"
               variants={fadeIn}
             >
-              <div className="h-12 w-12 bg-green-100 rounded-full flex items-center justify-center mb-6 mx-auto">
-                <BriefcaseIcon className="h-6 w-6 text-green-600" />
+              <div className="h-12 w-12 bg-gradient-to-r from-blue-600/10 to-cyan-500/10 rounded-full flex items-center justify-center mb-6 mx-auto">
+                <BriefcaseIcon className="h-6 w-6 text-blue-600" />
               </div>
               <h3 className="text-xl font-semibold mb-4">Growth</h3>
               <p className="text-gray-600">
@@ -229,10 +229,10 @@ export default function CareersPage() {
                   </div>
                   <div className="flex flex-col md:flex-row md:items-center mt-4 md:mt-0 space-y-2 md:space-y-0 md:space-x-4">
                     <span className="text-sm text-gray-500">{job.location}</span>
-                    <span className="bg-blue-100 text-blue-800 text-sm py-1 px-3 rounded-full">{job.type}</span>
+                    <span className="bg-gradient-to-r from-blue-600/10 to-cyan-500/10 text-blue-600 text-sm py-1 px-3 rounded-full">{job.type}</span>
                     <Button
                       variant="outline"
-                      className="ml-0 md:ml-2"
+                      className="ml-0 md:ml-2 text-blue-600 border-blue-200 hover:bg-blue-50"
                       onClick={() => navigate("/auth")}
                     >
                       Apply Now
@@ -299,7 +299,7 @@ export default function CareersPage() {
 
       {/* CTA Section */}
       <section className="relative py-20 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 opacity-90"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-cyan-500 opacity-90"></div>
         <div className="absolute inset-0 opacity-30">
           <motion.div 
             className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"
@@ -343,7 +343,7 @@ export default function CareersPage() {
             whileTap={{ scale: 0.95 }}
           >
             <Button
-              className="bg-white text-blue-600 hover:bg-white/90 py-6 px-8 text-lg font-medium rounded-lg shadow-lg"
+              className="bg-white text-blue-600 hover:bg-gray-50 hover:shadow-lg hover:shadow-white/25 py-6 px-8 text-lg font-medium rounded-lg"
               onClick={() => navigate("/auth")}
             >
               View All Positions

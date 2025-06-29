@@ -68,7 +68,7 @@ export default function PricingPage() {
         <section className="relative overflow-hidden" aria-labelledby="pricing-heading">
           <div className="absolute inset-0 bg-gradient-to-b from-blue-50 to-white">
             <motion.div 
-              className="absolute top-1/4 right-1/4 w-1/2 h-1/2 bg-blue-100/20 rounded-full blur-3xl"
+              className="absolute top-1/4 right-1/4 w-1/2 h-1/2 bg-gradient-to-r from-blue-600/10 to-cyan-500/10 rounded-full blur-3xl"
               animate={{
                 x: [0, 20, 0],
                 y: [0, -20, 0],
@@ -90,7 +90,7 @@ export default function PricingPage() {
               variants={fadeIn}
             >
               <h1 id="pricing-heading" className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-                Simple Pricing, <span className="text-primary">Maximum Value</span>
+                Simple Pricing, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">Maximum Value</span>
               </h1>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-4">
                 Briki is free to use—we get paid by insurance providers, not by you.
@@ -158,27 +158,27 @@ export default function PricingPage() {
                 whileHover={{ y: -5 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >
-                <div className="absolute top-0 right-0 bg-blue-600 text-white text-xs font-bold py-1 px-3 rounded-bl-lg">
+                <div className="absolute top-0 right-0 bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-xs font-bold py-1 px-3 rounded-bl-lg">
                   RECOMMENDED
                 </div>
                 <div className="p-8">
                   <h3 className="text-xl font-semibold text-gray-900 mb-4">Premium</h3>
                   <div className="flex items-baseline mb-6">
-                    <span className="text-4xl font-bold text-gray-900">$4.99</span>
+                    <span className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">$4.99</span>
                     <span className="text-xl text-gray-600 ml-2">/month</span>
                   </div>
                   <p className="text-gray-600 mb-6">
                     Enhanced features to help you manage all your insurance policies in one place.
                   </p>
                   <Button
-                    className="w-full bg-blue-600 hover:bg-blue-700"
+                    className="w-full bg-gradient-to-r from-blue-600 to-cyan-500 hover:shadow-lg hover:shadow-blue-600/25 text-white"
                     onClick={() => navigate("/auth")}
                     aria-label="Try premium plan free for 14 days"
                   >
                     Try Free for 14 Days
                   </Button>
                 </div>
-                <div className="bg-blue-50 p-8 border-t border-blue-100">
+                <div className="bg-gradient-to-r from-blue-600/5 to-cyan-500/5 p-8 border-t border-blue-100">
                   <h4 className="font-medium text-gray-900 mb-4">Everything in Personal, plus:</h4>
                   <ul className="space-y-3">
                     {premiumFeatures.map((feature, index) => (
@@ -222,7 +222,7 @@ export default function PricingPage() {
                 className="bg-white rounded-xl shadow-md p-8 text-center"
                 variants={fadeIn}
               >
-                <div className="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center mb-6 mx-auto">
+                <div className="h-12 w-12 bg-gradient-to-r from-blue-600/10 to-cyan-500/10 rounded-full flex items-center justify-center mb-6 mx-auto">
                   <CreditCard className="h-6 w-6 text-blue-600" aria-hidden="true" />
                 </div>
                 <h3 className="text-xl font-semibold mb-4">Insurance Commissions</h3>
@@ -236,8 +236,8 @@ export default function PricingPage() {
                 className="bg-white rounded-xl shadow-md p-8 text-center"
                 variants={fadeIn}
               >
-                <div className="h-12 w-12 bg-indigo-100 rounded-full flex items-center justify-center mb-6 mx-auto">
-                  <Award className="h-6 w-6 text-indigo-600" aria-hidden="true" />
+                <div className="h-12 w-12 bg-gradient-to-r from-blue-600/10 to-cyan-500/10 rounded-full flex items-center justify-center mb-6 mx-auto">
+                  <Award className="h-6 w-6 text-blue-600" aria-hidden="true" />
                 </div>
                 <h3 className="text-xl font-semibold mb-4">Premium Subscriptions</h3>
                 <p className="text-gray-600">
@@ -250,8 +250,8 @@ export default function PricingPage() {
                 className="bg-white rounded-xl shadow-md p-8 text-center"
                 variants={fadeIn}
               >
-                <div className="h-12 w-12 bg-purple-100 rounded-full flex items-center justify-center mb-6 mx-auto">
-                  <Lock className="h-6 w-6 text-purple-600" aria-hidden="true" />
+                <div className="h-12 w-12 bg-gradient-to-r from-blue-600/10 to-cyan-500/10 rounded-full flex items-center justify-center mb-6 mx-auto">
+                  <Lock className="h-6 w-6 text-blue-600" aria-hidden="true" />
                 </div>
                 <h3 className="text-xl font-semibold mb-4">Our Promise to You</h3>
                 <p className="text-gray-600">
@@ -334,7 +334,7 @@ export default function PricingPage() {
 
         {/* CTA Section */}
         <section className="relative py-20 overflow-hidden" aria-labelledby="cta-heading">
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 opacity-90"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-cyan-500 opacity-90"></div>
           <div className="absolute inset-0 opacity-30">
             <motion.div 
               className="absolute top-0 right-0 w-1/2 h-1/2 bg-white/10 rounded-full blur-3xl transform translate-x-1/4 -translate-y-1/4"
