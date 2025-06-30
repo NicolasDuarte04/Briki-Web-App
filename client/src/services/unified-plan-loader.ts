@@ -39,7 +39,7 @@ export async function loadAllPlans(): Promise<UnifiedPlan[]> {
  * Load plans by category
  */
 export async function loadPlansByCategory(category: InsuranceCategory): Promise<UnifiedPlan[]> {
-  const realCategoryPlans = getRealPlansByCategory(category);
+    const realCategoryPlans = getRealPlansByCategory(category);
   return realCategoryPlans.map(realPlanToUnified);
 }
 

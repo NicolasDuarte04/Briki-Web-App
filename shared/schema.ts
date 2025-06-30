@@ -1,4 +1,4 @@
-import { pgTable, serial, varchar, timestamp, text, integer, boolean, jsonb, index, pgEnum } from "drizzle-orm/pg-core";
+import { pgTable, serial, varchar, timestamp, text, integer, boolean, jsonb, index, uniqueIndex, pgEnum } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -414,6 +414,10 @@ export const insurancePlans = pgTable("insurance_plans", {
   benefits: jsonb("benefits").$type<string[]>().notNull(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => {
+  return {
+    nameProviderUnique: uniqueIndex("insurance_plans_name_provider_unique").on(table.name, table.provider),
+  };
 });
 
 // Trip table

@@ -12,7 +12,7 @@ const ComparisonCard: React.FC<ComparisonCardProps> = ({ category, planIds }) =>
   // Get all plans for the category and filter by IDs
   const allPlans = getRealPlansByCategory(category);
   const plansToCompare = allPlans.filter(plan => planIds.includes(plan.id));
-
+  
   if (plansToCompare.length === 0) {
     return (
       <Card>
@@ -25,7 +25,7 @@ const ComparisonCard: React.FC<ComparisonCardProps> = ({ category, planIds }) =>
       </Card>
     );
   }
-
+  
   return (
     <Card>
       <CardHeader>
@@ -47,13 +47,13 @@ const ComparisonCard: React.FC<ComparisonCardProps> = ({ category, planIds }) =>
                     </li>
                   ))}
                 </ul>
-              </div>
+                        </div>
               {plan.price && (
                 <div className="mt-4">
                   <h4 className="font-medium">Price:</h4>
                   <p className="text-sm">{plan.price}</p>
-                </div>
-              )}
+                        </div>
+                      )}
               {plan.externalLink && (
                 <a
                   href={plan.externalLink}
@@ -65,7 +65,7 @@ const ComparisonCard: React.FC<ComparisonCardProps> = ({ category, planIds }) =>
                 </a>
               )}
             </div>
-          ))}
+              ))}
         </div>
       </CardContent>
     </Card>

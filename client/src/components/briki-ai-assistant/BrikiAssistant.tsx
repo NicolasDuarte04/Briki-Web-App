@@ -193,7 +193,7 @@ export function BrikiAssistant() {
         : undefined;
 
       console.log('📦 Suggested plans received:', normalizedPlans);
-
+      
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         content: data.message,
@@ -263,9 +263,9 @@ export function BrikiAssistant() {
       action: 'PlanClick',
       label: plan.provider,
       metadata: {
-        plan_id: plan.id,
-        provider: plan.provider,
-        isRecommended: plan.isRecommended
+      plan_id: plan.id,
+      provider: plan.provider,
+      isRecommended: plan.isRecommended
       }
     });
   };
@@ -381,19 +381,19 @@ export function BrikiAssistant() {
                     {isLoadingPlans ? (
                       <PlansLoadingPlaceholder />
                     ) : message.plans && message.plans.length > 0 ? (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 mt-4"
-                      >
-                        {message.plans.slice(0, MAX_PLANS_SHOWN).map((plan) => (
-                          <PlanCard
-                            key={plan.id}
-                            plan={plan}
-                            onClick={() => handlePlanClick(plan)}
-                          />
-                        ))}
-                      </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 mt-4"
+                  >
+                    {message.plans.slice(0, MAX_PLANS_SHOWN).map((plan) => (
+                      <PlanCard
+                        key={plan.id}
+                        plan={plan}
+                        onClick={() => handlePlanClick(plan)}
+                      />
+                    ))}
+                  </motion.div>
                     ) : (
                       <NoPlansFound onShowAlternatives={handleShowAlternatives} />
                     )}

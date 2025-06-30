@@ -373,7 +373,7 @@ export async function generateAssistantResponse(
         isExternal: p.isExternal
       }))
     );
-
+    
     return {
       message: assistantMessage,
       response: assistantMessage, // Provide both for compatibility
