@@ -14,6 +14,9 @@ import vehicleRoutes from './routes/vehicle';
 
 const app = express();
 
+// Quick sanity check: confirm OPENAI_API_KEY env variable is loaded
+console.log("[ENV] OPENAI_API_KEY present:", !!process.env.OPENAI_API_KEY);
+
 // Setup CORS with proper credentials support
 // In development, use this more permissive CORS configuration
 app.use(cors({

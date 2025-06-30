@@ -1,123 +1,51 @@
 /**
  * Unified Plan Loader Service
- * Manages loading plans from both mock and real sources based on configuration
+ * Manages loading plans from real sources
  */
 
 import { InsuranceCategory } from "@shared/schema";
-import { MockInsurancePlan, travelPlans, autoPlans, petPlans, healthPlans } from "@/components/plans/mockPlans";
 import { RealInsurancePlan, realPlans, getRealPlansByCategory } from "@/data/realPlans";
-import { shouldShowMockPlans, shouldShowRealPlans } from "@/config/plan-sources";
-import { getRecommendedPlans } from "@/utils/plan-comparison";
 
-// Type that can represent both mock and real plans
-export type UnifiedPlan = (MockInsurancePlan | RealInsurancePlan) & {
-  // Ensure common fields exist
-  id: string | number;
-  name?: string;
-  title?: string;
+// Type that represents real plans
+export type UnifiedPlan = RealInsurancePlan & {
+  id: string;
+  name: string;
   provider: string;
   category: InsuranceCategory;
   features: string[];
-  isExternal?: boolean;
-  externalLink?: string;
-  price?: string | number;
+  isExternal: boolean;
+  externalLink: string | null;
+  price: string | null;
   basePrice?: number;
 };
-
-/**
- * Convert mock plan to unified format
- */
-function mockPlanToUnified(plan: MockInsurancePlan): UnifiedPlan {
-  return {
-    ...plan,
-    name: plan.title || plan.title, // MockInsurancePlan uses 'title'
-    basePrice: plan.price,
-    price: plan.price,
-    isExternal: false,
-    features: plan.features || []
-  };
-}
 
 /**
  * Convert real plan to unified format
  */
 function realPlanToUnified(plan: RealInsurancePlan): UnifiedPlan {
   return {
-    ...plan,
-    title: plan.name, // For backward compatibility
-    features: plan.features || []
+    ...plan
   };
 }
 
 /**
- * Get all mock plans
- */
-function getAllMockPlans(): MockInsurancePlan[] {
-  return [...travelPlans, ...autoPlans, ...petPlans, ...healthPlans];
-}
-
-/**
- * Get mock plans by category
- */
-function getMockPlansByCategory(category: InsuranceCategory): MockInsurancePlan[] {
-  switch (category) {
-    case 'travel':
-      return travelPlans;
-    case 'auto':
-      return autoPlans;
-    case 'pet':
-      return petPlans;
-    case 'health':
-      return healthPlans;
-    default:
-      return [];
-  }
-}
-
-/**
- * Load all plans based on configuration
+ * Load all plans
  */
 export async function loadAllPlans(): Promise<UnifiedPlan[]> {
-  const plans: UnifiedPlan[] = [];
-
-  // Load mock plans if enabled
-  if (shouldShowMockPlans()) {
-    const mockPlans = getAllMockPlans();
-    plans.push(...mockPlans.map(mockPlanToUnified));
-  }
-
-  // Load real plans if enabled
-  if (shouldShowRealPlans()) {
-    plans.push(...realPlans.map(realPlanToUnified));
-  }
-
-  return plans;
+  return realPlans.map(realPlanToUnified);
 }
 
 /**
- * Load plans by category based on configuration
+ * Load plans by category
  */
 export async function loadPlansByCategory(category: InsuranceCategory): Promise<UnifiedPlan[]> {
-  const plans: UnifiedPlan[] = [];
-
-  // Load mock plans if enabled
-  if (shouldShowMockPlans()) {
-    const mockPlans = getMockPlansByCategory(category);
-    plans.push(...mockPlans.map(mockPlanToUnified));
-  }
-
-  // Load real plans if enabled
-  if (shouldShowRealPlans()) {
-    const realCategoryPlans = getRealPlansByCategory(category);
-    plans.push(...realCategoryPlans.map(realPlanToUnified));
-  }
-
-  return plans;
+  const realCategoryPlans = getRealPlansByCategory(category);
+  return realCategoryPlans.map(realPlanToUnified);
 }
 
 /**
  * Get recommended plans for AI assistant
- * Ensures provider diversity and relevance
+ * Uses simple relevance scoring based on text matching
  */
 export async function getAIRecommendedPlans(
   userQuery: string,
@@ -129,19 +57,23 @@ export async function getAIRecommendedPlans(
     ? await loadPlansByCategory(category)
     : await loadAllPlans();
 
-  // Get recommended plans with provider diversity
-  const recommended = getRecommendedPlans(
-    allPlans as any,
-    userQuery,
-    category,
-    {
-      maxPlans,
-      uniqueProviders: true,
-      sortBy: 'relevance'
-    }
-  );
+  // Simple relevance scoring based on text matching
+  const scoredPlans = allPlans.map(plan => {
+    const searchableText = `${plan.name} ${plan.provider} ${plan.description || ''} ${plan.features.join(' ')}`.toLowerCase();
+    const queryTerms = userQuery.toLowerCase().split(' ');
+    const score = queryTerms.reduce((acc, term) => 
+      acc + (searchableText.includes(term) ? 1 : 0), 0
+    );
+    return { plan, score };
+  });
 
-  return recommended as UnifiedPlan[];
+  // Sort by score and take top N plans
+  const recommended = scoredPlans
+    .sort((a, b) => b.score - a.score)
+    .slice(0, maxPlans)
+    .map(({ plan }) => plan);
+
+  return recommended;
 }
 
 /**
@@ -152,8 +84,7 @@ export async function searchPlans(query: string): Promise<UnifiedPlan[]> {
   
   const searchTerm = query.toLowerCase();
   return allPlans.filter(plan => {
-    const planName = plan.name || plan.title || '';
-    const searchableText = `${planName} ${plan.provider} ${plan.description || ''} ${plan.features.join(' ')}`.toLowerCase();
+    const searchableText = `${plan.name} ${plan.provider} ${plan.description || ''} ${plan.features.join(' ')}`.toLowerCase();
     return searchableText.includes(searchTerm);
   });
 }

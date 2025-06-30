@@ -40,6 +40,8 @@ const logConversation = async (logData: {
  * Endpoint para generar respuestas del asistente IA
  */
 router.post('/chat', async (req, res) => {
+  console.log(`[AI Route] /api/ai/chat hit at ${new Date().toISOString()} from ${req.ip}`);
+
   try {
     const { message, conversationHistory, memory, category = 'general', resetContext = false } = req.body;
     const userId = req.session.user?.id || null;

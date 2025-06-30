@@ -50,7 +50,8 @@ export const INSURANCE_CATEGORIES = {
   TRAVEL: "travel",
   AUTO: "auto",
   PET: "pet",
-  HEALTH: "health"
+  HEALTH: "health",
+  SOAT: "soat"
 } as const;
 
 export type InsuranceCategory = typeof INSURANCE_CATEGORIES[keyof typeof INSURANCE_CATEGORIES];
@@ -272,6 +273,10 @@ export const planFieldLabels: Record<InsuranceCategory, Record<string, string>> 
     coversPreventive: "Preventive Care",
     coversEmergency: "Emergency Care",
     coversSpecialist: "Specialist Coverage"
+  },
+  soat: {
+    basePrice: "Precio (Tarifa Regulada)",
+    coverageAmount: "Monto de Cobertura"
   }
 };
 

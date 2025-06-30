@@ -28,6 +28,9 @@ import { analyzeContextNeeds, detectInsuranceCategory, ContextAnalysisResult } f
 import fetch from 'node-fetch';
 import { AssistantMemory } from "@shared/types/assistant";
 import { getLatestUserContext } from "./context-service";
+import { filterPlans, FilterCriteria } from "@/lib/plan-filter";
+import { extractFormalFeatures } from "@shared/feature-synonyms";
+import { extractPriceRange } from "@shared/context-utils";
 
 // Define a simpler, unified plan type for the assistant's purpose
 interface InsurancePlan {
@@ -41,6 +44,9 @@ interface InsurancePlan {
   country: string;
   benefits: string[];
   description?: string; // Add optional description
+  features: string[];
+  externalLink: string | null;
+  isExternal: boolean;
 }
 
 // Initialize the OpenAI client with API key from environment variables
@@ -59,6 +65,7 @@ export interface AssistantMessage {
 
 export interface AssistantResponse {
   message?: string;
+  
   response?: string;
   suggestedPlans?: InsurancePlan[];
   category?: string;
@@ -80,6 +87,19 @@ export async function generateAssistantResponse(
 ): Promise<AssistantResponse> {
   const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   let updatedMemory = { ...memory };
+
+  // Extract and store price preferences
+  const priceRange = extractPriceRange(userMessage);
+  if (priceRange) {
+    updatedMemory.preferences = {
+      ...updatedMemory.preferences,
+      priceRange: {
+        min: priceRange[0],
+        max: priceRange[1],
+        currency: 'COP'
+      }
+    };
+  }
 
   // Detect category first to decide on special actions
   const category = detectInsuranceCategory(userMessage);
@@ -107,7 +127,7 @@ export async function generateAssistantResponse(
 
   try {
     // If auto insurance, check for license plate and lookup if needed
-    if (category === 'auto' && !updatedMemory.vehicle) {
+    if (category === 'auto') {
       const plate = extractPlate(userMessage);
       if (plate) {
         console.log(`[Vehicle Lookup][${requestId}] Plate detected: ${plate}. Fetching details...`);
@@ -120,7 +140,8 @@ export async function generateAssistantResponse(
           const vehicleData = await response.json();
 
           if (vehicleData) {
-            // Standardize the memory structure
+            // Always update vehicle memory with new data
+            const previousVehicle = updatedMemory.vehicle;
             updatedMemory.vehicle = {
               plate: vehicleData.plate,
               make: vehicleData.brand,
@@ -128,7 +149,11 @@ export async function generateAssistantResponse(
               year: vehicleData.year,
               fuel: vehicleData.fuel,
             };
-            console.log(`[Vehicle Lookup][${requestId}] Success. Vehicle data injected into memory.`);
+            
+            if (previousVehicle && previousVehicle.plate !== vehicleData.plate) {
+              console.log(`[Vehicle Lookup][${requestId}] Vehicle changed from ${previousVehicle.make} ${previousVehicle.model} to ${vehicleData.brand} ${vehicleData.model}`);
+            }
+            console.log(`[Vehicle Lookup][${requestId}] Success. Vehicle data injected into memory:`, updatedMemory.vehicle);
           }
         } catch (error: any) {
           console.warn(`[Vehicle Lookup][${requestId}] Failed: ${error.message}`);
@@ -138,7 +163,16 @@ export async function generateAssistantResponse(
     }
 
     // Get real plans from the database
-    let allPlans: InsurancePlan[] = await db.select().from(insurancePlans);
+    let allPlans: InsurancePlan[] = await db.select().from(insurancePlans).then(plans => 
+      plans.map(p => ({
+        ...p,
+        // Ensure we have features field for frontend compatibility
+        features: (p as any).features || (p as any).benefits || [],
+        // Add external link fields
+        externalLink: (p as any).externalLink || `https://brikiapp.com/plan/${p.id}`,
+        isExternal: (p as any).isExternal !== undefined ? (p as any).isExternal : false,
+      }))
+    ) as InsurancePlan[];
     console.log(`[OpenAI][${requestId}] Loaded ${allPlans.length} total plans from database`);
 
     // DEV FALLBACK: if the database is empty, fall back to the JSON mock plans
@@ -148,6 +182,11 @@ export async function generateAssistantResponse(
         ...p,
         // Map 'features' -> 'benefits' so downstream code works without changes
         benefits: Array.isArray(p.features) ? p.features : [],
+        // Ensure we have features for frontend
+        features: Array.isArray(p.features) ? p.features : [],
+        // Add external link fields if missing
+        externalLink: p.externalLink || `https://brikiapp.com/plan/${p.id}`,
+        isExternal: p.isExternal !== undefined ? p.isExternal : false,
       })) as unknown as InsurancePlan[];
       console.log(`[OpenAI][${requestId}] Loaded ${allPlans.length} mock plans from JSON fallback`);
     }
@@ -316,6 +355,25 @@ export async function generateAssistantResponse(
         .join(' ');
     const finalContextAnalysis = analyzeContextNeeds(finalConversation, finalContextCategory, updatedMemory);
     
+    // --- FAIL-SOFT: if no plans were chosen, still send top relevant ones ---
+    if (!suggestedPlans || suggestedPlans.length === 0) {
+      suggestedPlans = relevantPlans.slice(0, 3);
+    }
+
+    // Debug log the structure of suggested plans
+    console.log(`[OpenAI][${requestId}] Suggested plans structure:`, 
+      suggestedPlans.map(p => ({
+        id: p.id,
+        name: p.name,
+        provider: p.provider,
+        hasFeatures: !!p.features,
+        featureCount: p.features?.length || 0,
+        hasExternalLink: !!p.externalLink,
+        externalLink: p.externalLink,
+        isExternal: p.isExternal
+      }))
+    );
+
     return {
       message: assistantMessage,
       response: assistantMessage, // Provide both for compatibility
@@ -339,6 +397,8 @@ export async function generateAssistantResponse(
     };
 
     console.error(`[OpenAI][${requestId}] Error:`, errorDetails);
+    // Additional raw error logging for easier debugging
+    console.error('OpenAI error:', error);
 
     // Different error messages for better UX
     if (error.code === "rate_limit_exceeded") {
@@ -660,21 +720,27 @@ function findRelevantPlans(
       const requestedCount = extractRequestedPlanCount(userMessage);
       const maxPlans = requestedCount || Math.min(categoryPlans.length, 4); // Default to 4 or available plans
 
-      // Score only plans from the correct category
-      const scoredPlans = categoryPlans.map((plan) => ({
-        plan,
-        score: calculateRelevanceScore(userMessage, plan),
-      }));
+      // Extract price range if specified
+      const priceRange = extractPriceRange(userMessage);
+      console.log(`💰 Price range detected:`, priceRange);
 
-      const sortedPlans = scoredPlans
-        .sort((a, b) => b.score - a.score)
-        .slice(0, maxPlans)
-        .map(item => item.plan);
+      // Extract provider preferences and required features
+      const filterCriteria: FilterCriteria = {
+        maxResults: maxPlans,
+        relevanceThreshold: 0.3,
+        userPreferences: {
+          preferredProviders: extractPreferredProviders(userMessage),
+          mustHaveFeatures: extractRequiredFeatures(userMessage),
+          priceRange: priceRange ? {
+            min: priceRange[0],
+            max: priceRange[1],
+            currency: 'COP'
+          } : undefined
+        }
+      };
 
-      console.log(`✅ Found ${sortedPlans.length} ${detectedCategory} plans (requested: ${requestedCount || 'default'})`);
-      return sortedPlans;
+      return filterPlans(categoryPlans, filterCriteria);
     } else {
-      // FIXED: NO fallback - return empty array instead of wrong category plans
       console.log(`❌ No plans found for category: ${detectedCategory}`);
       return [];
     }
@@ -682,19 +748,41 @@ function findRelevantPlans(
 
   // STEP 3: If no clear category is detected, fall back to general relevance scoring
   console.log(`❓ No clear category detected, scoring all available plans based on message content.`);
-  const scoredPlans = plans.map((plan) => ({
-    plan,
-    score: calculateRelevanceScore(userMessage, plan),
-  }));
-
-  const sortedPlans = scoredPlans
-    .filter(item => item.score > 0) // Only include plans with some relevance
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 4) // Default to a smaller limit for general queries
-    .map(item => item.plan);
   
-  console.log(`✅ Found ${sortedPlans.length} relevant plans from general search.`);
-  return sortedPlans;
+  const priceRange = extractPriceRange(userMessage);
+  const filterCriteria: FilterCriteria = {
+    maxResults: 4,
+    relevanceThreshold: 0.3,
+    userPreferences: priceRange ? {
+      priceRange: {
+        min: priceRange[0],
+        max: priceRange[1],
+        currency: 'COP'
+      }
+    } : undefined
+  };
+  
+  return filterPlans(plans, filterCriteria);
+}
+
+/**
+ * Extract preferred providers from user message
+ */
+function extractPreferredProviders(message: string): string[] {
+  const lowerMessage = message.toLowerCase();
+  const providers = ['SURA', 'MAPFRE', 'HDI', 'Bolívar', 'Qualitas', 'Colasistencia'];
+  
+  return providers.filter(provider => 
+    lowerMessage.includes(provider.toLowerCase())
+  );
+}
+
+/**
+ * Extract required features from user message
+ */
+function extractRequiredFeatures(message: string): string[] {
+  // Use the new feature extraction logic
+  return extractFormalFeatures(message);
 }
 
 /**

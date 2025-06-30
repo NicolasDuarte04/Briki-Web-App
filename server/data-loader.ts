@@ -28,6 +28,8 @@ export interface MockInsurancePlan {
   tags: string[];
   rating: number;
   status: 'draft' | 'active' | 'archived';
+  externalLink?: string | null;
+  isExternal?: boolean;
 }
 
 /**
@@ -63,7 +65,13 @@ export function loadMockInsurancePlans(): MockInsurancePlan[] {
           
           // Validar que el plan tiene la categoría correcta
           if (plan.category === category) {
-            plans.push(plan);
+            // Add default values for externalLink and isExternal if not present
+            const enrichedPlan = {
+              ...plan,
+              externalLink: plan.externalLink || `https://brikiapp.com/plan/${plan.id}`,
+              isExternal: plan.isExternal !== undefined ? plan.isExternal : false
+            };
+            plans.push(enrichedPlan);
             console.log(`Loaded plan: ${plan.name} (${plan.category})`);
           } else {
             console.warn(`Plan in file ${file} has incorrect category: ${plan.category}, expected: ${category}`);

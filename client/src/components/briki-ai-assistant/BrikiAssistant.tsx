@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, RefreshCw, Home } from 'lucide-react';
+import { Send, RefreshCw, Home, Loader2, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -23,6 +23,11 @@ interface Message {
   type?: 'text' | 'plans';
 }
 
+interface AIResponse {
+  message: string;
+  suggestedPlans?: Plan[];
+}
+
 const STORAGE_KEY = 'briki_chat_history';
 const MAX_PLANS_SHOWN = 4;
 const MAX_MESSAGE_WIDTH = 'max-w-[75%]';
@@ -35,7 +40,57 @@ const PLACEHOLDER_HINTS = [
   "¿Quieres comparar coberturas?"
 ];
 
-export function CleanBrikiAssistant() {
+interface NoPlansFoundProps {
+  onShowAlternatives: () => void;
+}
+
+const NoPlansFound: React.FC<NoPlansFoundProps> = ({ onShowAlternatives }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 10 }}
+    animate={{ opacity: 1, y: 0 }}
+    className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-6 text-center"
+  >
+    <Search className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+    <h3 className="text-lg font-medium mb-2">
+      No se encontraron planes con esas características
+    </h3>
+    <p className="text-gray-600 dark:text-gray-300 mb-4">
+      Podemos explorar otras opciones que podrían interesarte
+    </p>
+    <Button
+      variant="outline"
+      onClick={onShowAlternatives}
+      className="bg-white dark:bg-gray-800"
+    >
+      Ver otras opciones
+    </Button>
+  </motion.div>
+);
+
+const PlansLoadingPlaceholder: React.FC = () => (
+  <motion.div
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 mt-4"
+  >
+    {[...Array(4)].map((_, i) => (
+      <div
+        key={i}
+        className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-6 space-y-4 animate-pulse"
+      >
+        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4" />
+        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2" />
+        <div className="space-y-2">
+          <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-full" />
+          <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-5/6" />
+          <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-4/6" />
+        </div>
+      </div>
+    ))}
+  </motion.div>
+);
+
+export function BrikiAssistant() {
   const [messages, setMessages] = useState<Message[]>(() => {
     const saved = sessionStorage.getItem(STORAGE_KEY);
     return saved ? JSON.parse(saved) : [];
@@ -43,10 +98,13 @@ export function CleanBrikiAssistant() {
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [currentSuggestion, setCurrentSuggestion] = useState(0);
+  const [shouldResetContext, setShouldResetContext] = useState(false);
+  const [memory, setMemory] = useState<any>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const { trackEvent } = useAnalytics();
   const [, navigate] = useLocation();
+  const [isLoadingPlans, setIsLoadingPlans] = useState(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -93,6 +151,7 @@ export function CleanBrikiAssistant() {
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsTyping(true);
+    setIsLoadingPlans(true);
 
     try {
       const response = await fetch('/api/ai/chat', {
@@ -100,66 +159,129 @@ export function CleanBrikiAssistant() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: input.trim(),
-          memory: messages.map(m => ({
+          conversationHistory: messages.map(m => ({
             role: m.role,
             content: m.content
-          }))
+          })),
+          memory: memory,
+          resetContext: shouldResetContext
         })
       });
 
-      if (!response.ok) throw new Error('API call failed');
+      if (shouldResetContext) {
+        setShouldResetContext(false);
+      }
 
-      const data = await response.json();
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.details || errorData.error || 'API call failed');
+      }
+
+      const data: AIResponse & { memory?: any } = await response.json();
       
+      // Update memory state with response
+      if (data.memory) {
+        setMemory(data.memory);
+      }
+      
+      // Normalize plans to ensure 'features' field exists
+      const normalizedPlans: Plan[] | undefined = data.suggestedPlans
+        ? data.suggestedPlans.map((p: any) => ({
+            ...p,
+            features: p.features || p.benefits || [],
+          }))
+        : undefined;
+
+      console.log('📦 Suggested plans received:', normalizedPlans);
+
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         content: data.message,
         role: 'assistant',
         timestamp: new Date(),
-        type: data.plans ? 'plans' : 'text',
-        plans: data.plans
+        type: 'text'
       };
 
-      setMessages(prev => [...prev, assistantMessage]);
+      const newMessages = [assistantMessage];
+      if (normalizedPlans && normalizedPlans.length > 0) {
+        newMessages.push({
+          id: (Date.now() + 2).toString(),
+          content: '',
+          role: 'assistant',
+          timestamp: new Date(),
+          type: 'plans',
+          plans: normalizedPlans,
+        });
+      }
+
+      setMessages(prev => [...prev, ...newMessages]);
       
-      if (data.plans) {
+      if (normalizedPlans && normalizedPlans.length > 0) {
         trackEvent('ai_recommended_plans', {
-          count: data.plans.length,
-          providers: [...new Set(data.plans.map((p: Plan) => p.provider))].join(',')
+          category: 'Assistant',
+          action: 'RecommendPlans',
+          label: 'AI Assistant',
+          value: normalizedPlans.length,
+          metadata: {
+            count: normalizedPlans.length,
+            providers: [...new Set(normalizedPlans.map((p: Plan) => p.provider))].join(',')
+          }
         });
       }
     } catch (error) {
       console.error('Error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
       setMessages(prev => [...prev, {
         id: (Date.now() + 1).toString(),
-        content: "Lo siento, hubo un error al procesar tu solicitud. Por favor, intenta de nuevo.",
+        content: `Lo siento, hubo un error al procesar tu solicitud: ${errorMessage}. Por favor, intenta de nuevo.`,
         role: 'assistant',
         timestamp: new Date(),
         type: 'text'
       }]);
     } finally {
       setIsTyping(false);
+      setIsLoadingPlans(false);
     }
   };
 
   const handleReset = () => {
     setMessages([]);
     setInput('');
+    setMemory({});
+    setShouldResetContext(true);
     sessionStorage.removeItem(STORAGE_KEY);
-    trackEvent('chat_reset');
+    trackEvent('chat_reset', {
+      category: 'Assistant',
+      action: 'Reset',
+      label: 'Chat Reset'
+    });
   };
 
   const handlePlanClick = (plan: Plan) => {
     trackEvent('plan_click', {
-      plan_id: plan.id,
-      provider: plan.provider,
-      isRecommended: plan.isRecommended
+      category: 'Assistant',
+      action: 'PlanClick',
+      label: plan.provider,
+      metadata: {
+        plan_id: plan.id,
+        provider: plan.provider,
+        isRecommended: plan.isRecommended
+      }
     });
   };
 
   const handleSuggestionClick = (suggestion: string) => {
     setInput(suggestion);
-    trackEvent('suggestion_clicked', { suggestion });
+    trackEvent('suggestion_clicked', {
+      category: 'Assistant',
+      action: 'SuggestionClick',
+      label: suggestion
+    });
+  };
+
+  const handleShowAlternatives = () => {
+    setInput("¿Qué otros tipos de seguros me recomiendas?");
+    handleSubmit(new Event('submit') as any);
   };
 
   return (
@@ -254,20 +376,28 @@ export function CleanBrikiAssistant() {
                 </div>
 
                 {/* Render plans if present */}
-                {message.type === 'plans' && message.plans && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 mt-4"
-                  >
-                    {message.plans.slice(0, MAX_PLANS_SHOWN).map((plan) => (
-                      <PlanCard
-                        key={plan.id}
-                        plan={plan}
-                        onClick={() => handlePlanClick(plan)}
-                      />
-                    ))}
-                  </motion.div>
+                {message.type === 'plans' && (
+                  <>
+                    {isLoadingPlans ? (
+                      <PlansLoadingPlaceholder />
+                    ) : message.plans && message.plans.length > 0 ? (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 mt-4"
+                      >
+                        {message.plans.slice(0, MAX_PLANS_SHOWN).map((plan) => (
+                          <PlanCard
+                            key={plan.id}
+                            plan={plan}
+                            onClick={() => handlePlanClick(plan)}
+                          />
+                        ))}
+                      </motion.div>
+                    ) : (
+                      <NoPlansFound onShowAlternatives={handleShowAlternatives} />
+                    )}
+                  </>
                 )}
               </motion.div>
             ))}
@@ -281,11 +411,12 @@ export function CleanBrikiAssistant() {
               >
                 <div className={cn(
                   MAX_MESSAGE_WIDTH,
-                  "bg-white dark:bg-gray-800 rounded-lg px-4 py-2 flex space-x-1 shadow-sm border border-blue-100 dark:border-blue-800"
+                  "bg-white dark:bg-gray-800 rounded-lg px-4 py-2 flex items-center space-x-2 shadow-sm border border-blue-100 dark:border-blue-800"
                 )}>
-                  <span className="animate-bounce text-blue-600">•</span>
-                  <span className="animate-bounce delay-100 text-blue-600">•</span>
-                  <span className="animate-bounce delay-200 text-blue-600">•</span>
+                  <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
+                  <span className="text-sm text-gray-600 dark:text-gray-300">
+                    Buscando las mejores opciones...
+                  </span>
                 </div>
               </motion.div>
             )}
@@ -334,4 +465,6 @@ export function CleanBrikiAssistant() {
       </div>
     </div>
   );
-} 
+}
+
+export default BrikiAssistant; 

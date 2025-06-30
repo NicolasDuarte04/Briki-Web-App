@@ -9,4 +9,14 @@ export interface AssistantMemory {
     transmission?: string;
     color?: string;
   };
+  preferences?: {
+    preferredProviders?: string[];
+    mustHaveFeatures?: string[];
+    priceRange?: {
+      min: number;
+      max: number;
+      currency: string;
+    };
+    location?: string;
+  };
 } 

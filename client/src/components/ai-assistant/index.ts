@@ -1,5 +1,5 @@
-import ChatInterface from './chat-interface';
 import PlanRecommender from './plan-recommender';
 import TermExplainer from './term-explainer';
+import { BrikiAssistant } from '../briki-ai-assistant/BrikiAssistant';
 
-export { ChatInterface, PlanRecommender, TermExplainer };
+export { BrikiAssistant, PlanRecommender, TermExplainer };

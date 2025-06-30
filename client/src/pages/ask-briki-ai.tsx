@@ -1,5 +1,5 @@
 import { Helmet } from 'react-helmet';
-import { CleanBrikiAssistant } from '@/components/briki-ai-assistant/CleanBrikiAssistant';
+import { BrikiAssistant } from '@/components/briki-ai-assistant/BrikiAssistant';
 import Navbar from '@/components/layout/navbar';
 
 export default function AskBrikiAIPage() {
@@ -16,7 +16,7 @@ export default function AskBrikiAIPage() {
       <Navbar />
       
       <main className="flex-grow">
-        <CleanBrikiAssistant />
+        <BrikiAssistant />
       </main>
     </div>
   );
