@@ -1,8 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Sparkles, MessageSquareWarning, SearchX } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '../ui/button';
+import { Card, CardContent } from '../ui/card';
 
 interface AssistantEmptyStateProps {
   type: 'welcome' | 'no-plans' | 'fallback';

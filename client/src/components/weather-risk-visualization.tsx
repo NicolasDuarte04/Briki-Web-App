@@ -13,8 +13,8 @@ import {
   destinationRisks,
   getDestinationsByMonth
 } from '../data/weatherRiskData';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Badge } from './ui/badge';
+import { Button } from './ui/button';
 import { 
   Card, 
   CardContent, 
@@ -22,16 +22,16 @@ import {
   CardFooter, 
   CardHeader, 
   CardTitle 
-} from '@/components/ui/card';
+} from './ui/card';
 import { 
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue 
-} from '@/components/ui/select';
-import { Progress } from '@/components/ui/progress';
-import { useLanguage } from '@/components/language-selector';
+} from './ui/select';
+import { Progress } from './ui/progress';
+import { useLanguage } from './language-selector';
 
 interface WeatherRiskVisualizationProps {
   selectedDestination?: string;

@@ -3,7 +3,7 @@
  * Functions to compare and score insurance plans based on various criteria
  */
 
-import { InsuranceCategory } from "@shared/schema";
+import { InsuranceCategory } from "../../../shared/schema";
 
 export interface ComparablePlan {
   id: string;

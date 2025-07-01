@@ -1,4 +1,4 @@
-import { RealInsurancePlan } from "@/data/realPlans";
+import { RealInsurancePlan } from "../data/realPlans";
 
 // Define the InsurancePlan interface to match the backend
 interface InsurancePlan {

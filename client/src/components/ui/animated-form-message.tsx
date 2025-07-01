@@ -1,8 +1,8 @@
 import * as React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FormMessage } from "@/components/ui/form";
+import { FormMessage } from "./form";
 import { CheckCircle, AlertCircle } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "../../lib/utils";
 
 // Define props interface
 interface AnimatedFormMessageProps {

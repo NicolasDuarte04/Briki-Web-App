@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ExploreLayout } from "@/components/layout";
+import { ExploreLayout } from "../../components/layout";
 import { Link } from "wouter";
 import { Car, Shield, Clock, ArrowRight, BadgeCheck, Wrench, PhoneCall } from "lucide-react";
 

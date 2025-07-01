@@ -1,8 +1,8 @@
 import React from 'react';
 import { Shield, Zap, CheckCircle } from 'lucide-react';
-import { GradientCard } from '@/components/ui';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { cn } from '@/lib/utils';
+import { GradientCard } from '../ui';
+import { ScrollArea } from '../ui/scroll-area';
+import { cn } from '../../lib/utils';
 
 interface ConversationContainerProps {
   children: React.ReactNode;

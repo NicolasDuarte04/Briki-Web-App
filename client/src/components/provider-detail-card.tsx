@@ -1,12 +1,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Globe, Database, Check, X, AlertTriangle, Clock, PlusCircle } from 'lucide-react';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { Skeleton } from '@/components/ui/skeleton';
-import { ProviderConfig } from '@/services/api/insurance-providers';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './ui/card';
+import { Badge } from './ui/badge';
+import { Button } from './ui/button';
+import { Progress } from './ui/progress';
+import { Skeleton } from './ui/skeleton';
+import { ProviderConfig } from '../services/api/insurance-providers';
 import { Link } from 'wouter';
 
 interface ProviderDetailCardProps {

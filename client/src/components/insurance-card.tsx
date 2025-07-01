@@ -1,9 +1,9 @@
-import { InsurancePlan } from "@shared/schema";
-import { Button } from "@/components/ui/button";
+import { InsurancePlan } from "../../../shared/schema";
+import { Button } from "./ui/button";
 import { Check, Shield, Clock, Star, Award, X, Heart, CreditCard, Activity, Briefcase, Umbrella } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "../lib/utils";
 import { useState } from "react";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "./ui/badge";
 
 interface InsuranceCardProps {
   plan: InsurancePlan;

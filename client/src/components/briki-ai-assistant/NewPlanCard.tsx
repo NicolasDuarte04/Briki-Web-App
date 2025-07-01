@@ -1,10 +1,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../ui/card";
+import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
 import { CheckCircle, ArrowRight, ExternalLink, Star, TrendingUp } from "lucide-react";
-import { Separator } from '@/components/ui/separator';
+import { Separator } from '../ui/separator';
 
 // This interface matches the data coming from the backend AI service
 export interface InsurancePlan {

@@ -9,7 +9,7 @@ import {
   INSURANCE_CATEGORIES,
   CompanyPlan,
   InsertCompanyPlan
-} from '@shared/schema';
+} from '../../shared/schema';
 
 // Base validation schema for plan uploads
 const basePlanSchema = z.object({

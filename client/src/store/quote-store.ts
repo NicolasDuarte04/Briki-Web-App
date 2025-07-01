@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { TravelQuote, INSURANCE_CATEGORIES, InsuranceCategory } from '@shared/schema';
-import { createId } from '@/lib/utils';
+import { TravelQuote, INSURANCE_CATEGORIES, InsuranceCategory } from '../../../shared/schema';
+import { createId } from '../lib/utils';
 
 // Initialize default values for new travel quotes
 const createDefaultTravelQuote = (): TravelQuote => ({

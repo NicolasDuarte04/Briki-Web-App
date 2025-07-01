@@ -1,6 +1,6 @@
-import { useAuth } from "@/hooks/use-auth";
-import DashboardPublic from "@/pages/dashboard-public";
-import DashboardAuthenticated from "@/pages/dashboard-authenticated";
+import { useAuth } from "../hooks/use-auth";
+import DashboardPublic from "../pages/dashboard-public";
+import DashboardAuthenticated from "../pages/dashboard-authenticated";
 
 export default function DashboardRouter() {
   const { user, isLoading } = useAuth();

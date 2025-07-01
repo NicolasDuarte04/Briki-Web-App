@@ -1,5 +1,5 @@
 import { db } from '../db';
-import { conversationLogs, contextSnapshots } from '@shared/schema';
+import { conversationLogs, contextSnapshots } from '../../shared/schema';
 import { eq, and, desc } from 'drizzle-orm';
 
 /**

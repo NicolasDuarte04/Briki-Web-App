@@ -4,7 +4,7 @@
  * These plans include external links to the provider's quote/purchase pages.
  */
 
-import { InsuranceCategory } from "@shared/schema";
+import { InsuranceCategory } from "../../../shared/schema";
 
 export interface RealInsurancePlan {
   id: string;

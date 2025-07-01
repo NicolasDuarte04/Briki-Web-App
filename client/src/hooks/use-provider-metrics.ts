@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { INSURANCE_PROVIDERS, ApiError } from '@/services/api/insurance-providers';
+import { INSURANCE_PROVIDERS, ApiError } from '../services/api/insurance-providers';
 import { useQueryClient } from '@tanstack/react-query';
-import { CACHE_KEYS } from '@/services/caching/insurance-cache';
+import { CACHE_KEYS } from '../services/caching/insurance-cache';
 
 interface ProviderMetric {
   provider: string;

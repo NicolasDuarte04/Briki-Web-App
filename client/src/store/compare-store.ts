@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { InsurancePlan } from '@/types/insurance';
+import type { InsurancePlan } from '../types/insurance';
 
 interface CompareState {
   plansToCompare: InsurancePlan[];

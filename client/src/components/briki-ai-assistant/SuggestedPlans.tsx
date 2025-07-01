@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import NewPlanCard from './NewPlanCard';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '../../hooks/use-toast';
 import { useLocation } from 'wouter';
-import { logPlanAnalytics } from '@/lib/analytics';
-import { useAuth } from '@/hooks/use-auth';
+import { logPlanAnalytics } from '../../lib/analytics';
+import { useAuth } from '../../hooks/use-auth';
 import { InsurancePlan } from './NewPlanCard';
-import { Button } from '@/components/ui/button';
+import { Button } from '../ui/button';
 import { ChevronRight } from 'lucide-react';
 
 interface SuggestedPlansProps {

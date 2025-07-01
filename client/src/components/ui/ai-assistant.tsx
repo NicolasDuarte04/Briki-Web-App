@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { AIAssistantIcon } from "@/components/icons/futuristic-icons";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { AIAssistantIcon } from "../icons/futuristic-icons";
+import { Input } from "./input";
+import { Button } from "./button";
 import { Mic, MicOff, Send, Volume2, X } from "lucide-react";
 
 // Define context-aware tips for different pages

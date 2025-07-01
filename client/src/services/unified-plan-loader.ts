@@ -3,8 +3,8 @@
  * Manages loading plans from real sources
  */
 
-import { InsuranceCategory } from "@shared/schema";
-import { RealInsurancePlan, realPlans, getRealPlansByCategory } from "@/data/realPlans";
+import { InsuranceCategory } from "../../../shared/schema";
+import { RealInsurancePlan, realPlans, getRealPlansByCategory } from "../data/realPlans";
 
 // Type that represents real plans
 export type UnifiedPlan = RealInsurancePlan & {

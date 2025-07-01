@@ -1,11 +1,11 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { useToast } from '@/hooks/use-toast';
-import { InsuranceCategory } from '@/types/insurance';
-import { useNavigation } from '@/lib/navigation';
-import { trackEvent } from '@/lib/analytics';
-import { EventCategory } from '@/constants/analytics';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../ui/card';
+import { useToast } from '../../hooks/use-toast';
+import { InsuranceCategory } from '../../types/insurance';
+import { useNavigation } from '../../lib/navigation';
+import { trackEvent } from '../../lib/analytics';
+import { EventCategory } from '../../constants/analytics';
 
 interface PlanRecommenderProps {
   category?: InsuranceCategory;

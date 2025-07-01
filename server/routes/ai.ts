@@ -5,7 +5,7 @@ import { generateAssistantResponse, analyzeImageForInsurance } from '../services
 import { generateMockResponse } from '../services/mock-assistant-responses';
 import { semanticSearch } from '../services/semantic-search';
 import { db } from '../db';
-import { conversationLogs, contextSnapshots, insurancePlans } from '@shared/schema';
+import { conversationLogs, contextSnapshots, insurancePlans } from '../../shared/schema';
 import { desc, eq } from 'drizzle-orm';
 
 const router = express.Router();

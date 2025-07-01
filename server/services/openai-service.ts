@@ -22,14 +22,14 @@ import OpenAI from "openai";
 // } from "../data-loader";
 import { storage } from "../storage";
 import { db } from "../db";
-import { insurancePlans, InsuranceCategory } from "@shared/schema";
-import { analyzeContextNeeds, detectInsuranceCategory, ContextAnalysisResult } from "@shared/context-utils";
+import { insurancePlans, InsuranceCategory } from "../../shared/schema";
+import { analyzeContextNeeds, detectInsuranceCategory, ContextAnalysisResult } from "../../shared/context-utils";
 import fetch from 'node-fetch';
-import { AssistantMemory } from "@shared/types/assistant";
+import { AssistantMemory } from "../../shared/types/assistant";
 import { getLatestUserContext } from "./context-service";
-import { filterPlans, FilterCriteria } from "@/lib/plan-filter";
-import { extractFormalFeatures } from "@shared/feature-synonyms";
-import { extractPriceRange } from "@shared/context-utils";
+import { filterPlans, FilterCriteria } from "../../client/src/lib/plan-filter";
+import { extractFormalFeatures } from "../../shared/feature-synonyms";
+import { extractPriceRange } from "../../shared/context-utils";
 
 // Define a simpler, unified plan type for the assistant's purpose
 interface InsurancePlan {

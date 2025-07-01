@@ -1,13 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
 import { Send, RefreshCw, Home, Loader2, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Textarea } from '@/components/ui/textarea';
-import { cn } from '@/lib/utils';
-import NewPlanCard from '@/components/briki-ai-assistant/NewPlanCard';
-import { useAnalytics } from '@/hooks/use-analytics';
-import { RealInsurancePlan } from '@/data/realPlans';
+import { Button } from '../ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { Textarea } from '../ui/textarea';
+import { cn } from '../../lib/utils';
+import NewPlanCard from './NewPlanCard';
+import { useAnalytics } from '../../hooks/use-analytics';
+import { RealInsurancePlan } from '../../data/realPlans';
 import { useLocation } from 'wouter';
 
 interface Plan extends RealInsurancePlan {

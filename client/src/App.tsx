@@ -1,53 +1,53 @@
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "@/components/ui/toaster";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { AuthProvider } from "@/contexts/AuthContext";
-import { useAuth } from "@/hooks/use-auth";
-import ProtectedRoute from "@/components/auth/ProtectedRoute";
-import { LanguageProvider } from "@/components/language-selector";
-import { PageTransition } from "@/components/ui/transition-effect";
-import { RecentlyViewedProvider } from "@/contexts/recently-viewed-context";
-import { AIAssistantProvider, AuthenticatedLayout, MainLayout } from "@/components/layout";
-import { LoginNotification } from "@/components/login-notification";
-import { useNavigation } from "@/lib/navigation";
-import { useAnalytics } from "@/hooks/use-analytics";
+import { Toaster } from "./components/ui/toaster";
+import { TooltipProvider } from "./components/ui/tooltip";
+import { AuthProvider } from "./contexts/AuthContext";
+import { useAuth } from "./hooks/use-auth";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
+import { LanguageProvider } from "./components/language-selector";
+import { PageTransition } from "./components/ui/transition-effect";
+import { RecentlyViewedProvider } from "./contexts/recently-viewed-context";
+import { AIAssistantProvider, AuthenticatedLayout, MainLayout } from "./components/layout";
+import { LoginNotification } from "./components/login-notification";
+import { useNavigation } from "./lib/navigation";
+import { useAnalytics } from "./hooks/use-analytics";
 import { useEffect } from "react";
-import { initGA, trackEvent } from "@/lib/analytics";
-import { EventCategory } from "@/constants/analytics";
-import { ColorProvider } from "@/contexts/color-context";
-import { AnonymousUserProvider } from "@/contexts/anonymous-user-context";
+import { initGA, trackEvent } from "./lib/analytics";
+import { EventCategory } from "./constants/analytics";
+import { ColorProvider } from "./contexts/color-context";
+import { AnonymousUserProvider } from "./contexts/anonymous-user-context";
 
-import NotFound from "@/pages/not-found";
-import LandingPage from "@/pages/landing-page";
-import DashboardRouter from "@/components/dashboard-router";
+import NotFound from "./pages/not-found";
+import LandingPage from "./pages/landing-page";
+import DashboardRouter from "./components/dashboard-router";
 // Import our new unified authentication screen
-import AuthPage from "@/pages/auth-page-enhanced";
-import TripInfoPage from "@/pages/trip-info-page";
-import InsuranceCategoriesPage from "@/pages/insurance-categories-page";
-import CheckoutPage from "@/pages/checkout-page";
-import WeatherRiskPage from "@/pages/weather-risk-page";
-import LearnMorePage from "@/pages/learn-more-page";
-import TermsPage from "@/pages/terms-page";
-import ProfilePage from "@/pages/profile-page";
-import SettingsPage from "@/pages/settings-page";
-import ApiSettingsPage from "@/pages/api-settings-page";
+import AuthPage from "./pages/auth-page-enhanced";
+import TripInfoPage from "./pages/trip-info-page";
+import InsuranceCategoriesPage from "./pages/insurance-categories-page";
+import CheckoutPage from "./pages/checkout-page";
+import WeatherRiskPage from "./pages/weather-risk-page";
+import LearnMorePage from "./pages/learn-more-page";
+import TermsPage from "./pages/terms-page";
+import ProfilePage from "./pages/profile-page";
+import SettingsPage from "./pages/settings-page";
+import ApiSettingsPage from "./pages/api-settings-page";
 // Import comparison screens
 // Removed legacy ComparePlansPage import - using ComparePlansFixed instead
 import ComparePlansFixed from "@/pages/compare-plans-fixed";  // Fixed version of comparison component
 
 // Import new public site pages
-import FeaturesPage from "@/pages/features";
-import PricingPage from "@/pages/pricing";
-import AskBrikiPage from "@/pages/ask-briki";
+import FeaturesPage from "./pages/features";
+import PricingPage from "./pages/pricing";
+import AskBrikiPage from "./pages/ask-briki";
 
-import AskBrikiAIPage from "@/pages/ask-briki-ai";
-import BlogPage from "@/pages/blog";
-import BlogPostPage from "@/pages/blog/[slug]";
-import ForumPage from "@/pages/forum";
-import CareersPage from "@/pages/careers";
-import ColorPaletteDemo from "@/pages/color-palette-demo";
+import AskBrikiAIPage from "./pages/ask-briki-ai";
+import BlogPage from "./pages/blog";
+import BlogPostPage from "./pages/blog/[slug]";
+import ForumPage from "./pages/forum";
+import CareersPage from "./pages/careers";
+import ColorPaletteDemo from "./pages/color-palette-demo";
 
 // Import redirects from their respective files
 import { 
@@ -55,49 +55,49 @@ import {
   PetInsuranceRedirect,
   HealthInsuranceRedirect,
   TravelInsuranceRedirect
-} from "@/pages/redirects/insurance-redirects";
+} from "./pages/redirects/insurance-redirects";
 
 import { 
   InsurancePlansRedirect 
-} from "@/pages/redirects/plans-redirects";
+} from "./pages/redirects/plans-redirects";
 // Legacy AI assistant imports removed - all routes now redirect to /ask-briki-ai
-import CountdownPageNew from "@/pages/countdown-page-new";
-import BrikiPilotPortal from "@/pages/briki-pilot-portal";
+import CountdownPageNew from "./pages/countdown-page-new";
+import BrikiPilotPortal from "./pages/briki-pilot-portal";
 
 // New insurance category pages
-import TravelInsurance from "@/pages/insurance/travel";
-import AutoInsurance from "@/pages/insurance/auto";
-import PetInsurance from "@/pages/insurance/pet";
-import HealthInsurance from "@/pages/insurance/health";
+import TravelInsurance from "./pages/insurance/travel";
+import AutoInsurance from "./pages/insurance/auto";
+import PetInsurance from "./pages/insurance/pet";
+import HealthInsurance from "./pages/insurance/health";
 
 // Quote pages
-import GetQuotePage from "@/pages/get-quote";
-import QuoteConfirmationPage from "@/pages/quote-confirmation";
-import QuoteHistoryPage from "@/pages/quote-history";
+import GetQuotePage from "./pages/get-quote";
+import QuoteConfirmationPage from "./pages/quote-confirmation";
+import QuoteHistoryPage from "./pages/quote-history";
 
 // Comparison pages
-import InsuranceQuote from "@/pages/insurance/[category]/quote";
+import InsuranceQuote from "./pages/insurance/[category]/quote";
 
 // Explore pages (public-facing SEO pages without app layout)
-import ExploreTravelInsurance from "@/pages/explore/travel";
-import ExploreAutoInsurance from "@/pages/explore/auto";
-import ExplorePetInsurance from "@/pages/explore/pet";
-import ExploreHealthInsurance from "@/pages/explore/health";
+import ExploreTravelInsurance from "./pages/explore/travel";
+import ExploreAutoInsurance from "./pages/explore/auto";
+import ExplorePetInsurance from "./pages/explore/pet";
+import ExploreHealthInsurance from "./pages/explore/health";
 
 // Company pages
-import CompanyPage from "@/pages/company-page";
-import CompanyLogin from "@/pages/company-login";
-import CompanyRegister from "@/pages/company-register";
-import CompanyDashboard from "@/pages/company-dashboard";
-import CompanyUploadPage from "@/pages/company-upload-page";
-import CompanyAnalysisPage from "@/pages/company-analysis-page";
-import CompanyMarketplacePage from "@/pages/company-marketplace-page";
-import CompanySettings from "@/pages/company-settings";
-import CompanyPreviewPage from "@/pages/company-preview-page";
-import CompanyRequestPilotPage from "@/pages/company-request-pilot-page";
-import ContactSalesPage from "@/pages/contact-sales-page";
-import CompanyPlans from "@/pages/company-plans";
-import CompanyPlanEdit from "@/pages/company-plan-edit";
+import CompanyPage from "./pages/company-page";
+import CompanyLogin from "./pages/company-login";
+import CompanyRegister from "./pages/company-register";
+import CompanyDashboard from "./pages/company-dashboard";
+import CompanyUploadPage from "./pages/company-upload-page";
+import CompanyAnalysisPage from "./pages/company-analysis-page";
+import CompanyMarketplacePage from "./pages/company-marketplace-page";
+import CompanySettings from "./pages/company-settings";
+import CompanyPreviewPage from "./pages/company-preview-page";
+import CompanyRequestPilotPage from "./pages/company-request-pilot-page";
+import ContactSalesPage from "./pages/contact-sales-page";
+import CompanyPlans from "./pages/company-plans";
+import CompanyPlanEdit from "./pages/company-plan-edit";
 
 // Removed unused ConditionalAIProvider
 

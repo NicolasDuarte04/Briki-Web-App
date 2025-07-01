@@ -1,7 +1,7 @@
 import { ReactNode, useEffect } from 'react';
 import { useLocation } from 'wouter';
-import { useAuth } from '@/hooks/use-auth';
-import { Spinner } from '@/components/ui/spinner';
+import { useAuth } from '../../hooks/use-auth';
+import { Spinner } from '../ui/spinner';
 
 interface ProtectedRouteProps {
   children: ReactNode;

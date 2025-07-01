@@ -1,13 +1,13 @@
 import React from 'react';
-import { PublicLayout } from '@/components/layout/public-layout';
-import { useColorContext } from '@/contexts/color-context';
-import ColorPaletteSelector from '@/components/color-palette-selector';
+import { PublicLayout } from '../components/layout/public-layout';
+import { useColorContext } from '../contexts/color-context';
+import ColorPaletteSelector from '../components/color-palette-selector';
 import { Helmet } from 'react-helmet';
 import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '../components/ui/button';
+import { Alert, AlertDescription, AlertTitle } from '../components/ui/alert';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
+import { Badge } from '../components/ui/badge';
 import { Info, AlertTriangle, CheckCircle, AlertCircle } from 'lucide-react';
 
 export default function ColorPaletteDemo() {

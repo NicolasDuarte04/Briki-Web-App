@@ -1,8 +1,8 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useLocation } from "wouter";
-import { COLORS } from "@/config";
-import GradientButton from "@/components/gradient-button";
+import { COLORS } from "../../config";
+import GradientButton from "../gradient-button";
 
 /**
  * The hero section for the B2C audience

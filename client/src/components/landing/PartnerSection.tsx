@@ -1,8 +1,8 @@
 import { motion } from "framer-motion";
 import { ArrowRight, PieChart, LineChart, BarChart3, Database } from "lucide-react";
 import { useLocation } from "wouter";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "../ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 
 /**
  * The insurance partner section for the B2B audience

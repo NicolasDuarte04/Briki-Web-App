@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { InsuranceCategory } from "@shared/schema";
+import { InsuranceCategory } from "../../../shared/schema";
 
 // Import our new components
-import AnimatedBackground from "@/components/animated-background";
-import GlassCard from "@/components/ui/glass-card";
-import GradientButton from "@/components/gradient-button";
-import { PublicLayout } from "@/components/layout/public-layout";
+import AnimatedBackground from "../components/animated-background";
+import GlassCard from "../components/ui/glass-card";
+import GradientButton from "../components/gradient-button";
+import { PublicLayout } from "../components/layout/public-layout";
 
 // Icons
 import { Plane, Car, Heart, Cat, HelpCircle, ChevronRight } from "lucide-react";

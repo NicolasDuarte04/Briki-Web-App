@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "../hooks/use-auth";
 import { useLocation } from "wouter";
 import { 
   Shield, 
@@ -9,17 +9,17 @@ import {
   Sparkles,
   MessageSquare
 } from "lucide-react";
-import { SectionContainer } from "@/components/ui/section-container";
-import { GradientButton } from "@/components/ui/gradient-button";
+import { SectionContainer } from "../components/ui/section-container";
+import { GradientButton } from "../components/ui/gradient-button";
 import { 
   WelcomeHero,
   DashboardStatCard,
   QuickActions,
   ActivityTimeline,
   PolicyGrid
-} from "@/components/dashboard";
+} from "../components/dashboard";
 import { motion } from "framer-motion";
-import { cn } from "@/lib/utils";
+import { cn } from "../lib/utils";
 
 export default function DashboardAuthenticated() {
   const { user } = useAuth();

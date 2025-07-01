@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { QuoteSummary } from "@/components/quote-summary";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { useQuoteStore } from "@/store/quote-store";
-import { TravelPlan, INSURANCE_CATEGORIES } from "@shared/schema";
-import { formatPrice } from "@/lib/utils";
+import { QuoteSummary } from "../../../components/quote-summary";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../../../components/ui/card";
+import { Button } from "../../../components/ui/button";
+import { Separator } from "../../../components/ui/separator";
+import { useQuoteStore } from "../../../store/quote-store";
+import { TravelPlan, INSURANCE_CATEGORIES } from "../../../../../shared/schema";
+import { formatPrice } from "../../../lib/utils";
 
 // Sample travel plans for demonstration
 const SAMPLE_TRAVEL_PLANS: TravelPlan[] = [

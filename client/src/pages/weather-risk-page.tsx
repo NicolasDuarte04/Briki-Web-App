@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { WeatherRiskVisualization } from '@/components/weather-risk-visualization';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { destinationRisks } from '@/data/weatherRiskData';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { WeatherRiskVisualization } from '../components/weather-risk-visualization';
+import { Button } from '../components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import { destinationRisks } from '../data/weatherRiskData';
+import { Alert, AlertDescription } from '../components/ui/alert';
 
 export default function WeatherRiskPage() {
   const [selectedDestination, setSelectedDestination] = useState<string>('');

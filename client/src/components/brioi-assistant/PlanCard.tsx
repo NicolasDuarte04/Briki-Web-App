@@ -1,8 +1,8 @@
-import { useToast } from '@/hooks/use-toast';
-import { formatCurrency } from '@/utils/format';
-import { InsurancePlan } from '@/types/insurance';
-import { logPlanAnalytics } from '@/lib/analytics';
-import { useAuth } from '@/hooks/use-auth';
+import { useToast } from '../../hooks/use-toast';
+import { formatCurrency } from '../../utils/format';
+import { InsurancePlan } from '../../types/insurance';
+import { logPlanAnalytics } from '../../lib/analytics';
+import { useAuth } from '../../hooks/use-auth';
 
 interface PlanCardProps {
   plan: InsurancePlan;

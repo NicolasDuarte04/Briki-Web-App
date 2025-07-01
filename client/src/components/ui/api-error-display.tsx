@@ -1,10 +1,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { AlertTriangle, RefreshCw, Wifi, Shield, Key, Clock } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { ApiError } from '@/services/api/insurance-providers';
+import { Button } from './button';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './card';
+import { Alert, AlertDescription, AlertTitle } from './alert';
+import { ApiError } from '../../services/api/insurance-providers';
 import { Link } from 'wouter';
 
 interface ApiErrorDisplayProps {

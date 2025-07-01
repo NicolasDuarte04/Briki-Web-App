@@ -1,15 +1,15 @@
 import { motion } from "framer-motion";
 import { useLocation } from "wouter";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "../components/ui/button";
+import { Badge } from "../components/ui/badge";
 import { ArrowRight, Star, Users, Shield, Zap } from "lucide-react";
-import AiAssistantSection from "@/components/landing/AiAssistantSection";
-import Features from "@/components/landing/Features";
-import PartnerSection from "@/components/landing/PartnerSection";
-import Testimonials from "@/components/landing/Testimonials";
-import AboutSection from "@/components/landing/AboutSection";
-import { PublicLayout } from "@/components/layout/public-layout";
-import { Card, CardContent } from "@/components/ui/card";
+import AiAssistantSection from "../components/landing/AiAssistantSection";
+import Features from "../components/landing/Features";
+import PartnerSection from "../components/landing/PartnerSection";
+import Testimonials from "../components/landing/Testimonials";
+import AboutSection from "../components/landing/AboutSection";
+import { PublicLayout } from "../components/layout/public-layout";
+import { Card, CardContent } from "../components/ui/card";
 
 /**
  * Landing Page Component

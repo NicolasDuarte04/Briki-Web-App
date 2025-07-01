@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { useAuth } from "@/hooks/use-auth";
-import { useToast } from "@/hooks/use-toast";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuth } from "../hooks/use-auth";
+import { useToast } from "../hooks/use-toast";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
+import { Button } from "../components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { useQuery } from "@tanstack/react-query";
 import { 
   LineChart, 
@@ -35,11 +35,11 @@ import {
   ArrowUpRight,
   ArrowDownRight
 } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
-import { InsurancePlan as BasePlan, CompanyProfile } from "@shared/types";
-import CompanyLayout from "@/components/layout/company-layout";
+import { Skeleton } from "../components/ui/skeleton";
+import { Progress } from "../components/ui/progress";
+import { Badge } from "../components/ui/badge";
+import { InsurancePlan as BasePlan, CompanyProfile } from "../../../shared/types";
+import CompanyLayout from "../components/layout/company-layout";
 import { format } from "date-fns";
 
 // Types for analytics data

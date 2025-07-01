@@ -1,6 +1,6 @@
 import React from 'react';
-import { InsurancePlan } from '@/components/briki-ai-assistant/PlanCard';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { InsurancePlan } from '../briki-ai-assistant/PlanCard';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import { Check, X } from 'lucide-react';
 
 interface CategoryComparisonTableProps {

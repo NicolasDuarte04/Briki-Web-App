@@ -1,8 +1,8 @@
 import React from "react";
 import { Link } from "wouter";
 import { ArrowLeft, Shield, Clock, CheckCircle } from "lucide-react";
-import { useLanguage } from "@/components/language-selector";
-import { PublicLayout } from "@/components/layout/public-layout";
+import { useLanguage } from "../components/language-selector";
+import { PublicLayout } from "../components/layout/public-layout";
 
 export default function LearnMorePage() {
   const { t } = useLanguage();

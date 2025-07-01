@@ -1,9 +1,9 @@
 import { useState, useEffect, useMemo } from 'react';
-import { insurancePlansApi, type InsurancePlan } from '@/services/insurance-plans-api';
-import type { InsuranceAPIFilters } from '@/services/insurance-api';
-import { useToast } from '@/hooks/use-toast';
-import { AdvancedFilters } from '@/components/insurance/AdvancedFilterPanel';
-import { applyAdvancedFilters, getFilterOptions, getDefaultFilters } from '@/utils/filterUtils';
+import { insurancePlansApi, type InsurancePlan } from '../services/insurance-plans-api';
+import type { InsuranceAPIFilters } from '../services/insurance-api';
+import { useToast } from './use-toast';
+import { AdvancedFilters } from '../components/insurance/AdvancedFilterPanel';
+import { applyAdvancedFilters, getFilterOptions, getDefaultFilters } from '../utils/filterUtils';
 
 export interface UseInsurancePlansOptions {
   category?: string;

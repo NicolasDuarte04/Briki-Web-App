@@ -1,8 +1,8 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { AlertTriangle, RefreshCw, Wifi, Search, Filter, Shield, Home } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "./button";
+import { Card, CardContent } from "./card";
 
 interface ErrorStateProps {
   type?: 'network' | 'no-results' | 'filter-empty' | 'api-error' | 'not-found' | 'generic';

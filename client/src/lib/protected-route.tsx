@@ -1,8 +1,8 @@
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "../hooks/useAuth";
 import { Loader2 } from "lucide-react";
 import { Redirect, Route } from "wouter";
 import { useState, useEffect } from "react";
-import { useNavigation } from "@/lib/navigation";
+import { useNavigation } from "./navigation";
 
 export function ProtectedRoute({
   path,

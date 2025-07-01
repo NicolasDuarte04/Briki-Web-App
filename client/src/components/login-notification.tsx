@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/use-auth";
+import { useToast } from "../hooks/use-toast";
+import { useAuth } from "../hooks/use-auth";
 import { LayoutGroup, motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
 

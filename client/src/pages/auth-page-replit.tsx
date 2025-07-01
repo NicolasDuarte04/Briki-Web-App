@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "../hooks/useAuth";
 import { useLocation } from "wouter";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "../hooks/use-toast";
 
 // Import our components
-import AnimatedBackground from "@/components/animated-background";
-import GlassCard from "@/components/ui/glass-card";
-import GradientButton from "@/components/gradient-button";
+import AnimatedBackground from "../components/animated-background";
+import GlassCard from "../components/ui/glass-card";
+import GradientButton from "../components/gradient-button";
 
 // Icons
 import { ArrowLeft, LogIn } from "lucide-react";

@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { cn } from "@/lib/utils";
+import { cn } from "../../lib/utils";
 import { 
   Activity, BadgeCheck, Check, CheckSquare, Clock, ClipboardList, 
   Globe, HelpCircle, Pill, PhoneOutgoing, Shield, ShieldCheck, 

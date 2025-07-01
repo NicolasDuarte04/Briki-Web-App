@@ -1,13 +1,13 @@
 import * as React from "react";
 import { motion } from "framer-motion";
-import { cn } from "@/lib/utils";
+import { cn } from "../../lib/utils";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "./select";
 
 // The interface for the SelectTrigger props
 interface AnimatedSelectTriggerProps extends React.ComponentPropsWithoutRef<typeof SelectTrigger> {

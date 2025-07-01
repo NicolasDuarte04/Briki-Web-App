@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { FixedSizeGrid as Grid } from "react-window";
 import { motion } from "framer-motion";
 import LazyPlanCard from "./LazyPlanCard";
-import { InsurancePlan } from "@/types/insurance";
+import { InsurancePlan } from "../../types/insurance";
 
 interface VirtualizedPlanListProps {
   plans: InsurancePlan[];

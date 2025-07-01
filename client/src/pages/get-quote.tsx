@@ -1,6 +1,6 @@
 import React from "react";
-import QuoteForm from "@/components/quote/QuoteForm";
-import { useAuth } from "@/hooks/use-auth";
+import QuoteForm from "../components/quote/QuoteForm";
+import { useAuth } from "../hooks/use-auth";
 import { Loader2 } from "lucide-react";
 
 export default function GetQuotePage() {

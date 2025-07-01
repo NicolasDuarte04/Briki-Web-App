@@ -1,8 +1,8 @@
 import React from 'react';
-import { PublicLayout } from '@/components/layout/public-layout';
+import { PublicLayout } from '../components/layout/public-layout';
 import { motion } from 'framer-motion';
-import { useNavigation } from '@/lib/navigation';
-import { Button } from '@/components/ui/button';
+import { useNavigation } from '../lib/navigation';
+import { Button } from '../components/ui/button';
 import { Helmet } from 'react-helmet';
 import { MessageCircle, Users, ArrowRight, ThumbsUp, Reply, Lock, Eye, Award, Search } from 'lucide-react';
 

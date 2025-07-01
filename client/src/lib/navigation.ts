@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from 'react';
 import { useLocation } from 'wouter';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '../hooks/use-auth';
 
 /**
  * Get the appropriate insurance path based on authentication status

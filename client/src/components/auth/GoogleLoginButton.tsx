@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "../ui/button";
 import { Loader2 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { trackEvent } from "@/lib/analytics";
+import { useToast } from "../../hooks/use-toast";
+import { trackEvent } from "../../lib/analytics";
 
 type GoogleLoginButtonProps = {
   mode: "login" | "signup";

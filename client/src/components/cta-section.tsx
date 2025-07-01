@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { motion } from "framer-motion";
-import GradientButton from "@/components/gradient-button";
+import GradientButton from "./gradient-button";
 
 interface CTASectionProps {
   title?: string;

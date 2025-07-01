@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Search, X, Filter } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
+import { Badge } from "../ui/badge";
+import { Card, CardContent } from "../ui/card";
 import { motion, AnimatePresence } from "framer-motion";
-import { InsurancePlan } from "@/types/insurance";
+import { InsurancePlan } from "../../types/insurance";
 
 interface SearchSuggestion {
   type: 'provider' | 'feature' | 'tag' | 'category';

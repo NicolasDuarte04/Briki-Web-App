@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import { Upload, FileText, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "./button";
 
 interface FileUploaderProps {
   accept?: string;

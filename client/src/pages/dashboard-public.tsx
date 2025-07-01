@@ -1,8 +1,8 @@
 import { useLocation } from "wouter";
 import { BarChart3, Shield, Car, Plane, Heart, PawPrint } from "lucide-react";
-import { useLanguage } from "@/components/language-selector";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useLanguage } from "../components/language-selector";
+import { Button } from "../components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 
 export default function DashboardPublic() {
   const [, navigate] = useLocation();

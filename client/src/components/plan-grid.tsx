@@ -1,8 +1,8 @@
-import { InsurancePlan } from "@shared/schema";
+import { InsurancePlan } from "../../../shared/schema";
 import { useState } from "react";
 import InsuranceCard from "./insurance-card";
-import { CompareButton } from "@/components/compare-button";
-import { cn } from "@/lib/utils";
+import { CompareButton } from "./compare-button";
+import { cn } from "../lib/utils";
 
 interface PlanGridProps {
   plans: InsurancePlan[];

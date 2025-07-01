@@ -1,14 +1,14 @@
 import React from 'react';
-import { Button, ButtonProps } from '@/components/ui/button';
-import { InsurancePlan, useCompareStore } from '@/store/compare-store';
+import { Button, ButtonProps } from '../ui/button';
+import { InsurancePlan, useCompareStore } from '../../store/compare-store';
 import { Plus, Check, BarChart3, AlertCircle } from 'lucide-react';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip';
-import { useToast } from '@/hooks/use-toast';
+} from '../ui/tooltip';
+import { useToast } from '../../hooks/use-toast';
 import { useLocation } from 'wouter';
 
 interface ComparePlanButtonProps extends ButtonProps {

@@ -1,7 +1,7 @@
 import React from "react";
 import { useLocation } from "wouter";
-import TravelQuoteForm from "@/components/forms/travel-quote-form";
-import { INSURANCE_CATEGORIES } from "@shared/schema";
+import TravelQuoteForm from "../../../components/forms/travel-quote-form";
+import { INSURANCE_CATEGORIES } from "../../../../../shared/schema";
 
 export default function TravelQuotePage() {
   const [location] = useLocation();

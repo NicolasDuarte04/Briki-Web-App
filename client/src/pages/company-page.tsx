@@ -1,11 +1,11 @@
 import { useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
-import { useLanguage } from "@/components/language-selector";
+import { Button } from "../components/ui/button";
+import { Card, CardHeader, CardContent, CardFooter } from "../components/ui/card";
+import { useLanguage } from "../components/language-selector";
 import { BriefcaseIcon, LineChart, Shield, Lightbulb, ArrowRight, Building2 } from "lucide-react";
-import { PublicLayout } from "@/components/layout/public-layout";
+import { PublicLayout } from "../components/layout/public-layout";
 
 export default function CompanyPage() {
   const [, navigate] = useLocation();

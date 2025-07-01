@@ -1,9 +1,9 @@
 import React from 'react';
-import { useColorContext } from '@/contexts/color-context';
-import { InsuranceCategory, categoryPalettes } from '@/lib/color-harmonizer';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useColorContext } from '../contexts/color-context';
+import { InsuranceCategory, categoryPalettes } from '../lib/color-harmonizer';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { Label } from './ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { motion } from 'framer-motion';
 
 export function ColorPaletteSelector() {

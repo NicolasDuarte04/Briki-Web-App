@@ -2,10 +2,10 @@
 import React from 'react';
 import { Bot, SparklesIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
+import { Button } from '../ui/button';
 import { useLocation } from 'wouter';
-import { cn } from '@/lib/utils';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { cn } from '../../lib/utils';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 
 // Create a separate type that doesn't extend ButtonProps
 interface AIAssistantButtonProps {

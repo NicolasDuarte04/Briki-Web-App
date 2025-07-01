@@ -16,7 +16,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { InsuranceCategory, INSURANCE_CATEGORIES } from '@shared/schema';
+import { InsuranceCategory, INSURANCE_CATEGORIES } from '../shared/schema';
 
 // Para ESM, necesitamos calcular __dirname ya que no está disponible por defecto
 const __filename = fileURLToPath(import.meta.url);

@@ -1,6 +1,6 @@
-import { useAuth } from "@/hooks/use-auth";
-import { InsuranceCategory } from "@shared/schema";
-import { CATEGORY_PATHS } from "@/constants/sharedContent";
+import { useAuth } from "./use-auth";
+import { InsuranceCategory } from "../../../shared/schema";
+import { CATEGORY_PATHS } from "../constants/sharedContent";
 
 /**
  * Custom hook for auth-aware navigation throughout the app

@@ -1,6 +1,6 @@
 import express from 'express';
 import { z } from 'zod';
-import { insertQuoteSchema } from '@shared/schema';
+import { insertQuoteSchema } from '../../shared/schema';
 import { storage } from '../storage';
 import { isAuthenticated } from '../auth/local-auth';
 

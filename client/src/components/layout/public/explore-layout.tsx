@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Instagram, Linkedin, ChevronRight, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Helmet } from "react-helmet";
-import { useNavigation } from "@/lib/navigation";
+import { useNavigation } from "../../../lib/navigation";
 
 interface ExploreLayoutProps {
   children: ReactNode;

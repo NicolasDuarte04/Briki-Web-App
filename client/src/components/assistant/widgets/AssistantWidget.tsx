@@ -1,7 +1,7 @@
 import React from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { AssistantWidgetType, GlossaryWidgetData, VisualComparisonWidgetData } from '@/services/ai-service';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../ui/card';
+import { Button } from '../../ui/button';
+import { AssistantWidgetType, GlossaryWidgetData, VisualComparisonWidgetData } from '../../../services/ai-service';
 import { BookOpen, BarChart2, MessageCircle, ExternalLink } from 'lucide-react';
 
 interface AssistantWidgetProps {

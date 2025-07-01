@@ -1,5 +1,5 @@
-import { InsurancePlan } from "@shared/schema";
-import { cn } from "@/lib/utils";
+import { InsurancePlan } from "../../../shared/schema";
+import { cn } from "../lib/utils";
 import { 
   Shield, 
   Check, 
@@ -15,7 +15,7 @@ import {
   Car,
   Map
 } from "lucide-react";
-import { Progress } from "@/components/ui/progress";
+import { Progress } from "./ui/progress";
 
 interface FeatureBreakdownProps {
   plans: InsurancePlan[];

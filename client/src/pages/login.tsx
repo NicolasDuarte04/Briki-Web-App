@@ -3,16 +3,16 @@ import { useLocation } from 'wouter';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Separator } from "@/components/ui/separator";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from '@/hooks/use-auth';
+import { Button } from "../components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../components/ui/card";
+import { Input } from "../components/ui/input";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../components/ui/form";
+import { Separator } from "../components/ui/separator";
+import { useToast } from "../hooks/use-toast";
+import { useAuth } from '../hooks/use-auth';
 import { motion } from 'framer-motion';
-import GradientBackground from '@/components/ui/gradient-background';
-import GlassCard from '@/components/ui/glass-card';
+import GradientBackground from '../components/ui/gradient-background';
+import GlassCard from '../components/ui/glass-card';
 
 const loginSchema = z.object({
   identifier: z.string().min(1, 'Email or username is required'),

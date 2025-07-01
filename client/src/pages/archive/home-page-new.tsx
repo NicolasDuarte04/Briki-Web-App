@@ -1,28 +1,28 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/use-auth";
-import { useLanguage } from "@/components/language-selector";
-import { FadeIn, SlideIn, StaggerChildren } from "@/components/ui/transition-effect";
-import PopularPlansSlider from "@/components/popular-plans-slider";
-import RecentlyViewedPlans from "@/components/recently-viewed-plans";
-import AnimatedBackground from "@/components/animated-background";
-import GlassCard from "@/components/ui/glass-card";
-import GradientButton from "@/components/gradient-button";
-import FeaturesGrid from "@/components/features-grid";
-import CTASection from "@/components/cta-section";
-import BetaNotice from "@/components/beta-notice";
-import Footer from "@/components/footer";
-import { AIAssistant, getTravelInsuranceTips, getAutoInsuranceTips, getHealthInsuranceTips, getPetInsuranceTips } from "@/components/ui/ai-assistant";
-import { ComparisonChart, RadarChart, CoverageComparison } from "@/components/ui/data-visualization";
+import { Button } from "../../components/ui/button";
+import { useAuth } from "../../hooks/use-auth";
+import { useLanguage } from "../../components/language-selector";
+import { FadeIn, SlideIn, StaggerChildren } from "../../components/ui/transition-effect";
+import PopularPlansSlider from "../../components/popular-plans-slider";
+import RecentlyViewedPlans from "../../components/recently-viewed-plans";
+import AnimatedBackground from "../../components/animated-background";
+import GlassCard from "../../components/ui/glass-card";
+import GradientButton from "../../components/gradient-button";
+import FeaturesGrid from "../../components/features-grid";
+import CTASection from "../../components/cta-section";
+import BetaNotice from "../../components/beta-notice";
+import Footer from "../../components/footer";
+import { AIAssistant, getTravelInsuranceTips, getAutoInsuranceTips, getHealthInsuranceTips, getPetInsuranceTips } from "../../components/ui/ai-assistant";
+import { ComparisonChart, RadarChart, CoverageComparison } from "../../components/ui/data-visualization";
 import { 
   FuturisticTravelIcon, 
   FuturisticAutoIcon, 
   FuturisticPetIcon, 
   FuturisticHealthIcon 
-} from "@/components/icons/futuristic-icons";
-import { popularPlans } from "@/data/popular-plans";
+} from "../../components/icons/futuristic-icons";
+import { popularPlans } from "../../data/popular-plans";
 import { ArrowRight, Shield, ShieldCheck, PieChart, Clock, Star, Sparkles, TrendingUp, Users, Check } from "lucide-react";
 
 export default function HomePage() {

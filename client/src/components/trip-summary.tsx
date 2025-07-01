@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Trip } from "@shared/schema";
+import { Trip } from "../../../shared/schema";
 import { useLocation } from "wouter";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card } from "./ui/card";
+import { Button } from "./ui/button";
 import { PlaneIcon, Users, CalendarRange, PencilIcon } from "lucide-react";
 
 export default function TripSummary() {

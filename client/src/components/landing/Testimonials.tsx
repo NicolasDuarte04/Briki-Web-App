@@ -1,8 +1,8 @@
 import { motion } from "framer-motion";
 import { Quote, Star } from "lucide-react";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardFooter } from "../ui/card";
+import { Avatar, AvatarFallback } from "../ui/avatar";
+import { Badge } from "../ui/badge";
 
 interface Testimonial {
   quote: string;

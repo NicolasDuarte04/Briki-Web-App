@@ -5,7 +5,7 @@ import {
   categoryPalettes, 
   applyPaletteToDOM,
   adjustForAccessibility
-} from '@/lib/color-harmonizer';
+} from '../lib/color-harmonizer';
 
 interface ColorContextType {
   currentPalette: ColorPalette;

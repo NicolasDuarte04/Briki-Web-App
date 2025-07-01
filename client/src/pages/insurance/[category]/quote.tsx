@@ -1,7 +1,7 @@
-import { MainLayout } from "@/components/layout";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { useNavigation } from "@/hooks/use-navigation";
+import { MainLayout } from "../../../components/layout";
+import { Button } from "../../../components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "../../../components/ui/card";
+import { useNavigation } from "../../../hooks/use-navigation";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { 
@@ -22,10 +22,10 @@ import {
   Info 
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { InsuranceCategory } from "@/components/briki-ai-assistant/PlanCard";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { InsuranceCategory } from "../../../components/briki-ai-assistant/PlanCard";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../../../components/ui/form";
+import { Input } from "../../../components/ui/input";
+import { Textarea } from "../../../components/ui/textarea";
 import { useForm } from "react-hook-form";
 import { 
   Select, 
@@ -33,20 +33,20 @@ import {
   SelectItem, 
   SelectTrigger, 
   SelectValue 
-} from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { useToast } from "@/hooks/use-toast";
-import { Separator } from "@/components/ui/separator";
+} from "../../../components/ui/select";
+import { Checkbox } from "../../../components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "../../../components/ui/radio-group";
+import { useToast } from "../../../hooks/use-toast";
+import { Separator } from "../../../components/ui/separator";
 import { 
   useQuoteStore, 
   TravelQuoteData, 
   AutoQuoteData, 
   PetQuoteData, 
   HealthQuoteData 
-} from "@/store/quote-store";
+} from "../../../store/quote-store";
 import { format } from "date-fns";
-import { Switch } from "@/components/ui/switch";
+import { Switch } from "../../../components/ui/switch";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 

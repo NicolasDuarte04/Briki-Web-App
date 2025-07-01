@@ -1,17 +1,17 @@
 import { useEffect } from "react";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "../hooks/use-auth";
 import { useLocation } from "wouter";
 import { Loader2, User, Bell, CreditCard, Shield, Globe, Lock } from "lucide-react";
-import { AnimatedButton } from "@/components/ui/animated-button";
+import { AnimatedButton } from "../components/ui/animated-button";
 import { motion } from "framer-motion";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
-import { Badge } from "@/components/ui/badge";
-import { AuthenticatedLayout } from "@/components/layout";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
+import { Label } from "../components/ui/label";
+import { Input } from "../components/ui/input";
+import { Switch } from "../components/ui/switch";
+import { Badge } from "../components/ui/badge";
+import { AuthenticatedLayout } from "../components/layout";
 
 export default function SettingsPage() {
   const { user, isLoading } = useAuth();

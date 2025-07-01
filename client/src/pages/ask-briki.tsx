@@ -1,9 +1,9 @@
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet';
 import { Bot, Shield, MessageCircle, ArrowRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '../components/ui/button';
 import { useLocation } from 'wouter';
-import Navbar from '@/components/layout/navbar';
+import Navbar from '../components/layout/navbar';
 
 export default function AskBrikiPage() {
   const [, navigate] = useLocation();

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { motion } from "framer-motion";
-import { cn } from "@/lib/utils";
-import { Input } from "@/components/ui/input";
+import { cn } from "../../lib/utils";
+import { Input } from "./input";
 
 // Define props interface with all the HTML input element props
 interface AnimatedInputProps extends React.InputHTMLAttributes<HTMLInputElement> {

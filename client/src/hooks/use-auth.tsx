@@ -5,10 +5,10 @@ import {
   UseMutationResult,
 } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { insertUserSchema, User as SelectUser, InsertUser } from "@shared/schema";
+import { insertUserSchema, User as SelectUser, InsertUser } from "../../../shared/schema";
 import { getQueryFn, apiRequest, queryClient } from "../lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
-import { trackEvent } from "@/lib/analytics";
+import { useToast } from "./use-toast";
+import { trackEvent } from "../lib/analytics";
 
 type TokenResponse = {
   user: SelectUser;

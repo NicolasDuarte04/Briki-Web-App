@@ -1,4 +1,4 @@
-import { InsuranceCategory as SharedInsuranceCategory } from '@shared/schema';
+import { InsuranceCategory as SharedInsuranceCategory } from '../../../shared/schema';
 
 // Insurance category types
 export type InsuranceCategory = SharedInsuranceCategory | 'general';

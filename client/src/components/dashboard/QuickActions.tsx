@@ -1,8 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Plus, GitCompare, MessageSquareText, FileText } from 'lucide-react';
-import { GradientButton } from '@/components/ui/gradient-button';
-import { cn } from '@/lib/utils';
+import { GradientButton } from '../ui/gradient-button';
+import { cn } from '../../lib/utils';
 
 interface QuickAction {
   id: string;

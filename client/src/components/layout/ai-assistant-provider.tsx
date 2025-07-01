@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, ReactNode } from 'react';
 import { useLocation } from 'wouter';
-import { BrikiAssistant } from '@/components/ai-assistant';
+import { BrikiAssistant } from '../ai-assistant';
 
 interface AIAssistantContextType {
   isOpen: boolean;

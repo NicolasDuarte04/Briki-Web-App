@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
-import { useCompareStore } from '@/store/compare-store';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { useCompareStore } from '../store/compare-store';
+import { Button } from '../components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Badge } from '../components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { ScrollArea } from '../components/ui/scroll-area';
 import { 
   AlertDialog, 
   AlertDialogAction, 
@@ -15,12 +15,12 @@ import {
   AlertDialogFooter, 
   AlertDialogHeader, 
   AlertDialogTitle
-} from '@/components/ui/alert-dialog';
+} from '../components/ui/alert-dialog';
 import { ArrowLeft, FileBarChart, Trash, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useToast } from '@/hooks/use-toast';
-import { cn } from '@/lib/utils';
-import { InsuranceCategory } from '@shared/schema';
+import { useToast } from '../hooks/use-toast';
+import { cn } from '../lib/utils';
+import { InsuranceCategory } from '../../../shared/schema';
 
 /**
  * Optimized ComparePlansPage Component

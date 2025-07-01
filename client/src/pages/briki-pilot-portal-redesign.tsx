@@ -3,8 +3,8 @@ import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 
 // Import components
-import GlassCard from "@/components/ui/glass-card";
-import GradientButton from "@/components/gradient-button";
+import GlassCard from "../components/ui/glass-card";
+import GradientButton from "../components/gradient-button";
 
 // Icons
 import { 
@@ -13,9 +13,9 @@ import {
   AreaChart, LucideIcon, Globe, BriefcaseBusiness, 
   Users, Search, Bell, LogOut
 } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "../components/ui/avatar";
+import { Button } from "../components/ui/button";
 
 /**
  * Briki Pilot Portal - specialized B2B interface with dark futuristic design

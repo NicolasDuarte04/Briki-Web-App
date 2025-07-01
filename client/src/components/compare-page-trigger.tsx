@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
-import { useCompareStore } from '@/store/compare-store';
-import { Button } from '@/components/ui/button';
+import { useCompareStore } from '../store/compare-store';
+import { Button } from './ui/button';
 import { BarChart2, X } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '../hooks/use-toast';
 
 /**
  * Floating button that appears when plans are selected for comparison

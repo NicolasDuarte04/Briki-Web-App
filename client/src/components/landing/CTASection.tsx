@@ -1,8 +1,8 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useLocation } from "wouter";
-import GradientButton from "@/components/gradient-button";
-import { COUNTDOWN_DATE } from "@/config";
+import GradientButton from "../gradient-button";
+import { COUNTDOWN_DATE } from "../../config";
 import CountdownComponent from "./CountdownComponent";
 
 /**

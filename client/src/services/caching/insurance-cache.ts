@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
-import { INSURANCE_PROVIDERS, ApiError } from '@/services/api/insurance-providers';
-import { apiRequest } from '@/lib/queryClient';
+import { INSURANCE_PROVIDERS, ApiError } from '../api/insurance-providers';
+import { apiRequest } from '../../lib/queryClient';
 
 /**
  * Centralized cache keys for insurance data

@@ -1,8 +1,8 @@
 import { useContext } from 'react';
 import { useLocation } from 'wouter';
 import { useMutation } from '@tanstack/react-query';
-import { AuthContext, type User, type AuthContextType } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
+import { AuthContext, type User, type AuthContextType } from '../contexts/AuthContext';
+import { useToast } from './use-toast';
 
 // Interface extends the AuthContextType
 interface UseAuthReturn extends AuthContextType {

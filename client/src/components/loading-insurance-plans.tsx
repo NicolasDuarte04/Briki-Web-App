@@ -1,8 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
-import { InsurancePlanSkeleton } from '@/components/ui/insurance-plan-skeleton';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardHeader, CardContent, CardFooter } from './ui/card';
+import { InsurancePlanSkeleton } from './ui/insurance-plan-skeleton';
+import { Skeleton } from './ui/skeleton';
 
 /**
  * Loading state for insurance plans with animated skeleton elements

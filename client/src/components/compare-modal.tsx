@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { InsurancePlan } from "@shared/schema";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { InsurancePlan } from "../../../shared/schema";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "./ui/dialog";
+import { Button } from "./ui/button";
 import { Check, X, ArrowLeft, Info, Star, Shield, DollarSign, CreditCard, Briefcase, MapPin, Calendar, AlertTriangle, Zap } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { ScrollArea } from "./ui/scroll-area";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface CompareModalProps {

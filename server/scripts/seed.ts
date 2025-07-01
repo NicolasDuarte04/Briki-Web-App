@@ -2,7 +2,7 @@ import 'dotenv/config';
 import path from 'node:path';
 import fs from 'node:fs/promises';
 import { db } from '../db';
-import { insurancePlans } from '@shared/schema';
+import { insurancePlans } from '../../shared/schema';
 import { eq, and } from 'drizzle-orm';
 
 interface RawPlan {

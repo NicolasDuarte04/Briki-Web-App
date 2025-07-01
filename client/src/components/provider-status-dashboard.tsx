@@ -12,14 +12,14 @@ import {
   Activity,
   InfoIcon
 } from 'lucide-react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import { useProviderStatus } from '@/services/caching/insurance-cache';
-import { INSURANCE_PROVIDERS } from '@/services/api/insurance-providers';
-import { ProviderStatusSkeleton } from '@/components/ui/insurance-plan-skeleton';
+import { Card } from './ui/card';
+import { Button } from './ui/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
+import { Badge } from './ui/badge';
+import { Skeleton } from './ui/skeleton';
+import { useProviderStatus } from '../services/caching/insurance-cache';
+import { INSURANCE_PROVIDERS } from '../services/api/insurance-providers';
+import { ProviderStatusSkeleton } from './ui/insurance-plan-skeleton';
 
 interface ProviderStatusCardProps {
   provider: string;

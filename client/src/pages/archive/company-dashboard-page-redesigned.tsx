@@ -25,11 +25,11 @@ import {
   Cell,
   Legend
 } from "recharts";
-import { useAuth } from "@/hooks/use-auth";
-import CompanyLayout from "@/components/layout/company-layout-redesigned";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
+import { useAuth } from "../../hooks/use-auth";
+import CompanyLayout from "../../components/layout/company-layout-redesigned";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs";
+import { Badge } from "../../components/ui/badge";
 
 // Simulated analytics data
 const dailyData = [

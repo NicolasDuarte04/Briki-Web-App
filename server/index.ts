@@ -149,10 +149,9 @@ app.use('/api/vehicle', vehicleRoutes);
     serveStatic(app);
   }
 
-  // ALWAYS serve the app on port 5051
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = 5051;
+  // Use PORT from environment or default to 5000 for deployment
+  // Replit and other deployment platforms expect port 5000
+  const port = process.env.PORT ? parseInt(process.env.PORT) : 5000;
   server.listen(port, () => {
     log(`✅ Server is running on http://localhost:${port}`);
   });

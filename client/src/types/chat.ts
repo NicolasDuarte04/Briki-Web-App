@@ -1,4 +1,4 @@
-import { PlanProps } from '@/components/PlanRecommendationCard';
+import { PlanProps } from '../components/PlanRecommendationCard';
 
 // Widget types that can be displayed in assistant messages
 export type AssistantWidgetType = 

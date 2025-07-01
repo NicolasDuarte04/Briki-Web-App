@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
+import { Button } from '../ui/button';
 import { Car, Plane, Heart, Stethoscope } from 'lucide-react';
 
 interface WelcomeCardProps {

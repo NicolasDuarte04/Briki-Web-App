@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { INSURANCE_CATEGORIES, InsuranceCategory } from '@shared/schema';
+import { INSURANCE_CATEGORIES, InsuranceCategory } from '../../shared/schema';
 import { mockStorage } from '../storage';
 import { 
   prepareAIContext, 

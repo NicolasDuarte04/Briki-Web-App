@@ -1,4 +1,4 @@
-import { InsurancePlan } from "@/store/compare-store";
+import { InsurancePlan } from "../store/compare-store";
 
 // Types for AI-generated insights
 export type InsightTag = 'best-value' | 'best-coverage' | 'brikis-pick' | 'popular-choice' | 'budget-friendly' | 'comprehensive';

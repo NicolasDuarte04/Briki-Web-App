@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigation } from '@/lib/navigation';
+import { useNavigation } from '../../lib/navigation';
 import { Link } from 'wouter';
 import { motion } from 'framer-motion';
 import Navbar from './navbar';

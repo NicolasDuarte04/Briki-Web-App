@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
-import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/use-auth";
-import { useLanguage } from "@/components/language-selector";
+import { Button } from "../ui/button";
+import { useAuth } from "../../hooks/use-auth";
+import { useLanguage } from "../language-selector";
 
 export default function Navbar() {
   const [, navigate] = useLocation();

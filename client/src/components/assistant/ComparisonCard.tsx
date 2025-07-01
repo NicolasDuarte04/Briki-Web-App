@@ -1,7 +1,7 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Check, X, AlertCircle } from "lucide-react";
-import { RealInsurancePlan, getRealPlansByCategory } from '@/data/realPlans';
+import { RealInsurancePlan, getRealPlansByCategory } from '../../data/realPlans';
 
 export interface ComparisonCardProps {
   category: 'pet' | 'travel' | 'auto' | 'health';

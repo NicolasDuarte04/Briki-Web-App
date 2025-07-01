@@ -1,8 +1,8 @@
 import React from "react";
 import { Link } from "wouter";
 import { ArrowLeft } from "lucide-react";
-import { useLanguage } from "@/components/language-selector";
-import { PublicLayout } from "@/components/layout/public-layout";
+import { useLanguage } from "../components/language-selector";
+import { PublicLayout } from "../components/layout/public-layout";
 
 export default function TermsPage() {
   const { t } = useLanguage();

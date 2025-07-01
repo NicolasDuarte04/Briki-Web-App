@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { formatDate, formatPrice } from "@/lib/utils";
-import { TravelQuote, INSURANCE_CATEGORIES } from "@shared/schema";
-import { useQuoteStore } from "@/store/quote-store";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Separator } from "./ui/separator";
+import { formatDate, formatPrice } from "../lib/utils";
+import { TravelQuote, INSURANCE_CATEGORIES } from "../../../shared/schema";
+import { useQuoteStore } from "../store/quote-store";
 
 interface QuoteSummaryProps {
   className?: string;

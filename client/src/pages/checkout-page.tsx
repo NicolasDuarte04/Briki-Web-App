@@ -4,10 +4,10 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { apiRequest, queryClient } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/use-auth";
-import { InsurancePlan, Trip } from "@shared/schema";
+import { apiRequest, queryClient } from "../lib/queryClient";
+import { useToast } from "../hooks/use-toast";
+import { useAuth } from "../hooks/use-auth";
+import { InsurancePlan, Trip } from "../../../shared/schema";
 import { loadStripe } from "@stripe/stripe-js";
 import { motion } from "framer-motion";
 import { 
@@ -17,10 +17,10 @@ import {
   useElements 
 } from "@stripe/react-stripe-js";
 
-import PaymentSuccess from "@/components/payment-success";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
+import PaymentSuccess from "../components/payment-success";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Card, CardContent } from "../components/ui/card";
 import {
   Form,
   FormControl,
@@ -28,19 +28,19 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
+} from "../components/ui/form";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "../components/ui/select";
 import { Loader2, ShieldCheck, Calendar, Briefcase, HelpCircle } from "lucide-react";
-import { FuturisticBackground } from "@/components/ui/futuristic-background";
-import { AIAssistant, getCheckoutTips } from "@/components/ui/ai-assistant";
-import { AuthenticatedLayout } from "@/components/layout";
-import { logPlanAnalytics } from "@/lib/analytics";
+import { FuturisticBackground } from "../components/ui/futuristic-background";
+import { AIAssistant, getCheckoutTips } from "../components/ui/ai-assistant";
+import { AuthenticatedLayout } from "../components/layout";
+import { logPlanAnalytics } from "../lib/analytics";
 
 const checkoutFormSchema = z.object({
   firstName: z.string().min(1, "First name is required"),

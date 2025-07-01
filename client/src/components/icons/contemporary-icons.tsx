@@ -1,8 +1,8 @@
 import React from "react";
-import travelSvg from '@/assets/insurance-types/travel.svg';
-import autoSvg from '@/assets/insurance-types/auto.svg';
-import petSvg from '@/assets/insurance-types/pet.svg';
-import healthSvg from '@/assets/insurance-types/health.svg';
+import travelSvg from '../../assets/insurance-types/travel.svg';
+import autoSvg from '../../assets/insurance-types/auto.svg';
+import petSvg from '../../assets/insurance-types/pet.svg';
+import healthSvg from '../../assets/insurance-types/health.svg';
 
 // Export image-based icons using stock images
 export const TravelIcon: React.FC<{ className?: string }> = ({ className = "w-20 h-20" }) => (

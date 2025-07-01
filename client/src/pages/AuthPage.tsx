@@ -2,9 +2,9 @@ import { useEffect } from "react";
 import { useLocation, useRoute } from "wouter";
 import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
-import { useAuth } from "@/hooks/use-auth";
-import { trackEvent } from "@/lib/analytics";
-import UnifiedAuthScreen from "@/components/auth/UnifiedAuthScreen";
+import { useAuth } from "../hooks/use-auth";
+import { trackEvent } from "../lib/analytics";
+import UnifiedAuthScreen from "../components/auth/UnifiedAuthScreen";
 
 export default function AuthPage() {
   const [, navigate] = useLocation();

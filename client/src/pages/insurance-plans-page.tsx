@@ -1,24 +1,24 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { InsurancePlan, Trip } from "@shared/schema";
+import { InsurancePlan, Trip } from "../../../shared/schema";
 import { useLocation, Link } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigation } from "@/hooks/use-navigation";
-import { useToast } from "@/hooks/use-toast";
+import { useNavigation } from "../hooks/use-navigation";
+import { useToast } from "../hooks/use-toast";
 
-import { MainLayout } from "@/components/layout/main-layout";
-import CompareModal from "@/components/compare-modal";
-import TripSummary from "@/components/trip-summary";
-import { PlanGrid } from "@/components/plan-grid";
-import { FeatureBreakdown } from "@/components/feature-breakdown";
-import { Button } from "@/components/ui/button";
-import { BackButton } from "@/components/ui/back-button";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { MainLayout } from "../components/layout/main-layout";
+import CompareModal from "../components/compare-modal";
+import TripSummary from "../components/trip-summary";
+import { PlanGrid } from "../components/plan-grid";
+import { FeatureBreakdown } from "../components/feature-breakdown";
+import { Button } from "../components/ui/button";
+import { BackButton } from "../components/ui/back-button";
+import { Input } from "../components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { Filter, Search, Sparkles, Medal, ThumbsUp, Zap, Star, HelpCircle, RefreshCw } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
-import { Slider } from "@/components/ui/slider";
+import { Checkbox } from "../components/ui/checkbox";
+import { Badge } from "../components/ui/badge";
+import { Slider } from "../components/ui/slider";
 import {
   Sheet,
   SheetContent,
@@ -28,12 +28,12 @@ import {
   SheetTrigger,
   SheetFooter,
   SheetClose
-} from "@/components/ui/sheet";
-import { FuturisticBackground } from "@/components/ui/futuristic-background";
-import { AIAssistant, getComparisonTips } from "@/components/ui/ai-assistant";
-import { PlanGridSkeleton, TopProgressBar } from "@/components/ui/skeleton-loaders";
-import { ApiErrorsSummary, AllProvidersFailedError } from "@/components/ui/error-display";
-import { usePlansForTrip, useInvalidatePlansCache, usePlanErrors } from "@/services/caching/insurance-cache";
+} from "../components/ui/sheet";
+import { FuturisticBackground } from "../components/ui/futuristic-background";
+import { AIAssistant, getComparisonTips } from "../components/ui/ai-assistant";
+import { PlanGridSkeleton, TopProgressBar } from "../components/ui/skeleton-loaders";
+import { ApiErrorsSummary, AllProvidersFailedError } from "../components/ui/error-display";
+import { usePlansForTrip, useInvalidatePlansCache, usePlanErrors } from "../services/caching/insurance-cache";
 
 export default function InsurancePlansPage() {
   const [, navigate] = useLocation();

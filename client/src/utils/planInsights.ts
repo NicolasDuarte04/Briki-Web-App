@@ -1,4 +1,4 @@
-import { InsurancePlan } from "@/types/insurance";
+import { InsurancePlan } from "../types/insurance";
 
 export interface PlanInsight {
   type: 'best-value' | 'most-popular' | 'premium-choice' | 'budget-friendly';

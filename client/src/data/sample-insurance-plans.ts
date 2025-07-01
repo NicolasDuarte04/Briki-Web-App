@@ -1,5 +1,5 @@
-import { InsurancePlan } from '@/store/compare-store';
-import { InsuranceCategory } from '@shared/schema';
+import { InsurancePlan } from '../store/compare-store';
+import { InsuranceCategory } from '../../../shared/schema';
 
 // Sample insurance plans data using the new schema
 export const sampleInsurancePlans: InsurancePlan[] = [

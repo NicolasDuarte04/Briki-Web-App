@@ -1,8 +1,8 @@
 import React from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Badge } from '../ui/badge';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 import { Award, Check, Star, Zap, AlertCircle, BookOpen } from 'lucide-react';
-import { InsightTag } from '@/utils/ai-insights';
+import { InsightTag } from '../../utils/ai-insights';
 
 interface PlanInsightTagProps {
   tag: InsightTag;

@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { Button } from "./ui/button";
+import { cn } from "../lib/utils";
 import { FileBarChart } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 

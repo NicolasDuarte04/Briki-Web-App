@@ -1,5 +1,5 @@
-import { InsurancePlan } from "@/types/insurance";
-import { AdvancedFilters } from "@/components/insurance/AdvancedFilterPanel";
+import { InsurancePlan } from "../types/insurance";
+import { AdvancedFilters } from "../components/insurance/AdvancedFilterPanel";
 
 export function applyAdvancedFilters(
   plans: InsurancePlan[],

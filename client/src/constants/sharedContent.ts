@@ -1,4 +1,4 @@
-import { InsuranceCategory } from "@shared/schema";
+import { InsuranceCategory } from "../../../shared/schema";
 
 /**
  * Shared content for insurance categories across the application

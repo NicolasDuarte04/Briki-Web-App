@@ -12,24 +12,24 @@ import {
   LogOut,
   Menu
 } from "lucide-react";
-import { useAuth } from "@/hooks/use-auth";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { useAuth } from "../../hooks/use-auth";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Button } from "../ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "../ui/dropdown-menu";
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet";
-import { AuthenticatedLayout } from "@/components/layout";
+} from "../ui/sheet";
+import { AuthenticatedLayout } from "./";
 import { Link } from "wouter";
 
 type CompanyLayoutProps = {

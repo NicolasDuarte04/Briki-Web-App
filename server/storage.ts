@@ -20,7 +20,7 @@ import {
   PlanAnalytic,
   InsertPlanAnalytic,
   INSURANCE_CATEGORIES
-} from "@shared/schema";
+} from "../shared/schema";
 // DEPRECATED: Mock data loader is no longer used
 // import { 
 //   loadMockInsurancePlans, 

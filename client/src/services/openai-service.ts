@@ -1,4 +1,4 @@
-import { apiRequest } from '@/lib/api';
+import { apiRequest } from '../lib/api';
 
 /**
  * Send a message to the AI assistant backend

@@ -9,10 +9,10 @@ import {
   FormItem,
   FormLabel,
   FormMessage 
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { DatePicker } from "@/components/ui/date-picker";
+} from "../ui/form";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
+import { DatePicker } from "../ui/date-picker";
 import { 
   Select,
   SelectContent,
@@ -20,13 +20,13 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue
-} from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Separator } from "@/components/ui/separator";
-import { useQuoteStore } from "@/store/quote-store";
-import { travelQuoteSchema, TravelQuote, INSURANCE_CATEGORIES } from "@shared/schema";
-import { formatDate, daysBetween, isDateWithinRange } from "@/lib/utils";
+} from "../ui/select";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "../ui/card";
+import { Checkbox } from "../ui/checkbox";
+import { Separator } from "../ui/separator";
+import { useQuoteStore } from "../../store/quote-store";
+import { travelQuoteSchema, TravelQuote, INSURANCE_CATEGORIES } from "../../../../shared/schema";
+import { formatDate, daysBetween, isDateWithinRange } from "../../lib/utils";
 
 const POPULAR_DESTINATIONS = [
   "France",

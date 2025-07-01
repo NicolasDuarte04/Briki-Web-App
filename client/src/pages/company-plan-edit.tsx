@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation, useParams } from "wouter";
-import { useToast } from "@/hooks/use-toast";
-import { trackEvent } from "@/lib/analytics";
+import { useToast } from "../hooks/use-toast";
+import { trackEvent } from "../lib/analytics";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import CompanyLayout from "@/components/layout/company-layout";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import CompanyLayout from "../components/layout/company-layout";
+import { Button } from "../components/ui/button";
+import { Checkbox } from "../components/ui/checkbox";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "../components/ui/card";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { Textarea } from "../components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 import {
   Form,
   FormControl,
@@ -22,10 +22,10 @@ import {
   FormItem,
   FormLabel,
   FormMessage
-} from "@/components/ui/form";
-import { Switch } from "@/components/ui/switch";
-import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
+} from "../components/ui/form";
+import { Switch } from "../components/ui/switch";
+import { Separator } from "../components/ui/separator";
+import { Skeleton } from "../components/ui/skeleton";
 import {
   AlertCircle,
   ArrowLeft,
@@ -42,8 +42,8 @@ import {
   ListChecks,
   ShieldCheck,
 } from "lucide-react";
-import { apiRequest } from "@/lib/api";
-import { planFieldLabels, INSURANCE_CATEGORIES } from "@/lib/constants";
+import { apiRequest } from "../lib/api";
+import { planFieldLabels, INSURANCE_CATEGORIES } from "../lib/constants";
 
 // Plan interface matching our schema
 interface InsurancePlan {

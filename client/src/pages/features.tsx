@@ -1,9 +1,9 @@
 import React from 'react';
-import { PublicLayout } from '@/components/layout/public-layout';
+import { PublicLayout } from '../components/layout/public-layout';
 import { motion } from 'framer-motion';
-import { useNavigation } from '@/lib/navigation';
-import { Button } from '@/components/ui/button';
-import GradientButton from '@/components/gradient-button';
+import { useNavigation } from '../lib/navigation';
+import { Button } from '../components/ui/button';
+import GradientButton from '../components/gradient-button';
 import { Helmet } from 'react-helmet';
 import { 
   Sparkles, 

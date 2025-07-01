@@ -4,20 +4,20 @@ import { useForm, useFormState } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
+import { apiRequest, queryClient } from "../lib/queryClient";
+import { useToast } from "../hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAuth } from "@/hooks/use-auth";
-import { useAnonymousUser } from "@/hooks/use-anonymous-user";
-import { generateQuoteTrackingId } from "@/lib/anonymous-data-migration";
+import { useAuth } from "../hooks/use-auth";
+import { useAnonymousUser } from "../hooks/use-anonymous-user";
+import { generateQuoteTrackingId } from "../lib/anonymous-data-migration";
 
 // Layout is handled by App.tsx
-import { useLanguage } from "@/components/language-selector";
-import { CountryCombobox } from "@/components/country-combobox";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Checkbox } from "@/components/ui/checkbox";
+import { useLanguage } from "../components/language-selector";
+import { CountryCombobox } from "../components/country-combobox";
+import { Input } from "../components/ui/input";
+import { Button } from "../components/ui/button";
+import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group";
+import { Checkbox } from "../components/ui/checkbox";
 import {
   Form,
   FormControl,
@@ -26,28 +26,28 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
+} from "../components/ui/form";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "../components/ui/select";
 import { format } from "date-fns";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "../components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover";
 import { CalendarIcon, CheckCircle, AlertCircle, HelpCircle } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { FuturisticBackground } from "@/components/ui/futuristic-background";
-import { AIAssistant, getTripFormTips } from "@/components/ui/ai-assistant";
+import { cn } from "../lib/utils";
+import { FuturisticBackground } from "../components/ui/futuristic-background";
+import { AIAssistant, getTripFormTips } from "../components/ui/ai-assistant";
 
 // Import our new animated components
-import { AnimatedInput } from "@/components/ui/animated-input";
-import { AnimatedButton } from "@/components/ui/animated-button";
-import { AnimatedFormMessage } from "@/components/ui/animated-form-message";
-import { AnimatedSelect } from "@/components/ui/animated-select";
-import { FormAnimationWrapper } from "@/components/ui/form-animation-wrapper";
+import { AnimatedInput } from "../components/ui/animated-input";
+import { AnimatedButton } from "../components/ui/animated-button";
+import { AnimatedFormMessage } from "../components/ui/animated-form-message";
+import { AnimatedSelect } from "../components/ui/animated-select";
+import { FormAnimationWrapper } from "../components/ui/form-animation-wrapper";
 
 // Define the base schema (form input)
 const tripFormInputSchema = z.object({

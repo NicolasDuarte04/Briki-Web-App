@@ -1,6 +1,6 @@
 import { useEffect, useCallback } from 'react';
 import { useLocation } from 'wouter';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from './use-auth';
 
 /**
  * Custom hook to provide enhanced navigation functionality

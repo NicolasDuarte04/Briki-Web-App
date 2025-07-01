@@ -1,9 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { AlertTriangle, Info, RefreshCw, AlertCircle, Wifi, CloudOff } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { ApiError } from '@/services/api/insurance-providers';
+import { Button } from './button';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './card';
+import { ApiError } from '../../services/api/insurance-providers';
 
 interface ErrorDisplayProps {
   title?: string;

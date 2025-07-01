@@ -1,8 +1,8 @@
 import React from 'react';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card } from '../ui/card';
+import { Badge } from '../ui/badge';
 import { CheckCircle, XCircle, AlertCircle, TrendingUp, TrendingDown, Minus } from 'lucide-react';
-import { Separator } from '@/components/ui/separator';
+import { Separator } from '../ui/separator';
 
 interface FormattedAIResponseProps {
   content: string;

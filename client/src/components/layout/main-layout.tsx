@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "wouter";
-import Footer from "@/components/footer";
+import Footer from "../footer";
 
 interface MainLayoutProps {
   children: ReactNode;

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useCompareStore } from '@/store/compare-store';
-import { Button } from '@/components/ui/button';
+import { useCompareStore } from '../../store/compare-store';
+import { Button } from '../ui/button';
 import { X, BarChart2 } from 'lucide-react';
 import CategoryComparisonTable from './CategoryComparisonTable';
 

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useToast } from '@/hooks/use-toast';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { useToast } from '../hooks/use-toast';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
 import { 
   Card, 
   CardContent, 
@@ -10,7 +10,7 @@ import {
   CardFooter, 
   CardHeader, 
   CardTitle 
-} from '@/components/ui/card';
+} from './ui/card';
 import {
   Dialog,
   DialogContent,
@@ -19,23 +19,23 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
+} from './ui/dialog';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
+} from './ui/select';
+import { Checkbox } from './ui/checkbox';
 import { Search, Key, Check, Shield, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { INSURANCE_PROVIDERS, ProviderConfig } from '@/services/api/insurance-providers';
+import { INSURANCE_PROVIDERS, ProviderConfig } from '../services/api/insurance-providers';
 import { 
   setProviderApiKey, 
   getProviderApiKey, 
   checkRequiredApiKeys 
-} from '@/services/api/api-keys';
+} from '../services/api/api-keys';
 
 interface ApiKeyFormProps {
   provider: ProviderConfig;

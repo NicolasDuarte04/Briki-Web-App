@@ -1,14 +1,14 @@
 import { useEffect, useState, useRef } from "react";
 import { useLocation } from "wouter";
-import { MainLayout } from "@/components/layout";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { MainLayout } from "../../../components/layout";
+import { Button } from "../../../components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../../../components/ui/card";
 import { CheckCircle, ArrowLeft, DownloadCloud, Send, Info, Printer } from "lucide-react";
 import { motion } from "framer-motion";
-import { useToast } from "@/hooks/use-toast";
-import { InsurancePlan } from "@/store/compare-store";
-import { generatePlanInsights, PlanInsight } from "@/utils/ai-insights";
-import { PlanInsightTag } from "@/components/plans/PlanInsightTag";
+import { useToast } from "../../../hooks/use-toast";
+import { InsurancePlan } from "../../../store/compare-store";
+import { generatePlanInsights, PlanInsight } from "../../../utils/ai-insights";
+import { PlanInsightTag } from "../../../components/plans/PlanInsightTag";
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 

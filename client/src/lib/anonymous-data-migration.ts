@@ -1,5 +1,5 @@
-import { AnonymousUserData } from '@/contexts/anonymous-user-context';
-import { User } from '@/contexts/AuthContext';
+import { AnonymousUserData } from '../contexts/anonymous-user-context';
+import { User } from '../contexts/AuthContext';
 
 /**
  * Handles migration of anonymous user data to authenticated user account

@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { PublicLayout } from '@/components/layout/public-layout';
+import { PublicLayout } from '../components/layout/public-layout';
 import { motion } from 'framer-motion';
-import { useNavigation } from '@/lib/navigation';
+import { useNavigation } from '../lib/navigation';
 import { CalendarIcon, Clock, User, ArrowRight, Search } from 'lucide-react';
 import { Helmet } from 'react-helmet';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
 import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 

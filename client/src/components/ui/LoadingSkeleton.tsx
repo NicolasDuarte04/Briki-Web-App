@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent, CardHeader } from "./card";
+import { Skeleton } from "./skeleton";
 
 interface LoadingSkeletonProps {
   type?: 'plan-card' | 'plan-list' | 'search-results' | 'filters' | 'quote-form';

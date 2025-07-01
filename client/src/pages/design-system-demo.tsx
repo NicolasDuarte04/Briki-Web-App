@@ -1,6 +1,6 @@
 import { ArrowRight, Shield, Sparkles, Zap } from 'lucide-react';
-import { GradientButton, GradientCard, SectionContainer } from '@/components/ui';
-import { PublicLayout } from '@/components/layout/public-layout';
+import { GradientButton, GradientCard, SectionContainer } from '../components/ui';
+import { PublicLayout } from '../components/layout/public-layout';
 
 export default function DesignSystemDemo() {
   return (

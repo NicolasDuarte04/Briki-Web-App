@@ -1,11 +1,11 @@
 import React from 'react';
 import { useLocation } from 'wouter';
-import { Card } from '@/components/ui/card';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card } from '../ui/card';
+import { Tabs, TabsList, TabsTrigger } from '../ui/tabs';
 import { Plane, Car, Cat, HeartPulse, BarChart3 } from 'lucide-react';
-import { InsuranceCategory } from '@shared/schema';
-import NavButton from '@/components/common/NavButton';
-import { useCompareStore } from '@/store/compare-store';
+import { InsuranceCategory } from '../../../../shared/schema';
+import NavButton from '../common/NavButton';
+import { useCompareStore } from '../../store/compare-store';
 
 interface CategoryNavProps {
   transparent?: boolean;

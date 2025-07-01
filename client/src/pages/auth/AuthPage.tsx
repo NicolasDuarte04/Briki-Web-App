@@ -2,9 +2,9 @@ import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { useLocation, useRoute } from "wouter";
 import { ArrowLeft } from "lucide-react";
-import UnifiedAuthForm from "@/components/auth/UnifiedAuthForm";
-import { useAuth } from "@/hooks/use-auth";
-import { trackEvent } from "@/lib/analytics";
+import UnifiedAuthForm from "../../components/auth/UnifiedAuthForm";
+import { useAuth } from "../../hooks/use-auth";
+import { trackEvent } from "../../lib/analytics";
 
 // Animated floating elements for the background
 const FloatingElements = () => (

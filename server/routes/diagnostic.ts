@@ -1,6 +1,6 @@
 import express from 'express';
 import { db } from '../db';
-import { conversationLogs, contextSnapshots } from '@shared/schema';
+import { conversationLogs, contextSnapshots } from '../../shared/schema';
 import { desc } from 'drizzle-orm';
 import { requireAuth } from '../auth/session';
 

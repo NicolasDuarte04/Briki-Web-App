@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { AnonymousUserContext, AnonymousUserContextType } from '@/contexts/anonymous-user-context';
+import { AnonymousUserContext, AnonymousUserContextType } from '../contexts/anonymous-user-context';
 
 /**
  * Custom hook to access anonymous user context

@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import UnifiedAuthForm from "./UnifiedAuthForm";
-import { trackEvent } from "@/lib/analytics";
+import { trackEvent } from "../../lib/analytics";
 
 interface UnifiedAuthScreenProps {
   initialTab?: "login" | "signup";

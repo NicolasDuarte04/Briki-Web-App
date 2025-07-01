@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { analyzeContextNeeds, detectInsuranceCategory, InsuranceCategory } from '@shared/context-utils';
+import { analyzeContextNeeds, detectInsuranceCategory, InsuranceCategory } from '../../shared/context-utils';
 
 describe('Shared Context Utilities', () => {
 

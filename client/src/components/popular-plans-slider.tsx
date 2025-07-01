@@ -1,10 +1,10 @@
 import { useLocation } from "wouter";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, A11y, Autoplay, EffectFade } from 'swiper/modules';
-import { Button } from "@/components/ui/button";
-import { useRecentlyViewed, type Plan } from "@/contexts/recently-viewed-context";
-import { SlideIn } from "@/components/ui/transition-effect";
-import { FadeScale, CardHover } from "@/components/ui/apple-transition";
+import { Button } from "./ui/button";
+import { useRecentlyViewed, type Plan } from "../contexts/recently-viewed-context";
+import { SlideIn } from "./ui/transition-effect";
+import { FadeScale, CardHover } from "./ui/apple-transition";
 import { useCallback, useEffect, useRef } from "react";
 
 // Import Swiper styles

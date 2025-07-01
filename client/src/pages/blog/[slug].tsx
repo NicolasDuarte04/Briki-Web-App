@@ -1,12 +1,12 @@
 import React from 'react';
 import { useParams } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
-import { PublicLayout } from '@/components/layout/public-layout';
+import { PublicLayout } from '../../components/layout/public-layout';
 import { motion } from 'framer-motion';
 import { CalendarIcon, Clock, User, ArrowLeft, Share2, Eye } from 'lucide-react';
 import { Helmet } from 'react-helmet';
-import { Button } from '@/components/ui/button';
-import { useNavigation } from '@/lib/navigation';
+import { Button } from '../../components/ui/button';
+import { useNavigation } from '../../lib/navigation';
 import { format } from 'date-fns';
 
 interface BlogPost {

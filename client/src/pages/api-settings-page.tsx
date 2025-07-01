@@ -2,15 +2,15 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import { motion } from 'framer-motion';
 import { ChevronLeft, Database, Key, BarChart, ServerCog, RefreshCw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import ProviderApiSetup from '@/components/provider-api-setup';
-import ProviderStatusDashboard from '@/components/provider-status-dashboard';
-import { FuturisticBackground } from '@/components/ui/futuristic-background';
-import { useInvalidatePlansCache } from '@/services/caching/insurance-cache';
-import { useToast } from '@/hooks/use-toast';
-import { AuthenticatedLayout } from '@/components/layout';
+import { Button } from '../components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import ProviderApiSetup from '../components/provider-api-setup';
+import ProviderStatusDashboard from '../components/provider-status-dashboard';
+import { FuturisticBackground } from '../components/ui/futuristic-background';
+import { useInvalidatePlansCache } from '../services/caching/insurance-cache';
+import { useToast } from '../hooks/use-toast';
+import { AuthenticatedLayout } from '../components/layout';
 
 export default function ApiSettingsPage() {
   const [, navigate] = useLocation();

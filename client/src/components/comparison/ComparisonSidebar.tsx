@@ -1,7 +1,7 @@
 import React from 'react';
-import { useCompareStore } from '@/store/compare-store';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { useCompareStore } from '../../store/compare-store';
+import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
+import { Button } from '../ui/button';
 import { X } from 'lucide-react';
 import CategoryComparisonTable from './CategoryComparisonTable';
 

@@ -5,18 +5,18 @@
 
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import PlanCard from '@/components/briki-ai-assistant/PlanCard';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Slider } from '@/components/ui/slider';
-import { Label } from '@/components/ui/label';
-import { InsurancePlan } from '@/types/insurance';
-import { compareByPrice, compareByRating, compareByFeatureCount, extractNumericPrice } from '@/utils/plan-comparison';
+import PlanCard from '../briki-ai-assistant/PlanCard';
+import { Button } from '../ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { Badge } from '../ui/badge';
+import { Checkbox } from '../ui/checkbox';
+import { Slider } from '../ui/slider';
+import { Label } from '../ui/label';
+import { InsurancePlan } from '../../types/insurance';
+import { compareByPrice, compareByRating, compareByFeatureCount, extractNumericPrice } from '../../utils/plan-comparison';
 import { Filter, SortAsc, X } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Separator } from '../ui/separator';
 
 interface PlanListViewProps {
   plans: InsurancePlan[];

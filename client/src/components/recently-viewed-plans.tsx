@@ -1,11 +1,11 @@
 import { useLocation } from "wouter";
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Button } from "@/components/ui/button";
-import { useRecentlyViewed, type InsuranceCategory } from "@/contexts/recently-viewed-context";
+import { Button } from "./ui/button";
+import { useRecentlyViewed, type InsuranceCategory } from "../contexts/recently-viewed-context";
 import { Navigation, A11y, FreeMode } from 'swiper/modules';
 import { ClockIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import { useCallback, useEffect, useRef } from "react";
-import { CardHover } from "@/components/ui/apple-transition";
+import { CardHover } from "./ui/apple-transition";
 
 // Import Swiper styles
 import 'swiper/css';

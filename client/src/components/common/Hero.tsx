@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Link } from "wouter";
-import { cn } from "@/lib/utils";
-import { useAuth } from "@/hooks/use-auth";
+import { cn } from "../../lib/utils";
+import { useAuth } from "../../hooks/use-auth";
 
 interface HeroProps {
   title: string;

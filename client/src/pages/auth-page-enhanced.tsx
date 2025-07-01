@@ -1,19 +1,19 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "../hooks/use-auth";
 import { useLocation } from "wouter";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { User as SelectUser, UpsertUser } from "@shared/schema";
-import { queryClient } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
+import { User as SelectUser, UpsertUser } from "../../../shared/schema";
+import { queryClient } from "../lib/queryClient";
+import { useToast } from "../hooks/use-toast";
 
 // Import design system components
-import { GradientButton, GradientCard } from "@/components/ui";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { GradientButton, GradientCard } from "../components/ui";
+import { Input } from "../components/ui/input";
+import { Checkbox } from "../components/ui/checkbox";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import {
   Form,
   FormControl,
@@ -21,11 +21,11 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
+} from "../components/ui/form";
 
 // Icons
 import { Mail, Lock, User, ArrowRight, CheckCircle2, Quote, Star, Sparkles, Shield, ArrowLeft, Eye, EyeOff, Building2 } from "lucide-react";
-import GoogleLoginButton from "@/components/auth/GoogleLoginButton";
+import GoogleLoginButton from "../components/auth/GoogleLoginButton";
 
 // Form schemas
 const loginSchema = z.object({

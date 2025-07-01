@@ -1,10 +1,10 @@
 import { useCallback } from 'react';
 import { useLocation } from 'wouter';
-import { AssistantAction } from '@/services/ai-service';
-import { useCompareStore } from '@/store/compare-store';
-import { useQuoteStore } from '@/store/quote-store';
-import { trackEvent } from '@/lib/analytics';
-import { EventCategory } from '@/constants/analytics';
+import { AssistantAction } from '../services/ai-service';
+import { useCompareStore } from '../store/compare-store';
+import { useQuoteStore } from '../store/quote-store';
+import { trackEvent } from '../lib/analytics';
+import { EventCategory } from '../constants/analytics';
 
 /**
  * Hook to process assistant actions

@@ -1,10 +1,10 @@
 import React, { Suspense, lazy } from "react";
 import { motion } from "framer-motion";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "../ui/skeleton";
+import { Card, CardContent } from "../ui/card";
 
 // Lazy load the actual PlanCard component
-const PlanCard = lazy(() => import("@/components/insurance/PlanCard"));
+const PlanCard = lazy(() => import("./PlanCard"));
 
 interface LazyPlanCardProps {
   planId: string;

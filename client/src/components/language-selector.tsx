@@ -1,12 +1,12 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { Button } from "@/components/ui/button";
+import { Button } from "./ui/button";
 import { Check, Globe } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "./ui/dropdown-menu";
 
 // Available languages
 export type Language = 'en' | 'es' | 'pt';

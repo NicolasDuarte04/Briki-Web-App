@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useAuth } from '@/hooks/use-auth';
-import { fetchConversationHistory, fetchConversation } from '@/services/openai-service';
-import { ConversationPreviewCard } from '@/components/briki-ai-assistant/ConversationPreviewCard';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
+import { useAuth } from '../hooks/use-auth';
+import { fetchConversationHistory, fetchConversation } from '../services/openai-service';
+import { ConversationPreviewCard } from '../components/briki-ai-assistant/ConversationPreviewCard';
+import { ScrollArea } from '../components/ui/scroll-area';
+import { Button } from '../components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
+import { Badge } from '../components/ui/badge';
 import { Loader2, History, MessageCircle, ArrowLeft, ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { ChatBubble } from '@/components/briki-ai-assistant/ChatBubble';
+import { useToast } from '../hooks/use-toast';
+import { ChatBubble } from '../components/briki-ai-assistant/ChatBubble';
 
 interface Conversation {
   id: number;

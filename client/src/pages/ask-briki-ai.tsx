@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet';
-import { BrikiAssistant } from '@/components/briki-ai-assistant/BrikiAssistant';
-import Navbar from '@/components/layout/navbar';
+import { BrikiAssistant } from '../components/briki-ai-assistant/BrikiAssistant';
+import Navbar from '../components/layout/navbar';
 
 export default function AskBrikiAIPage() {
   return (

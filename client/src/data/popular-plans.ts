@@ -1,4 +1,4 @@
-import { Plan } from "@/contexts/recently-viewed-context";
+import { Plan } from "../contexts/recently-viewed-context";
 
 // Sample data for popular plans across different insurance categories
 export const popularPlans: Plan[] = [

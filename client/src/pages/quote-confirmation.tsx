@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "wouter";
-import { useToast } from "@/hooks/use-toast";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { useToast } from "../hooks/use-toast";
+import { Button } from "../components/ui/button";
+import { Card } from "../components/ui/card";
 import { CheckCircle2 } from "lucide-react";
 
 export default function QuoteConfirmationPage() {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useNavigation } from '@/hooks/use-navigation';
+import { Button } from './button';
+import { useNavigation } from '../../hooks/use-navigation';
 
 interface BackButtonProps {
   className?: string;
