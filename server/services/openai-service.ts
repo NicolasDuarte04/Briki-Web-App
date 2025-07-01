@@ -164,6 +164,9 @@ export async function generateAssistantResponse(
 
   // Detect category first to decide on special actions
   const category = detectInsuranceCategory(userMessage);
+  
+  // DEBUG: Log the detected category
+  console.log(`[DEBUG][${requestId}] Initial category detection for "${userMessage}":`, category);
 
   // --- PERSISTENT MEMORY REHYDRATION ---
   // If this is the start of a conversation, try to load the last known context.
@@ -253,10 +256,12 @@ export async function generateAssistantResponse(
         // Ensure type safety by checking both sides are valid InsuranceCategory values
         return plan.category === category;
       });
+      console.log(`[DEBUG][${requestId}] Plans after category filter (${category}): ${categoryPlans.length} plans`);
       relevantPlans = getTopRelevantPlans(userMessage, categoryPlans, 6);
       console.log(`[OpenAI][${requestId}] Category '${category}' detected: ${categoryPlans.length} plans in category, selected ${relevantPlans.length} most relevant`);
     } else {
       // No clear category, get top relevant from all plans
+      console.log(`[DEBUG][${requestId}] Category is general or undefined, searching all plans`);
       relevantPlans = getTopRelevantPlans(userMessage, filteredPlans, 6);
       console.log(`[OpenAI][${requestId}] No specific category detected, selected ${relevantPlans.length} most relevant from all plans`);
     }
@@ -433,13 +438,17 @@ export async function generateAssistantResponse(
     // First check if we already have a category in memory or from earlier detection
     let finalContextCategory: InsuranceCategory | 'general' = (updatedMemory.lastDetectedCategory as InsuranceCategory | 'general') || category;
     
+    console.log(`[DEBUG][${requestId}] Category resolution: memory=${updatedMemory.lastDetectedCategory}, initial=${category}, final=${finalContextCategory}`);
+    
     // If no category in memory, detect from full conversation
     if (!finalContextCategory || finalContextCategory === 'general') {
       finalContextCategory = detectInsuranceCategory(finalConversation);
+      console.log(`[DEBUG][${requestId}] Re-detected from full conversation: ${finalContextCategory}`);
       
       // If still general, try detecting from just the current message
       if (finalContextCategory === 'general') {
         finalContextCategory = detectInsuranceCategory(userMessage);
+        console.log(`[DEBUG][${requestId}] Re-detected from current message: ${finalContextCategory}`);
       }
     }
     

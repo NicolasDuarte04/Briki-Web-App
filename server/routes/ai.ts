@@ -47,8 +47,24 @@ router.post('/chat', async (req, res) => {
     const { message, conversationHistory, memory, category = 'general', resetContext = false } = req.body;
     const userId = req.session.user?.id || null;
 
-    if (!message) {
-      return res.status(400).json({ error: 'Se requiere un mensaje' });
+    // Add input validation logging
+    console.log('[AI Route] Request body:', {
+      hasMessage: !!message,
+      messageType: typeof message,
+      messageLength: message?.length,
+      hasHistory: !!conversationHistory,
+      historyLength: conversationHistory?.length,
+      hasMemory: !!memory,
+      category,
+      resetContext
+    });
+
+    if (!message || typeof message !== 'string') {
+      console.error('[AI Route] Invalid message:', message);
+      return res.status(400).json({ 
+        error: 'Se requiere un mensaje válido',
+        details: `Message type: ${typeof message}, value: ${message}`
+      });
     }
 
     const formattedHistory = (conversationHistory || []).map((msg: any) => ({
@@ -96,6 +112,16 @@ router.post('/chat', async (req, res) => {
       input: message,
       output: response.message || null,
       memoryJson: response.memory,
+    });
+    
+    // CRITICAL DEBUG: Log exactly what we're sending
+    console.log('[AI Route] Sending response to frontend:', {
+      hasMessage: !!response.message,
+      hasResponse: !!response.response,
+      messageLength: response.message?.length,
+      responseType: typeof response,
+      responseKeys: Object.keys(response),
+      fullResponse: JSON.stringify(response, null, 2)
     });
     
     // Ensure proper JSON response

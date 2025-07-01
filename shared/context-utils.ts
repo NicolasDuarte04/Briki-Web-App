@@ -220,6 +220,17 @@ export function analyzeContextNeeds(
         }
     }
 
+    // Special handling for auto: if we have a brand, that's enough to show initial plans
+    if (category === 'auto' && (checks as any).brand) {
+        // If user mentioned a car brand, show plans even without year/country
+        result.missingInfo = result.missingInfo.filter(info => info === 'brand');
+        result.suggestedQuestions = result.suggestedQuestions.filter(q => 
+            q !== questions[category]['brand']
+        );
+        result.needsMoreContext = false;
+        return result;
+    }
+
     if (category === 'auto' && memory?.vehicle?.make && memory.vehicle.model && memory.vehicle.year) {
         // Basic vehicle data present – treat context as sufficient
         result.missingInfo = [];

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
-import PlanCard from '@/components/briki-ai-assistant/PlanCard';
+import NewPlanCard from '@/components/briki-ai-assistant/NewPlanCard';
 import { useAnalytics } from '@/hooks/use-analytics';
 import { RealInsurancePlan } from '@/data/realPlans';
 import { useLocation } from 'wouter';
@@ -401,10 +401,28 @@ export function BrikiAssistant() {
                     className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 mt-4"
                   >
                     {message.plans.slice(0, MAX_PLANS_SHOWN).map((plan) => (
-                      <PlanCard
+                      <NewPlanCard
                         key={plan.id}
-                        plan={plan}
-                        onClick={() => handlePlanClick(plan)}
+                        plan={{
+                          id: typeof plan.id === 'string' ? parseInt(plan.id) : plan.id,
+                          name: plan.name,
+                          category: plan.category,
+                          provider: plan.provider,
+                          basePrice: plan.basePrice || (plan.price ? parseFloat(plan.price.replace(/[^0-9.-]+/g, '')) : 0),
+                          currency: plan.currency || 'COP',
+                          benefits: plan.features || [],
+                          isExternal: plan.isExternal,
+                          externalLink: plan.externalLink
+                        }}
+                        onViewDetails={(planId) => {
+                          handlePlanClick(plan);
+                          // Navigate to plan details if needed
+                        }}
+                        onQuote={(planId) => {
+                          handlePlanClick(plan);
+                          // Navigate to quote page if needed
+                          navigate(`/insurance/${plan.category}/quote?planId=${planId}`);
+                        }}
                       />
                     ))}
                   </motion.div>

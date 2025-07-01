@@ -336,9 +336,18 @@ const NewBrikiAssistant: React.FC = () => {
 
     } catch (error) {
       console.error('Error sending message:', error);
+      console.error('Error details:', {
+        message: (error as Error).message,
+        stack: (error as Error).stack,
+        name: (error as Error).name
+      });
+      
+      // Show the actual error message to help debug
+      const errorMessage = (error as Error).message || "No pude procesar tu mensaje. Por favor intenta de nuevo.";
+      
       toast({
         title: "Error",
-        description: "No pude procesar tu mensaje. Por favor intenta de nuevo.",
+        description: errorMessage,
         variant: "destructive",
       });
 
