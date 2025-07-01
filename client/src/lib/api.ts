@@ -1,6 +1,7 @@
 /**
  * Enhanced API utilities for making requests to the backend
  */
+import { getApiUrl, isCrossOrigin } from './api-config';
 
 // Get the auth token from localStorage
 function getAuthToken(): string | null {
@@ -52,7 +53,16 @@ export async function apiRequest(url: string, options: {
   };
   
   try {
-    const res = await fetch(url, requestOptions);
+    // Use the API configuration to get the full URL
+    const fullUrl = getApiUrl(url);
+    
+    // Add credentials for cross-origin requests
+    const fetchOptions = {
+      ...requestOptions,
+      ...(isCrossOrigin ? { credentials: 'include' as RequestCredentials } : {})
+    };
+    
+    const res = await fetch(fullUrl, fetchOptions);
     
     // Handle unauthorized responses
     if (res.status === 401) {
