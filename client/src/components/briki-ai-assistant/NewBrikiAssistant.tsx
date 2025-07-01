@@ -270,14 +270,14 @@ const NewBrikiAssistant: React.FC = () => {
       const response = await sendMessageToAI(messageToSend, conversationHistory, mergedContext, isAfterReset);
 
       // Debug logging for data flow analysis
-      console.log('DEBUG - Plans assignment:', {
+      console.log('🔍 DEBUG - Plans assignment:', {
         rawResponse: response,
         hasMessage: !!(response.message || response.response),
         hasSuggestedPlans: !!response.suggestedPlans,
         planCount: response.suggestedPlans?.length || 0,
         planNames: response.suggestedPlans?.map((p: InsurancePlan) => p.name) || [],
         shouldHaveShownPlans: shouldRequestPlans,
-        fullResponse: response
+        fullResponse: JSON.stringify(response, null, 2)
       });
 
       // Manejar preguntas sugeridas si falta contexto

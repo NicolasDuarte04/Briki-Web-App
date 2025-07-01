@@ -475,9 +475,14 @@ export async function generateAssistantResponse(
     // FINAL GUARD: only send plans when context is sufficient and category
     // is not 'general'.  This prevents premature suggestions after greetings.
     // -------------------------------------------------------------------
-    if (finalContextAnalysis.needsMoreContext || finalContextCategory === 'general') {
+    // UPDATED: If we have detected a specific category and have some relevant plans, show them
+    // even if context analysis says we need more info. This allows progressive disclosure.
+    if (finalContextCategory === 'general' || (finalContextAnalysis.needsMoreContext && suggestedPlans.length === 0)) {
       console.log('[DEBUG] Context insufficient or category general – omitting suggestedPlans');
       suggestedPlans = [];
+    } else if (finalContextAnalysis.needsMoreContext && suggestedPlans.length > 0) {
+      console.log('[DEBUG] Context needs more info but we have plans - showing initial recommendations');
+      // Keep the plans but ensure we also ask for more context
     }
 
     // Debug log the structure of suggested plans

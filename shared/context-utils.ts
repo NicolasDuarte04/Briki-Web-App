@@ -58,7 +58,7 @@ const soatKeywords = ['soat', 'seguro obligatorio'];
 const categoryKeywords: Record<Exclude<InsuranceCategory, 'soat'>, string[]> = {
   pet: ['mascota', 'perro', 'perrito', 'gato', 'gatito', 'pet', 'dog', 'cat', 'animal', 'veterinario', 'cachorro', 'felino', 'canino', 'border collie', 'labrador', 'golden', 'bulldog', 'poodle', 'chihuahua', 'pastor alemán'],
   travel: ['viaje', 'travel', 'trip', 'internacional', 'europa', 'estados unidos', 'méxico', 'vacaciones', 'turismo', 'exterior', 'extranjero'],
-  auto: ['auto', 'carro', 'vehiculo', 'vehículo', 'moto', 'car', 'vehicle', 'motorcycle', 'scooter', 'vespa', 'motocicleta', 'automóvil', 'coche', 'mazda', 'bmw', 'mercedes', 'audi', 'kia', 'hyundai', 'volkswagen', 'vw', 'peugeot', 'renault', 'fiat', 'jeep', 'subaru', 'mitsubishi', 'suzuki', 'lexus', 'chevy'],
+  auto: ['auto', 'carro', 'vehiculo', 'vehículo', 'moto', 'car', 'vehicle', 'motorcycle', 'scooter', 'vespa', 'motocicleta', 'automóvil', 'coche', 'mazda', 'bmw', 'bm', 'mercedes', 'audi', 'kia', 'hyundai', 'volkswagen', 'vw', 'peugeot', 'renault', 'fiat', 'jeep', 'subaru', 'mitsubishi', 'suzuki', 'lexus', 'chevy', 'chevrolet', 'toyota', 'honda', 'ford', 'nissan', 'asegurar'],
   health: ['salud', 'health', 'médico', 'medical', 'hospital', 'doctor', 'medicina', 'hospitalización', 'clínica', 'eps'],
 };
 
@@ -82,6 +82,11 @@ export function detectInsuranceCategory(message: string): InsuranceCategory | 'g
   if (/seguro.*(auto|vehicul|carro)/i.test(lowerMessage)) return 'auto';
   if (/seguro.*(salud|medic)/i.test(lowerMessage)) return 'health';
   if (/(soat|seguro obligatorio)/i.test(lowerMessage)) return 'soat';
+  
+  // Additional patterns for car insurance
+  if (/(compré|compre|compramos|adquirí|adquiri|tengo un nuevo).*(auto|carro|vehiculo|vehículo|moto).*asegurar/i.test(lowerMessage)) return 'auto';
+  if (/asegurar.*(auto|carro|vehiculo|vehículo|moto|coche)/i.test(lowerMessage)) return 'auto';
+  if (/(compré|compre|compramos|adquirí|adquiri|tengo).*(bmw|bm|mercedes|audi|mazda|toyota|honda|ford|nissan|kia|hyundai|volkswagen|vw|chevrolet|chevy)/i.test(lowerMessage)) return 'auto';
 
   return 'general';
 }
@@ -220,15 +225,20 @@ export function analyzeContextNeeds(
         }
     }
 
-    // Special handling for auto: if we have a brand, that's enough to show initial plans
-    if (category === 'auto' && (checks as any).brand) {
-        // If user mentioned a car brand, show plans even without year/country
-        result.missingInfo = result.missingInfo.filter(info => info === 'brand');
-        result.suggestedQuestions = result.suggestedQuestions.filter(q => 
-            q !== questions[category]['brand']
-        );
-        result.needsMoreContext = false;
-        return result;
+    // Special handling for auto: if we have a brand OR clear intent to insure, that's enough to show initial plans
+    if (category === 'auto') {
+        const hasInsureIntent = /asegurar|seguro|insurance|protección|cobertura/i.test(lowerConversation);
+        const hasBrand = (checks as any).brand;
+        
+        if (hasBrand || hasInsureIntent) {
+            // If user mentioned a car brand OR clear insurance intent, show plans even without full details
+            result.missingInfo = result.missingInfo.filter(info => info !== 'brand');
+            result.suggestedQuestions = result.suggestedQuestions.filter(q => 
+                q !== questions[category]['brand']
+            );
+            result.needsMoreContext = false;
+            return result;
+        }
     }
 
     if (category === 'auto' && memory?.vehicle?.make && memory.vehicle.model && memory.vehicle.year) {
