@@ -1,10 +1,11 @@
 import express from 'express';
 import { generateAssistantResponse, analyzeImageForInsurance } from '../services/openai-service';
-import { loadMockInsurancePlans, filterPlansByCategory } from '../data-loader';
+// DEPRECATED: Mock data loader is no longer used
+// import { loadMockInsurancePlans, filterPlansByCategory } from '../data-loader';
 import { generateMockResponse } from '../services/mock-assistant-responses';
 import { semanticSearch } from '../services/semantic-search';
 import { db } from '../db';
-import { conversationLogs, contextSnapshots } from '@shared/schema';
+import { conversationLogs, contextSnapshots, insurancePlans } from '@shared/schema';
 import { desc, eq } from 'drizzle-orm';
 
 const router = express.Router();
@@ -55,7 +56,38 @@ router.post('/chat', async (req, res) => {
       content: msg.content
     }));
 
-    const response = await generateAssistantResponse(message, formattedHistory, memory, "Colombia", userId, resetContext);
+    let response;
+    try {
+      response = await generateAssistantResponse(message, formattedHistory, memory, "Colombia", userId, resetContext);
+    } catch (innerError: any) {
+      console.error('[AI Route] Error generating assistant response:', innerError);
+      console.error('[AI Route] Stack trace:', innerError.stack);
+      
+      // Return a safe fallback response
+      return res.json({
+        message: "Lo siento, hubo un error al procesar tu solicitud. Por favor, intenta de nuevo.",
+        response: "Lo siento, hubo un error al procesar tu solicitud. Por favor, intenta de nuevo.",
+        suggestedPlans: [],
+        category: 'general',
+        memory: memory || {},
+        needsMoreContext: false,
+        suggestedQuestions: []
+      });
+    }
+    
+    // Validate response structure before sending
+    if (!response || typeof response !== 'object') {
+      console.error('[AI Route] Invalid response structure:', response);
+      return res.json({
+        message: "Error: respuesta inválida del asistente",
+        response: "Error: respuesta inválida del asistente",
+        suggestedPlans: [],
+        category: 'general',
+        memory: memory || {},
+        needsMoreContext: false,
+        suggestedQuestions: []
+      });
+    }
     
     // Log the interaction
     logConversation({
@@ -66,9 +98,12 @@ router.post('/chat', async (req, res) => {
       memoryJson: response.memory,
     });
     
+    // Ensure proper JSON response
+    res.setHeader('Content-Type', 'application/json');
     return res.json(response);
   } catch (error: any) {
     console.error('Error en el chat IA:', error);
+    console.error('Stack trace:', error.stack);
     res.status(500).json({ 
       error: 'Error al procesar la solicitud',
       details: error.message || 'Error desconocido'
@@ -96,52 +131,28 @@ router.post('/ask', async (req, res) => {
       return res.status(400).json({ error: 'Se requiere un mensaje' });
     }
 
-    // Cargar planes de seguro
-    const allPlans = loadMockInsurancePlans();
-    
-    // Filtrar planes por categoría si se especifica
-    const plans = category 
-      ? filterPlansByCategory(allPlans, category) 
-      : allPlans;
-
-    // Si el modo OpenAI está activado, intentar usar la API
-    if (useOpenAI) {
-      try {
-        const response = await generateAssistantResponse(message, history || [], memory);
-        
-        // Log the interaction
-        logConversation({
-          userId,
-          category,
-          input: message,
-          output: response.message || null,
-          memoryJson: response.memory,
-        });
-        
-        return res.json(response);
-      } catch (error: any) {
-        console.warn(`[AI Service] OpenAI API error - falling back to mock responses: ${error.message}`);
-        // Si hay un error con OpenAI, usar las respuestas mock como fallback
-      }
-    } 
-    
-    // Usar respuestas avanzadas del asistente para desarrollo/pruebas o como fallback
-    {
-      // Determinar la categoría para el mensaje
-      let categoryToUse = category;
+    // Always use OpenAI service which now exclusively uses database plans
+    try {
+      const response = await generateAssistantResponse(message, history || [], memory);
       
-      // Si no se especificó una categoría, intentar usar la búsqueda semántica para encontrar planes relevantes
-      const relevantPlans = category 
-        ? plans 
-        : semanticSearch(message, allPlans, 5);
+      // Log the interaction
+      logConversation({
+        userId,
+        category,
+        input: message,
+        output: response.message || null,
+        memoryJson: response.memory,
+      });
       
-      // Generar una respuesta personalizada basada en el mensaje y los planes relevantes
-      const mockResponse = generateMockResponse(categoryToUse, message, relevantPlans);
+      return res.json(response);
+    } catch (error: any) {
+      console.error(`[AI Service] Error generating response: ${error.message}`);
       
-      // Ensure consistent response structure
+      // Return a helpful error message
       return res.json({
-        message: mockResponse.message,
-        suggestedPlans: mockResponse.suggestedPlans || []
+        message: "Lo siento, encontré un problema al procesar tu solicitud. Por favor, intenta nuevamente más tarde.",
+        suggestedPlans: [],
+        error: true
       });
     }
   } catch (error: any) {

@@ -8,6 +8,7 @@ import {
   companyProfiles,
   companyPlans,
   planAnalytics,
+  insurancePlans,
   InsertQuote, 
   Quote, 
   InsuranceCategory,
@@ -20,15 +21,16 @@ import {
   InsertPlanAnalytic,
   INSURANCE_CATEGORIES
 } from "@shared/schema";
-import { 
-  loadMockInsurancePlans, 
-  MockInsurancePlan, 
-  filterPlansByCategory, 
-  filterPlansByTags, 
-  filterPlansByUserNeed,
-  filterPlansByAttributes,
-  PlanFilters
-} from "./data-loader";
+// DEPRECATED: Mock data loader is no longer used
+// import { 
+//   loadMockInsurancePlans, 
+//   MockInsurancePlan, 
+//   filterPlansByCategory, 
+//   filterPlansByTags, 
+//   filterPlansByUserNeed,
+//   filterPlansByAttributes,
+//   PlanFilters
+// } from "./data-loader";
 
 // Updated user input schema to match our enhanced DB schema
 export const userAuthSchema = z.object({
@@ -98,13 +100,8 @@ export interface IStorage {
   createTrip(tripData: any): Promise<any>;
   getTripsByUserId(userId: string): Promise<any[]>;
 
-  // Mock plan operations
-  getAllInsurancePlans(): Promise<MockInsurancePlan[]>;
-  getInsurancePlansByCategory(category: InsuranceCategory): Promise<MockInsurancePlan[]>;
-  getInsurancePlansByTags(tags: string[]): Promise<MockInsurancePlan[]>;
-  getInsurancePlansByUserNeed(need: string): Promise<MockInsurancePlan[]>;
-  getInsurancePlansByAttributes(filters: PlanFilters): Promise<MockInsurancePlan[]>;
-  semanticSearchPlans(query: string, limit?: number): Promise<MockInsurancePlan[]>;
+  // DEPRECATED: Mock plan operations are no longer supported
+  // All insurance plans must be loaded from the database
 }
 
 export class DatabaseStorage implements IStorage {
@@ -259,30 +256,6 @@ export class DatabaseStorage implements IStorage {
     async getTripsByUserId(userId: string): Promise<any[]> {
         return [];
     }
-    getAllInsurancePlans(): Promise<MockInsurancePlan[]> {
-        return Promise.resolve(loadMockInsurancePlans());
-    }
-    getInsurancePlansByCategory(category: InsuranceCategory): Promise<MockInsurancePlan[]> {
-        const plans = loadMockInsurancePlans();
-        return Promise.resolve(filterPlansByCategory(plans, category));
-    }
-    getInsurancePlansByTags(tags: string[]): Promise<MockInsurancePlan[]> {
-        const plans = loadMockInsurancePlans();
-        return Promise.resolve(filterPlansByTags(plans, tags));
-    }
-    getInsurancePlansByUserNeed(need: string): Promise<MockInsurancePlan[]> {
-        const plans = loadMockInsurancePlans();
-        return Promise.resolve(filterPlansByUserNeed(plans, need));
-    }
-    getInsurancePlansByAttributes(filters: PlanFilters): Promise<MockInsurancePlan[]> {
-        const plans = loadMockInsurancePlans();
-        return Promise.resolve(filterPlansByAttributes(plans, filters));
-    }
-    semanticSearchPlans(query: string, limit?: number): Promise<MockInsurancePlan[]> {
-        const plans = loadMockInsurancePlans();
-        const { semanticSearch } = require("./services/semantic-search");
-        return Promise.resolve(semanticSearch(query, plans, limit));
-    }
 }
 
 export class MockDataStorage implements IStorage {
@@ -294,10 +267,9 @@ export class MockDataStorage implements IStorage {
     private companyProfiles: Map<string, CompanyProfile> = new Map();
     private companyPlans: Map<number, CompanyPlan> = new Map();
     private planAnalytics: Map<string, PlanAnalytic[]> = new Map();
-    private mockInsurancePlans: MockInsurancePlan[] = [];
 
     constructor() {
-        this.mockInsurancePlans = loadMockInsurancePlans();
+        // REMOVED: Loading of mock plans
     }
 
     async getUser(id: string): Promise<User | undefined> { return this.users.get(id); }
@@ -383,15 +355,6 @@ export class MockDataStorage implements IStorage {
     async getDashboardAnalytics(companyId: number): Promise<any> { return {}; }
     async createTrip(tripData: any): Promise<any> { return { id: 'trip123', ...tripData }; }
     async getTripsByUserId(userId: string): Promise<any[]> { return []; }
-    getAllInsurancePlans(): Promise<MockInsurancePlan[]> { return Promise.resolve(this.mockInsurancePlans); }
-    getInsurancePlansByCategory(category: InsuranceCategory): Promise<MockInsurancePlan[]> { return Promise.resolve(filterPlansByCategory(this.mockInsurancePlans, category)); }
-    getInsurancePlansByTags(tags: string[]): Promise<MockInsurancePlan[]> { return Promise.resolve(filterPlansByTags(this.mockInsurancePlans, tags)); }
-    getInsurancePlansByUserNeed(need: string): Promise<MockInsurancePlan[]> { return Promise.resolve(filterPlansByUserNeed(this.mockInsurancePlans, need)); }
-    getInsurancePlansByAttributes(filters: PlanFilters): Promise<MockInsurancePlan[]> { return Promise.resolve(filterPlansByAttributes(this.mockInsurancePlans, filters)); }
-    semanticSearchPlans(query: string, limit: number = 5): Promise<MockInsurancePlan[]> { 
-        const { semanticSearch } = require("./services/semantic-search");
-        return Promise.resolve(semanticSearch(query, this.mockInsurancePlans, limit)); 
-    }
 }
 
 export const storage: IStorage = new DatabaseStorage();

@@ -5,22 +5,21 @@
  * This service now integrates with real insurance plan data fetched
  * directly from the Supabase database (`insurance_plans` table).
  *
- * The mock data loader (`data-loader.ts`) and the mock insurance
- * data service (`insurance-data-service.ts`) are no longer used for
- * generating assistant responses with plan suggestions.
- *
- * To extend or update the available plans, you should add or modify
- * the records in the `insurance_plans` table in the database.
- * The `scripts/seed-plans.ts` script can be used as a reference
- * for populating this table.
+ * IMPORTANT: All mock data sources have been deprecated.
+ * The service exclusively uses plans from the PostgreSQL database.
+ * 
+ * To add or update plans, modify the records in the `insurance_plans` 
+ * table in the database. The `scripts/seed-plans.ts` script can be 
+ * used as a reference for populating this table.
  * =================================================================
  */
 import OpenAI from "openai";
-import {
-  MockInsurancePlan,
-  createEnrichedContext,
-  loadMockInsurancePlans,
-} from "../data-loader";
+// DEPRECATED: Mock data loader is no longer used
+// import {
+//   MockInsurancePlan,
+//   createEnrichedContext,
+//   loadMockInsurancePlans,
+// } from "../data-loader";
 import { storage } from "../storage";
 import { db } from "../db";
 import { insurancePlans, InsuranceCategory } from "@shared/schema";
@@ -54,6 +53,68 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
 const DEFAULT_MODEL = process.env.OPENAI_MODEL || "gpt-4o";
+
+// Simple in-memory cache for OpenAI responses
+interface CacheEntry {
+  response: any;
+  timestamp: number;
+}
+
+const responseCache = new Map<string, CacheEntry>();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+// Cache key generator
+function getCacheKey(message: string, category: string): string {
+  return `${category}:${message.toLowerCase().trim()}`;
+}
+
+// Plan cache
+interface PlanCache {
+  plans: InsurancePlan[];
+  timestamp: number;
+}
+
+let planCache: PlanCache | null = null;
+const PLAN_CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+
+async function getCachedPlans(): Promise<InsurancePlan[]> {
+  // Check if cache is valid
+  if (planCache && Date.now() - planCache.timestamp < PLAN_CACHE_TTL) {
+    console.log('[Plan Cache] Using cached plans');
+    return planCache.plans;
+  }
+
+  // Fetch from database
+  console.log('[Plan Cache] Fetching fresh plans from database');
+  const plans = await db.select({
+    id: insurancePlans.id,
+    name: insurancePlans.name,
+    category: insurancePlans.category,
+    provider: insurancePlans.provider,
+    basePrice: insurancePlans.basePrice,
+    coverageAmount: insurancePlans.coverageAmount,
+    currency: insurancePlans.currency,
+    country: insurancePlans.country,
+    benefits: insurancePlans.benefits,
+    externalLink: insurancePlans.externalLink,
+    isExternal: insurancePlans.isExternal,
+    createdAt: insurancePlans.createdAt,
+    updatedAt: insurancePlans.updatedAt,
+  }).from(insurancePlans).then(plans => 
+    plans.map(p => ({
+      ...p,
+      features: (p as any).features || (p as any).benefits || [],
+    }))
+  ) as InsurancePlan[];
+
+  // Update cache
+  planCache = {
+    plans,
+    timestamp: Date.now()
+  };
+
+  return plans;
+}
 
 /**
  * Interfaces for AI Assistant
@@ -133,7 +194,7 @@ export async function generateAssistantResponse(
         console.log(`[Vehicle Lookup][${requestId}] Plate detected: ${plate}. Fetching details...`);
         try {
           // Use the new, centralized vehicle lookup endpoint
-          const response = await fetch(`http://localhost:5050/api/vehicle/lookup?plate=${plate}`);
+          const response = await fetch(`http://localhost:5051/api/vehicle/lookup?plate=${plate}`);
           if (!response.ok) {
             throw new Error(`Vehicle lookup failed with status: ${response.status}`);
           }
@@ -162,41 +223,43 @@ export async function generateAssistantResponse(
       }
     }
 
-    // Get real plans from the database
-    let allPlans: InsurancePlan[] = await db.select().from(insurancePlans).then(plans => 
-      plans.map(p => ({
-        ...p,
-        // Ensure we have features field for frontend compatibility
-        features: (p as any).features || (p as any).benefits || [],
-        // Add external link fields
-        externalLink: (p as any).externalLink || `https://brikiapp.com/plan/${p.id}`,
-        isExternal: (p as any).isExternal !== undefined ? (p as any).isExternal : false,
-      }))
-    ) as InsurancePlan[];
+    // Get real plans from the database (with caching)
+    let allPlans: InsurancePlan[] = [];
+    try {
+      allPlans = await getCachedPlans();
+    } catch (error: any) {
+      console.error(`[OpenAI][${requestId}] Error loading plans:`, error);
+      allPlans = [];
+    }
     console.log(`[OpenAI][${requestId}] Loaded ${allPlans.length} total plans from database`);
 
-    // DEV FALLBACK: if the database is empty, fall back to the JSON mock plans
+    // NO FALLBACK TO MOCK PLANS - Database is the single source of truth
     if (allPlans.length === 0) {
-      console.warn(`[OpenAI][${requestId}] DB returned 0 plans — falling back to mock plans from JSON.`);
-      allPlans = loadMockInsurancePlans().map((p: any) => ({
-        ...p,
-        // Map 'features' -> 'benefits' so downstream code works without changes
-        benefits: Array.isArray(p.features) ? p.features : [],
-        // Ensure we have features for frontend
-        features: Array.isArray(p.features) ? p.features : [],
-        // Add external link fields if missing
-        externalLink: p.externalLink || `https://brikiapp.com/plan/${p.id}`,
-        isExternal: p.isExternal !== undefined ? p.isExternal : false,
-      })) as unknown as InsurancePlan[];
-      console.log(`[OpenAI][${requestId}] Loaded ${allPlans.length} mock plans from JSON fallback`);
+      console.log(`[OpenAI][${requestId}] No plans found in database for any category`);
+      // Continue with empty plans array - the AI will inform the user
     }
 
     // Filter and get relevant plans
     const filteredPlans = filterPlansByCountry(allPlans, userCountry);
     console.log(`[OpenAI][${requestId}] After country filtering: ${filteredPlans.length} plans (country: ${userCountry})`);
     
-    const relevantPlans = getTopRelevantPlans(userMessage, filteredPlans, 6);
-    console.log(`[OpenAI][${requestId}] After relevance scoring: ${relevantPlans.length} relevant plans`);
+    // Use the category that was already detected and passed to this function
+    let relevantPlans: InsurancePlan[] = [];
+    
+    if (category && category !== 'general') {
+      // At this point, TypeScript knows category is InsuranceCategory
+      // Filter by category first, then get top relevant
+      const categoryPlans = filteredPlans.filter(plan => {
+        // Ensure type safety by checking both sides are valid InsuranceCategory values
+        return plan.category === category;
+      });
+      relevantPlans = getTopRelevantPlans(userMessage, categoryPlans, 6);
+      console.log(`[OpenAI][${requestId}] Category '${category}' detected: ${categoryPlans.length} plans in category, selected ${relevantPlans.length} most relevant`);
+    } else {
+      // No clear category, get top relevant from all plans
+      relevantPlans = getTopRelevantPlans(userMessage, filteredPlans, 6);
+      console.log(`[OpenAI][${requestId}] No specific category detected, selected ${relevantPlans.length} most relevant from all plans`);
+    }
 
     // Enhanced system prompt with real plan data and memory context
     const conversation = [...conversationHistory, { role: 'user', content: userMessage }].map(m => m.content).join(' ');
@@ -247,8 +310,9 @@ export async function generateAssistantResponse(
 
     const startTime = Date.now();
 
-    // FIXED: Call OpenAI with proper error handling
-    const response = await callOpenAIWithRetry(messages);
+    // FIXED: Call OpenAI with proper error handling and caching
+    const cacheKey = getCacheKey(userMessage, category || 'general');
+    const response = await callOpenAIWithRetry(messages, cacheKey);
 
     const endTime = Date.now();
     const responseTime = endTime - startTime;
@@ -293,15 +357,27 @@ export async function generateAssistantResponse(
     let suggestedPlans: InsurancePlan[] = [];
 
     // Check if this is a follow-up question about previously suggested plans
-    const previousPlans = extractPreviousPlansFromHistory(conversationHistory);
-    const isFollowUp = isFollowUpQuestion(userMessage) && previousPlans.length > 0;
+    const isFollowUp = isFollowUpQuestion(userMessage);
 
-    if (isFollowUp) {
-      // For follow-up questions, reattach the previously suggested plans
-      suggestedPlans = previousPlans;
-      console.log(
-        `🧠 [OpenAI][${requestId}] Follow-up question detected – reattaching ${suggestedPlans.length} previous plans`,
+    if (isFollowUp && relevantPlans.length > 0) {
+      // For follow-up questions, try to find which plan the user is referring to
+      console.log(`🧠 [OpenAI][${requestId}] Follow-up question detected, searching for plan references...`);
+      
+      // Check if user is referring to a specific plan by name or provider
+      const matchingPlans = relevantPlans.filter(plan => 
+        isReferringToPlan(userMessage, plan.name) || 
+        isReferringToPlan(userMessage, plan.provider)
       );
+      
+      if (matchingPlans.length > 0) {
+        // User is asking about specific plans
+        suggestedPlans = matchingPlans;
+        console.log(`[OpenAI][${requestId}] Found ${matchingPlans.length} matching plans for follow-up`);
+      } else {
+        // User is asking a general follow-up, show recent relevant plans again
+        suggestedPlans = relevantPlans.slice(0, 3);
+        console.log(`[OpenAI][${requestId}] General follow-up, showing top 3 relevant plans`);
+      }
     } else {
       // Check if we need more context before showing plans
       const category = detectInsuranceCategory(userMessage);
@@ -348,16 +424,51 @@ export async function generateAssistantResponse(
     });
 
     // Use the same context analysis from the plan logic
-    const finalContextCategory = detectInsuranceCategory(userMessage);
+    // Important: use the full conversation context, not just the current message
     const finalConversation = [...conversationHistory, { role: 'user', content: userMessage }]
         .filter(msg => msg.role === 'user')
         .map(msg => msg.content)
         .join(' ');
+    
+    // First check if we already have a category in memory or from earlier detection
+    let finalContextCategory = updatedMemory.lastDetectedCategory || category;
+    
+    // If no category in memory, detect from full conversation
+    if (!finalContextCategory || finalContextCategory === 'general') {
+      finalContextCategory = detectInsuranceCategory(finalConversation);
+      
+      // If still general, try detecting from just the current message
+      if (finalContextCategory === 'general') {
+        finalContextCategory = detectInsuranceCategory(userMessage);
+      }
+    }
+    
+    // Store the detected category in memory for consistency
+    if (finalContextCategory !== 'general') {
+      updatedMemory.lastDetectedCategory = finalContextCategory;
+    }
+    
     const finalContextAnalysis = analyzeContextNeeds(finalConversation, finalContextCategory, updatedMemory);
+    
+    // Debug log the context analysis result
+    console.log('[DEBUG] Context analysis result:', {
+      ...finalContextAnalysis,
+      detectedCategory: finalContextCategory,
+      memoryCategory: updatedMemory.lastDetectedCategory
+    });
     
     // --- FAIL-SOFT: if no plans were chosen, still send top relevant ones ---
     if (!suggestedPlans || suggestedPlans.length === 0) {
       suggestedPlans = relevantPlans.slice(0, 3);
+    }
+
+    // -------------------------------------------------------------------
+    // FINAL GUARD: only send plans when context is sufficient and category
+    // is not 'general'.  This prevents premature suggestions after greetings.
+    // -------------------------------------------------------------------
+    if (finalContextAnalysis.needsMoreContext || finalContextCategory === 'general') {
+      console.log('[DEBUG] Context insufficient or category general – omitting suggestedPlans');
+      suggestedPlans = [];
     }
 
     // Debug log the structure of suggested plans
@@ -374,15 +485,20 @@ export async function generateAssistantResponse(
       }))
     );
     
-    return {
+    // CRITICAL DEBUG: Log the exact response being sent
+    const finalResponse = {
       message: assistantMessage,
       response: assistantMessage, // Provide both for compatibility
-      suggestedPlans: suggestedPlans.length > 0 ? suggestedPlans : undefined,
+      suggestedPlans,
       category: finalContextCategory,
       memory: updatedMemory,
       needsMoreContext: finalContextAnalysis.needsMoreContext,
       suggestedQuestions: finalContextAnalysis.suggestedQuestions || [],
     };
+    
+    console.log(`[OpenAI][${requestId}] FINAL RESPONSE TO FRONTEND:`, JSON.stringify(finalResponse, null, 2));
+    
+    return finalResponse;
   } catch (error: any) {
     // Enhanced error handling with specific error types
     const errorDetails = {
@@ -422,17 +538,37 @@ export async function generateAssistantResponse(
 }
 
 /**
- * OpenAI API call with automatic retry mechanism
+ * OpenAI API call with automatic retry mechanism and caching
  */
-async function callOpenAIWithRetry(messages: any[], retries = 3): Promise<any> {
+async function callOpenAIWithRetry(messages: any[], cacheKey?: string, retries = 3): Promise<any> {
+  // Check cache first
+  if (cacheKey) {
+    const cached = responseCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+      console.log(`[Cache] Hit for key: ${cacheKey}`);
+      return cached.response;
+    }
+  }
+
   for (let i = 0; i < retries; i++) {
     try {
-      return await openai.chat.completions.create({
+      const response = await openai.chat.completions.create({
         model: DEFAULT_MODEL,
         messages: messages as any,
         temperature: 0.7,
         max_tokens: 800,
       });
+
+      // Cache the response
+      if (cacheKey) {
+        responseCache.set(cacheKey, {
+          response,
+          timestamp: Date.now()
+        });
+        console.log(`[Cache] Stored response for key: ${cacheKey}`);
+      }
+
+      return response;
     } catch (error: any) {
       if (i === retries - 1) throw error;
 
@@ -488,13 +624,16 @@ function isFollowUpQuestion(message: string): boolean {
  * Extract previously suggested plans from conversation history
  */
 function extractPreviousPlansFromHistory(history: AssistantMessage[]): InsurancePlan[] {
+  // Look for the most recent assistant message that mentions plans
   for (let i = history.length - 1; i >= 0; i--) {
     const message = history[i];
     if (message.role === 'assistant' && message.content.includes('[Planes previamente recomendados:')) {
       const planMatch = message.content.match(/\[Planes previamente recomendados: ([^\]]+)\]/);
       if (planMatch) {
-        const planString = planMatch[1];
-        return parsePlansFromString(planString);
+        // For now, we'll return an empty array since we can't reconstruct full plan objects from strings
+        // The frontend should be modified to send actual plan data
+        console.log('[Follow-up] Found plan reference in history but cannot reconstruct full objects');
+        return [];
       }
     }
   }
@@ -503,16 +642,30 @@ function extractPreviousPlansFromHistory(history: AssistantMessage[]): Insurance
 
 /**
  * Parse plan information from formatted string and return plan objects
+ * Note: This is a placeholder - the frontend should send actual plan data
  */
 function parsePlansFromString(planString: string): InsurancePlan[] {
-  try {
-    // This function will need to be updated or replaced as it relies on mock data
-    // For now, it will return an empty array.
-    return [];
-  } catch (error) {
-    console.warn('Error parsing plans from string:', error);
-    return [];
-  }
+  console.warn('[Follow-up] parsePlansFromString called but cannot reconstruct plan objects from string:', planString);
+  return [];
+}
+
+/**
+ * Check if user is referring to previously shown plans
+ */
+function isReferringToPlan(message: string, planName: string): boolean {
+  const lowerMessage = message.toLowerCase();
+  const lowerPlanName = planName.toLowerCase();
+  
+  // Direct name match
+  if (lowerMessage.includes(lowerPlanName)) return true;
+  
+  // Provider match (e.g., "el de HDI", "el plan de SURA")
+  const providerMatch = planName.match(/\b(SURA|HDI|MAPFRE|Bolívar|Qualitas|Colasistencia|Heymondo|IATI|Assist Card|Pax)\b/i);
+  if (providerMatch && lowerMessage.includes(providerMatch[0].toLowerCase())) return true;
+  
+  // Index references (e.g., "el primero", "el segundo")
+  const indexRefs = ['primero', 'segundo', 'tercero', 'cuarto', 'último'];
+  return indexRefs.some(ref => lowerMessage.includes(ref));
 }
 
 /**
@@ -526,8 +679,7 @@ function createSystemPrompt(
   memory: AssistantMemory,
 ): string {
   const hasHistory = conversationHistory.length > 0;
-  const previousPlans = extractPreviousPlansFromHistory(conversationHistory);
-  const isFollowUp = isFollowUpQuestion(userMessage) && previousPlans.length > 0;
+  const isFollowUp = isFollowUpQuestion(userMessage);
 
   const vehicleContext = memory.vehicle 
     ? `
@@ -553,10 +705,10 @@ IMPORTANTE: NUNCA termines la conversación después de mostrar planes. SIEMPRE 
 
 ## FLUJO CONVERSACIONAL:
 ${isFollowUp ? `
-🧠 MODO SEGUIMIENTO: El usuario está preguntando sobre planes ya mostrados.
-- Planes previamente mostrados: ${previousPlans.map(p => p.name).join(', ')}
-- Responde específicamente sobre esos planes
-- Mantén visible la información de los planes anteriores
+🧠 MODO SEGUIMIENTO: El usuario está preguntando sobre planes mostrados o quiere más información.
+- Si pregunta por un plan específico (por nombre, proveedor o posición), enfócate en ese plan
+- Si es una pregunta general, ayuda a comparar las opciones mostradas
+- Mantén la conversación fluida y natural
 ` : `
 ${contextAnalysis.needsMoreContext ? `
 🤔 MODO RECOLECCIÓN: Necesitas más información antes de mostrar planes.
@@ -595,7 +747,14 @@ ${relevantPlans.length > 0 ? `
 ${relevantPlans.map(plan => `
 - ${plan.name} (${plan.provider}) - ${plan.category}
 `).join('\n')}
-` : ''}
+` : `
+## IMPORTANTE - NO HAY PLANES DISPONIBLES:
+- Actualmente no tenemos planes disponibles para esta categoría en nuestra base de datos
+- Informa al usuario: "Actualmente no tenemos planes disponibles para esta categoría. Estamos trabajando para agregar más opciones pronto."
+- Ofrece ayuda con información general sobre seguros
+- Sugiere otras categorías que podrían tener planes disponibles
+- Mantén un tono positivo y servicial
+`}
 
 Responde de manera útil y mantén la conversación activa. Si muestras planes, SIEMPRE pregunta si el usuario quiere saber más detalles, comparar opciones, o tiene otras dudas.`;
 }
@@ -830,12 +989,35 @@ function calculateRelevanceScore(userMessage: string, plan: InsurancePlan): numb
 }
 
 /**
+ * Normalise country names/codes to a common two-letter code.
+ * Extend this map as new regions are added.
+ */
+function normaliseCountry(c: string | null | undefined): string {
+  if (!c) return '';
+  return c.trim().toUpperCase()
+    .replace('COLOMBIA', 'CO')
+    .replace('MEXICO', 'MX')
+    .replace('WORLDWIDE', 'WW');
+}
+
+/**
  * Filter plans by country (placeholder for country-specific filtering)
  */
 function filterPlansByCountry(plans: InsurancePlan[], country: string): InsurancePlan[] {
-  // FIXED: Handle null country values properly
-  // For now, include all plans since most plans have null country or are universal
-  return plans.filter(p => !p.country || p.country === country || p.country === 'WW' || p.country === null);
+  const norm = normaliseCountry(country);
+  const filteredPlans = plans.filter(p => {
+    const planCountry = normaliseCountry(p.country as any);
+    return !planCountry || planCountry === norm || planCountry === 'WW';
+  });
+
+  // Debug helper to confirm filtering behaviour
+  console.log('[DEBUG] Plans after country filter:', filteredPlans.length);
+  if (filteredPlans.length === 0) {
+    console.log('[DEBUG] Raw plan country codes:', Array.from(new Set(plans.map(p => p.country))));
+    console.log('[DEBUG] Normalised user country:', norm);
+  }
+
+  return filteredPlans;
 }
 
 /**

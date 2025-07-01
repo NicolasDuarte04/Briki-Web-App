@@ -16,6 +16,8 @@ interface RawPlan {
   country?: string;
   features?: string[]; // from realPlans.ts
   benefits?: string[]; // legacy fallback
+  externalLink?: string | null;
+  isExternal?: boolean;
 }
 
 async function main() {
@@ -42,6 +44,8 @@ async function main() {
           currency: plan.currency ?? 'COP',
           country: plan.country ?? 'CO',
           benefits: plan.features ?? plan.benefits ?? [],
+          externalLink: plan.externalLink ?? null,
+          isExternal: plan.isExternal ?? false,
         };
 
         if (!mapped.name || !mapped.category || !mapped.provider) {

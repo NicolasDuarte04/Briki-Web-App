@@ -412,6 +412,8 @@ export const insurancePlans = pgTable("insurance_plans", {
   currency: varchar("currency", { length: 3 }).default('USD').notNull(),
   country: varchar("country", { length: 2 }).notNull(),
   benefits: jsonb("benefits").$type<string[]>().notNull(),
+  externalLink: varchar("external_link", { length: 500 }),
+  isExternal: boolean("is_external").default(false),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => {

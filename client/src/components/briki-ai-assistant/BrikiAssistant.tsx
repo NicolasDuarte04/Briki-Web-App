@@ -179,20 +179,30 @@ export function BrikiAssistant() {
 
       const data: AIResponse & { memory?: any } = await response.json();
       
+      // Add detailed debug logging
+      console.log('[BrikiAI] Full API response:', data);
+      console.log('[BrikiAI] suggestedPlans raw:', data.suggestedPlans);
+      
       // Update memory state with response
       if (data.memory) {
         setMemory(data.memory);
       }
       
       // Normalize plans to ensure 'features' field exists
-      const normalizedPlans: Plan[] | undefined = data.suggestedPlans
+      const normalizedPlans: Plan[] = Array.isArray(data.suggestedPlans)
         ? data.suggestedPlans.map((p: any) => ({
             ...p,
             features: p.features || p.benefits || [],
           }))
-        : undefined;
+        : [];
 
-      console.log('📦 Suggested plans received:', normalizedPlans);
+      console.log(
+        '📦 Suggested plans received:',
+        Array.isArray(data.suggestedPlans)
+          ? data.suggestedPlans.length
+          : 'Invalid or undefined'
+      );
+      console.log('[BrikiAI] Normalized plans:', normalizedPlans);
       
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -378,6 +388,10 @@ export function BrikiAssistant() {
                 {/* Render plans if present */}
                 {message.type === 'plans' && (
                   <>
+                    {(() => {
+                      console.log('[BrikiAI] Rendering message with type=plans:', message.plans?.length, message.plans);
+                      return null;
+                    })()}
                     {isLoadingPlans ? (
                       <PlansLoadingPlaceholder />
                     ) : message.plans && message.plans.length > 0 ? (

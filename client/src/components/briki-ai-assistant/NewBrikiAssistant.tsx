@@ -9,7 +9,7 @@ import { apiRequest } from '@/lib/api';
 import { sendMessageToAI } from '@/services/openai-service';
 // import type { APIMessage, AIResponse, AssistantMemory } from '@/types/chat';
 import WelcomeCard from './WelcomeCard';
-import { InsurancePlan } from './PlanCard';
+import { InsurancePlan } from './NewPlanCard';
 import SuggestedQuestions from './SuggestedQuestions';
 import { detectInsuranceCategory, hasSufficientContext } from '@shared/context-utils';
 import { extractContextFromMessage } from "@/utils/context-utils";
@@ -449,7 +449,13 @@ const NewBrikiAssistant: React.FC = () => {
 
               {/* Messages */}
               {messages.map((message) => {
-                console.log("🔍 Message from AI:", message);
+                console.log("🔍 Rendering message:", {
+                  id: message.id,
+                  role: message.role,
+                  hasSuggestedPlans: !!message.suggestedPlans,
+                  planCount: message.suggestedPlans?.length || 0,
+                  isLoading: message.isLoading
+                });
                 return (
                   <ChatBubble
                     key={message.id}
@@ -461,6 +467,10 @@ const NewBrikiAssistant: React.FC = () => {
                     {/* Show SuggestedPlans if message has plans */}
                     {message.role === 'assistant' && message.suggestedPlans && message.suggestedPlans.length > 0 && (
                       <ScrollArea className="mt-4 max-h-96">
+                        {(() => {
+                          console.log('📦 Rendering SuggestedPlans component for message:', message.id, 'with', message.suggestedPlans.length, 'plans');
+                          return null;
+                        })()}
                         <Suspense fallback={
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {[1, 2].map((i) => (

@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, ArrowRight } from "lucide-react";
+import { CheckCircle, ArrowRight, ExternalLink } from "lucide-react";
 import { Separator } from '@/components/ui/separator';
 
 // This interface matches the data coming from the backend AI service
@@ -15,6 +15,9 @@ export interface InsurancePlan {
   basePrice: number;
   currency: string;
   benefits: string[];
+  isExternal?: boolean;
+  externalLink?: string | null;
+  features?: string[];
 }
 
 interface NewPlanCardProps {
@@ -35,6 +38,16 @@ const NewPlanCard: React.FC<NewPlanCardProps> = ({ plan, onViewDetails, onQuote 
   const cardVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 },
+  };
+
+  const handleQuoteClick = () => {
+    if (plan.isExternal && plan.externalLink) {
+      // Open external link in new tab
+      window.open(plan.externalLink, '_blank', 'noopener,noreferrer');
+    } else {
+      // Call the internal quote handler
+      onQuote(plan.id);
+    }
   };
 
   return (
@@ -91,12 +104,22 @@ const NewPlanCard: React.FC<NewPlanCardProps> = ({ plan, onViewDetails, onQuote 
             >
               Ver detalles
             </Button>
-            <Button 
-              className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white"
-              onClick={() => onQuote(plan.id)}
-            >
-              Cotizar ahora <ArrowRight className="h-4 w-4 ml-2" />
-            </Button>
+            {plan.externalLink ? (
+              <Button 
+                className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white"
+                onClick={handleQuoteClick}
+              >
+                Cotizar ahora <ExternalLink className="h-4 w-4 ml-2" />
+              </Button>
+            ) : (
+              <Button 
+                className="w-full"
+                variant="outline"
+                disabled
+              >
+                No disponible
+              </Button>
+            )}
           </div>
         </CardFooter>
       </Card>

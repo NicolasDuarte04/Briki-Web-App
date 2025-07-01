@@ -56,7 +56,7 @@ export interface SimpleMessage {
 const soatKeywords = ['soat', 'seguro obligatorio'];
 
 const categoryKeywords: Record<Exclude<InsuranceCategory, 'soat'>, string[]> = {
-  pet: ['mascota', 'perro', 'gato', 'pet', 'dog', 'cat', 'animal', 'veterinario', 'cachorro', 'felino', 'canino'],
+  pet: ['mascota', 'perro', 'perrito', 'gato', 'gatito', 'pet', 'dog', 'cat', 'animal', 'veterinario', 'cachorro', 'felino', 'canino', 'border collie', 'labrador', 'golden', 'bulldog', 'poodle', 'chihuahua', 'pastor alemán'],
   travel: ['viaje', 'travel', 'trip', 'internacional', 'europa', 'estados unidos', 'méxico', 'vacaciones', 'turismo', 'exterior', 'extranjero'],
   auto: ['auto', 'carro', 'vehiculo', 'vehículo', 'moto', 'car', 'vehicle', 'motorcycle', 'scooter', 'vespa', 'motocicleta', 'automóvil', 'coche', 'mazda', 'bmw', 'mercedes', 'audi', 'kia', 'hyundai', 'volkswagen', 'vw', 'peugeot', 'renault', 'fiat', 'jeep', 'subaru', 'mitsubishi', 'suzuki', 'lexus', 'chevy'],
   health: ['salud', 'health', 'médico', 'medical', 'hospital', 'doctor', 'medicina', 'hospitalización', 'clínica', 'eps'],
@@ -104,9 +104,10 @@ export function hasSufficientContext(conversation: string, category: InsuranceCa
   switch (category) {
     case 'travel':
       const hasDestination = /(europa|asia|méxico|estados unidos|colombia|españa|francia|alemania|italia|brasil|chile|perú|usa|canadá|argentina|viajar a)/i.test(lowerConversation);
-      const hasOrigin = /(desde|de|partiendo de|salgo de|origen)/i.test(lowerConversation);
-      const hasDuration = /(días?|semanas?|meses?|\d+)/i.test(lowerConversation);
-      return hasDestination && hasOrigin && hasDuration;
+      // Check for either dates OR duration (origin is not required)
+      const hasDates = /(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre|\d{1,2}\/\d{1,2}\/\d{2,4}|del \d+|hasta el \d+)/i.test(lowerConversation);
+      const hasDuration = /(\d+\s*(días?|semanas?|meses?)|una semana|dos semanas|un mes|dos meses)/i.test(lowerConversation);
+      return hasDestination && (hasDates || hasDuration);
 
     case 'pet':
       const hasPetType = /(perr|gat|dog|cat)/i.test(lowerConversation);
@@ -169,7 +170,9 @@ export function analyzeContextNeeds(
     const checks = {
         travel: {
             destination: /(europa|asia|méxico|estados unidos|colombia|españa|francia|alemania|italia|brasil|chile|perú|usa|canadá|argentina|viajar a)/i.test(lowerConversation),
-            startDate: /(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre|\d{1,2}\/\d{1,2}\/\d{2,4})/i.test(lowerConversation)
+            // Check for either dates OR duration (not both required)
+            datesOrDuration: (/(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre|\d{1,2}\/\d{1,2}\/\d{2,4}|del \d+|hasta el \d+)/i.test(lowerConversation) || 
+                             /(\d+\s*(días?|semanas?|meses?)|una semana|dos semanas|un mes|dos meses)/i.test(lowerConversation))
         },
         pet: {
             petType: /(perro|gato|dog|cat)/i.test(lowerConversation),
@@ -191,8 +194,7 @@ export function analyzeContextNeeds(
     const questions: Record<string, Record<string, string>> = {
         travel: {
             destination: "¿A qué país o continente planeas viajar?",
-            startDate: "¿Cuándo es la fecha de inicio de tu viaje?",
-            country: "¿En qué país está registrado el vehículo (ej. Colombia, México)?"
+            datesOrDuration: "¿Cuándo planeas viajar o por cuánto tiempo?",
         },
         pet: {
             petType: "¿Qué tipo de mascota tienes? (perro, gato, etc.)",

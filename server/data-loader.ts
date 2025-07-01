@@ -1,3 +1,18 @@
+/**
+ * =================================================================
+ * DEPRECATED: This file is no longer used for loading insurance plans
+ * =================================================================
+ * The Briki AI Assistant now exclusively loads insurance plans from 
+ * the PostgreSQL database (insurance_plans table).
+ * 
+ * This file is kept for:
+ * - Loading knowledge base data (FAQs, terms, destinations, etc.)
+ * - Legacy compatibility (will be removed in future versions)
+ * 
+ * To add or modify insurance plans, update the database directly.
+ * =================================================================
+ */
+
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';

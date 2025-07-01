@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import PlanCard from './PlanCard';
+import NewPlanCard from './NewPlanCard';
 import { useToast } from '@/hooks/use-toast';
 import { useLocation } from 'wouter';
 import { logPlanAnalytics } from '@/lib/analytics';
 import { useAuth } from '@/hooks/use-auth';
-import { InsurancePlan } from '@/types/insurance';
+import { InsurancePlan } from './NewPlanCard';
 import { Button } from '@/components/ui/button';
 import { ChevronRight } from 'lucide-react';
 
@@ -55,9 +55,16 @@ const SuggestedPlans: React.FC<SuggestedPlansProps> = ({ plans, category, onView
     return null;
   }
 
-  const handleViewDetails = (planId: string) => {
+  // Additional debug before rendering
+  console.log('✅ SuggestedPlans - About to render plans:', {
+    totalPlans: plans.length,
+    firstPlan: plans[0],
+    allPlanNames: plans.map(p => p.name)
+  });
+
+  const handleViewDetails = (planId: number) => {
     console.log('👆 View details clicked:', { planId });
-    const plan = plans.find(p => p.id.toString() === planId);
+    const plan = plans.find(p => p.id === planId);
     if (plan) {
       // Navigate to plan details page with plan data
       navigate(`/plan/${planId}`, { state: { plan } });
@@ -68,9 +75,9 @@ const SuggestedPlans: React.FC<SuggestedPlansProps> = ({ plans, category, onView
     });
   };
 
-  const handleQuote = (planId: string) => {
+  const handleQuote = (planId: number) => {
     console.log('🎯 Quote clicked:', { planId });
-    const plan = plans.find(p => p.id.toString() === planId);
+    const plan = plans.find(p => p.id === planId);
     
     if (plan) {
       // Check if plan is external
@@ -141,10 +148,9 @@ const SuggestedPlans: React.FC<SuggestedPlansProps> = ({ plans, category, onView
           });
 
           return (
-            <PlanCard
+            <NewPlanCard
               key={plan.id}
               plan={plan as any}
-              highlighted={index === 0}
               onViewDetails={handleViewDetails}
               onQuote={handleQuote}
             />

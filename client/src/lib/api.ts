@@ -67,7 +67,16 @@ export async function apiRequest(url: string, options: {
     // Check if the response contains a JSON body
     const contentType = res.headers.get('content-type');
     if (contentType && contentType.includes('application/json')) {
-      return await res.json();
+      try {
+        const jsonData = await res.json();
+        return jsonData;
+      } catch (jsonError) {
+        console.error(`JSON parsing error for ${url}:`, jsonError);
+        // Can't read the response text after json() fails - the body has been consumed
+        console.error('Response headers:', res.headers);
+        console.error('Response status:', res.status);
+        throw new Error(`Invalid JSON response: ${(jsonError as Error).message}`);
+      }
     }
     
     return res;

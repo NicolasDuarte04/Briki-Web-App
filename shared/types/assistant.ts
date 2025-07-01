@@ -19,4 +19,5 @@ export interface AssistantMemory {
     };
     location?: string;
   };
+  lastDetectedCategory?: string;
 } 

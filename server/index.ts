@@ -149,10 +149,10 @@ app.use('/api/vehicle', vehicleRoutes);
     serveStatic(app);
   }
 
-  // ALWAYS serve the app on port 5000
+  // ALWAYS serve the app on port 5051
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
-  const port = 5050;
+  const port = 5051;
   server.listen(port, () => {
     log(`✅ Server is running on http://localhost:${port}`);
   });

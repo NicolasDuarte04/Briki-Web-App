@@ -1,0 +1,39 @@
+{
+  "id": "travel-pax-001",
+  "category": "travel",
+  "provider": "Pax Assistance",
+  "name": "Plan Básico 15 días",
+  "description": "Cobertura básica de viaje internacional con asistencia médica de emergencia y protección de equipaje.",
+  "basePrice": 30,
+  "currency": "USD",
+  "duration": "15 días",
+  "coverageAmount": 35000,
+  "coverage": {
+    "medical": 35000,
+    "luggage": 1200,
+    "cancellation": 0,
+    "repatriation": 10000,
+    "medication": 500
+  },
+  "features": [
+    "Gastos médicos de emergencia hasta USD 35,000",
+    "Repatriación sanitaria incluida",
+    "Compensación por pérdida de equipaje hasta USD 1,200",
+    "Asistencia 24/7 en español",
+    "Cobertura mundial excepto país de residencia",
+    "Medicamentos recetados de emergencia",
+    "Gastos odontológicos de urgencia hasta USD 300"
+  ],
+  "deductible": 0,
+  "exclusions": [
+    "Enfermedades preexistentes",
+    "Deportes extremos",
+    "Viajes a zonas de guerra"
+  ],
+  "addOns": [],
+  "tags": ["internacional", "básico", "15-días", "emergencia-médica"],
+  "rating": 4.3,
+  "status": "active",
+  "externalLink": "https://www.paxassistance.com/en-co",
+  "isExternal": true
+} 
