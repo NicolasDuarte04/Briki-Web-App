@@ -9,6 +9,7 @@ import NewPlanCard from './NewPlanCard';
 import { useAnalytics } from '../../hooks/use-analytics';
 import { RealInsurancePlan } from '../../data/realPlans';
 import { useLocation } from 'wouter';
+import { apiRequest } from '../../lib/api';
 
 interface Plan extends RealInsurancePlan {
   isRecommended?: boolean;
@@ -154,10 +155,9 @@ export function BrikiAssistant() {
     setIsLoadingPlans(true);
 
     try {
-      const response = await fetch('/api/ai/chat', {
+      const responseData = await apiRequest('/api/ai/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+        data: {
           message: input.trim(),
           conversationHistory: messages.map(m => ({
             role: m.role,
@@ -165,19 +165,15 @@ export function BrikiAssistant() {
           })),
           memory: memory,
           resetContext: shouldResetContext
-        })
+        }
       });
 
       if (shouldResetContext) {
         setShouldResetContext(false);
       }
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.details || errorData.error || 'API call failed');
-      }
-
-      const data: AIResponse & { memory?: any } = await response.json();
+      // apiRequest throws on error and returns parsed JSON data directly
+      const data: AIResponse & { memory?: any } = responseData;
       
       // Add detailed debug logging
       console.log('[BrikiAI] Full API response:', data);
@@ -239,11 +235,26 @@ export function BrikiAssistant() {
         });
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error('[BrikiAI] API Error:', error);
+      console.error('[BrikiAI] Error details:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+        apiUrl: import.meta.env.VITE_API_URL || 'Using proxy',
+        environment: import.meta.env.MODE
+      });
+      
       const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+      let userFriendlyMessage = 'Lo siento, hubo un error al procesar tu solicitud.';
+      
+      // Check for specific error patterns
+      if (errorMessage.includes('did not match the expected pattern')) {
+        userFriendlyMessage = 'Error de configuración del servidor. Por favor, contacta al soporte técnico.';
+        console.error('[BrikiAI] Pattern match error - likely URL validation issue');
+      }
+      
       setMessages(prev => [...prev, {
         id: (Date.now() + 1).toString(),
-        content: `Lo siento, hubo un error al procesar tu solicitud: ${errorMessage}. Por favor, intenta de nuevo.`,
+        content: `${userFriendlyMessage} Error: ${errorMessage}`,
         role: 'assistant',
         timestamp: new Date(),
         type: 'text'

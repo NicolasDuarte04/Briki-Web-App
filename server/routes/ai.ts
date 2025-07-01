@@ -41,22 +41,44 @@ const logConversation = async (logData: {
  * Endpoint para generar respuestas del asistente IA
  */
 router.post('/chat', async (req, res) => {
-  console.log(`[AI Route] /api/ai/chat hit at ${new Date().toISOString()} from ${req.ip}`);
+  const requestTime = new Date().toISOString();
+  console.log(`[AI Route] /api/ai/chat hit at ${requestTime} from ${req.ip}`);
+  
+  // Enhanced logging for production debugging
+  console.log('[AI Route] Request headers:', {
+    contentType: req.headers['content-type'],
+    origin: req.headers.origin,
+    referer: req.headers.referer,
+    userAgent: req.headers['user-agent']
+  });
 
   try {
+    // Validate request body exists
+    if (!req.body || typeof req.body !== 'object') {
+      console.error('[AI Route] Invalid request body:', req.body);
+      return res.status(400).json({ 
+        error: 'Invalid request body',
+        details: 'Request body must be a JSON object'
+      });
+    }
+    
     const { message, conversationHistory, memory, category = 'general', resetContext = false } = req.body;
-    const userId = req.session.user?.id || null;
+    const userId = req.session?.user?.id || null;
 
-    // Add input validation logging
-    console.log('[AI Route] Request body:', {
+    // Add detailed input validation logging
+    console.log('[AI Route] Parsed request data:', {
       hasMessage: !!message,
       messageType: typeof message,
       messageLength: message?.length,
+      messagePreview: message ? message.substring(0, 50) + '...' : 'null',
       hasHistory: !!conversationHistory,
       historyLength: conversationHistory?.length,
       hasMemory: !!memory,
+      memoryKeys: memory ? Object.keys(memory) : [],
       category,
-      resetContext
+      resetContext,
+      userId,
+      sessionExists: !!req.session
     });
 
     if (!message || typeof message !== 'string') {

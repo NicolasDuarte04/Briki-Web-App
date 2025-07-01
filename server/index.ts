@@ -17,17 +17,42 @@ const app = express();
 // Quick sanity check: confirm OPENAI_API_KEY env variable is loaded
 console.log("[ENV] OPENAI_API_KEY present:", !!process.env.OPENAI_API_KEY);
 
+
+
 // Setup CORS with proper credentials support
-// In development, use this more permissive CORS configuration
-app.use(cors({
-  origin: function(origin, callback) {
-    callback(null, true); // Allow requests from any origin in development
+const corsOptions = {
+  origin: function(origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
+    // Allow requests with no origin (like mobile apps or Postman)
+    if (!origin) {
+      return callback(null, true);
+    }
+    
+    // List of allowed origins
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'http://localhost:5173',
+      'http://localhost:5001',
+      'https://brikiapp.com',
+      'https://www.brikiapp.com',
+      process.env.FRONTEND_URL // Allow custom frontend URL from environment
+    ].filter(Boolean); // Remove undefined values
+    
+    // Check if the origin is allowed
+    if (allowedOrigins.some(allowed => allowed && origin.startsWith(allowed))) {
+      callback(null, true);
+    } else {
+      console.warn(`[CORS] Blocked request from origin: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Cache-Control', 'Pragma', 'Accept'],
-  exposedHeaders: ['Set-Cookie']
-}));
+  exposedHeaders: ['Set-Cookie'],
+  optionsSuccessStatus: 200 // Some legacy browsers choke on 204
+};
+
+app.use(cors(corsOptions));
 
 // Setup session management before routes
 let sessionConfig;

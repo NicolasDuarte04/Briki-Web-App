@@ -56,6 +56,17 @@ export async function apiRequest(url: string, options: {
     // Use the API configuration to get the full URL
     const fullUrl = getApiUrl(url);
     
+    // Add detailed logging for production debugging
+    console.log('[API Request] Details:', {
+      originalUrl: url,
+      fullUrl: fullUrl,
+      method: options.method,
+      hasData: !!options.data,
+      isCrossOrigin: isCrossOrigin,
+      apiBaseUrl: import.meta.env.VITE_API_URL || 'Not set (using proxy)',
+      environment: import.meta.env.MODE
+    });
+    
     // Add credentials for cross-origin requests
     const fetchOptions = {
       ...requestOptions,

@@ -4,10 +4,32 @@
  */
 
 // Get API URL from environment or use default
-export const API_BASE_URL = import.meta.env.VITE_API_URL || '';
+const rawApiUrl = import.meta.env.VITE_API_URL || '';
+
+// Clean and validate the API URL
+export const API_BASE_URL = rawApiUrl ? rawApiUrl.replace(/\/+$/, '') : ''; // Remove trailing slashes
+
+// Log configuration for debugging
+if (import.meta.env.MODE === 'production') {
+  console.log('[API Config] Production mode detected');
+  console.log('[API Config] Raw API URL:', rawApiUrl);
+  console.log('[API Config] Cleaned API URL:', API_BASE_URL);
+}
 
 /**
- * Construct full API URL
+ * Validate URL format
+ */
+function isValidUrl(url: string): boolean {
+  try {
+    new URL(url);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Construct full API URL with validation
  * In development, uses proxy (empty base URL)
  * In production, uses full URL from environment
  */
@@ -20,8 +42,18 @@ export function getApiUrl(endpoint: string): string {
     return normalizedEndpoint;
   }
   
-  // Otherwise, construct full URL
-  return `${API_BASE_URL}${normalizedEndpoint}`;
+  // Construct full URL
+  const fullUrl = `${API_BASE_URL}${normalizedEndpoint}`;
+  
+  // Validate in production
+  if (import.meta.env.MODE === 'production' && !isValidUrl(fullUrl)) {
+    console.error('[API Config] Invalid URL constructed:', fullUrl);
+    console.error('[API Config] Base URL:', API_BASE_URL);
+    console.error('[API Config] Endpoint:', normalizedEndpoint);
+    throw new Error(`Invalid API URL pattern: ${fullUrl}`);
+  }
+  
+  return fullUrl;
 }
 
 /**
