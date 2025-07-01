@@ -431,7 +431,7 @@ export async function generateAssistantResponse(
         .join(' ');
     
     // First check if we already have a category in memory or from earlier detection
-    let finalContextCategory = updatedMemory.lastDetectedCategory || category;
+    let finalContextCategory: InsuranceCategory | 'general' = (updatedMemory.lastDetectedCategory as InsuranceCategory | 'general') || category;
     
     // If no category in memory, detect from full conversation
     if (!finalContextCategory || finalContextCategory === 'general') {
@@ -722,6 +722,29 @@ ${contextAnalysis.needsMoreContext ? `
 `}
 `}
 
+## FORMATO DE COMPARACIONES:
+Cuando compares planes, usa este formato estructurado:
+
+**Comparando [Plan A] vs [Plan B]:**
+
+**[Nombre del Plan A]:**
+✅ Ventajas:
+• [ventaja 1]
+• [ventaja 2]
+❌ Limitaciones:
+• [limitación 1]
+Ideal para: [tipo de usuario]
+
+**[Nombre del Plan B]:**
+✅ Ventajas:
+• [ventaja 1]
+• [ventaja 2]
+❌ Limitaciones:
+• [limitación 1]
+Ideal para: [tipo de usuario]
+
+**Recomendación:** [Tu sugerencia basada en el contexto del usuario]
+
 ## DESPUÉS DE MOSTRAR PLANES:
 - Pregunta si necesita más información sobre algún plan específico
 - Ofrece comparar características entre planes
@@ -730,7 +753,9 @@ ${contextAnalysis.needsMoreContext ? `
 
 ## ESTILO DE RESPUESTA:
 - Conversacional y amigable
-- Explica en términos simples
+- Usa listas con viñetas para mejor legibilidad
+- Estructura la información en secciones claras
+- Evita párrafos largos y densos
 - Haz preguntas relevantes para entender mejor las necesidades
 - SIEMPRE termina invitando a continuar la conversación
 - CUANDO MUESTRES PLANES: Menciona brevemente que verán las opciones como tarjetas visuales

@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Bot, User, Loader2 } from 'lucide-react';
+import FormattedAIResponse from './FormattedAIResponse';
 
 interface ChatBubbleProps {
   role: 'user' | 'assistant';
@@ -46,16 +47,16 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({
           delay: 0.1
         }}
         className={cn(
-          "flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center",
+          "flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center shadow-sm",
           isUser 
             ? "bg-gradient-to-br from-[#00C7C4] to-[#0077B6] shadow-md" 
-            : "bg-gray-100"
+            : "bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800"
         )}
       >
         {isUser ? (
           <User className="w-4 h-4 text-white" />
         ) : (
-          <Bot className="w-4 h-4 text-gray-600" />
+          <Bot className="w-4 h-4 text-gray-600 dark:text-gray-300" />
         )}
       </motion.div>
 
@@ -69,19 +70,19 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({
           <motion.div
             initial={{ x: 20 }}
             animate={{ x: 0 }}
-            className="bg-gradient-to-r from-[#00C7C4] to-[#0077B6] text-white rounded-2xl rounded-tr-sm px-4 py-2 shadow-md"
+            className="bg-gradient-to-r from-[#00C7C4] to-[#0077B6] text-white rounded-2xl rounded-tr-sm px-4 py-3 shadow-md"
           >
             {isLoading ? (
               <div className="flex items-center gap-2">
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span className="text-sm">Sending...</span>
+                <span className="text-sm">Enviando...</span>
               </div>
             ) : (
-              <p className="text-sm leading-normal whitespace-pre-wrap">{content}</p>
+              <p className="text-sm leading-relaxed whitespace-pre-wrap">{content}</p>
             )}
           </motion.div>
         ) : (
-          <div className="bg-gray-50 rounded-2xl rounded-tl-sm px-4 py-2">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm border border-gray-100 dark:border-gray-700">
             {isLoading ? (
               <div className="flex items-center gap-3">
                 <div className="flex gap-1">
@@ -101,16 +102,16 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({
                     className="w-2 h-2 bg-[#0077B6] rounded-full"
                   />
                 </div>
-                <span className="text-sm text-gray-500">Briki is thinking...</span>
+                <span className="text-sm text-gray-500">Briki está pensando...</span>
               </div>
             ) : (
               <div>
-                <p className="text-sm leading-normal text-gray-700 whitespace-pre-wrap">
-                  {content}
-                </p>
+                {/* Use FormattedAIResponse for better text formatting */}
+                <FormattedAIResponse content={content} />
+                
                 {/* Additional content like plan cards */}
                 {children && (
-                  <div className="mt-4 pt-3 border-t border-gray-100">
+                  <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-700">
                     {children}
                   </div>
                 )}
