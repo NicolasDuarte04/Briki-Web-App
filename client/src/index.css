@@ -586,34 +586,51 @@
     background: white;
   }
   
-  /* Modern badge with subtle gradient */
+  /* Enhanced badge styles with improved contrast */
   .briki-badge {
     @apply inline-flex items-center justify-center px-2.5 py-1 text-xs font-medium;
     border-radius: 20px;
-    background: hsl(var(--muted) / 0.6);
-    color: hsl(var(--muted-foreground) / 0.9);
+    background: hsl(var(--muted));
+    color: hsl(var(--foreground));
     transition: all 0.15s ease;
+    /* Ensure minimum contrast ratio */
+    backdrop-filter: blur(4px);
   }
   
   .briki-badge-primary {
-    background: var(--gradient-card-hover);
-    color: hsl(var(--primary));
-    box-shadow: 0 0 0 1px hsl(var(--primary) / 0.2);
+    background: linear-gradient(145deg, rgba(76, 110, 255, 0.15), rgba(95, 159, 255, 0.20));
+    color: hsl(221.2 83.2% 35%); /* Darker blue for better contrast */
+    box-shadow: 0 0 0 1px hsl(var(--primary) / 0.3);
+    font-weight: 500;
+  }
+  
+  /* Dark mode enhancement for badges */
+  .dark .briki-badge-primary {
+    background: linear-gradient(145deg, rgba(76, 110, 255, 0.25), rgba(95, 159, 255, 0.30));
+    color: hsl(217.2 91.2% 80%); /* Lighter blue for dark mode */
+    box-shadow: 0 0 0 1px hsl(var(--primary) / 0.4);
   }
   
   .briki-badge-primary:hover {
-    box-shadow: 0 0 0 1px hsl(var(--primary) / 0.3), 0 2px 5px rgba(79, 70, 229, 0.1);
+    box-shadow: 0 0 0 1px hsl(var(--primary) / 0.4), 0 2px 5px rgba(79, 70, 229, 0.15);
     transform: translateY(-1px);
   }
   
   .briki-badge-success {
-    background: linear-gradient(145deg, rgba(16, 185, 129, 0.05), rgba(16, 185, 129, 0.1));
-    color: #10B981;
-    box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.2);
+    background: linear-gradient(145deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.20));
+    color: hsl(161 81% 25%); /* Darker green for better contrast */
+    box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.3);
+    font-weight: 500;
+  }
+  
+  .dark .briki-badge-success {
+    background: linear-gradient(145deg, rgba(16, 185, 129, 0.25), rgba(16, 185, 129, 0.30));
+    color: hsl(161 81% 70%); /* Lighter green for dark mode */
+    box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.4);
   }
   
   .briki-badge-success:hover {
-    box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.3), 0 2px 5px rgba(16, 185, 129, 0.1);
+    box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.4), 0 2px 5px rgba(16, 185, 129, 0.15);
     transform: translateY(-1px);
   }
 
