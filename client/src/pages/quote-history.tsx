@@ -379,7 +379,7 @@ export default function QuoteHistoryPage() {
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [selectedQuoteId, setSelectedQuoteId] = useState<number | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
-  const [deleteQuoteId, setDeleteQuoteId] = useState<number | null>(null);
+  const [deleteQuoteId, setDeleteQuoteId] = useState<number | null>(null as number | null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   // Fetch quotes from API

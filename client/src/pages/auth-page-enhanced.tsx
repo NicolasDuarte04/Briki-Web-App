@@ -1,12 +1,10 @@
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useAuth } from "../hooks/use-auth";
 import { useLocation } from "wouter";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { User as SelectUser, UpsertUser } from "../../../shared/schema";
-import { queryClient } from "../lib/queryClient";
 import { useToast } from "../hooks/use-toast";
 
 // Import design system components

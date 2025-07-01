@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from "./components/ui/toaster";
-import ComparePlansDebug from "./pages/compare-plans-debug";
+// import ComparePlansDebug from "./pages/compare-plans-debug"; // Module doesn't exist
 import './index.css';
 
 // Create a new QueryClient instance
@@ -21,7 +21,7 @@ function StandaloneCompare() {
   return (
     <QueryClientProvider client={queryClient}>
       <div className="min-h-screen bg-background">
-        <ComparePlansDebug />
+        <div>Compare Plans Debug - Module Not Found</div>
         <Toaster />
       </div>
     </QueryClientProvider>

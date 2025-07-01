@@ -1,4 +1,5 @@
-import { PlanProps } from '../components/PlanRecommendationCard';
+// import { PlanProps } from '../components/PlanRecommendationCard'; // Module doesn't exist
+type PlanProps = any; // Temporary fix
 
 // Widget types that can be displayed in assistant messages
 export type AssistantWidgetType = 

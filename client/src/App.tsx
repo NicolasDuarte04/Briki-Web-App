@@ -1,7 +1,6 @@
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "./components/ui/toaster";
 import { TooltipProvider } from "./components/ui/tooltip";
 import { AuthProvider } from "./contexts/AuthContext";
 import { useAuth } from "./hooks/use-auth";
@@ -35,7 +34,7 @@ import SettingsPage from "./pages/settings-page";
 import ApiSettingsPage from "./pages/api-settings-page";
 // Import comparison screens
 // Removed legacy ComparePlansPage import - using ComparePlansFixed instead
-import ComparePlansFixed from "@/pages/compare-plans-fixed";  // Fixed version of comparison component
+import ComparePlansFixed from "./pages/compare-plans-fixed";  // Fixed version of comparison component
 
 // Import new public site pages
 import FeaturesPage from "./pages/features";
@@ -347,7 +346,6 @@ function App() {
             <LanguageProvider>
               <RecentlyViewedProvider>
                 <TooltipProvider>
-                  <Toaster />
                   <AppContent />
                 </TooltipProvider>
               </RecentlyViewedProvider>

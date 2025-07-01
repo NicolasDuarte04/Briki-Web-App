@@ -1,6 +1,4 @@
 import { EventCategory } from '../constants/analytics';
-import { InsurancePlan } from '../types/insurance';
-
 // Define the gtag function globally
 declare global {
   interface Window {

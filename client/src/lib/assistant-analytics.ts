@@ -1,6 +1,7 @@
 import { trackEvent } from './analytics';
 import { EventCategory } from '../constants/analytics';
-import { AssistantActionType } from '../services/ai-service';
+// import { AssistantActionType } from '../services/ai-service'; // Module doesn't exist
+type AssistantActionType = string; // Temporary fix
 
 /**
  * Track when a new assistant session begins

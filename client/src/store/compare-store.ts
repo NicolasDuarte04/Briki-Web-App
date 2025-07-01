@@ -49,3 +49,5 @@ export const useCompareStore = create<CompareState>()(
     }
   )
 );
+
+export type { InsurancePlan };

@@ -12,7 +12,7 @@ import { useToast } from "../hooks/use-toast";
 import { useAuth } from '../hooks/use-auth';
 import { motion } from 'framer-motion';
 import GradientBackground from '../components/ui/gradient-background';
-import GlassCard from '../components/ui/glass-card';
+import Glass from '../components/ui/glass-card';
 
 const registerSchema = z.object({
   username: z.string().min(3, 'Username must be at least 3 characters'),
@@ -89,7 +89,7 @@ export default function RegisterPage() {
         transition={{ duration: 0.5 }}
         className="w-full max-w-md px-4"
       >
-        <GlassCard className="w-full">
+        <Glass className="w-full">
           <CardHeader className="space-y-2">
             <CardTitle className="text-2xl font-bold text-center">Create an Account</CardTitle>
             <CardDescription className="text-center">
@@ -252,7 +252,7 @@ export default function RegisterPage() {
               </Button>
             </p>
           </CardFooter>
-        </GlassCard>
+        </Glass>
       </motion.div>
     </div>
   );
