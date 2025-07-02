@@ -14,6 +14,7 @@ import {
   companyProfiles,
   companyPlans,
   planAnalytics,
+  insurancePlans,
   InsertCompanyPlan,
   CompanyPlan,
   INSURANCE_CATEGORIES,
@@ -25,6 +26,8 @@ import {
   BlogPostWithRelations,
   InsertBlogPost
 } from "../shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { 
   getChatCompletionFromOpenAI, 
@@ -163,7 +166,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         databasePlans = await db
           .select()
           .from(insurancePlans)
-          .where(eq(insurancePlans.category, category as string));
+          .where(eq(insurancePlans.category, category as InsuranceCategory));
       } else {
         databasePlans = await db.select().from(insurancePlans);
       }
