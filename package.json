@@ -26,6 +26,7 @@
     "db:clean": "tsx scripts/clean-db.ts",
     "seed:real-plans": "tsx scripts/seed-real-plans.ts",
     "seed": "tsx server/scripts/seed.ts",
+    "seed:production": "tsx scripts/seed-production.ts",
     "dev:server": "tsx watch server/index.ts",
     "dev:client": "vite"
   },
