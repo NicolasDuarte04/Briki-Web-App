@@ -1,9 +1,6 @@
-import { Pool, neonConfig } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-serverless';
-import ws from "ws";
+import { Pool } from 'pg';
+import { drizzle, NodePgDatabase } from 'drizzle-orm/node-postgres';
 import * as schema from "../shared/schema";
-
-neonConfig.webSocketConstructor = ws;
 
 if (!process.env.DATABASE_URL) {
   throw new Error(
@@ -14,13 +11,13 @@ if (!process.env.DATABASE_URL) {
 // Create a global singleton for database connections
 let _dbInstance: {
   pool: Pool;
-  db: ReturnType<typeof drizzle>;
+  db: NodePgDatabase<typeof schema>;
 } | null = null;
 
 // Initialize database connection (called once during app startup)
 export const initializeDb = async (retries = 3, retryDelay = 5000): Promise<{
   pool: Pool;
-  db: ReturnType<typeof drizzle>;
+  db: NodePgDatabase<typeof schema>;
 } | null> => {
   if (_dbInstance) {
     return _dbInstance;
@@ -36,11 +33,10 @@ export const initializeDb = async (retries = 3, retryDelay = 5000): Promise<{
         connectionString: process.env.DATABASE_URL,
         max: 2, // Limit concurrent connections
         idleTimeoutMillis: 30000, // Close idle connections after 30 seconds
-        connectionTimeoutMillis: 15000, // Increased from 5s to 15s for Neon cold start
-        allowExitOnIdle: true, // Allow pool to cleanup on idle
-        ssl: {
-          rejectUnauthorized: false, // Accept self-signed / Neon certificates
-        },
+        connectionTimeoutMillis: 15000, // 15 second timeout for connections
+        ssl: process.env.DATABASE_URL?.includes('render.com') ? {
+          rejectUnauthorized: false // Required for Render PostgreSQL
+        } : undefined,
       });
       
       // Test pool connection once to catch early errors
@@ -55,7 +51,7 @@ export const initializeDb = async (retries = 3, retryDelay = 5000): Promise<{
       
       console.log('Database connection test successful');
       
-      const db = drizzle({ client: pool, schema });
+      const db = drizzle(pool, { schema });
       
       _dbInstance = { pool, db };
       return _dbInstance;
@@ -94,7 +90,7 @@ export const pool = new Proxy({} as Pool, {
   }
 });
 
-export const db = new Proxy({} as ReturnType<typeof drizzle>, {
+export const db = new Proxy({} as NodePgDatabase<typeof schema>, {
   get(target, prop, receiver) {
     const instance = _dbInstance;
     if (!instance) {
