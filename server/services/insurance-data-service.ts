@@ -1,10 +1,13 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import { MockInsurancePlan } from '../data-loader';
+import { db } from '../db';
+import { insurancePlans } from '../../shared/schema';
+import { eq } from 'drizzle-orm';
 
 /**
  * Insurance Data Service
- * Centralized service for loading and managing insurance plan data from JSON files
+ * Centralized service for loading and managing insurance plan data from database
  */
 
 export interface InsuranceDataService {
@@ -27,7 +30,55 @@ class InsuranceDataServiceImpl implements InsuranceDataService {
   private readonly DATA_DIR = path.join(process.cwd(), 'server', 'data');
 
   /**
-   * Load all insurance plans from JSON files
+   * Load all insurance plans from database
+   */
+  private async loadPlansFromDatabase(): Promise<MockInsurancePlan[]> {
+    console.log('[Insurance Data Service] Loading plans from database...');
+    
+    try {
+      const plans = await db.select().from(insurancePlans);
+      
+      // Transform database plans to MockInsurancePlan format
+      const transformedPlans: MockInsurancePlan[] = plans.map(plan => ({
+        id: plan.id.toString(),
+        name: plan.name,
+        category: plan.category as any,
+        provider: plan.provider,
+        basePrice: plan.basePrice,
+        coverageAmount: plan.coverageAmount,
+        currency: plan.currency,
+        country: plan.country,
+        features: plan.benefits || [],
+        description: `${plan.name} by ${plan.provider}`,
+        rating: Math.floor(Math.random() * 2) + 4, // Random rating 4-5 for now
+        isExternal: plan.isExternal || false,
+        externalLink: plan.externalLink || null,
+        // Additional fields required by MockInsurancePlan
+        duration: 'annual',
+        coverage: {},
+        deductible: 0,
+        exclusions: [],
+        additionalBenefits: [],
+        tags: [],
+        paymentOptions: ['monthly', 'annual'],
+        addOns: [],
+        status: 'active',
+      }));
+      
+      console.log(`[Insurance Data Service] Successfully loaded ${transformedPlans.length} plans from database`);
+      return transformedPlans;
+      
+    } catch (error) {
+      console.error('[Insurance Data Service] Error loading plans from database:', error);
+      
+      // Fallback to JSON files if database is empty or fails
+      console.log('[Insurance Data Service] Attempting fallback to JSON files...');
+      return this.loadPlansFromFiles();
+    }
+  }
+  
+  /**
+   * Load all insurance plans from JSON files (fallback)
    */
   private async loadPlansFromFiles(): Promise<MockInsurancePlan[]> {
     console.log('[Insurance Data Service] Loading plans from files...');
@@ -90,9 +141,9 @@ class InsuranceDataServiceImpl implements InsuranceDataService {
       return this.plansCache;
     }
     
-    // Load fresh data
-    console.log('[Insurance Data Service] Cache expired or empty, loading fresh data');
-    this.plansCache = await this.loadPlansFromFiles();
+    // Load fresh data from database
+    console.log('[Insurance Data Service] Cache expired or empty, loading fresh data from database');
+    this.plansCache = await this.loadPlansFromDatabase();
     this.lastCacheUpdate = now;
     
     return this.plansCache;

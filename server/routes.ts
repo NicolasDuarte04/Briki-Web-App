@@ -140,15 +140,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/insurance/plans", async (_req, res) => {
+  app.get("/api/insurance/plans", async (req, res) => {
     try {
+      const { insuranceDataService } = await import('./services/insurance-data-service.js');
       const plans = await insuranceDataService.getAllPlans();
+      console.log(`[API] GET /api/insurance/plans - Returning ${plans.length} plans`);
       res.json(plans);
     } catch (error: any) {
-      res.status(500).json({ message: "Failed to fetch insurance plans", error: error.message });
+      console.error("Error fetching plans:", error);
+      res.status(500).json({ error: "Failed to fetch insurance plans" });
     }
   });
-  
+
+  // Debug route to check plan availability in database
+  app.get("/api/debug/plans-count", async (req, res) => {
+    try {
+      const { category } = req.query;
+      
+      // Get counts from database
+      let databasePlans: any[] = [];
+      if (category) {
+        databasePlans = await db
+          .select()
+          .from(insurancePlans)
+          .where(eq(insurancePlans.category, category as string));
+      } else {
+        databasePlans = await db.select().from(insurancePlans);
+      }
+      
+      // Get category breakdown
+      const allPlans = await db.select().from(insurancePlans);
+      const categoryCounts = allPlans.reduce((acc: Record<string, number>, plan) => {
+        acc[plan.category] = (acc[plan.category] || 0) + 1;
+        return acc;
+      }, {});
+      
+      const response = {
+        total: databasePlans.length,
+        category: category || 'all',
+        categoryBreakdown: categoryCounts,
+        samplePlans: databasePlans.slice(0, 3).map(p => ({
+          id: p.id,
+          name: p.name,
+          provider: p.provider,
+          category: p.category,
+          basePrice: p.basePrice
+        })),
+        timestamp: new Date().toISOString()
+      };
+      
+      console.log(`[Debug] Plans count - Category: ${category || 'all'}, Count: ${databasePlans.length}`);
+      res.json(response);
+    } catch (error: any) {
+      console.error("Error in debug route:", error);
+      res.status(500).json({ 
+        error: "Failed to get plan count", 
+        message: error.message,
+        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      });
+    }
+  });
+
   app.get("/api/plans/:category", async (req, res) => {
     try {
       const { category } = req.params;
