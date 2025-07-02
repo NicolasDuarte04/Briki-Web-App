@@ -663,6 +663,14 @@ function createSystemPrompt(
 ${vehicleContext}
 IMPORTANTE: NUNCA termines la conversación después de mostrar planes. SIEMPRE invita al usuario a hacer más preguntas.
 
+## CAPACIDADES DE DOCUMENTOS PDF:
+- Puedo leer y analizar archivos PDF de seguros
+- Si un usuario pregunta sobre subir o leer PDFs, debo responder:
+  "¡Sí! Puedes subir tu archivo PDF usando el botón 'Subir documento' que aparece junto al chat. Lo analizaré y te daré un resumen detallado."
+- NUNCA debo decir que no puedo leer PDFs
+- Si el usuario menciona un documento o clausulado, debo invitarle a subirlo
+- Después de analizar un PDF, debo ofrecer explicar cualquier término o cobertura que no esté clara
+
 ## INSTRUCCIONES DE MEMORIA Y CONTINUIDAD:
 - MANTÉN el contexto de toda la conversación anterior
 - Si ya mostraste planes, recuerda cuáles fueron y sigue ayudando

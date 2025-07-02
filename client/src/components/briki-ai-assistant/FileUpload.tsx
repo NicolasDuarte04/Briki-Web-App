@@ -67,7 +67,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   };
 
   return (
-    <div className={cn("relative", className)}>
+    <div className={cn("relative min-w-[140px]", className)}>
       <input
         ref={fileInputRef}
         type="file"
@@ -89,13 +89,13 @@ export const FileUpload: React.FC<FileUploadProps> = ({
             <Button
               type="button"
               variant="outline"
-              size="sm"
+              size="default"
               onClick={handleButtonClick}
               disabled={isUploading}
-              className="flex items-center gap-2 hover:bg-gray-50 transition-colors"
+              className="w-full flex items-center gap-2 bg-white hover:bg-gray-50 border-2 border-gray-200 hover:border-[#00C7C4] text-gray-700 hover:text-gray-900 transition-all duration-200"
             >
               <Upload className="h-4 w-4" />
-              <span className="text-sm">Subir documento</span>
+              <span className="text-sm font-medium">Subir documento</span>
             </Button>
           </motion.div>
         ) : (
@@ -105,7 +105,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 5 }}
             transition={{ duration: 0.15 }}
-            className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2"
+            className="flex items-center gap-2 bg-blue-50 border-2 border-blue-200 rounded-lg px-3 py-2"
           >
             <FileText className="h-4 w-4 text-blue-600 flex-shrink-0" />
             <div className="flex-1 min-w-0">
@@ -120,6 +120,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
               <button
                 onClick={clearFile}
                 className="p-1 hover:bg-blue-100 rounded transition-colors"
+                aria-label="Remove file"
               >
                 <X className="h-4 w-4 text-gray-500" />
               </button>

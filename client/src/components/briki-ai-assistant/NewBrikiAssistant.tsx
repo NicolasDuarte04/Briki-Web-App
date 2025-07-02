@@ -491,35 +491,39 @@ const NewBrikiAssistant: React.FC = () => {
       )}
 
       {/* Input Field with File Upload */}
-      <div className="flex gap-3 items-end bg-white">
-        <FileUpload
-          onFileSelect={handleDocumentUpload}
-          isUploading={isUploadingDocument}
-          className="mb-1"
-        />
-        <div className="flex-1 relative">
-          <Input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder="Ask me about insurance..."
-            disabled={isLoading || isUploadingDocument}
-            className="flex-1 pr-12 py-4 text-base rounded-2xl border-2 border-gray-200 focus:border-[#00C7C4] focus:ring-4 focus:ring-[#00C7C4]/10 transition-all duration-200 bg-white shadow-sm"
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <FileUpload
+            onFileSelect={handleDocumentUpload}
+            isUploading={isUploadingDocument}
+            className="flex-shrink-0"
           />
-          <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-xs text-gray-400">
-            {input.length}/500
-          </div>
         </div>
-        <GradientButton
-          onClick={() => handleSendMessage()}
-          disabled={isLoading || !input.trim() || isUploadingDocument}
-          size="lg"
-          loading={isLoading}
-          icon={!isLoading && <Send className="h-5 w-5" />}
-          className="rounded-2xl px-6 shadow-sm"
-        >
-          {isLoading ? "Sending..." : "Send"}
-        </GradientButton>
+        <div className="flex flex-1 gap-3 items-end">
+          <div className="flex-1 relative">
+            <Input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Ask me about insurance..."
+              disabled={isLoading || isUploadingDocument}
+              className="flex-1 pr-12 py-4 text-base rounded-2xl border-2 border-gray-200 focus:border-[#00C7C4] focus:ring-4 focus:ring-[#00C7C4]/10 transition-all duration-200 bg-white shadow-sm"
+            />
+            <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-xs text-gray-400">
+              {input.length}/500
+            </div>
+          </div>
+          <GradientButton
+            onClick={() => handleSendMessage()}
+            disabled={isLoading || !input.trim() || isUploadingDocument}
+            size="lg"
+            loading={isLoading}
+            icon={!isLoading && <Send className="h-5 w-5" />}
+            className="rounded-2xl px-6 shadow-sm"
+          >
+            {isLoading ? "Sending..." : "Send"}
+          </GradientButton>
+        </div>
       </div>
     </div>
   );
