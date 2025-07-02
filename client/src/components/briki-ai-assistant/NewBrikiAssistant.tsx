@@ -11,7 +11,7 @@ import { sendMessageToAI } from '../../services/openai-service';
 import WelcomeCard from './WelcomeCard';
 import { InsurancePlan } from './NewPlanCard';
 import SuggestedQuestions from './SuggestedQuestions';
-import { detectInsuranceCategory, hasSufficientContext } from '../../../../shared/context-utils';
+import { detectInsuranceCategory, hasSufficientContext, canShowPlans } from '../../../../shared/context-utils';
 import { extractContextFromMessage } from "../../utils/context-utils";
 import ChatBubble from './ChatBubble';
 import ConversationContainer from './ConversationContainer';
@@ -296,13 +296,15 @@ const NewBrikiAssistant: React.FC = () => {
         plans: response.suggestedPlans
       });
 
-      // Trust backend decision - if plans are returned, show them
-      const finalSuggestedPlans = response.suggestedPlans || [];
+      // Only show plans if context is sufficient
+      const finalSuggestedPlans = (!response.needsMoreContext && response.suggestedPlans) ? response.suggestedPlans : [];
 
       console.log('✅ Final plans state:', {
         plans: finalSuggestedPlans,
         count: finalSuggestedPlans.length,
-        firstPlan: finalSuggestedPlans[0]
+        firstPlan: finalSuggestedPlans[0],
+        needsMoreContext: response.needsMoreContext,
+        blockedPlans: response.needsMoreContext && response.suggestedPlans?.length > 0
       });
 
       // Update loading message with response and memory

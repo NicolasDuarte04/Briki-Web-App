@@ -115,8 +115,8 @@ export function hasSufficientContext(conversation: string, category: InsuranceCa
       return hasDestination && (hasDates || hasDuration);
 
     case 'pet':
-      const hasPetType = /(perr|gat|dog|cat)/i.test(lowerConversation);
-      const hasPetAge = /(\d+|años?|meses?|cachorro|adulto|mayor)/i.test(lowerConversation);
+      const hasPetType = /(perro|gato|dog|cat|mascota|pet)/i.test(lowerConversation);
+      const hasPetAge = /(\d+\s*(años?|meses?|years?|months?))/i.test(lowerConversation); // Strict: must have number + unit
       // Solo se necesita el tipo y la edad
       return hasPetType && hasPetAge;
 
@@ -180,8 +180,9 @@ export function analyzeContextNeeds(
                              /(\d+\s*(días?|semanas?|meses?)|una semana|dos semanas|un mes|dos meses)/i.test(lowerConversation))
         },
         pet: {
-            petType: /(perro|gato|dog|cat)/i.test(lowerConversation),
-            petAge: /(\d+|años?|meses?|cachorro|adulto|mayor)/i.test(lowerConversation),
+            petType: /(perro|gato|dog|cat|mascota|pet)/i.test(lowerConversation),
+            petAge: /(\d+\s*(años?|meses?|years?|months?))/i.test(lowerConversation), // Strict: must have number + unit
+            petBreed: /(labrador|golden|bulldog|poodle|chihuahua|pastor|pug|beagle|husky|pitbull|rottweiler|boxer|cocker|terrier|maltés|schnauzer|shih tzu|dálmata|dóberman|gran danés)/i.test(lowerConversation),
         },
         auto: {
             brand: !!memory?.vehicle?.make || /(marca|toyota|honda|ford|chevrolet|nissan|mazda|kia|hyundai|bmw|mercedes|audi|volkswagen|vw|renault|fiat)/i.test(lowerConversation),
@@ -203,7 +204,8 @@ export function analyzeContextNeeds(
         },
         pet: {
             petType: "¿Qué tipo de mascota tienes? (perro, gato, etc.)",
-            petAge: "¿Qué edad tiene tu mascota?",
+            petAge: "¿Qué edad tiene tu mascota? (ej: 2 años, 6 meses)",
+            petBreed: "¿De qué raza es tu mascota?",
         },
         auto: {
             brand: "¿Cuál es la marca de tu vehículo?",
@@ -225,35 +227,41 @@ export function analyzeContextNeeds(
         }
     }
 
-    // Special handling for auto: if we have a brand OR clear intent to insure, that's enough to show initial plans
-    if (category === 'auto') {
-        const hasInsureIntent = /asegurar|seguro|insurance|protección|cobertura/i.test(lowerConversation);
-        const hasBrand = (checks as any).brand;
-        
-        if (hasBrand || hasInsureIntent) {
-            // If user mentioned a car brand OR clear insurance intent, show plans even without full details
-            result.missingInfo = result.missingInfo.filter(info => info !== 'brand');
-            result.suggestedQuestions = result.suggestedQuestions.filter(q => 
-                q !== questions[category]['brand']
-            );
-            result.needsMoreContext = false;
-            return result;
-        }
-    }
-
+    // Special handling for auto: only skip context if we have actual vehicle data
     if (category === 'auto' && memory?.vehicle?.make && memory.vehicle.model && memory.vehicle.year) {
-        // Basic vehicle data present – treat context as sufficient
+        // Complete vehicle data present from lookup – treat context as sufficient
         result.missingInfo = [];
         result.suggestedQuestions = [];
         result.needsMoreContext = false;
         return result;
     }
 
+
+
     if (result.missingInfo.length > 0) {
         result.needsMoreContext = true;
     }
 
     return result;
+}
+
+/**
+ * Centralized logic to determine if plans should be shown
+ * Used by both backend and frontend to ensure consistency
+ */
+export function canShowPlans(contextAnalysis: ContextAnalysisResult, suggestedPlans: any[]): boolean {
+  // Never show plans if more context is needed
+  if (contextAnalysis.needsMoreContext) {
+    return false;
+  }
+  
+  // Never show plans for general category
+  if (contextAnalysis.category === 'general') {
+    return false;
+  }
+  
+  // Only show plans if we have actual plans to show
+  return suggestedPlans && suggestedPlans.length > 0;
 }
 
 // Price range constants (in COP)
