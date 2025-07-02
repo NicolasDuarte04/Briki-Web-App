@@ -67,7 +67,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   };
 
   return (
-    <div className={cn("relative min-w-[140px]", className)}>
+    <div className={cn("relative min-w-[140px] border-4 border-red-500 bg-red-100 p-2", className)}>
       <input
         ref={fileInputRef}
         type="file"
@@ -93,6 +93,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
               onClick={handleButtonClick}
               disabled={isUploading}
               className="w-full flex items-center gap-2 bg-white hover:bg-gray-50 border-2 border-gray-200 hover:border-[#00C7C4] text-gray-700 hover:text-gray-900 transition-all duration-200"
+              style={{ visibility: 'visible', display: 'flex' }}
             >
               <Upload className="h-4 w-4" />
               <span className="text-sm font-medium">Subir documento</span>
