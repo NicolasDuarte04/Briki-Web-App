@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { cn } from '../../lib/utils';
 import { Bot, User, Loader2 } from 'lucide-react';
 import FormattedAIResponse from './FormattedAIResponse';
+import LoadingDots from './LoadingDots';
 
 interface ChatBubbleProps {
   role: 'user' | 'assistant';
@@ -84,25 +85,9 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({
         ) : (
           <div className="bg-white dark:bg-gray-800 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm border border-gray-100 dark:border-gray-700">
             {isLoading ? (
-              <div className="flex items-center gap-3">
-                <div className="flex gap-1">
-                  <motion.div
-                    animate={{ opacity: [0.4, 1, 0.4] }}
-                    transition={{ duration: 1.5, repeat: Infinity, delay: 0 }}
-                    className="w-2 h-2 bg-[#0077B6] rounded-full"
-                  />
-                  <motion.div
-                    animate={{ opacity: [0.4, 1, 0.4] }}
-                    transition={{ duration: 1.5, repeat: Infinity, delay: 0.2 }}
-                    className="w-2 h-2 bg-[#0077B6] rounded-full"
-                  />
-                  <motion.div
-                    animate={{ opacity: [0.4, 1, 0.4] }}
-                    transition={{ duration: 1.5, repeat: Infinity, delay: 0.4 }}
-                    className="w-2 h-2 bg-[#0077B6] rounded-full"
-                  />
-                </div>
-                <span className="text-sm text-gray-500">Briki está pensando...</span>
+              <div className="flex items-center gap-2">
+                <LoadingDots />
+                <span className="text-sm text-gray-500 animate-pulse">Analizando tu contexto...</span>
               </div>
             ) : (
               <div>

@@ -111,26 +111,34 @@ export function hasSufficientContext(conversation: string, category: InsuranceCa
       const hasDestination = /(europa|asia|méxico|estados unidos|colombia|españa|francia|alemania|italia|brasil|chile|perú|usa|canadá|argentina|viajar a)/i.test(lowerConversation);
       // Check for either dates OR duration (origin is not required)
       const hasDates = /(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre|\d{1,2}\/\d{1,2}\/\d{2,4}|del \d+|hasta el \d+)/i.test(lowerConversation);
-      const hasDuration = /(\d+\s*(días?|semanas?|meses?)|una semana|dos semanas|un mes|dos meses)/i.test(lowerConversation);
-      return hasDestination && (hasDates || hasDuration);
+      const hasDuration = /(\d+\s*(días?|semanas?|meses?)|una semana|dos semanas|un mes|dos meses|la próxima semana|próxima semana|siguiente semana)/i.test(lowerConversation);
+      const hasTravelers = /(\d+\s*(personas?|viajeros?|travelers?))/i.test(lowerConversation);
+      const hasPurpose = /(negocio|business|trabajo|turismo|leisure|vacaciones)/i.test(lowerConversation);
+      return hasDestination && (hasDates || hasDuration) && hasTravelers && hasPurpose;
 
     case 'pet':
-      const hasPetType = /(perro|gato|dog|cat|mascota|pet)/i.test(lowerConversation);
+      const hasPetType = /(perro|gato|dog|cat|mascota|pet|labrador|golden|bulldog|poodle|chihuahua|pastor|pug|beagle|husky|pitbull|rottweiler|boxer|cocker|terrier|maltés|schnauzer|shih tzu|dálmata|dóberman|gran danés)/i.test(lowerConversation);
       const hasPetAge = /(\d+\s*(años?|meses?|years?|months?))/i.test(lowerConversation); // Strict: must have number + unit
       // Solo se necesita el tipo y la edad
       return hasPetType && hasPetAge;
 
     case 'auto':
-      const hasBrand = /(marca|toyota|honda|ford|chevrolet|nissan)/i.test(lowerConversation);
+      const hasBrand = /(marca|toyota|honda|ford|chevrolet|nissan|mazda|kia|hyundai|bmw|mercedes|audi|volkswagen|vw|renault|fiat)/i.test(lowerConversation);
       const hasModel = /(modelo|\d{4}|año)/i.test(lowerConversation);
-      // Solo se necesita la marca y el modelo/año
-      return hasBrand && hasModel;
+      const hasAutoLocation = /(bogotá|medellín|cali|barranquilla|cartagena|colombia|méxico|perú)/i.test(lowerConversation);
+      // Se necesita marca, modelo/año y ubicación
+      return hasBrand && hasModel && hasAutoLocation;
 
     case 'health':
-      const hasAge = /(\d+|años?|joven|adulto|mayor)/i.test(lowerConversation);
+      const hasAge = /(\d+\s*(años?|years?))/i.test(lowerConversation);
       const hasGender = /(hombre|mujer|masculino|femenino)/i.test(lowerConversation);
       const hasLocation = /(vivo en|resido en|en colombia|en méxico|en perú)/i.test(lowerConversation);
       return hasAge && hasGender && hasLocation;
+
+    case 'soat':
+      const hasVehicleType = /(carro|moto|auto|vehiculo|vehículo|car|motorcycle)/i.test(lowerConversation);
+      const hasSOATLocation = /(bogotá|medellín|cali|barranquilla|cartagena|colombia)/i.test(lowerConversation);
+      return hasVehicleType && hasSOATLocation;
 
     default:
       return false;
@@ -177,30 +185,36 @@ export function analyzeContextNeeds(
             destination: /(europa|asia|méxico|estados unidos|colombia|españa|francia|alemania|italia|brasil|chile|perú|usa|canadá|argentina|viajar a)/i.test(lowerConversation),
             // Check for either dates OR duration (not both required)
             datesOrDuration: (/(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre|\d{1,2}\/\d{1,2}\/\d{2,4}|del \d+|hasta el \d+)/i.test(lowerConversation) || 
-                             /(\d+\s*(días?|semanas?|meses?)|una semana|dos semanas|un mes|dos meses)/i.test(lowerConversation))
+                             /(\d+\s*(días?|semanas?|meses?)|una semana|dos semanas|un mes|dos meses|la próxima semana|próxima semana|siguiente semana)/i.test(lowerConversation)),
+            travelers: /(\d+\s*(personas?|viajeros?|travelers?))/i.test(lowerConversation),
+            purpose: /(negocio|business|trabajo|turismo|leisure|vacaciones)/i.test(lowerConversation)
         },
         pet: {
-            petType: /(perro|gato|dog|cat|mascota|pet)/i.test(lowerConversation),
+            petType: /(perro|gato|dog|cat|mascota|pet|labrador|golden|bulldog|poodle|chihuahua|pastor|pug|beagle|husky|pitbull|rottweiler|boxer|cocker|terrier|maltés|schnauzer|shih tzu|dálmata|dóberman|gran danés)/i.test(lowerConversation),
             petAge: /(\d+\s*(años?|meses?|years?|months?))/i.test(lowerConversation), // Strict: must have number + unit
-            petBreed: /(labrador|golden|bulldog|poodle|chihuahua|pastor|pug|beagle|husky|pitbull|rottweiler|boxer|cocker|terrier|maltés|schnauzer|shih tzu|dálmata|dóberman|gran danés)/i.test(lowerConversation),
         },
         auto: {
             brand: !!memory?.vehicle?.make || /(marca|toyota|honda|ford|chevrolet|nissan|mazda|kia|hyundai|bmw|mercedes|audi|volkswagen|vw|renault|fiat)/i.test(lowerConversation),
             year: !!memory?.vehicle?.year || /(año|\d{4})/i.test(lowerConversation),
-            country: /(colombia|méxico|perú|chile|argentina)/i.test(lowerConversation)
+            country: /(colombia|méxico|perú|chile|argentina|bogotá|medellín|cali|barranquilla|cartagena)/i.test(lowerConversation)
         },
         health: {
-            age: /(\d+|años?|joven|adulto|mayor)/i.test(lowerConversation),
+            age: /(\d+\s*(años?|years?))/i.test(lowerConversation),
             gender: /(hombre|mujer|masculino|femenino)/i.test(lowerConversation),
             country: /(colombia|méxico|perú|chile|argentina)/i.test(lowerConversation)
         },
-        soat: {} // SOAT does not require additional context checks
+        soat: {
+            vehicleType: /(carro|moto|auto|vehiculo|vehículo|car|motorcycle)/i.test(lowerConversation),
+            location: /(bogotá|medellín|cali|barranquilla|cartagena|colombia)/i.test(lowerConversation)
+        }
     }[category];
 
     const questions: Record<string, Record<string, string>> = {
         travel: {
             destination: "¿A qué país o continente planeas viajar?",
             datesOrDuration: "¿Cuándo planeas viajar o por cuánto tiempo?",
+            travelers: "¿Cuántas personas viajarán?",
+            purpose: "¿Es un viaje de negocios o turismo?",
         },
         pet: {
             petType: "¿Qué tipo de mascota tienes? (perro, gato, etc.)",
@@ -217,7 +231,10 @@ export function analyzeContextNeeds(
             gender: "¿Cuál es tu género?",
             country: "¿En qué país resides actualmente (ej. Colombia, México)?"
         },
-        soat: {}
+        soat: {
+            vehicleType: "¿Qué tipo de vehículo vas a asegurar? (carro o moto)",
+            location: "¿En qué ciudad está registrado el vehículo?"
+        }
     };
     
     for (const key in checks) {
@@ -235,8 +252,6 @@ export function analyzeContextNeeds(
         result.needsMoreContext = false;
         return result;
     }
-
-
 
     if (result.missingInfo.length > 0) {
         result.needsMoreContext = true;

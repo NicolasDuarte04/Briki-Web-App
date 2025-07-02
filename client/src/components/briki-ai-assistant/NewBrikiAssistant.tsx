@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, Suspense, lazy } from 'react';
 import { motion } from 'framer-motion';
 import { GradientButton } from '../ui';
 import { Input } from '../ui/input';
-import { Loader2, Send, Bot, RefreshCw, CornerDownLeft, X } from 'lucide-react';
+import { Loader2, Send, Bot, RefreshCw, CornerDownLeft, X, Info } from 'lucide-react';
 import { ScrollArea } from '../ui/scroll-area';
 import { useToast } from '../../hooks/use-toast';
 import { apiRequest } from '../../lib/api';
@@ -11,6 +11,7 @@ import { sendMessageToAI } from '../../services/openai-service';
 import WelcomeCard from './WelcomeCard';
 import { InsurancePlan } from './NewPlanCard';
 import SuggestedQuestions from './SuggestedQuestions';
+import InteractiveQuestions from './InteractiveQuestions';
 import { detectInsuranceCategory, hasSufficientContext, canShowPlans } from '../../../../shared/context-utils';
 import { extractContextFromMessage } from "../../utils/context-utils";
 import ChatBubble from './ChatBubble';
@@ -111,6 +112,8 @@ const NewBrikiAssistant: React.FC = () => {
   const { toast } = useToast();
   const [isAfterReset, setIsAfterReset] = useState(true);
   const [showEmptyState, setShowEmptyState] = useState<'welcome' | 'no-plans' | 'fallback' | null>('welcome');
+  const [currentCategory, setCurrentCategory] = useState<string | null>(null);
+  const [missingInfo, setMissingInfo] = useState<string[]>([]);
   
   const inputRef = useRef<HTMLInputElement>(null);
   const plansToCompare = useCompareStore(state => state.plansToCompare);
@@ -287,6 +290,16 @@ const NewBrikiAssistant: React.FC = () => {
       } else {
         setPendingQuestions([]); // Limpiar preguntas si ya no hay
       }
+      
+      // Update context summary chip data
+      if (response.category && response.category !== 'general') {
+        setCurrentCategory(response.category);
+        if (response.needsMoreContext && response.missingInfo) {
+          setMissingInfo(response.missingInfo);
+        } else {
+          setMissingInfo([]);
+        }
+      }
 
       // Inside handleSendMessage, after getting AI response
       console.log('🔍 AI Response:', {
@@ -432,10 +445,6 @@ const NewBrikiAssistant: React.FC = () => {
           <div className="flex items-center justify-between p-3 border-b">
             <h3 className="text-base font-semibold text-gray-800">Asistente Briki</h3>
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm" onClick={handleReset}>
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Comenzar de nuevo
-              </Button>
               {plansToCompare.length > 0 && (
                 <Button variant="ghost" size="sm" onClick={() => {
                   // Implement the logic to open the comparison sidebar
@@ -452,10 +461,27 @@ const NewBrikiAssistant: React.FC = () => {
               input={inputArea}
             >
               {showWelcomeCard && <WelcomeCard onSendMessage={handleSendMessage} />}
+              
+              {/* Context Summary Chip */}
+              {currentCategory && missingInfo.length > 0 && (
+                <div className="flex items-center justify-center mb-4">
+                  <div className="flex items-center gap-2 text-xs bg-gray-100 rounded-full px-3 py-1">
+                    <Info className="w-3 h-3 text-blue-600" />
+                    <span>
+                      Detectado: {currentCategory} | Falta: {missingInfo.join(', ')}
+                    </span>
+                  </div>
+                </div>
+              )}
 
-              {/* Suggested questions block */}
+              {/* Interactive questions block */}
               {pendingQuestions.length > 0 && (
-                <SuggestedQuestions questions={pendingQuestions} />
+                <InteractiveQuestions 
+                  questions={pendingQuestions}
+                  onQuestionClick={(response) => {
+                    handleSendMessage(response);
+                  }}
+                />
               )}
 
               {/* Messages */}
@@ -514,6 +540,21 @@ const NewBrikiAssistant: React.FC = () => {
           {/* Removed duplicate bottom input field to avoid two input boxes */}
         </div>
       </div>
+      
+      {/* Floating Action Button for reset */}
+      {messages.length > 1 && (
+        <motion.button
+          className="fixed bottom-6 right-6 bg-red-500 rounded-full p-3 shadow-lg hover:shadow-xl hover:bg-red-600 transition-all duration-200 z-50"
+          onClick={handleReset}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0 }}
+        >
+          <RefreshCw className="w-5 h-5 text-white" />
+        </motion.button>
+      )}
     </div>
   );
 };

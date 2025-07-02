@@ -23,7 +23,7 @@ import OpenAI from "openai";
 import { storage } from "../storage";
 import { db } from "../db";
 import { insurancePlans, InsuranceCategory } from "../../shared/schema";
-import { analyzeContextNeeds, detectInsuranceCategory, ContextAnalysisResult } from "../../shared/context-utils";
+import { analyzeContextNeeds, detectInsuranceCategory, ContextAnalysisResult, canShowPlans } from "../../shared/context-utils";
 import fetch from 'node-fetch';
 import { AssistantMemory } from "../../shared/types/assistant";
 import { getLatestUserContext } from "./context-service";
@@ -133,6 +133,7 @@ export interface AssistantResponse {
   memory?: AssistantMemory;
   needsMoreContext?: boolean;
   suggestedQuestions?: string[];
+  missingInfo?: string[];
 }
 
 /**
@@ -358,63 +359,8 @@ export async function generateAssistantResponse(
       };
     }
 
-    // Enhanced insurance intent detection with follow-up question support
+    // Initial empty plans array
     let suggestedPlans: InsurancePlan[] = [];
-
-    // Check if this is a follow-up question about previously suggested plans
-    const isFollowUp = isFollowUpQuestion(userMessage);
-
-    if (isFollowUp && relevantPlans.length > 0) {
-      // For follow-up questions, try to find which plan the user is referring to
-      console.log(`🧠 [OpenAI][${requestId}] Follow-up question detected, searching for plan references...`);
-      
-      // Check if user is referring to a specific plan by name or provider
-      const matchingPlans = relevantPlans.filter(plan => 
-        isReferringToPlan(userMessage, plan.name) || 
-        isReferringToPlan(userMessage, plan.provider)
-      );
-      
-      if (matchingPlans.length > 0) {
-        // User is asking about specific plans
-        suggestedPlans = matchingPlans;
-        console.log(`[OpenAI][${requestId}] Found ${matchingPlans.length} matching plans for follow-up`);
-      } else {
-        // User is asking a general follow-up, show recent relevant plans again
-        suggestedPlans = relevantPlans.slice(0, 3);
-        console.log(`[OpenAI][${requestId}] General follow-up, showing top 3 relevant plans`);
-      }
-    } else {
-      // Check if we need more context before showing plans
-      const category = detectInsuranceCategory(userMessage);
-      const conversation = [...conversationHistory, { role: 'user', content: userMessage }]
-        .filter(msg => msg.role === 'user')
-        .map(msg => msg.content)
-        .join(' ');
-      const planContextAnalysis = analyzeContextNeeds(conversation, category, updatedMemory);
-
-      if (planContextAnalysis.needsMoreContext) {
-        // Don't show plans when more context is needed
-        console.log(
-          `[OpenAI][${requestId}] More context needed for ${planContextAnalysis.category}, not showing plans yet`,
-        );
-        suggestedPlans = [];
-      } else {
-        // Show plans if context is sufficient
-        const category = detectInsuranceCategory(userMessage);
-
-        if (category !== "general" && relevantPlans.length > 0) {
-          suggestedPlans = findRelevantPlans(userMessage, relevantPlans);
-          console.log(
-            `[OpenAI][${requestId}] Category detected (${category}), showing ${suggestedPlans.length} relevant plans`,
-          );
-        } else if (shouldShowInsurancePlans(userMessage)) {
-          suggestedPlans = findRelevantPlans(userMessage, relevantPlans);
-          console.log(
-            `[OpenAI][${requestId}] Insurance intent detected, showing ${suggestedPlans.length} relevant plans`,
-          );
-        }
-      }
-    }
 
     // Log success with detailed metrics
     console.log(`[OpenAI][${requestId}] Success:`, {
@@ -428,7 +374,7 @@ export async function generateAssistantResponse(
       timestamp: new Date().toISOString(),
     });
 
-    // Use the same context analysis from the plan logic
+    // Use a single context analysis to drive all decisions
     // Important: use the full conversation context, not just the current message
     const finalConversation = [...conversationHistory, { role: 'user', content: userMessage }]
         .filter(msg => msg.role === 'user')
@@ -466,11 +412,40 @@ export async function generateAssistantResponse(
       memoryCategory: updatedMemory.lastDetectedCategory
     });
     
-    // -------------------------------------------------------------------
-    // STRICT GUARD: Only send plans when context is sufficient
-    // -------------------------------------------------------------------
-    if (finalContextAnalysis.needsMoreContext || finalContextCategory === 'general') {
-      console.log('[DEBUG] Context insufficient or category general – clearing all suggestedPlans');
+    // Check if this is a follow-up question
+    const isFollowUp = isFollowUpQuestion(userMessage);
+    
+    // Determine if we should show plans based on context analysis
+    if (!finalContextAnalysis.needsMoreContext && finalContextCategory !== 'general' && relevantPlans.length > 0) {
+      if (isFollowUp) {
+        // For follow-up questions, try to find which plan the user is referring to
+        console.log(`🧠 [OpenAI][${requestId}] Follow-up question detected, searching for plan references...`);
+        
+        const matchingPlans = relevantPlans.filter(plan => 
+          isReferringToPlan(userMessage, plan.name) || 
+          isReferringToPlan(userMessage, plan.provider)
+        );
+        
+        if (matchingPlans.length > 0) {
+          suggestedPlans = matchingPlans;
+          console.log(`[OpenAI][${requestId}] Found ${matchingPlans.length} matching plans for follow-up`);
+        } else {
+          // Only show plans on general follow-up if context is complete
+          if (!finalContextAnalysis.needsMoreContext) {
+            suggestedPlans = relevantPlans.slice(0, 3);
+            console.log(`[OpenAI][${requestId}] General follow-up with complete context, showing top 3 relevant plans`);
+          }
+        }
+      } else {
+        // Not a follow-up, show relevant plans
+        suggestedPlans = findRelevantPlans(userMessage, relevantPlans);
+        console.log(`[OpenAI][${requestId}] Context complete for ${finalContextCategory}, showing ${suggestedPlans.length} relevant plans`);
+      }
+    }
+    
+    // Final safety check: Don't show plans if context is insufficient
+    if (finalContextAnalysis.needsMoreContext) {
+      console.log('[DEBUG] Final check: Context insufficient – clearing all suggestedPlans');
       suggestedPlans = [];
     }
 
@@ -497,6 +472,7 @@ export async function generateAssistantResponse(
       memory: updatedMemory,
       needsMoreContext: finalContextAnalysis.needsMoreContext,
       suggestedQuestions: finalContextAnalysis.suggestedQuestions || [],
+      missingInfo: finalContextAnalysis.missingInfo || [],
     };
     
     console.log(`[OpenAI][${requestId}] FINAL RESPONSE TO FRONTEND:`, JSON.stringify(finalResponse, null, 2));
