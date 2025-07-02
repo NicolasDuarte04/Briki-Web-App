@@ -4,6 +4,7 @@ import { MockInsurancePlan } from '../data-loader';
 import { db } from '../db';
 import { insurancePlans } from '../../shared/schema';
 import { eq } from 'drizzle-orm';
+import { withDbRetry } from '../utils/db-retry';
 
 /**
  * Insurance Data Service
@@ -36,7 +37,15 @@ class InsuranceDataServiceImpl implements InsuranceDataService {
     console.log('[Insurance Data Service] Loading plans from database...');
     
     try {
-      const plans = await db.select().from(insurancePlans);
+      const plans = await withDbRetry(
+        () => db.select().from(insurancePlans),
+        {
+          maxRetries: 3,
+          onRetry: (error, attempt) => {
+            console.warn(`[InsuranceDataService] Retry attempt ${attempt} for getAllPlans:`, error.message);
+          }
+        }
+      );
       
       // Transform database plans to MockInsurancePlan format
       const transformedPlans: MockInsurancePlan[] = plans.map(plan => ({

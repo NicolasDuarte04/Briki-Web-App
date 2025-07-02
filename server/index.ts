@@ -155,6 +155,18 @@ app.use('/api/vehicle', vehicleRoutes);
   console.log("Initializing knowledge base...");
   loadKnowledgeBase();
   
+  // Initialize database connection with retry logic
+  console.log("Initializing database connection...");
+  const { initializeDb } = await import('./db');
+  const dbInstance = await initializeDb();
+  
+  if (!dbInstance) {
+    console.warn("⚠️  Failed to connect to database. The server will start but database features may not work.");
+    console.warn("⚠️  This is expected during cold starts on serverless platforms.");
+  } else {
+    console.log("✅ Database connection established successfully");
+  }
+  
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
