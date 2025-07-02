@@ -20,7 +20,7 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
   return (
     <div
       className={cn(
-        "w-full h-full flex flex-col overflow-hidden bg-white",
+        "w-full h-full flex flex-col overflow-hidden bg-white relative",
         className
       )}
     >
@@ -51,7 +51,7 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
 
       {/* Fixed Input Area */}
       {input && (
-        <div className="border-t border-gray-100 bg-gray-50/50 sticky bottom-0">
+        <div className="border-t border-gray-100 bg-white sticky bottom-0 left-0 right-0 z-50 shadow-lg">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 py-4">
             {input}
           </div>
