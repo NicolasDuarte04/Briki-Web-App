@@ -7,8 +7,26 @@ import { semanticSearch } from '../services/semantic-search';
 import { db } from '../db';
 import { conversationLogs, contextSnapshots, insurancePlans } from '../../shared/schema';
 import { desc, eq } from 'drizzle-orm';
+import multer from 'multer';
+import { parsePdfText, truncateTextForGPT } from '../utils/pdf-parser';
+import OpenAI from 'openai';
 
 const router = express.Router();
+
+// Configure multer for memory storage
+const upload = multer({ 
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype === 'application/pdf') {
+      cb(null, true);
+    } else {
+      cb(new Error('Only PDF files are allowed'));
+    }
+  }
+});
 
 // Helper function for logging conversations
 const logConversation = async (logData: {
@@ -261,6 +279,137 @@ router.post('/analyze-image', async (req, res) => {
     res.status(500).json({ 
       error: 'Error al analizar la imagen',
       details: error.message || 'Error desconocido'
+    });
+  }
+});
+
+/**
+ * Endpoint para analizar PDFs de seguros y generar un resumen estructurado
+ */
+router.post('/upload-document', upload.single('file'), async (req, res) => {
+  try {
+    const userId = req.session?.user?.id || null;
+    
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    // Extract text from PDF
+    let rawText: string;
+    try {
+      rawText = await parsePdfText(req.file.buffer);
+    } catch (parseError: any) {
+      console.error('PDF parsing error:', parseError);
+      return res.status(400).json({ 
+        error: 'Failed to parse PDF document',
+        details: parseError.message 
+      });
+    }
+
+    if (!rawText || rawText.length < 50) {
+      return res.status(400).json({ 
+        error: 'Unable to extract meaningful text from the PDF' 
+      });
+    }
+
+    // Truncate text if too long for GPT
+    const truncatedText = truncateTextForGPT(rawText, 8000);
+
+    // Initialize OpenAI client
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+
+    // Generate summary using GPT-4
+    try {
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4",
+        messages: [
+          {
+            role: "system",
+            content: `Eres un asistente técnico especializado en seguros. Tu tarea es analizar documentos de pólizas de seguros y proporcionar un resumen estructurado y claro en español.
+
+Para cada documento debes extraer y presentar:
+1. **Tipo de seguro**: Identifica si es auto, salud, viaje, mascota, etc.
+2. **Aseguradora**: Nombre de la compañía aseguradora
+3. **Coberturas principales**: Lista las coberturas más importantes con sus límites
+4. **Exclusiones relevantes**: Las exclusiones más importantes que el asegurado debe conocer
+5. **Deducibles**: Montos de deducibles aplicables
+6. **Vigencia**: Período de cobertura y condiciones de renovación
+7. **Información adicional**: Cualquier otra información relevante
+
+Formato de respuesta:
+📄 **Resumen del Clausulado**
+
+🔹 **Tipo de seguro**: [tipo]
+🏢 **Aseguradora**: [nombre]
+
+✅ **Coberturas principales**:
+• [cobertura 1 con límite]
+• [cobertura 2 con límite]
+• [etc.]
+
+⚠️ **Exclusiones importantes**:
+• [exclusión 1]
+• [exclusión 2]
+• [etc.]
+
+💰 **Deducibles**:
+• [deducible 1]
+• [deducible 2]
+
+📅 **Vigencia**: [período y condiciones]
+
+📌 **Información adicional**:
+• [dato relevante 1]
+• [dato relevante 2]
+
+Si no puedes encontrar alguna información, indícalo como "No especificado en el documento".`
+          },
+          {
+            role: "user",
+            content: `Analiza el siguiente documento de seguro y proporciona un resumen estructurado:\n\n${truncatedText}`
+          }
+        ],
+        temperature: 0.3,
+        max_tokens: 1500
+      });
+
+      const summary = completion.choices[0]?.message?.content || 'No se pudo generar un resumen.';
+
+      // Log the document analysis
+      await logConversation({
+        userId,
+        category: 'document-analysis',
+        input: `PDF Document Analysis: ${req.file.originalname}`,
+        output: summary,
+        memoryJson: {
+          fileName: req.file.originalname,
+          fileSize: req.file.size,
+          textLength: rawText.length,
+          truncated: rawText.length > 8000
+        }
+      });
+
+      return res.json({ 
+        summary,
+        fileName: req.file.originalname,
+        fileSize: req.file.size
+      });
+
+    } catch (openaiError: any) {
+      console.error('OpenAI API error:', openaiError);
+      return res.status(500).json({ 
+        error: 'Failed to generate document summary',
+        details: openaiError.message 
+      });
+    }
+
+  } catch (error: any) {
+    console.error('Error processing document upload:', error);
+    return res.status(500).json({ 
+      error: 'Error processing document',
+      details: error.message || 'Unknown error'
     });
   }
 });

@@ -21,6 +21,8 @@ import { useAuth } from '../../hooks/use-auth';
 import { useCompareStore } from '../../store/compare-store';
 import { AssistantEmptyState } from './AssistantEmptyState';
 import { ComparisonSidebar } from '../comparison/ComparisonSidebar';
+import { FileUpload } from './FileUpload';
+import { uploadDocument, DocumentUploadResponse } from '../../services/document-upload-service';
 
 // Lazy load the SuggestedPlans component
 const SuggestedPlans = lazy(() => import('./SuggestedPlans'));
@@ -115,6 +117,8 @@ const NewBrikiAssistant: React.FC = () => {
   const [currentCategory, setCurrentCategory] = useState<string | null>(null);
   const [missingInfo, setMissingInfo] = useState<string[]>([]);
   const [shownPlanIds, setShownPlanIds] = useState<Set<number>>(new Set());
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [isUploadingDocument, setIsUploadingDocument] = useState(false);
   
   const inputRef = useRef<HTMLInputElement>(null);
   const plansToCompare = useCompareStore(state => state.plansToCompare);
@@ -399,6 +403,68 @@ const NewBrikiAssistant: React.FC = () => {
     scrollToBottom(true);
   }, [messages]);
 
+  const handleDocumentUpload = async (file: File) => {
+    setUploadedFile(file);
+    setShowWelcomeCard(false);
+    setShowEmptyState(null);
+    
+    // Add loading message
+    const loadingMessage: Message = {
+      id: `loading-doc-${Date.now()}`,
+      role: 'assistant',
+      content: '📄 Procesando documento...',
+      timestamp: new Date(),
+      isLoading: true,
+    };
+    
+    setMessages(prev => [...prev, loadingMessage]);
+    setIsUploadingDocument(true);
+    
+    try {
+      const response = await uploadDocument(file);
+      
+      // Update the loading message with the summary
+      setMessages(prev => prev.map(msg => 
+        msg.id === loadingMessage.id 
+          ? {
+              ...msg,
+              content: response.summary,
+              isLoading: false,
+            }
+          : msg
+      ));
+      
+      // Clear the uploaded file
+      setUploadedFile(null);
+      
+      // Log the document upload for context
+      setUserContext((prev: any) => ({
+        ...prev,
+        lastUploadedDocument: {
+          fileName: response.fileName,
+          fileSize: response.fileSize,
+          uploadTime: new Date().toISOString()
+        }
+      }));
+      
+    } catch (error) {
+      console.error('Error uploading document:', error);
+      
+      // Remove loading message and show error
+      setMessages(prev => prev.filter(msg => msg.id !== loadingMessage.id));
+      
+      toast({
+        title: "Error al procesar documento",
+        description: error instanceof Error ? error.message : "No se pudo procesar el documento PDF.",
+        variant: "destructive",
+      });
+      
+      setUploadedFile(null);
+    } finally {
+      setIsUploadingDocument(false);
+    }
+  };
+
   // Input area component
   const inputArea = (
     <div className="space-y-4">
@@ -424,15 +490,20 @@ const NewBrikiAssistant: React.FC = () => {
         </motion.div>
       )}
 
-      {/* Input Field */}
+      {/* Input Field with File Upload */}
       <div className="flex gap-3 items-end bg-white">
+        <FileUpload
+          onFileSelect={handleDocumentUpload}
+          isUploading={isUploadingDocument}
+          className="mb-1"
+        />
         <div className="flex-1 relative">
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Ask me about insurance..."
-            disabled={isLoading}
+            disabled={isLoading || isUploadingDocument}
             className="flex-1 pr-12 py-4 text-base rounded-2xl border-2 border-gray-200 focus:border-[#00C7C4] focus:ring-4 focus:ring-[#00C7C4]/10 transition-all duration-200 bg-white shadow-sm"
           />
           <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-xs text-gray-400">
@@ -441,7 +512,7 @@ const NewBrikiAssistant: React.FC = () => {
         </div>
         <GradientButton
           onClick={() => handleSendMessage()}
-          disabled={isLoading || !input.trim()}
+          disabled={isLoading || !input.trim() || isUploadingDocument}
           size="lg"
           loading={isLoading}
           icon={!isLoading && <Send className="h-5 w-5" />}
