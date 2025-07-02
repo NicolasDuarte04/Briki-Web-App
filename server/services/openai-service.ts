@@ -267,113 +267,9 @@ export async function generateAssistantResponse(
       console.log(`[OpenAI][${requestId}] No specific category detected, selected ${relevantPlans.length} most relevant from all plans`);
     }
 
-    // Enhanced system prompt with real plan data and memory context
-    const conversation = [...conversationHistory, { role: 'user', content: userMessage }].map(m => m.content).join(' ');
-    const contextAnalysis = analyzeContextNeeds(conversation, category, updatedMemory);
-    const systemMessage: AssistantMessage = {
-      role: "system",
-      content: createSystemPrompt(
-        relevantPlans,
-        userMessage,
-        conversationHistory,
-        contextAnalysis,
-        updatedMemory
-      ),
-    };
-
-    // FIXED: Check OpenAI availability and fallback logic
-    if (!process.env.OPENAI_API_KEY) {
-      console.warn(
-        `[OpenAI][${requestId}] No API key configured, using fallback response`,
-      );
-      // Generate fallback response with relevant plans
-      const fallbackMessage = `¡Hola! Soy Briki, tu asistente de seguros. Entiendo que estás preguntando sobre: "${userMessage}". Te puedo ayudar con información sobre seguros y recomendarte los mejores planes disponibles.`;
-      
-      const fallbackCategory = detectInsuranceCategory(userMessage);
-      const fallbackConversation = [...(conversationHistory || []), { role: 'user', content: userMessage }]
-        .filter(msg => msg.role === 'user')
-        .map(msg => msg.content)
-        .join(' ');
-      const fallbackContextAnalysis = analyzeContextNeeds(fallbackConversation, fallbackCategory, updatedMemory);
-      
-      return {
-        message: fallbackMessage,
-        response: fallbackMessage,
-        suggestedPlans: relevantPlans.slice(0, 3),
-        category: fallbackCategory,
-        memory: updatedMemory,
-        needsMoreContext: fallbackContextAnalysis.needsMoreContext,
-        suggestedQuestions: fallbackContextAnalysis.suggestedQuestions || [],
-      };
-    }
-
-    // Combine history with current message
-    const messages: AssistantMessage[] = [
-      systemMessage,
-      ...conversationHistory,
-      { role: "user", content: userMessage },
-    ];
-
-    const startTime = Date.now();
-
-    // FIXED: Call OpenAI with proper error handling and caching
-    const cacheKey = getCacheKey(userMessage, category || 'general');
-    const response = await callOpenAIWithRetry(messages, cacheKey);
-
-    const endTime = Date.now();
-    const responseTime = endTime - startTime;
-
-    const assistantMessage =
-      response.choices[0].message.content ||
-      "Lo siento, no pude generar una respuesta.";
-
-    // --- GRACEFUL FALLBACK FOR MISUNDERSTOOD INPUT ---
-    const isMisunderstood = (msg: string): boolean => {
-      if (!msg.trim() || msg === "Lo siento, no pude generar una respuesta.") {
-        return true;
-      }
-      const misunderstoodPhrases = [
-        "no entiendo",
-        "no sé cómo ayudarte",
-        "puedes reformular",
-        "no comprendo",
-      ];
-      const lowerMsg = msg.toLowerCase();
-      return misunderstoodPhrases.some(phrase => lowerMsg.includes(phrase));
-    };
-
-    if (isMisunderstood(assistantMessage)) {
-      console.log(`[Fallback][${requestId}] Assistant response was generic or empty. Triggering fallback.`);
-      return {
-        message: "Lo siento, no entendí eso. ¿Puedes reformular tu pregunta o darme más detalles?",
-        response: "Lo siento, no entendí eso. ¿Puedes reformular tu pregunta o darme más detalles?",
-        suggestedPlans: undefined,
-        category: 'general',
-        memory: updatedMemory,
-        needsMoreContext: true,
-        suggestedQuestions: [
-            "¿Qué cubre un seguro de auto?",
-            "Cotízame un seguro de viaje para dos semanas",
-            "Compara los planes de salud",
-        ],
-      };
-    }
-
     // Initial empty plans array
     let suggestedPlans: InsurancePlan[] = [];
-
-    // Log success with detailed metrics
-    console.log(`[OpenAI][${requestId}] Success:`, {
-      model: DEFAULT_MODEL,
-      responseTime: `${responseTime}ms`,
-      tokensUsed: response.usage?.total_tokens || 0,
-      promptTokens: response.usage?.prompt_tokens || 0,
-      completionTokens: response.usage?.completion_tokens || 0,
-      responseLength: assistantMessage.length,
-      plansFound: suggestedPlans.length,
-      timestamp: new Date().toISOString(),
-    });
-
+    
     // Use a single context analysis to drive all decisions
     // Important: use the full conversation context, not just the current message
     const finalConversation = [...conversationHistory, { role: 'user', content: userMessage }]
@@ -448,7 +344,99 @@ export async function generateAssistantResponse(
       console.log('[DEBUG] Final check: Context insufficient – clearing all suggestedPlans');
       suggestedPlans = [];
     }
-
+    
+    // CRITICAL FIX: Create system prompt with ACTUAL plans that will be shown
+    const systemPrompt = createSystemPrompt(
+      suggestedPlans,  // Pass actual suggested plans, not all relevant plans
+      userMessage,
+      conversationHistory,
+      finalContextAnalysis,
+      updatedMemory
+    );
+    
+    // Check OpenAI availability
+    if (!process.env.OPENAI_API_KEY) {
+      console.warn(`[OpenAI][${requestId}] No API key configured, using fallback response`);
+      return {
+        message: "¡Hola! Soy Briki, tu asistente de seguros. Actualmente estoy en modo limitado. Por favor configura la API key de OpenAI.",
+        response: "¡Hola! Soy Briki, tu asistente de seguros. Actualmente estoy en modo limitado. Por favor configura la API key de OpenAI.",
+        suggestedPlans: [],
+        category: finalContextCategory,
+        memory: updatedMemory,
+        needsMoreContext: finalContextAnalysis.needsMoreContext,
+        suggestedQuestions: finalContextAnalysis.suggestedQuestions || [],
+        missingInfo: finalContextAnalysis.missingInfo || [],
+      };
+    }
+    
+    // Prepare messages for OpenAI
+    const messages: AssistantMessage[] = [
+      { role: "system", content: systemPrompt },
+      ...conversationHistory,
+      { role: "user", content: userMessage },
+    ];
+    
+    const startTime = Date.now();
+    const cacheKey = getCacheKey(userMessage, finalContextCategory || 'general');
+    
+    // Call OpenAI
+    const response = await callOpenAIWithRetry(messages, cacheKey);
+    
+    const endTime = Date.now();
+    const responseTime = endTime - startTime;
+    
+    const assistantMessage = response.choices[0].message.content || 
+      "Lo siento, no pude generar una respuesta.";
+      
+    // Log success metrics
+    console.log(`[OpenAI][${requestId}] Success:`, {
+      model: DEFAULT_MODEL,
+      responseTime: `${responseTime}ms`,
+      tokensUsed: response.usage?.total_tokens || 0,
+      promptTokens: response.usage?.prompt_tokens || 0,
+      completionTokens: response.usage?.completion_tokens || 0,
+      responseLength: assistantMessage.length,
+      plansFound: suggestedPlans.length,
+      timestamp: new Date().toISOString(),
+    });
+    
+    // Handle misunderstood responses
+    const isMisunderstood = (msg: string): boolean => {
+      if (!msg.trim() || msg === "Lo siento, no pude generar una respuesta.") {
+        return true;
+      }
+      const misunderstoodPhrases = [
+        "no entiendo",
+        "no sé cómo ayudarte",
+        "puedes reformular",
+        "no comprendo",
+      ];
+      const lowerMsg = msg.toLowerCase();
+      return misunderstoodPhrases.some(phrase => lowerMsg.includes(phrase));
+    };
+    
+    if (isMisunderstood(assistantMessage)) {
+      console.log(`[Fallback][${requestId}] Assistant response was generic or empty. Triggering fallback.`);
+      return {
+        message: "Lo siento, no entendí eso. ¿Puedes reformular tu pregunta o darme más detalles?",
+        response: "Lo siento, no entendí eso. ¿Puedes reformular tu pregunta o darme más detalles?",
+        suggestedPlans: undefined,
+        category: 'general',
+        memory: updatedMemory,
+        needsMoreContext: true,
+        suggestedQuestions: [
+            "¿Qué cubre un seguro de auto?",
+            "Cotízame un seguro de viaje para dos semanas",
+            "Compara los planes de salud",
+        ],
+      };
+    }
+    
+    // Handle pending questions if context is missing
+    if (finalContextAnalysis.needsMoreContext && Array.isArray(finalContextAnalysis.suggestedQuestions) && finalContextAnalysis.suggestedQuestions.length > 0) {
+      console.log(`[Context][${requestId}] Missing context, providing suggested questions`);
+    }
+    
     // Debug log the structure of suggested plans
     console.log(`[OpenAI][${requestId}] Suggested plans structure:`, 
       suggestedPlans.map(p => ({
@@ -464,7 +452,7 @@ export async function generateAssistantResponse(
     );
     
     // CRITICAL DEBUG: Log the exact response being sent
-    const finalResponse = {
+    const finalApiResponse = {
       message: assistantMessage,
       response: assistantMessage, // Provide both for compatibility
       suggestedPlans,
@@ -475,9 +463,9 @@ export async function generateAssistantResponse(
       missingInfo: finalContextAnalysis.missingInfo || [],
     };
     
-    console.log(`[OpenAI][${requestId}] FINAL RESPONSE TO FRONTEND:`, JSON.stringify(finalResponse, null, 2));
+    console.log(`[OpenAI][${requestId}] FINAL RESPONSE TO FRONTEND:`, JSON.stringify(finalApiResponse, null, 2));
     
-    return finalResponse;
+    return finalApiResponse;
   } catch (error: any) {
     // Enhanced error handling with specific error types
     const errorDetails = {
@@ -701,6 +689,13 @@ ${contextAnalysis.needsMoreContext ? `
 `}
 `}
 
+## INFORMACIÓN REQUERIDA POR CATEGORÍA:
+- PET: Tipo de mascota, edad ESPECÍFICA (ej: "2 años", no "joven"), raza, peso, ubicación
+- AUTO: Marca, año/modelo, ubicación/país (ej: "Colombia", "Bogotá")
+- TRAVEL: Destino, fechas O duración, número de viajeros, propósito (turismo/negocio)
+- HEALTH: Edad específica, género, país de residencia
+- SOAT: Tipo de vehículo, ciudad de registro
+
 ## FORMATO DE COMPARACIONES:
 Cuando compares planes, usa este formato estructurado:
 
@@ -737,30 +732,37 @@ Ideal para: [tipo de usuario]
 - Evita párrafos largos y densos
 - Haz preguntas relevantes para entender mejor las necesidades
 - SIEMPRE termina invitando a continuar la conversación
+${relevantPlans.length > 0 ? `
 - CUANDO MUESTRES PLANES: Menciona brevemente que verán las opciones como tarjetas visuales
+` : ''}
 
-## CRÍTICO - EVITAR DUPLICACIÓN DE PLANES:
-- Cuando muestres planes, NUNCA los listes por nombre en tu respuesta de texto
-- SOLO di "He encontrado algunas opciones que aparecerán como tarjetas interactivas"
-- NO menciones nombres específicos de planes, precios, o características
+## CRÍTICO - MANEJO DE PLANES:
+${relevantPlans.length > 0 ? `
+- Hay ${relevantPlans.length} planes disponibles que aparecerán como tarjetas interactivas
+- SOLO di "He encontrado algunas opciones que aparecerán abajo" o similar
+- NO listes los nombres de los planes, precios, o características
 - Las tarjetas muestran toda la información - tu texto debe ser breve
 - Enfócate en invitar al usuario a revisar las tarjetas y hacer preguntas
+` : `
+- NO HAY PLANES DISPONIBLES en la base de datos para esta consulta
+- NO digas "He encontrado planes" o frases similares
+- En su lugar, di algo como:
+  * "Actualmente no tenemos planes disponibles para esta categoría, pero puedo ayudarte con información general sobre seguros de ${contextAnalysis.category}."
+  * "Estamos trabajando para agregar más opciones. ¿Te gustaría conocer qué buscar en un seguro de ${contextAnalysis.category}?"
+  * "No encontré planes específicos, pero puedo explicarte las coberturas típicas de seguros de ${contextAnalysis.category}."
+- Ofrece ayuda con información general sobre seguros
+- Sugiere otras categorías que podrían tener planes disponibles
+- Mantén un tono positivo y servicial
+`}
 
 ${relevantPlans.length > 0 ? `
 ## PLANES DISPONIBLES PARA REFERENCIA (NO INCLUIR EN RESPUESTA):
 ${relevantPlans.map(plan => `
 - ${plan.name} (${plan.provider}) - ${plan.category}
 `).join('\n')}
-` : `
-## IMPORTANTE - NO HAY PLANES DISPONIBLES:
-- Actualmente no tenemos planes disponibles para esta categoría en nuestra base de datos
-- Informa al usuario: "Actualmente no tenemos planes disponibles para esta categoría. Estamos trabajando para agregar más opciones pronto."
-- Ofrece ayuda con información general sobre seguros
-- Sugiere otras categorías que podrían tener planes disponibles
-- Mantén un tono positivo y servicial
-`}
+` : ''}
 
-Responde de manera útil y mantén la conversación activa. Si muestras planes, SIEMPRE pregunta si el usuario quiere saber más detalles, comparar opciones, o tiene otras dudas.`;
+Responde de manera útil y mantén la conversación activa. ${relevantPlans.length > 0 ? 'Si muestras planes, SIEMPRE pregunta si el usuario quiere saber más detalles, comparar opciones, o tiene otras dudas.' : 'Ayuda al usuario con información general y sugiere alternativas.'}`;
 }
 
 /**

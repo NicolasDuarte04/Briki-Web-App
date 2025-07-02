@@ -192,10 +192,13 @@ export function analyzeContextNeeds(
         pet: {
             petType: /(perro|gato|dog|cat|mascota|pet|labrador|golden|bulldog|poodle|chihuahua|pastor|pug|beagle|husky|pitbull|rottweiler|boxer|cocker|terrier|maltés|schnauzer|shih tzu|dálmata|dóberman|gran danés)/i.test(lowerConversation),
             petAge: /(\d+\s*(años?|meses?|years?|months?))/i.test(lowerConversation), // Strict: must have number + unit
+            petBreed: /(labrador|golden|bulldog|poodle|chihuahua|pastor|pug|beagle|husky|pitbull|rottweiler|boxer|cocker|terrier|maltés|schnauzer|shih tzu|dálmata|dóberman|gran danés|mestizo|criollo|persa|siamés|angora)/i.test(lowerConversation),
+            petWeight: /(\d+\s*(kg|kilos?|libras?|pounds?))/i.test(lowerConversation),
+            location: /(colombia|bogotá|medellín|cali|barranquilla|cartagena|méxico|perú|chile|argentina)/i.test(lowerConversation)
         },
         auto: {
-            brand: !!memory?.vehicle?.make || /(marca|toyota|honda|ford|chevrolet|nissan|mazda|kia|hyundai|bmw|mercedes|audi|volkswagen|vw|renault|fiat)/i.test(lowerConversation),
-            year: !!memory?.vehicle?.year || /(año|\d{4})/i.test(lowerConversation),
+            brand: !!memory?.vehicle?.make || /(marca|toyota|honda|ford|chevrolet|nissan|mazda|kia|hyundai|bmw|mercedes|audi|volkswagen|vw|renault|fiat|picanto|spark|onix|sail|march|versa|sentra|corolla|civic)/i.test(lowerConversation),
+            year: !!memory?.vehicle?.year || /(año|\d{4}|modelo)/i.test(lowerConversation),
             country: /(colombia|méxico|perú|chile|argentina|bogotá|medellín|cali|barranquilla|cartagena)/i.test(lowerConversation)
         },
         health: {
@@ -220,6 +223,8 @@ export function analyzeContextNeeds(
             petType: "¿Qué tipo de mascota tienes? (perro, gato, etc.)",
             petAge: "¿Qué edad tiene tu mascota? (ej: 2 años, 6 meses)",
             petBreed: "¿De qué raza es tu mascota?",
+            petWeight: "¿Cuánto pesa tu mascota? (ej: 15 kg)",
+            location: "¿En qué ciudad/país vives?"
         },
         auto: {
             brand: "¿Cuál es la marca de tu vehículo?",
