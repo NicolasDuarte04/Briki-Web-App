@@ -14,7 +14,7 @@
     "build:server": "npm run copy:views",
     "typecheck": "tsc --project tsconfig.build.json --noEmit && cd client && tsc --project ../tsconfig.build.json --noEmit",
     "copy:views": "copyfiles -u 1 ./client/dist/**/* ./build/client",
-    "start": "ts-node server/index.ts",
+    "start": "tsx server/index.ts",
     "test": "npm run test:server && npm run test:client",
     "test:server": "jest --config jest.server.config.js",
     "test:client": "jest --config jest.client.config.js",
