@@ -1,8 +1,10 @@
-import pdf from 'pdf-parse';
-
 export async function parsePdfText(buffer: Buffer): Promise<string> {
   try {
-    const data = await pdf(buffer);
+    // Use dynamic import to avoid initialization error in production
+    const pdf = await import('pdf-parse');
+    const pdfParse = pdf.default || pdf;
+    
+    const data = await pdfParse(buffer);
     
     // Clean up the text by removing excessive whitespace and normalizing line breaks
     const cleanedText = data.text
