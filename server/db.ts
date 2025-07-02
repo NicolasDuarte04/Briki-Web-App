@@ -28,22 +28,22 @@ export const initializeDb = async (retries = 3, retryDelay = 5000): Promise<{
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       console.log(`Initializing database connection pool (attempt ${attempt}/${retries})...`);
-      
-      const pool = new Pool({ 
-        connectionString: process.env.DATABASE_URL,
-        max: 2, // Limit concurrent connections
-        idleTimeoutMillis: 30000, // Close idle connections after 30 seconds
+    
+    const pool = new Pool({ 
+      connectionString: process.env.DATABASE_URL,
+      max: 2, // Limit concurrent connections
+      idleTimeoutMillis: 30000, // Close idle connections after 30 seconds
         connectionTimeoutMillis: 15000, // 15 second timeout for connections
         ssl: process.env.DATABASE_URL?.includes('render.com') ? {
           rejectUnauthorized: false // Required for Render PostgreSQL
         } : undefined,
-      });
-      
-      // Test pool connection once to catch early errors
-      pool.on('error', (err) => {
-        console.error('Unexpected database pool error:', err);
-      });
-      
+    });
+    
+    // Test pool connection once to catch early errors
+    pool.on('error', (err) => {
+      console.error('Unexpected database pool error:', err);
+    });
+    
       // Test the connection
       const client = await pool.connect();
       await client.query('SELECT 1');
@@ -52,8 +52,8 @@ export const initializeDb = async (retries = 3, retryDelay = 5000): Promise<{
       console.log('Database connection test successful');
       
       const db = drizzle(pool, { schema });
-      
-      _dbInstance = { pool, db };
+    
+    _dbInstance = { pool, db };
       return _dbInstance;
     } catch (error) {
       lastError = error as Error;

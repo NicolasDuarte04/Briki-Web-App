@@ -114,6 +114,7 @@ const NewBrikiAssistant: React.FC = () => {
   const [showEmptyState, setShowEmptyState] = useState<'welcome' | 'no-plans' | 'fallback' | null>('welcome');
   const [currentCategory, setCurrentCategory] = useState<string | null>(null);
   const [missingInfo, setMissingInfo] = useState<string[]>([]);
+  const [shownPlanIds, setShownPlanIds] = useState<Set<number>>(new Set());
   
   const inputRef = useRef<HTMLInputElement>(null);
   const plansToCompare = useCompareStore(state => state.plansToCompare);
@@ -166,6 +167,9 @@ const NewBrikiAssistant: React.FC = () => {
     setPendingQuestions([]);
     setIsAfterReset(true);
     setShowEmptyState('welcome');
+    setShownPlanIds(new Set());
+    setCurrentCategory(null);
+    setMissingInfo([]);
     if (inputRef.current) {
       inputRef.current.value = '';
     }
@@ -312,12 +316,23 @@ const NewBrikiAssistant: React.FC = () => {
       // Only show plans if context is sufficient
       const finalSuggestedPlans = (!response.needsMoreContext && response.suggestedPlans) ? response.suggestedPlans : [];
 
+      // Filter out already shown plans
+      const newPlans = finalSuggestedPlans.filter((plan: InsurancePlan) => !shownPlanIds.has(plan.id));
+      
+      // Update shown plan IDs
+      if (newPlans.length > 0) {
+        const newShownIds = new Set(shownPlanIds);
+        newPlans.forEach((plan: InsurancePlan) => newShownIds.add(plan.id));
+        setShownPlanIds(newShownIds);
+      }
+
       console.log('✅ Final plans state:', {
-        plans: finalSuggestedPlans,
-        count: finalSuggestedPlans.length,
-        firstPlan: finalSuggestedPlans[0],
+        plans: newPlans,
+        count: newPlans.length,
+        firstPlan: newPlans[0],
         needsMoreContext: response.needsMoreContext,
-        blockedPlans: response.needsMoreContext && response.suggestedPlans?.length > 0
+        blockedPlans: response.needsMoreContext && response.suggestedPlans?.length > 0,
+        alreadyShownCount: finalSuggestedPlans.length - newPlans.length
       });
 
       // Update loading message with response and memory
@@ -328,11 +343,11 @@ const NewBrikiAssistant: React.FC = () => {
                 ...msg,
                 id: `assistant-${Date.now()}`,
                 content: response.message || response.response || "No pude generar una respuesta.",
-                suggestedPlans: finalSuggestedPlans,
+                suggestedPlans: newPlans,
                 isLoading: false,
                 timestamp: new Date(),
-                plansSummary: (finalSuggestedPlans && finalSuggestedPlans.length > 0) 
-                  ? `Mostré ${finalSuggestedPlans.length} planes de ${response.category || 'seguros'}` 
+                plansSummary: (newPlans && newPlans.length > 0) 
+                  ? `Mostré ${newPlans.length} planes de ${response.category || 'seguros'}` 
                   : undefined
               }
             : msg
@@ -461,14 +476,49 @@ const NewBrikiAssistant: React.FC = () => {
               input={inputArea}
             >
               {showWelcomeCard && <WelcomeCard onSendMessage={handleSendMessage} />}
-              
+
               {/* Context Summary Chip */}
-              {currentCategory && missingInfo.length > 0 && (
+              {currentCategory && currentCategory !== 'general' && (
                 <div className="flex items-center justify-center mb-4">
-                  <div className="flex items-center gap-2 text-xs bg-gray-100 rounded-full px-3 py-1">
+                  <div className="flex items-center gap-2 text-xs bg-gradient-to-r from-blue-50 to-green-50 rounded-full px-4 py-2 shadow-sm border border-blue-200">
                     <Info className="w-3 h-3 text-blue-600" />
-                    <span>
-                      Detectado: {currentCategory} | Falta: {missingInfo.join(', ')}
+                    <span className="font-medium">
+                      Detectado: <span className="text-blue-700">{currentCategory}</span>
+                      {missingInfo.length > 0 && (
+                        <>
+                          {' | '}
+                          <span className="text-orange-600">Falta: {missingInfo.join(', ')}</span>
+                        </>
+                      )}
+                      {userContext && Object.keys(userContext).length > 0 && (
+                        <>
+                          {' | '}
+                          <span className="text-green-600">
+                            {(() => {
+                              // Build context summary based on category
+                              const contextParts = [];
+                              if (currentCategory === 'auto' && userContext.vehicle) {
+                                const v = userContext.vehicle;
+                                if (v.make) contextParts.push(v.make);
+                                if (v.model) contextParts.push(v.model);
+                                if (v.year) contextParts.push(v.year);
+                              } else if (currentCategory === 'pet') {
+                                if (userContext.petType) contextParts.push(userContext.petType);
+                                if (userContext.petAge) contextParts.push(`${userContext.petAge} años`);
+                                if (userContext.petBreed) contextParts.push(userContext.petBreed);
+                              } else if (currentCategory === 'travel') {
+                                if (userContext.destination) contextParts.push(`a ${userContext.destination}`);
+                                if (userContext.duration) contextParts.push(userContext.duration);
+                                if (userContext.travelers) contextParts.push(`${userContext.travelers} viajeros`);
+                              } else if (currentCategory === 'health') {
+                                if (userContext.age) contextParts.push(`${userContext.age} años`);
+                                if (userContext.gender) contextParts.push(userContext.gender);
+                              }
+                              return contextParts.join(' ');
+                            })()}
+                          </span>
+                        </>
+                      )}
                     </span>
                   </div>
                 </div>

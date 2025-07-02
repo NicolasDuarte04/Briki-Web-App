@@ -77,17 +77,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Database connection check - non-blocking
   (async () => {
-    try {
-      const dbCheckPromise = pool.query('SELECT 1');
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Database connection timeout')), 3000);
-      });
-      await Promise.race([dbCheckPromise, timeoutPromise]);
+  try {
+    const dbCheckPromise = pool.query('SELECT 1');
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Database connection timeout')), 3000);
+    });
+    await Promise.race([dbCheckPromise, timeoutPromise]);
       console.log("✅ Database connection verified successfully in routes");
-    } catch (error) {
+  } catch (error) {
       console.error("⚠️  Database connection check failed in routes:", error);
       console.error("⚠️  This is expected during cold starts. Database queries will retry when needed.");
-    }
+  }
   })().catch(err => {
     // Extra safety catch to ensure this never crashes the server
     console.error("⚠️  Error in database connection check:", err);
@@ -210,7 +210,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
-
+  
   app.get("/api/plans/:category", async (req, res) => {
     try {
       const { category } = req.params;

@@ -334,7 +334,7 @@ export async function generateAssistantResponse(
         }
       } else {
         // Not a follow-up, show relevant plans
-        suggestedPlans = findRelevantPlans(userMessage, relevantPlans);
+        suggestedPlans = findRelevantPlans(userMessage, relevantPlans, finalContextCategory);
         console.log(`[OpenAI][${requestId}] Context complete for ${finalContextCategory}, showing ${suggestedPlans.length} relevant plans`);
       }
     }
@@ -746,10 +746,22 @@ ${relevantPlans.length > 0 ? `
 ` : `
 - NO HAY PLANES DISPONIBLES en la base de datos para esta consulta
 - NO digas "He encontrado planes" o frases similares
+${(() => {
+  // Check if user asked for specific provider
+  const preferredProviders = extractPreferredProviders(userMessage);
+  if (preferredProviders.length > 0 && contextAnalysis.category !== 'general') {
+    return `
+- El usuario pidió planes de ${preferredProviders.join(', ')} para ${contextAnalysis.category}
+- Explica claramente: "Actualmente no tengo planes de ${contextAnalysis.category} de ${preferredProviders.join(' o ')}"
+- Si sabes que ese proveedor ofrece otros tipos de seguros, menciona: "¿Te gustaría ver los planes de [otra categoría] de ${preferredProviders[0]}?"
+- NO muestres planes de otra categoría sin preguntar primero`;
+  }
+  return `
 - En su lugar, di algo como:
   * "Actualmente no tenemos planes disponibles para esta categoría, pero puedo ayudarte con información general sobre seguros de ${contextAnalysis.category}."
   * "Estamos trabajando para agregar más opciones. ¿Te gustaría conocer qué buscar en un seguro de ${contextAnalysis.category}?"
-  * "No encontré planes específicos, pero puedo explicarte las coberturas típicas de seguros de ${contextAnalysis.category}."
+  * "No encontré planes específicos, pero puedo explicarte las coberturas típicas de seguros de ${contextAnalysis.category}."`;
+})()}
 - Ofrece ayuda con información general sobre seguros
 - Sugiere otras categorías que podrían tener planes disponibles
 - Mantén un tono positivo y servicial
@@ -868,33 +880,80 @@ function extractRequestedPlanCount(message: string): number | null {
 function findRelevantPlans(
   userMessage: string,
   plans: InsurancePlan[],
+  currentCategory?: InsuranceCategory | 'general' | null,
 ): InsurancePlan[] {
   if (!plans.length) return [];
 
   // STEP 1: Detect user intent and required category
   const detectedCategory = detectInsuranceCategory(userMessage);
+  
+  // Use current category if available and no new category is detected
+  const targetCategory = (detectedCategory && detectedCategory !== 'general') 
+    ? detectedCategory 
+    : currentCategory;
 
-  console.log(`🎯 Category detection: "${detectedCategory}" from message: "${userMessage}"`);
+  console.log(`🎯 Category detection:`, {
+    detected: detectedCategory,
+    current: currentCategory,
+    target: targetCategory,
+    message: userMessage
+  });
 
-  // STEP 2: If category is clearly detected, ONLY return plans from that category
-  if (detectedCategory && detectedCategory !== 'general') {
-    const categoryPlans = plans.filter(plan => plan.category === detectedCategory);
+  // STEP 2: If category is clearly established, ONLY return plans from that category
+  if (targetCategory && targetCategory !== 'general') {
+    const categoryPlans = plans.filter(plan => plan.category === targetCategory);
+
+    // Check if user is asking for a specific provider
+    const preferredProviders = extractPreferredProviders(userMessage);
+    
+    if (preferredProviders.length > 0) {
+      // Check if preferred provider has plans in current category
+      const providerPlans = categoryPlans.filter(plan => 
+        preferredProviders.some(provider => 
+          plan.provider.toLowerCase().includes(provider.toLowerCase())
+        )
+      );
+      
+      if (providerPlans.length === 0) {
+        // No plans from preferred provider in current category
+        console.log(`❌ No ${targetCategory} plans found for providers: ${preferredProviders.join(', ')}`);
+        
+        // Check if provider has plans in other categories
+        const otherCategoryPlans = plans.filter(plan => 
+          plan.category !== targetCategory &&
+          preferredProviders.some(provider => 
+            plan.provider.toLowerCase().includes(provider.toLowerCase())
+          )
+        );
+        
+        if (otherCategoryPlans.length > 0) {
+          const otherCategories = [...new Set(otherCategoryPlans.map(p => p.category))];
+          console.log(`ℹ️ Provider has plans in other categories: ${otherCategories.join(', ')}`);
+        }
+        
+        // Return empty array - let the assistant handle the explanation
+        return [];
+      }
+      
+      // Provider has plans in current category
+      return providerPlans;
+    }
 
     if (categoryPlans.length > 0) {
       // Check if user requested specific number of plans
       const requestedCount = extractRequestedPlanCount(userMessage);
-      const maxPlans = requestedCount || Math.min(categoryPlans.length, 4); // Default to 4 or available plans
+      const maxPlans = requestedCount || Math.min(categoryPlans.length, 4);
 
       // Extract price range if specified
       const priceRange = extractPriceRange(userMessage);
       console.log(`💰 Price range detected:`, priceRange);
 
-      // Extract provider preferences and required features
+      // Extract required features
       const filterCriteria: FilterCriteria = {
         maxResults: maxPlans,
         relevanceThreshold: 0.3,
         userPreferences: {
-          preferredProviders: extractPreferredProviders(userMessage),
+          preferredProviders: [], // Already handled above
           mustHaveFeatures: extractRequiredFeatures(userMessage),
           priceRange: priceRange ? {
             min: priceRange[0],
@@ -906,28 +965,14 @@ function findRelevantPlans(
 
       return filterPlans(categoryPlans, filterCriteria);
     } else {
-      console.log(`❌ No plans found for category: ${detectedCategory}`);
+      console.log(`❌ No plans found for category: ${targetCategory}`);
       return [];
     }
   }
 
-  // STEP 3: If no clear category is detected, fall back to general relevance scoring
-  console.log(`❓ No clear category detected, scoring all available plans based on message content.`);
-  
-  const priceRange = extractPriceRange(userMessage);
-  const filterCriteria: FilterCriteria = {
-    maxResults: 4,
-    relevanceThreshold: 0.3,
-    userPreferences: priceRange ? {
-      priceRange: {
-        min: priceRange[0],
-        max: priceRange[1],
-        currency: 'COP'
-      }
-    } : undefined
-  };
-  
-  return filterPlans(plans, filterCriteria);
+  // STEP 3: If no clear category is detected, return empty array
+  console.log(`❓ No clear category context, returning empty array to prevent confusion`);
+  return [];
 }
 
 /**

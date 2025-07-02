@@ -1,427 +1,152 @@
-# Briki AI Assistant - Functional Improvements
+# 🚀 Briki AI Assistant Improvements Summary
 
-## 1. Enhanced Context Gathering with Progressive Disclosure
+## Date: January 2, 2025
 
-### Current Issue
-The assistant sometimes shows plans too early or fails to gather sufficient context before making recommendations.
+### Overview
+Implemented 5 key improvements to fix duplicate plans, category contamination, missing context chip, and improve plan filtering based on production feedback.
 
-### Improvements
+---
 
+## ✅ Improvements Implemented
+
+### 1. **Duplicate Plan Prevention** ✅
+**Problem**: Plans were shown multiple times after follow-up questions.
+
+**Solution**:
+- Added `shownPlanIds` state tracking in `NewBrikiAssistant.tsx`
+- Filters out already-shown plans before rendering
+- Tracks plan IDs across the entire conversation
+- Clears tracking on conversation reset
+
+**Code Changes**:
 ```typescript
-// Enhanced context analysis with multi-stage questioning
-interface ContextStage {
-  stage: 'initial' | 'qualifying' | 'detailed' | 'ready';
-  missingInfo: string[];
-  confidence: number;
-}
+// NewBrikiAssistant.tsx
+const [shownPlanIds, setShownPlanIds] = useState<Set<number>>(new Set());
 
-function getContextStage(conversation: string, category: string, memory: AssistantMemory): ContextStage {
-  const requiredInfo = {
-    auto: ['vehicle_type', 'usage', 'location', 'coverage_needs'],
-    health: ['age', 'family_size', 'existing_conditions', 'budget'],
-    travel: ['destination', 'duration', 'travelers', 'activities'],
-    pet: ['pet_type', 'pet_age', 'breed', 'medical_history']
-  };
-  
-  // Calculate what percentage of required info we have
-  const gathered = requiredInfo[category].filter(info => 
-    hasInfoInContext(conversation, info, memory)
+// Filter duplicate plans
+const newPlans = finalSuggestedPlans.filter(plan => !shownPlanIds.has(plan.id));
+```
+
+---
+
+### 2. **Category Contamination Fix** ✅
+**Problem**: MAPFRE pet insurance shown when user asked for MAPFRE auto insurance.
+
+**Solution**:
+- Enhanced `findRelevantPlans()` to enforce strict category locking
+- Added provider-category validation
+- Returns empty array if provider has no plans in current category
+- Assistant now explains when provider doesn't offer plans in requested category
+
+**Code Changes**:
+```typescript
+// openai-service.ts - findRelevantPlans()
+if (preferredProviders.length > 0) {
+  const providerPlans = categoryPlans.filter(plan => 
+    preferredProviders.some(provider => 
+      plan.provider.toLowerCase().includes(provider.toLowerCase())
+    )
   );
   
-  const confidence = gathered.length / requiredInfo[category].length;
-  
-  if (confidence < 0.25) return { stage: 'initial', missingInfo: requiredInfo[category], confidence };
-  if (confidence < 0.5) return { stage: 'qualifying', missingInfo: [...], confidence };
-  if (confidence < 0.75) return { stage: 'detailed', missingInfo: [...], confidence };
-  return { stage: 'ready', missingInfo: [], confidence };
-}
-
-// Use stage-appropriate responses
-function generateStageAppropriateQuestions(stage: ContextStage, category: string): string[] {
-  switch (stage.stage) {
-    case 'initial':
-      return [
-        "¿Para qué tipo de vehículo necesitas el seguro?",
-        "¿Es para uso personal o comercial?",
-        "¿En qué ciudad conduces principalmente?"
-      ];
-    case 'qualifying':
-      return [
-        "¿Qué tipo de cobertura prefieres: básica, intermedia o completa?",
-        "¿Tienes un presupuesto mensual en mente?",
-        "¿Has tenido siniestros en los últimos 3 años?"
-      ];
-    // ... more stages
+  if (providerPlans.length === 0) {
+    // Log and return empty - let assistant explain
+    return [];
   }
 }
 ```
 
-## 2. Intelligent Logging and Debugging
+---
 
-### Current Issue
-Limited visibility into why plans weren't returned or matched.
+### 3. **Enhanced Context Summary Chip** ✅
+**Problem**: No visual indication of detected context and collected information.
 
-### Improvements
+**Solution**:
+- Added beautiful gradient context chip with icons
+- Shows detected category in blue
+- Shows missing info in orange
+- Shows collected context in green
+- Dynamically builds summary based on category
 
-```typescript
-// Enhanced logging system
-interface PlanMatchLog {
-  timestamp: Date;
-  userQuery: string;
-  detectedCategory: string;
-  contextScore: number;
-  plansAvailable: number;
-  plansAfterFilters: number;
-  filterReasons: {
-    country: number;
-    price: number;
-    features: number;
-    category: number;
-  };
-  finalPlanCount: number;
-  matchingCriteria: string[];
-  debugInfo: any;
-}
-
-async function logPlanMatching(log: PlanMatchLog) {
-  // Store in database for analysis
-  await db.insert(planMatchLogs).values(log);
-  
-  // Real-time monitoring
-  if (log.finalPlanCount === 0) {
-    console.error('[NO_PLANS_MATCHED]', {
-      query: log.userQuery,
-      category: log.detectedCategory,
-      reasons: log.filterReasons,
-      available: log.plansAvailable
-    });
-    
-    // Send alert if this happens frequently
-    if (await getFailureRate() > 0.2) {
-      await sendAlertToAdmin('High plan matching failure rate detected');
-    }
-  }
-}
-
-// Add to OpenAI service
-const matchLog: PlanMatchLog = {
-  timestamp: new Date(),
-  userQuery: userMessage,
-  detectedCategory: category,
-  contextScore: contextAnalysis.confidence || 0,
-  plansAvailable: allPlans.length,
-  plansAfterFilters: filteredPlans.length,
-  filterReasons: {
-    country: allPlans.length - filteredByCountry.length,
-    price: filteredByCountry.length - filteredByPrice.length,
-    features: filteredByPrice.length - filteredByFeatures.length,
-    category: filteredByFeatures.length - relevantPlans.length
-  },
-  finalPlanCount: suggestedPlans.length,
-  matchingCriteria: extractedCriteria,
-  debugInfo: { memory, contextAnalysis }
-};
-
-await logPlanMatching(matchLog);
+**Visual Example**:
+```
+🔵 Detectado: auto | 🟠 Falta: location | 🟢 Kia Picanto 2020
 ```
 
-## 3. Smart Fallback Logic
+---
 
-### Current Issue
-When no plans match, the assistant doesn't provide helpful alternatives.
+### 4. **Intelligent Provider Handling** ✅
+**Problem**: Assistant didn't explain when requested provider had no plans in category.
 
-### Improvements
+**Solution**:
+- Updated system prompt with provider-specific logic
+- Assistant now explains: "No tengo planes de auto de MAPFRE"
+- Suggests switching categories if provider offers other insurance types
+- Never shows wrong-category plans without user consent
 
-```typescript
-// Implement fallback strategies
-async function handleNoPlanMatches(
-  userQuery: string, 
-  category: string, 
-  filters: FilterCriteria
-): Promise<FallbackResponse> {
-  // Strategy 1: Broaden search criteria
-  const broadenedPlans = await searchWithRelaxedCriteria(filters);
-  
-  // Strategy 2: Suggest similar categories
-  const similarCategories = getSimilarCategories(category);
-  const alternativePlans = await searchInCategories(similarCategories);
-  
-  // Strategy 3: Ask clarifying questions
-  const clarifyingQuestions = generateClarifyingQuestions(userQuery, filters);
-  
-  // Strategy 4: Explain why no matches
-  const explanation = explainNoMatches(filters, await getAvailablePlans());
-  
-  return {
-    message: `No encontré planes exactos que coincidan con tu búsqueda, pero aquí hay algunas alternativas...`,
-    alternativePlans: broadenedPlans.slice(0, 3),
-    suggestedCategories: similarCategories,
-    clarifyingQuestions,
-    explanation
-  };
-}
+---
 
-// Relaxed search criteria
-function relaxCriteria(original: FilterCriteria): FilterCriteria {
-  return {
-    ...original,
-    priceRange: {
-      min: original.priceRange.min * 0.8,
-      max: original.priceRange.max * 1.2
-    },
-    requiredFeatures: original.requiredFeatures.slice(0, 2), // Keep only top features
-    providers: [] // Remove provider restriction
-  };
-}
-```
+### 5. **Improved Plan Filtering** ✅
+**Problem**: Plans not well-sorted, SURA always shown first.
 
-## 4. Context Memory Enhancements
+**Solution**:
+- Plans now filtered by detected category first
+- Provider preferences respected when available
+- Price range filtering maintained
+- Maximum 4 plans shown by default
 
-### Current Issue
-Limited persistence and utilization of user context across conversations.
+---
 
-### Improvements
+## 📊 Test Results
 
-```typescript
-// Enhanced memory structure
-interface EnhancedAssistantMemory {
-  // User profile
-  userProfile: {
-    age?: number;
-    location?: string;
-    familySize?: number;
-    occupation?: string;
-    riskProfile?: 'low' | 'medium' | 'high';
-  };
-  
-  // Preferences learned over time
-  preferences: {
-    priceSenitivity: 'low' | 'medium' | 'high';
-    preferredProviders: string[];
-    avoidedProviders: string[];
-    importantFeatures: string[];
-    communicationStyle: 'formal' | 'casual' | 'technical';
-  };
-  
-  // Insurance history
-  insuranceHistory: {
-    currentPlans: InsurancePlan[];
-    previousSearches: SearchHistory[];
-    rejectedPlans: RejectedPlan[];
-    claimsHistory: Claim[];
-  };
-  
-  // Conversation state
-  conversationState: {
-    currentIntent: 'browsing' | 'comparing' | 'purchasing' | 'claiming';
-    decisionStage: 'awareness' | 'consideration' | 'decision' | 'retention';
-    confidenceLevel: number;
-    lastUpdated: Date;
-  };
-}
+### Before Improvements:
+- ❌ Duplicate plans after follow-ups
+- ❌ Wrong category plans shown
+- ❌ No context visibility
+- ❌ Poor provider request handling
 
-// Intelligent memory updates
-function updateMemoryWithLearning(
-  memory: EnhancedAssistantMemory,
-  userMessage: string,
-  selectedPlan?: InsurancePlan,
-  rejectedPlans?: InsurancePlan[]
-): EnhancedAssistantMemory {
-  const updatedMemory = { ...memory };
-  
-  // Learn from rejections
-  if (rejectedPlans?.length > 0) {
-    const commonTraits = findCommonTraits(rejectedPlans);
-    updatedMemory.preferences.avoidedProviders.push(...commonTraits.providers);
-    
-    // Adjust price sensitivity
-    const avgRejectedPrice = average(rejectedPlans.map(p => p.basePrice));
-    if (avgRejectedPrice < memory.userProfile.estimatedBudget * 0.7) {
-      updatedMemory.preferences.priceSensitivity = 'low';
-    }
-  }
-  
-  // Learn from selections
-  if (selectedPlan) {
-    updatedMemory.preferences.preferredProviders.push(selectedPlan.provider);
-    updatedMemory.preferences.importantFeatures.push(...selectedPlan.features);
-  }
-  
-  // Update conversation state
-  updatedMemory.conversationState = detectConversationState(userMessage, memory);
-  
-  return updatedMemory;
-}
-```
+### After Improvements:
+- ✅ Each plan shown only once
+- ✅ Strict category enforcement
+- ✅ Beautiful context summary chip
+- ✅ Clear explanations for unavailable providers
+- ✅ Better plan relevance
 
-## 5. Advanced Input Validation
+---
 
-### Current Issue
-Basic input validation that doesn't catch edge cases or guide users effectively.
+## 🔧 Technical Details
 
-### Improvements
+### Files Modified:
+1. **client/src/components/briki-ai-assistant/NewBrikiAssistant.tsx**
+   - Added shownPlanIds state
+   - Enhanced context chip UI
+   - Improved plan filtering logic
 
-```typescript
-// Multi-layer input validation
-interface ValidationResult {
-  isValid: boolean;
-  issues: ValidationIssue[];
-  suggestions: string[];
-  normalizedInput?: string;
-}
+2. **server/services/openai-service.ts**
+   - Updated findRelevantPlans() with category enforcement
+   - Enhanced system prompt for provider handling
+   - Added current category tracking
 
-interface ValidationIssue {
-  type: 'ambiguous' | 'incomplete' | 'invalid' | 'offtopic';
-  field: string;
-  message: string;
-  severity: 'error' | 'warning' | 'info';
-}
+3. **shared/context-utils.ts**
+   - (Previously improved with enhanced requirements)
 
-async function validateAndNormalizeInput(
-  userMessage: string,
-  category: string,
-  memory: AssistantMemory
-): Promise<ValidationResult> {
-  const issues: ValidationIssue[] = [];
-  const suggestions: string[] = [];
-  
-  // Check for ambiguous requests
-  const ambiguityCheck = checkAmbiguity(userMessage);
-  if (ambiguityCheck.isAmbiguous) {
-    issues.push({
-      type: 'ambiguous',
-      field: ambiguityCheck.field,
-      message: `Tu solicitud sobre ${ambiguityCheck.field} no es clara`,
-      severity: 'warning'
-    });
-    suggestions.push(...ambiguityCheck.clarifications);
-  }
-  
-  // Validate category-specific requirements
-  const categoryValidation = validateCategoryRequirements(userMessage, category);
-  issues.push(...categoryValidation.issues);
-  
-  // Check for conflicting requirements
-  const conflicts = detectConflicts(userMessage);
-  if (conflicts.length > 0) {
-    issues.push({
-      type: 'invalid',
-      field: 'requirements',
-      message: 'Algunos requisitos parecen contradecirse',
-      severity: 'error'
-    });
-  }
-  
-  // Normalize input
-  const normalized = normalizeUserInput(userMessage, {
-    fixTypos: true,
-    expandAbbreviations: true,
-    standardizeAmounts: true,
-    extractDates: true
-  });
-  
-  return {
-    isValid: issues.filter(i => i.severity === 'error').length === 0,
-    issues,
-    suggestions,
-    normalizedInput: normalized
-  };
-}
+---
 
-// Smart typo correction for insurance terms
-function correctInsuranceTypos(text: string): string {
-  const corrections = {
-    'segur': 'seguro',
-    'polisa': 'póliza',
-    'cobertur': 'cobertura',
-    'deducible': 'deducible',
-    'prima': 'prima',
-    'siniestro': 'siniestro'
-  };
-  
-  let corrected = text;
-  Object.entries(corrections).forEach(([typo, correct]) => {
-    const regex = new RegExp(`\\b${typo}\\w*\\b`, 'gi');
-    corrected = corrected.replace(regex, correct);
-  });
-  
-  return corrected;
-}
-```
+## 🎯 Success Metrics
 
-## 6. Conversation Flow Management
+The improvements ensure:
+1. **No Duplicate Plans**: Each plan appears maximum once per conversation
+2. **Category Integrity**: Plans only from the detected/current category
+3. **Context Transparency**: Users see what's detected and what's missing
+4. **Provider Clarity**: Clear messaging when providers don't offer requested insurance
+5. **Better UX**: Smoother conversation flow with visual feedback
 
-### Current Issue
-Linear conversation flow that doesn't adapt to user's decision-making process.
+---
 
-### Improvements
+## 🚀 Next Steps
 
-```typescript
-// Dynamic conversation flow engine
-class ConversationFlowManager {
-  private flows: Map<string, ConversationFlow> = new Map();
-  
-  constructor() {
-    this.registerFlows();
-  }
-  
-  private registerFlows() {
-    // Auto insurance flow
-    this.flows.set('auto_quote', {
-      steps: [
-        { id: 'vehicle_info', required: true, questions: [...] },
-        { id: 'driver_info', required: true, questions: [...] },
-        { id: 'coverage_selection', required: false, questions: [...] },
-        { id: 'discount_check', required: false, questions: [...] }
-      ],
-      transitions: {
-        'vehicle_info': ['driver_info', 'skip_to_recommendations'],
-        'driver_info': ['coverage_selection', 'discount_check'],
-        // ...
-      }
-    });
-  }
-  
-  getNextStep(
-    currentStep: string, 
-    userResponse: string, 
-    memory: AssistantMemory
-  ): FlowStep {
-    const flow = this.flows.get(memory.currentFlow);
-    const transitions = flow.transitions[currentStep];
-    
-    // Intelligent routing based on user response
-    if (userIndicatesUrgency(userResponse)) {
-      return flow.steps.find(s => s.id === 'skip_to_recommendations');
-    }
-    
-    if (userProvidesMultipleInfo(userResponse)) {
-      // Skip steps that were already answered
-      const answeredSteps = extractAnsweredSteps(userResponse);
-      return findNextUnansweredStep(flow, answeredSteps);
-    }
-    
-    // Default to next required step
-    return flow.steps.find(s => 
-      transitions.includes(s.id) && s.required && !isStepComplete(s, memory)
-    );
-  }
-}
-```
-
-## Implementation Priority
-
-1. **High Priority**: Enhanced logging and debugging (immediate visibility)
-2. **High Priority**: Smart fallback logic (better user experience when no matches)
-3. **Medium Priority**: Context gathering improvements (better recommendations)
-4. **Medium Priority**: Memory enhancements (personalization over time)
-5. **Low Priority**: Advanced input validation (edge case handling)
-6. **Low Priority**: Conversation flow management (complex but powerful)
-
-## Quick Wins
-
-1. Add plan matching logs to every AI response
-2. Implement basic fallback when no plans match
-3. Store user preferences in memory between conversations
-4. Add debug mode flag for detailed logging
-5. Create admin dashboard to monitor AI performance 
+Consider these future enhancements:
+1. Add plan comparison mode (side-by-side view)
+2. Implement plan favoriting/bookmarking
+3. Add "Show more plans" button instead of automatic display
+4. Track user preferences across sessions
+5. Add plan recommendation scoring based on user profile 
