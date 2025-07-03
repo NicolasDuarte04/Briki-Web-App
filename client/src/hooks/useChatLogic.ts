@@ -212,12 +212,17 @@ export function useChatLogic(options: UseChatLogicOptions = {}) {
   const handleDocumentUpload = async (file: File) => {
     setIsUploadingDocument(true);
     
+    const messageId = `loading-doc-${Date.now()}`;
     const loadingMessage: ChatMessage = {
-      id: `loading-doc-${Date.now()}`,
+      id: messageId,
       content: '📄 Analizando documento...',
       role: 'assistant',
       timestamp: new Date(),
-      type: 'text'
+      type: 'document',
+      metadata: {
+        fileName: file.name,
+        fileSize: file.size
+      }
     };
     
     addMessage(loadingMessage);
@@ -228,14 +233,23 @@ export function useChatLogic(options: UseChatLogicOptions = {}) {
       // Ensure response has a usable summary
       const safeSummary = response.summary || 'Resumen no disponible. El análisis fue exitoso pero no se pudo generar un resumen detallado.';
       
-      updateMessage(loadingMessage.id, {
-        content: safeSummary,
+      // Extract document type and generate contextual response
+      const docInfo = extractDocumentInfo(safeSummary);
+      const contextualResponse = generateContextualResponse(docInfo);
+      
+      updateMessage(messageId, {
+        content: contextualResponse,
         type: 'document',
         metadata: {
           summaryId: response.summaryId,
           fileName: response.fileName,
           fileSize: response.fileSize
-        }
+        },
+        suggestions: [
+          '¿Quieres comparar esta póliza con otras similares?',
+          `¿Te gustaría ver opciones con mejor cobertura ${docInfo.type === 'health' ? 'médica' : 'general'}?`,
+          '¿Quieres cotizar este tipo de seguro con diferentes compañías?'
+        ]
       });
       
       // Add to document history
@@ -279,9 +293,15 @@ export function useChatLogic(options: UseChatLogicOptions = {}) {
       const errorMessage = error instanceof Error ? error.message : 'No se pudo procesar el documento PDF.';
       
       // Update the loading message to show error instead of removing it
-      updateMessage(loadingMessage.id, {
+      updateMessage(messageId, {
         content: `❌ Error al procesar documento: ${errorMessage}`,
-        type: 'text'
+        type: 'document',
+        metadata: {
+          fileName: file.name,
+          fileSize: file.size,
+          isError: true,
+          onRetry: () => handleDocumentUpload(file)
+        }
       });
       
       toast({
@@ -295,6 +315,53 @@ export function useChatLogic(options: UseChatLogicOptions = {}) {
     } finally {
       setIsUploadingDocument(false);
     }
+  };
+
+  // Helper function to extract document type and key info
+  const extractDocumentInfo = (summary: string): { type: string; coverage: string[] } => {
+    const lowerSummary = summary.toLowerCase();
+    let type = 'general';
+    
+    if (lowerSummary.includes('salud') || lowerSummary.includes('médic')) {
+      type = 'health';
+    } else if (lowerSummary.includes('auto') || lowerSummary.includes('vehículo')) {
+      type = 'auto';
+    } else if (lowerSummary.includes('viaje') || lowerSummary.includes('viajero')) {
+      type = 'travel';
+    } else if (lowerSummary.includes('mascota') || lowerSummary.includes('pet')) {
+      type = 'pet';
+    }
+
+    // Extract coverage points
+    const coverageMatch = summary.match(/Coberturas principales:(.*?)(?=\n\n|$)/s);
+    const coverage = coverageMatch 
+      ? coverageMatch[1].split('\n').map(line => line.trim()).filter(Boolean)
+      : [];
+
+    return { type, coverage };
+  };
+
+  // Helper function to generate contextual response
+  const generateContextualResponse = (docInfo: { type: string; coverage: string[] }): string => {
+    const typeText = {
+      health: 'seguro de salud',
+      auto: 'seguro de auto',
+      travel: 'seguro de viaje',
+      pet: 'seguro de mascota',
+      general: 'seguro'
+    }[docInfo.type];
+
+    let response = `He analizado el documento. Es un ${typeText} que incluye las siguientes coberturas principales:\n\n`;
+    
+    if (docInfo.coverage.length > 0) {
+      response += docInfo.coverage.map(c => `• ${c}`).join('\n');
+    } else {
+      response += '• Cobertura básica del seguro\n';
+    }
+
+    response += '\n\n¿Hay algo específico que te gustaría revisar o comparar?';
+    
+    return response;
   };
 
   // Send message with optional document

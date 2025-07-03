@@ -18,6 +18,7 @@ import { useToast } from '../../hooks/use-toast';
 import { DocumentHistory } from './DocumentHistory';
 import { DocumentComparison } from './DocumentComparison';
 import { DocumentSummary } from '../../services/document-upload-service';
+import { ChatBubble } from './ChatBubble';
 
 type Plan = RealInsurancePlan & {
   isRecommended?: boolean;
@@ -278,77 +279,69 @@ ${summary.exclusions ? (Array.isArray(summary.exclusions) ? summary.exclusions.m
                 exit={{ opacity: 0 }}
                 className="space-y-4"
               >
-                <div className={cn(
-                  "flex",
-                  message.role === 'user' ? 'justify-end' : 'justify-start'
-                )}>
-                  <div
-                    className={cn(
-                      MAX_MESSAGE_WIDTH,
-                      "rounded-lg px-4 py-2",
-                      message.role === 'user'
-                        ? 'bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-sm'
-                        : 'bg-white dark:bg-gray-800 shadow-sm border border-blue-100 dark:border-blue-800'
-                    )}
-                    role={message.role === 'assistant' ? 'status' : undefined}
-                  >
-                    {message.content}
-                  </div>
-                </div>
-
-                {/* Render plans if present */}
-                {message.type === 'plans' && message.metadata?.plans && (
-                  <>
-                    {(() => {
-                      if (process.env.NODE_ENV === 'development') {
-                        console.log('[BrikiAI] Rendering message with type=plans:', message.metadata.plans?.length, message.metadata.plans);
-                      }
-                      return null;
-                    })()}
-                    {message.metadata.plans.length > 0 ? (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 mt-4"
-                      >
-                        {message.metadata.plans.slice(0, MAX_PLANS_SHOWN).map((plan: Plan) => (
-                          <NewPlanCard
-                            key={plan.id}
-                            plan={{
-                              id: typeof plan.id === 'string' ? parseInt(plan.id) : plan.id,
-                              name: plan.name,
-                              category: plan.category,
-                              provider: plan.provider,
-                              basePrice: plan.basePrice || 0,
-                              currency: plan.currency || 'COP',
-                              benefits: plan.features || plan.benefits || [],
-                              isExternal: plan.isExternal,
-                              externalLink: plan.externalLink
-                            }}
-                            onViewDetails={(planId) => {
-                              handlePlanClick(plan);
-                            }}
-                            onQuote={(planId) => {
-                              handlePlanClick(plan);
-                              navigate(`/insurance/${plan.category}/quote?planId=${planId}`);
-                            }}
-                          />
-                        ))}
-                      </motion.div>
-                    ) : (
-                      <NoPlansFound onShowAlternatives={handleShowAlternatives} />
-                    )}
-                    
-                    {/* Show comparison if we have a selected document and plans */}
-                    {selectedDocument && message.metadata.plans.length > 0 && (
-                      <DocumentComparison
-                        document={selectedDocument}
-                        plans={message.metadata.plans}
-                        className="mt-4"
-                      />
-                    )}
-                  </>
-                )}
+                <ChatBubble
+                  role={message.role}
+                  content={message.content}
+                  type={message.type}
+                  metadata={message.metadata}
+                  suggestions={message.suggestions}
+                  onSuggestionClick={handleSuggestionClick}
+                  timestamp={message.timestamp}
+                >
+                  {/* Render plans if present */}
+                  {message.type === 'plans' && message.metadata?.plans && (
+                    <>
+                      {(() => {
+                        if (process.env.NODE_ENV === 'development') {
+                          console.log('[BrikiAI] Rendering message with type=plans:', message.metadata.plans?.length, message.metadata.plans);
+                        }
+                        return null;
+                      })()}
+                      {message.metadata.plans.length > 0 ? (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 mt-4"
+                        >
+                          {message.metadata.plans.slice(0, MAX_PLANS_SHOWN).map((plan: Plan) => (
+                            <NewPlanCard
+                              key={plan.id}
+                              plan={{
+                                id: typeof plan.id === 'string' ? parseInt(plan.id) : plan.id,
+                                name: plan.name,
+                                category: plan.category,
+                                provider: plan.provider,
+                                basePrice: plan.basePrice || 0,
+                                currency: plan.currency || 'COP',
+                                benefits: plan.features || plan.benefits || [],
+                                isExternal: plan.isExternal,
+                                externalLink: plan.externalLink
+                              }}
+                              onViewDetails={(planId) => {
+                                handlePlanClick(plan);
+                              }}
+                              onQuote={(planId) => {
+                                handlePlanClick(plan);
+                                navigate(`/insurance/${plan.category}/quote?planId=${planId}`);
+                              }}
+                            />
+                          ))}
+                        </motion.div>
+                      ) : (
+                        <NoPlansFound onShowAlternatives={handleShowAlternatives} />
+                      )}
+                      
+                      {/* Show comparison if we have a selected document and plans */}
+                      {selectedDocument && message.metadata.plans.length > 0 && (
+                        <DocumentComparison
+                          document={selectedDocument}
+                          plans={message.metadata.plans}
+                          className="mt-4"
+                        />
+                      )}
+                    </>
+                  )}
+                </ChatBubble>
               </motion.div>
             ))}
             {isTyping && (

@@ -42,6 +42,7 @@ export interface ChatMessage {
   isLoading?: boolean;
   plans?: any[]; // For backward compatibility
   plansSummary?: string; // For backward compatibility
+  suggestions?: string[]; // Follow-up suggestions that appear as clickable buttons
 }
 
 export interface Plan {

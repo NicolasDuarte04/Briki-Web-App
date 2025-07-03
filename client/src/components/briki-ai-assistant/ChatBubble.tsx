@@ -4,6 +4,8 @@ import { cn } from '../../lib/utils';
 import { Bot, User, Loader2 } from 'lucide-react';
 import FormattedAIResponse from './FormattedAIResponse';
 import LoadingDots from './LoadingDots';
+import { DocumentPreview } from './DocumentPreview';
+import { Button } from '../ui/button';
 
 interface ChatBubbleProps {
   role: 'user' | 'assistant';
@@ -11,6 +13,16 @@ interface ChatBubbleProps {
   isLoading?: boolean;
   timestamp?: Date;
   children?: React.ReactNode;
+  type?: 'text' | 'document' | 'plans';
+  metadata?: {
+    fileName?: string;
+    fileSize?: number;
+    summaryId?: string;
+    isError?: boolean;
+    onRetry?: () => void;
+  };
+  suggestions?: string[];
+  onSuggestionClick?: (suggestion: string) => void;
 }
 
 export const ChatBubble: React.FC<ChatBubbleProps> = ({
@@ -18,7 +30,11 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({
   content,
   isLoading,
   timestamp,
-  children
+  children,
+  type = 'text',
+  metadata,
+  suggestions,
+  onSuggestionClick
 }) => {
   const isUser = role === 'user';
 
@@ -91,9 +107,37 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({
               </div>
             ) : (
               <div>
-                {/* Use FormattedAIResponse for better text formatting */}
+                {/* Document Preview if available */}
+                {type === 'document' && metadata?.fileName && (
+                  <DocumentPreview
+                    fileName={metadata.fileName}
+                    fileSize={metadata.fileSize}
+                    isError={metadata.isError}
+                    onRetry={metadata.onRetry}
+                    className="mb-3"
+                  />
+                )}
+
+                {/* Message Content */}
                 <FormattedAIResponse content={content} />
                 
+                {/* Follow-up Suggestions */}
+                {suggestions && suggestions.length > 0 && (
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {suggestions.map((suggestion, index) => (
+                      <Button
+                        key={index}
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onSuggestionClick?.(suggestion)}
+                        className="text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                      >
+                        {suggestion}
+                      </Button>
+                    ))}
+                  </div>
+                )}
+
                 {/* Additional content like plan cards */}
                 {children && (
                   <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-700">
