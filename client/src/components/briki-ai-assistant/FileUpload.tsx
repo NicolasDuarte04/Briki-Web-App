@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Upload, FileText, X, AlertCircle } from 'lucide-react';
+import { Upload, FileText, X, AlertCircle, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '../ui/button';
 import { cn } from '../../lib/utils';
@@ -67,7 +67,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   };
 
   return (
-    <div className={cn("relative min-w-[140px] border-4 border-red-500 bg-red-100 p-2", className)}>
+    <div className={cn("relative", className)}>
       <input
         ref={fileInputRef}
         type="file"
@@ -92,11 +92,16 @@ export const FileUpload: React.FC<FileUploadProps> = ({
               size="default"
               onClick={handleButtonClick}
               disabled={isUploading}
-              className="w-full flex items-center gap-2 bg-white hover:bg-gray-50 border-2 border-gray-200 hover:border-[#00C7C4] text-gray-700 hover:text-gray-900 transition-all duration-200"
-              style={{ visibility: 'visible', display: 'flex' }}
+              className="w-full flex items-center gap-2 bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 border-2 border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-400 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-all duration-200 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
             >
-              <Upload className="h-4 w-4" />
-              <span className="text-sm font-medium">Subir documento</span>
+              {isUploading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Upload className="h-4 w-4" />
+              )}
+              <span className="text-sm font-medium">
+                {isUploading ? 'Procesando...' : 'Subir documento'}
+              </span>
             </Button>
           </motion.div>
         ) : (
@@ -106,7 +111,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 5 }}
             transition={{ duration: 0.15 }}
-            className="flex items-center gap-2 bg-blue-50 border-2 border-blue-200 rounded-lg px-3 py-2"
+            className="flex items-center gap-2 bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-800 rounded-lg px-3 py-2"
           >
             <FileText className="h-4 w-4 text-blue-600 flex-shrink-0" />
             <div className="flex-1 min-w-0">

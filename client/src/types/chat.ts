@@ -34,10 +34,26 @@ export type UserIntentType =
 // Message interface with support for text or widget content
 export interface ChatMessage {
   id: string;
-  sender: 'user' | 'assistant';
   content: string;
-  timestamp?: string;
-  widget?: AssistantWidgetType;
-  detectedIntent?: UserIntentType;
+  role: 'user' | 'assistant';
+  type?: 'text' | 'plans' | 'document';
+  timestamp?: Date;
+  metadata?: Record<string, any>;
   isLoading?: boolean;
+  plans?: any[]; // For backward compatibility
+  plansSummary?: string; // For backward compatibility
+}
+
+export interface Plan {
+  id: number;
+  name: string;
+  category: string;
+  provider: string;
+  basePrice: number;
+  currency: string;
+  benefits?: string[];
+  features?: string[];
+  isExternal?: boolean;
+  externalLink?: string | null;
+  isRecommended?: boolean;
 }

@@ -12,36 +12,17 @@ import { useLocation } from 'wouter';
 import { apiRequest } from '../../lib/api';
 import { FileUpload } from './FileUpload';
 import { uploadDocument } from '../../services/document-upload-service';
+import { useChatLogic } from '../../hooks/useChatLogic';
+import { ChatMessage } from '../../types/chat';
+import { useToast } from '../../hooks/use-toast';
 
-interface Plan extends RealInsurancePlan {
+type Plan = RealInsurancePlan & {
   isRecommended?: boolean;
+  benefits?: string[];
 }
 
-interface Message {
-  id: string;
-  content: string;
-  role: 'user' | 'assistant';
-  timestamp: Date;
-  plans?: Plan[];
-  type?: 'text' | 'plans';
-}
-
-interface AIResponse {
-  message: string;
-  suggestedPlans?: Plan[];
-}
-
-const STORAGE_KEY = 'briki_chat_history';
 const MAX_PLANS_SHOWN = 4;
 const MAX_MESSAGE_WIDTH = 'max-w-[75%]';
-
-const PLACEHOLDER_HINTS = [
-  "¿Buscas seguro para tu carro?",
-  "¿Vas a viajar? Pregúntame sobre seguros.",
-  "¿Tu mascota está asegurada?",
-  "¿Necesitas un plan de salud familiar?",
-  "¿Quieres comparar coberturas?"
-];
 
 interface NoPlansFoundProps {
   onShowAlternatives: () => void;
@@ -94,191 +75,38 @@ const PlansLoadingPlaceholder: React.FC = () => (
 );
 
 export function BrikiAssistant() {
-  const [messages, setMessages] = useState<Message[]>(() => {
-    const saved = sessionStorage.getItem(STORAGE_KEY);
-    return saved ? JSON.parse(saved) : [];
-  });
-  const [input, setInput] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  const [currentSuggestion, setCurrentSuggestion] = useState(0);
-  const [shouldResetContext, setShouldResetContext] = useState(false);
-  const [memory, setMemory] = useState<any>({});
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const chatContainerRef = useRef<HTMLDivElement>(null);
   const { trackEvent } = useAnalytics();
   const [, navigate] = useLocation();
-  const [isLoadingPlans, setIsLoadingPlans] = useState(false);
-  const [isUploadingDocument, setIsUploadingDocument] = useState(false);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  // Persist messages to sessionStorage
-  useEffect(() => {
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
-  }, [messages]);
-
-  // Rotate suggestions
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentSuggestion((current) => 
-        current === PLACEHOLDER_HINTS.length - 1 ? 0 : current + 1
-      );
-    }, 4000); // Slightly longer interval for better readability
-    return () => clearInterval(interval);
-  }, []);
+  const { toast } = useToast();
+  
+  const {
+    messages,
+    input,
+    isTyping,
+    isUploadingDocument,
+    currentSuggestion,
+    placeholderHints,
+    messagesEndRef,
+    setInput,
+    sendMessage,
+    handleDocumentUpload,
+    resetChat,
+  } = useChatLogic();
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSubmit(e);
+      sendMessage(input);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || isTyping) return;
-
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      content: input.trim(),
-      role: 'user',
-      timestamp: new Date(),
-      type: 'text'
-    };
-
-    setMessages(prev => [...prev, userMessage]);
-    setInput('');
-    setIsTyping(true);
-    setIsLoadingPlans(true);
-
-    try {
-      const responseData = await apiRequest('/api/ai/chat', {
-        method: 'POST',
-        data: {
-          message: input.trim(),
-          conversationHistory: messages.map(m => ({
-            role: m.role,
-            content: m.content
-          })),
-          memory: memory,
-          resetContext: shouldResetContext
-        }
-      });
-
-      if (shouldResetContext) {
-        setShouldResetContext(false);
-      }
-
-      // apiRequest throws on error and returns parsed JSON data directly
-      const data: AIResponse & { memory?: any } = responseData;
-      
-      // Add detailed debug logging
-      console.log('[BrikiAI] Full API response:', data);
-      console.log('[BrikiAI] suggestedPlans raw:', data.suggestedPlans);
-      
-      // Update memory state with response
-      if (data.memory) {
-        setMemory(data.memory);
-      }
-      
-      // Normalize plans to ensure 'features' field exists
-      const normalizedPlans: Plan[] = Array.isArray(data.suggestedPlans)
-        ? data.suggestedPlans.map((p: any) => ({
-            ...p,
-            features: p.features || p.benefits || [],
-          }))
-        : [];
-
-      console.log(
-        '📦 Suggested plans received:',
-        Array.isArray(data.suggestedPlans)
-          ? data.suggestedPlans.length
-          : 'Invalid or undefined'
-      );
-      console.log('[BrikiAI] Normalized plans:', normalizedPlans);
-      
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        content: data.message,
-        role: 'assistant',
-        timestamp: new Date(),
-        type: 'text'
-      };
-
-      const newMessages = [assistantMessage];
-      if (normalizedPlans && normalizedPlans.length > 0) {
-        newMessages.push({
-          id: (Date.now() + 2).toString(),
-          content: '',
-          role: 'assistant',
-          timestamp: new Date(),
-          type: 'plans',
-          plans: normalizedPlans,
-        });
-      }
-
-      setMessages(prev => [...prev, ...newMessages]);
-      
-      if (normalizedPlans && normalizedPlans.length > 0) {
-        trackEvent('ai_recommended_plans', {
-          category: 'Assistant',
-          action: 'RecommendPlans',
-          label: 'AI Assistant',
-          value: normalizedPlans.length,
-          metadata: {
-            count: normalizedPlans.length,
-            providers: [...new Set(normalizedPlans.map((p: Plan) => p.provider))].join(',')
-          }
-        });
-      }
-    } catch (error) {
-      console.error('[BrikiAI] API Error:', error);
-      console.error('[BrikiAI] Error details:', {
-        message: error instanceof Error ? error.message : 'Unknown error',
-        stack: error instanceof Error ? error.stack : undefined,
-        apiUrl: process.env.VITE_API_URL || 'Using proxy',
-        environment: process.env.NODE_ENV
-      });
-      
-      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-      let userFriendlyMessage = 'Lo siento, hubo un error al procesar tu solicitud.';
-      
-      // Check for specific error patterns
-      if (errorMessage.includes('did not match the expected pattern')) {
-        userFriendlyMessage = 'Error de configuración del servidor. Por favor, contacta al soporte técnico.';
-        console.error('[BrikiAI] Pattern match error - likely URL validation issue');
-      }
-      
-      setMessages(prev => [...prev, {
-        id: (Date.now() + 1).toString(),
-        content: `${userFriendlyMessage} Error: ${errorMessage}`,
-        role: 'assistant',
-        timestamp: new Date(),
-        type: 'text'
-      }]);
-    } finally {
-      setIsTyping(false);
-      setIsLoadingPlans(false);
-    }
+    sendMessage(input);
   };
 
   const handleReset = () => {
-    setMessages([]);
-    setInput('');
-    setMemory({});
-    setShouldResetContext(true);
-    sessionStorage.removeItem(STORAGE_KEY);
-    trackEvent('chat_reset', {
-      category: 'Assistant',
-      action: 'Reset',
-      label: 'Chat Reset'
-    });
+    resetChat();
   };
 
   const handlePlanClick = (plan: Plan) => {
@@ -287,9 +115,9 @@ export function BrikiAssistant() {
       action: 'PlanClick',
       label: plan.provider,
       metadata: {
-      plan_id: plan.id,
-      provider: plan.provider,
-      isRecommended: plan.isRecommended
+        plan_id: plan.id,
+        provider: plan.provider,
+        isRecommended: plan.isRecommended
       }
     });
   };
@@ -305,75 +133,14 @@ export function BrikiAssistant() {
 
   const handleShowAlternatives = () => {
     setInput("¿Qué otros tipos de seguros me recomiendas?");
-    handleSubmit(new Event('submit') as any);
+    sendMessage("¿Qué otros tipos de seguros me recomiendas?");
   };
 
-  const handleDocumentUpload = async (file: File) => {
-    setIsUploadingDocument(true);
-    
-    // Add loading message
-    const loadingMessage: Message = {
-      id: `loading-doc-${Date.now()}`,
-      content: '📄 Procesando documento...',
-      role: 'assistant',
-      timestamp: new Date(),
-      type: 'text'
-    };
-    
-    setMessages(prev => [...prev, loadingMessage]);
-    
-    try {
-      const response = await uploadDocument(file);
-      
-      // Update the loading message with the summary
-      setMessages(prev => prev.map(msg => 
-        msg.id === loadingMessage.id 
-          ? {
-              ...msg,
-              content: response.summary,
-              type: 'text'
-            }
-          : msg
-      ));
-      
-      // Log the document upload for context
-      setMemory((prev: Record<string, any>) => ({
-        ...prev,
-        lastUploadedDocument: {
-          fileName: response.fileName,
-          fileSize: response.fileSize,
-          uploadTime: new Date().toISOString()
-        }
-      }));
-      
-      trackEvent('document_upload', {
-        category: 'Assistant',
-        action: 'UploadDocument',
-        label: file.name,
-        metadata: {
-          fileSize: file.size,
-          fileType: file.type
-        }
-      });
-      
-    } catch (error) {
-      console.error('Error uploading document:', error);
-      
-      // Remove loading message and show error
-      setMessages(prev => prev.filter(msg => msg.id !== loadingMessage.id));
-      
-      // Add error message
-      setMessages(prev => [...prev, {
-        id: Date.now().toString(),
-        content: error instanceof Error ? error.message : "Error al procesar el documento PDF.",
-        role: 'assistant',
-        timestamp: new Date(),
-        type: 'text'
-      }]);
-      
-    } finally {
-      setIsUploadingDocument(false);
+  const handleFileUpload = async (file: File) => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Briki Debug] File uploaded:', file);
     }
+    await handleDocumentUpload(file);
   };
 
   return (
@@ -381,7 +148,6 @@ export function BrikiAssistant() {
 
       {/* Chat Window */}
       <div 
-        ref={chatContainerRef}
         className="flex-1 overflow-y-auto px-4 py-6 space-y-6 rounded-lg"
         role="log"
         aria-live="polite"
@@ -430,10 +196,10 @@ export function BrikiAssistant() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.3 }}
-                    onClick={() => handleSuggestionClick(PLACEHOLDER_HINTS[currentSuggestion])}
+                    onClick={() => handleSuggestionClick(placeholderHints[currentSuggestion])}
                     className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors text-lg font-medium cursor-pointer"
                   >
-                    {PLACEHOLDER_HINTS[currentSuggestion]}
+                    {placeholderHints[currentSuggestion]}
                   </motion.button>
                 </AnimatePresence>
               </div>
@@ -461,53 +227,51 @@ export function BrikiAssistant() {
                         ? 'bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-sm'
                         : 'bg-white dark:bg-gray-800 shadow-sm border border-blue-100 dark:border-blue-800'
                     )}
-                    role={message.role === 'assistant' ? 'status' : 'none'}
+                    role={message.role === 'assistant' ? 'status' : undefined}
                   >
                     {message.content}
                   </div>
                 </div>
 
                 {/* Render plans if present */}
-                {message.type === 'plans' && (
+                {message.type === 'plans' && message.metadata?.plans && (
                   <>
                     {(() => {
-                      console.log('[BrikiAI] Rendering message with type=plans:', message.plans?.length, message.plans);
+                      if (process.env.NODE_ENV === 'development') {
+                        console.log('[BrikiAI] Rendering message with type=plans:', message.metadata.plans?.length, message.metadata.plans);
+                      }
                       return null;
                     })()}
-                    {isLoadingPlans ? (
-                      <PlansLoadingPlaceholder />
-                    ) : message.plans && message.plans.length > 0 ? (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 mt-4"
-                  >
-                    {message.plans.slice(0, MAX_PLANS_SHOWN).map((plan) => (
-                      <NewPlanCard
-                        key={plan.id}
-                        plan={{
-                          id: typeof plan.id === 'string' ? parseInt(plan.id) : plan.id,
-                          name: plan.name,
-                          category: plan.category,
-                          provider: plan.provider,
-                          basePrice: plan.basePrice || (plan.price ? parseFloat(plan.price.replace(/[^0-9.-]+/g, '')) : 0),
-                          currency: plan.currency || 'COP',
-                          benefits: plan.features || [],
-                          isExternal: plan.isExternal,
-                          externalLink: plan.externalLink
-                        }}
-                        onViewDetails={(planId) => {
-                          handlePlanClick(plan);
-                          // Navigate to plan details if needed
-                        }}
-                        onQuote={(planId) => {
-                          handlePlanClick(plan);
-                          // Navigate to quote page if needed
-                          navigate(`/insurance/${plan.category}/quote?planId=${planId}`);
-                        }}
-                      />
-                    ))}
-                  </motion.div>
+                    {message.metadata.plans.length > 0 ? (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 mt-4"
+                      >
+                        {message.metadata.plans.slice(0, MAX_PLANS_SHOWN).map((plan: Plan) => (
+                          <NewPlanCard
+                            key={plan.id}
+                            plan={{
+                              id: typeof plan.id === 'string' ? parseInt(plan.id) : plan.id,
+                              name: plan.name,
+                              category: plan.category,
+                              provider: plan.provider,
+                              basePrice: plan.basePrice || 0,
+                              currency: plan.currency || 'COP',
+                              benefits: plan.features || plan.benefits || [],
+                              isExternal: plan.isExternal,
+                              externalLink: plan.externalLink
+                            }}
+                            onViewDetails={(planId) => {
+                              handlePlanClick(plan);
+                            }}
+                            onQuote={(planId) => {
+                              handlePlanClick(plan);
+                              navigate(`/insurance/${plan.category}/quote?planId=${planId}`);
+                            }}
+                          />
+                        ))}
+                      </motion.div>
                     ) : (
                       <NoPlansFound onShowAlternatives={handleShowAlternatives} />
                     )}
@@ -517,20 +281,17 @@ export function BrikiAssistant() {
             ))}
             {isTyping && (
               <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
                 className="flex justify-start"
-                role="status"
-                aria-label="Briki está escribiendo"
               >
-                <div className={cn(
-                  MAX_MESSAGE_WIDTH,
-                  "bg-white dark:bg-gray-800 rounded-lg px-4 py-2 flex items-center space-x-2 shadow-sm border border-blue-100 dark:border-blue-800"
-                )}>
-                  <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
-                  <span className="text-sm text-gray-600 dark:text-gray-300">
-                    Buscando las mejores opciones...
-                  </span>
+                <div className="bg-white dark:bg-gray-800 shadow-sm border border-blue-100 dark:border-blue-800 rounded-lg px-4 py-2 max-w-[75%]">
+                  <div className="flex items-center space-x-2">
+                    <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
+                    <span className="text-sm text-gray-600 dark:text-gray-300">
+                      Briki está escribiendo...
+                    </span>
+                  </div>
                 </div>
               </motion.div>
             )}
@@ -539,47 +300,102 @@ export function BrikiAssistant() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Area */}
-      <div className="relative border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shadow-lg">
-        {/* Reset Button - Absolute Position */}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleReset}
-          className="absolute left-8 top-1/2 -translate-y-1/2 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
-          aria-label="Comenzar nueva conversación"
-        >
-          <RefreshCw className="h-4 w-4 mr-2" />
-          Comenzar de nuevo
-        </Button>
-
-        <div className="max-w-4xl mx-auto pl-44">
-          <form onSubmit={handleSubmit} className="flex items-end gap-4">
-            <FileUpload
-              onFileSelect={handleDocumentUpload}
+      {/* Input Area with File Upload */}
+      <div className="p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+        <form onSubmit={handleSubmit} className="max-w-4xl mx-auto">
+          {/* Mobile Layout */}
+          <div className="flex flex-col gap-2 sm:hidden">
+            <FileUpload 
+              onFileSelect={handleFileUpload}
               isUploading={isUploadingDocument}
-              className="flex-shrink-0 !min-w-[180px]"
+              className="w-full min-w-[180px]"
+            />
+            <div className="flex gap-2">
+              <Textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyPress}
+                placeholder={placeholderHints[currentSuggestion]}
+                className="flex-1 resize-none bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 min-h-[60px] max-h-[200px]"
+                rows={1}
+                disabled={isTyping}
+              />
+              <div className="flex flex-col gap-2">
+                <Button
+                  type="submit"
+                  disabled={!input.trim() || isTyping}
+                  className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white shadow-sm transition-all duration-200 hover:shadow-md"
+                  size="icon"
+                >
+                  {isTyping ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Send className="w-4 h-4" />
+                  )}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleReset}
+                  disabled={messages.length === 0}
+                  className="border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
+                  size="icon"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* Desktop Layout */}
+          <div className="hidden sm:flex gap-2 items-end">
+            <FileUpload 
+              onFileSelect={handleFileUpload}
+              isUploading={isUploadingDocument}
+              className="min-w-[180px]"
             />
             <Textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyPress}
-              placeholder={PLACEHOLDER_HINTS[currentSuggestion]}
-              maxLength={500}
+              placeholder={placeholderHints[currentSuggestion]}
+              className="flex-1 resize-none bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 min-h-[60px] max-h-[200px]"
               rows={1}
-              className="flex-1 resize-none bg-gray-50 dark:bg-gray-800 border-0 focus-visible:ring-2 focus-visible:ring-blue-600 hover:bg-gray-100 dark:hover:bg-gray-700/50 rounded-lg transition-colors"
-              aria-label="Mensaje para Briki"
+              disabled={isTyping}
             />
-            <Button 
+            <Button
               type="submit"
               disabled={!input.trim() || isTyping}
-              className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:shadow-lg hover:shadow-blue-600/25 text-white transition-all disabled:opacity-50 disabled:hover:from-blue-600 disabled:hover:to-cyan-500"
-              aria-label="Enviar mensaje"
+              className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white shadow-sm transition-all duration-200 hover:shadow-md hover:scale-105 focus:scale-105"
+              size="default"
             >
-              <Send className="h-4 w-4" />
-              <span className="sr-only">Enviar mensaje</span>
+              {isTyping ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Send className="w-4 h-4" />
+              )}
             </Button>
-          </form>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleReset}
+              disabled={messages.length === 0}
+              className="border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 hover:scale-105 focus:scale-105 transition-all duration-200"
+              size="icon"
+            >
+              <RefreshCw className="w-4 h-4" />
+            </Button>
+          </div>
+        </form>
+        
+        <div className="mt-2 flex items-center justify-center text-xs text-gray-500 dark:text-gray-400">
+          <Home className="w-3 h-3 mr-1" />
+          <button
+            onClick={() => navigate('/')}
+            className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+          >
+            Volver al inicio
+          </button>
         </div>
       </div>
     </div>
