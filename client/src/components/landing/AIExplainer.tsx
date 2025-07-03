@@ -1,28 +1,31 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Brain, MessageCircle, Search, Target } from 'lucide-react';
+import { useLanguage } from '../language-selector';
 
 export const AIExplainer: React.FC = () => {
+  const { t } = useLanguage();
+
   const features = [
     {
       icon: <MessageCircle className="h-6 w-6" />,
-      title: "Natural Conversations",
-      description: "Chat with our AI in plain Spanish about your insurance needs. No technical jargon required."
+      title: t('ai.feature1.title'),
+      description: t('ai.feature1.description')
     },
     {
       icon: <Search className="h-6 w-6" />,
-      title: "Smart Plan Discovery",
-      description: "Our AI analyzes thousands of insurance plans to find options that match your specific requirements."
+      title: t('ai.feature2.title'),
+      description: t('ai.feature2.description')
     },
     {
       icon: <Target className="h-6 w-6" />,
-      title: "Personalized Recommendations",
-      description: "Get tailored suggestions based on your age, location, health, and financial situation."
+      title: t('ai.feature3.title'),
+      description: t('ai.feature3.description')
     },
     {
       icon: <Brain className="h-6 w-6" />,
-      title: "Continuous Learning",
-      description: "Our AI gets smarter with every interaction, providing increasingly accurate recommendations."
+      title: t('ai.feature4.title'),
+      description: t('ai.feature4.description')
     }
   ];
 
@@ -41,20 +44,19 @@ export const AIExplainer: React.FC = () => {
             <div className="inline-flex items-center gap-2 bg-purple-100 dark:bg-purple-900/30 px-4 py-2 rounded-full">
               <Brain className="h-4 w-4 text-purple-600" />
               <span className="text-sm font-medium text-purple-700 dark:text-purple-300">
-                AI Technology
+                {t('ai.badge')}
               </span>
             </div>
             
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white leading-tight">
-              Powered by{' '}
+              {t('ai.title')}{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-500">
-                Advanced AI
+                {t('ai.titleHighlight')}
               </span>
             </h2>
             
             <p className="text-xl text-gray-600 dark:text-gray-300 leading-relaxed max-w-3xl mx-auto">
-              Our artificial intelligence understands Colombian insurance regulations, 
-              market trends, and personal circumstances to provide expert-level guidance.
+              {t('ai.description')}
             </p>
           </motion.div>
 

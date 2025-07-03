@@ -3,25 +3,27 @@ import { motion } from 'framer-motion';
 import { FileText, Brain, ArrowRight, Upload, Zap, CheckCircle } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { Button } from '../ui/button';
+import { useLanguage } from '../language-selector';
 
 export const PDFSummaryAnimation: React.FC = () => {
   const [, navigate] = useLocation();
+  const { t } = useLanguage();
 
   const steps = [
     {
       icon: <Upload className="h-5 w-5" />,
-      title: "Upload Documents",
-      description: "Drag & drop your insurance PDFs, medical records, or financial documents"
+      title: t('pdf.step1.title'),
+      description: t('pdf.step1.description')
     },
     {
       icon: <Brain className="h-5 w-5" />,
-      title: "AI Analysis",
-      description: "Our AI extracts key information and identifies your coverage needs"
+      title: t('pdf.step2.title'),
+      description: t('pdf.step2.description')
     },
     {
       icon: <CheckCircle className="h-5 w-5" />,
-      title: "Personalized Recommendations",
-      description: "Get tailored insurance suggestions based on your unique situation"
+      title: t('pdf.step3.title'),
+      description: t('pdf.step3.description')
     }
   ];
 
@@ -41,21 +43,19 @@ export const PDFSummaryAnimation: React.FC = () => {
               <div className="inline-flex items-center gap-2 bg-blue-100 dark:bg-blue-900/30 px-4 py-2 rounded-full">
                 <Brain className="h-4 w-4 text-blue-600" />
                 <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
-                  AI-Powered Analysis
+                  {t('pdf.badge')}
                 </span>
               </div>
               
               <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white leading-tight">
-                Upload Your Documents,{' '}
+                {t('pdf.title')}{' '}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">
-                  Get Instant Insights
+                  {t('pdf.titleHighlight')}
                 </span>
               </h2>
               
               <p className="text-xl text-gray-600 dark:text-gray-300 leading-relaxed">
-                Our AI assistant can analyze your existing insurance documents, 
-                medical records, and financial information to provide personalized 
-                recommendations and identify coverage gaps.
+                {t('pdf.description')}
               </p>
             </div>
 
@@ -95,7 +95,7 @@ export const PDFSummaryAnimation: React.FC = () => {
                 onClick={() => navigate('/ask-briki-ai')}
                 className="h-14 px-8 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white border-0 hover:shadow-lg font-semibold group"
               >
-                Try Document Analysis
+                {t('pdf.cta')}
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Button>
             </motion.div>
@@ -120,10 +120,10 @@ export const PDFSummaryAnimation: React.FC = () => {
                 <div className="border-2 border-dashed border-blue-300 dark:border-blue-600 rounded-xl p-8 text-center bg-blue-50 dark:bg-blue-900/20">
                   <Upload className="h-12 w-12 text-blue-600 mx-auto mb-4" />
                   <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                    Drop your documents here
+                    {t('pdf.upload.title')}
                   </h4>
                   <p className="text-gray-600 dark:text-gray-300">
-                    Or click to browse files
+                    {t('pdf.upload.subtitle')}
                   </p>
                 </div>
 
@@ -143,21 +143,21 @@ export const PDFSummaryAnimation: React.FC = () => {
                     >
                       <Zap className="h-4 w-4 text-white" />
                     </motion.div>
-                    <span className="font-medium text-gray-900 dark:text-white">AI Processing...</span>
+                    <span className="font-medium text-gray-900 dark:text-white">{t('pdf.processing')}</span>
                   </div>
                   
                   <div className="space-y-3">
                     <div className="flex items-center gap-2">
                       <CheckCircle className="h-4 w-4 text-green-500" />
-                      <span className="text-sm text-gray-700 dark:text-gray-300">Document scanned successfully</span>
+                      <span className="text-sm text-gray-700 dark:text-gray-300">{t('pdf.success1')}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <CheckCircle className="h-4 w-4 text-green-500" />
-                      <span className="text-sm text-gray-700 dark:text-gray-300">Key information extracted</span>
+                      <span className="text-sm text-gray-700 dark:text-gray-300">{t('pdf.success2')}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <CheckCircle className="h-4 w-4 text-green-500" />
-                      <span className="text-sm text-gray-700 dark:text-gray-300">Coverage gaps identified</span>
+                      <span className="text-sm text-gray-700 dark:text-gray-300">{t('pdf.success3')}</span>
                     </div>
                   </div>
                 </motion.div>

@@ -1,31 +1,34 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { TrendingUp, Users, Award, Clock, Shield, Star } from 'lucide-react';
+import { useLanguage } from '../language-selector';
 
 export const StatsSection: React.FC = () => {
+  const { t } = useLanguage();
+
   const stats = [
     {
       icon: <Users className="h-8 w-8" />,
       number: "50,000+",
-      label: "Happy Customers",
+      label: t('stats.users'),
       description: "Colombians trust Briki for their insurance needs"
     },
     {
       icon: <Award className="h-8 w-8" />,
       number: "1,200+",
-      label: "Insurance Plans",
+      label: t('stats.plans'),
       description: "Comprehensive coverage options available"
     },
     {
       icon: <Clock className="h-8 w-8" />,
-      number: "< 2 min",
-      label: "Average Quote Time",
-      description: "Get personalized quotes in under 2 minutes"
+      number: "35%",
+      label: t('stats.savings'),
+      description: "Average customer savings on premiums"
     },
     {
-      icon: <TrendingUp className="h-8 w-8" />,
-      number: "95%",
-      label: "Satisfaction Rate",
+      icon: <Star className="h-8 w-8" />,
+      number: "4.8/5",
+      label: t('stats.rating'),
       description: "Customer satisfaction with our service"
     }
   ];
@@ -68,15 +71,11 @@ export const StatsSection: React.FC = () => {
             </div>
             
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white leading-tight">
-              Numbers That{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">
-                Speak
-              </span>
+              {t('stats.title')}
             </h2>
             
             <p className="text-xl text-gray-600 dark:text-gray-300 leading-relaxed max-w-3xl mx-auto">
-              See why thousands of Colombians choose Briki as their trusted insurance partner. 
-              Our track record speaks for itself.
+              {t('stats.subtitle')}
             </p>
           </motion.div>
 

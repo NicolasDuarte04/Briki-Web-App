@@ -1,8 +1,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Star, Quote } from 'lucide-react';
+import { useLanguage } from '../language-selector';
 
 export const TestimonialsSection: React.FC = () => {
+  const { t } = useLanguage();
+
   const testimonials = [
     {
       name: "María González",
@@ -50,15 +53,11 @@ export const TestimonialsSection: React.FC = () => {
             </div>
             
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white leading-tight">
-              What Our Customers{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-500">
-                Say
-              </span>
+              {t('testimonials.title')}
             </h2>
             
             <p className="text-xl text-gray-600 dark:text-gray-300 leading-relaxed max-w-3xl mx-auto">
-              Real stories from real people who found their perfect insurance coverage through Briki. 
-              Join thousands of satisfied customers.
+              {t('testimonials.subtitle')}
             </p>
           </motion.div>
 

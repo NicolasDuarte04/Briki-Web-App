@@ -33,6 +33,90 @@ const translations: Translations = {
     signIn: 'Sign in',
     signUp: 'Sign up',
     
+    // Landing Page - Hero Section
+    'hero.badge': 'New: AI-Powered Insurance Assistant',
+    'hero.title1': 'Find Your Perfect',
+    'hero.title2': 'Insurance',
+    'hero.title3': '',
+    'hero.subtitle': "Colombia's first AI-powered insurance platform. Compare plans, get instant quotes, and make informed decisions with our smart assistant.",
+    'hero.ctaAI': 'Start with AI Assistant',
+    'hero.ctaBrowse': 'Browse Insurance Plans',
+    'hero.secure': 'Secure & Private',
+    'hero.users': '50,000+ Users',
+    'hero.rating': '4.8/5 Rating',
+    'hero.instant': 'Instant Quotes',
+    
+    // Landing Page - PDF Summary Section
+    'pdf.badge': 'AI-Powered Analysis',
+    'pdf.title': 'Upload Your Documents,',
+    'pdf.titleHighlight': 'Get Instant Insights',
+    'pdf.description': 'Our AI assistant can analyze your existing insurance documents, medical records, and financial information to provide personalized recommendations and identify coverage gaps.',
+    'pdf.step1.title': 'Upload Documents',
+    'pdf.step1.description': 'Drag & drop your insurance PDFs, medical records, or financial documents',
+    'pdf.step2.title': 'AI Analysis',
+    'pdf.step2.description': 'Our AI extracts key information and identifies your coverage needs',
+    'pdf.step3.title': 'Personalized Recommendations',
+    'pdf.step3.description': 'Get tailored insurance suggestions based on your unique situation',
+    'pdf.cta': 'Try Document Analysis',
+    'pdf.upload.title': 'Drop your documents here',
+    'pdf.upload.subtitle': 'Or click to browse files',
+    'pdf.processing': 'AI Processing...',
+    'pdf.success1': 'Document scanned successfully',
+    'pdf.success2': 'Key information extracted',
+    'pdf.success3': 'Coverage gaps identified',
+    
+    // Landing Page - Product Demo Section
+    'demo.badge': 'Live Platform',
+    'demo.title': 'See How Easy It Is to',
+    'demo.titleHighlight': 'Find Your Perfect Plan',
+    'demo.description': 'Watch our platform in action and discover how Briki simplifies insurance shopping with AI-powered recommendations.',
+    'demo.feature1.title': 'Smart Search',
+    'demo.feature1.description': 'AI understands your needs instantly',
+    'demo.feature2.title': 'Real-Time Quotes',
+    'demo.feature2.description': 'Compare prices from multiple providers',
+    'demo.feature3.title': 'Expert Guidance',
+    'demo.feature3.description': '24/7 AI assistant answers all questions',
+    'demo.cta': 'Start Your Search',
+    
+    // Landing Page - AI Explainer Section
+    'ai.badge': 'Powered by Advanced AI',
+    'ai.title': 'Your Personal',
+    'ai.titleHighlight': 'Insurance Expert',
+    'ai.description': 'Our AI assistant combines cutting-edge technology with deep insurance knowledge to provide personalized recommendations tailored to your unique needs.',
+    'ai.feature1.title': 'Natural Conversations',
+    'ai.feature1.description': 'Chat naturally in Spanish or English about your insurance needs',
+    'ai.feature2.title': 'Document Analysis',
+    'ai.feature2.description': 'Upload existing policies for instant coverage gap analysis',
+    'ai.feature3.title': 'Smart Recommendations',
+    'ai.feature3.description': 'Get personalized suggestions based on your profile',
+    'ai.feature4.title': 'Always Learning',
+    'ai.feature4.description': 'Our AI improves with every interaction',
+    
+    // Landing Page - Stats Section
+    'stats.title': 'Trusted by Thousands',
+    'stats.subtitle': 'Join the growing community of smart insurance shoppers',
+    'stats.users': 'Active Users',
+    'stats.plans': 'Insurance Plans',
+    'stats.savings': 'Average Savings',
+    'stats.rating': 'User Rating',
+    
+    // Landing Page - Testimonials Section
+    'testimonials.title': 'What Our Users Say',
+    'testimonials.subtitle': 'Real stories from people who found better insurance with Briki',
+    
+    // Landing Page - Final CTA Section
+    'cta.title': 'Ready to Find Your Perfect Insurance?',
+    'cta.subtitle': 'Join thousands who are saving time and money with Briki',
+    'cta.button': 'Get Started Now',
+    'cta.demo': 'Schedule a Demo',
+    
+    // Footer
+    'footer.tagline': 'Insurance simplified.',
+    'footer.terms': 'Terms',
+    'footer.privacy': 'Privacy',
+    'footer.contact': 'Contact',
+    'footer.rights': 'All rights reserved.',
+    
     // Trip Form
     tripDetails: 'Trip details',
     countryOfOrigin: 'Country of Origin',
@@ -173,6 +257,90 @@ const translations: Translations = {
     signIn: 'Iniciar sesión',
     signUp: 'Crear cuenta',
     
+    // Landing Page - Hero Section
+    'hero.badge': 'Nuevo: Asistente de Seguros AI',
+    'hero.title1': 'Encuentra tu',
+    'hero.title2': 'Seguro Perfecto',
+    'hero.title3': '',
+    'hero.subtitle': 'La primera plataforma de seguros de Colombia impulsada por IA. Compara planes, obtén cotizaciones instantáneas y toma decisiones informadas con nuestro asistente inteligente.',
+    'hero.ctaAI': 'Comienza con el Asistente AI',
+    'hero.ctaBrowse': 'Explora Planes de Seguros',
+    'hero.secure': 'Seguro & Privado',
+    'hero.users': '50,000+ Usuarios',
+    'hero.rating': '4.8/5 Calificación',
+    'hero.instant': 'Cotizaciones Instantáneas',
+    
+    // Landing Page - PDF Summary Section
+    'pdf.badge': 'Análisis AI',
+    'pdf.title': 'Sube tus documentos,',
+    'pdf.titleHighlight': 'Obtén Insights Instantáneos',
+    'pdf.description': 'Nuestro asistente de IA puede analizar tus documentos de seguro existentes, registros médicos y información financiera para proporcionar recomendaciones personalizadas y identificar brechas de cobertura.',
+    'pdf.step1.title': 'Sube Documentos',
+    'pdf.step1.description': 'Arrastra y suelta tus PDFs de seguro, registros médicos o documentos financieros',
+    'pdf.step2.title': 'Análisis AI',
+    'pdf.step2.description': 'Nuestro IA extrae la información clave y identifica tus necesidades de cobertura',
+    'pdf.step3.title': 'Recomendaciones Personalizadas',
+    'pdf.step3.description': 'Obtén sugerencias de seguro adaptadas a tu situación única',
+    'pdf.cta': 'Prueba Análisis de Documentos',
+    'pdf.upload.title': 'Suelta tus documentos aquí',
+    'pdf.upload.subtitle': 'O haz clic para buscar archivos',
+    'pdf.processing': 'Procesando AI...',
+    'pdf.success1': 'Documento escaneado con éxito',
+    'pdf.success2': 'Información clave extraída',
+    'pdf.success3': 'Brechas de cobertura identificadas',
+    
+    // Landing Page - Product Demo Section
+    'demo.badge': 'Plataforma en Vivo',
+    'demo.title': '¡Ve cómo es fácil',
+    'demo.titleHighlight': 'Encontrar tu plan perfecto!',
+    'demo.description': '¡Mira nuestra plataforma en acción y descubre cómo Briki simplifica la compra de seguros con recomendaciones impulsadas por IA!',
+    'demo.feature1.title': 'Búsqueda Inteligente',
+    'demo.feature1.description': 'La IA entiende tus necesidades instantáneamente',
+    'demo.feature2.title': 'Cotizaciones en Tiempo Real',
+    'demo.feature2.description': 'Compara precios de múltiples proveedores',
+    'demo.feature3.title': 'Guía Experta',
+    'demo.feature3.description': 'La asistente de IA 24/7 responde todas las preguntas',
+    'demo.cta': 'Comienza tu búsqueda',
+    
+    // Landing Page - AI Explainer Section
+    'ai.badge': 'Potenciado por IA Avanzada',
+    'ai.title': 'Tu Experto en',
+    'ai.titleHighlight': 'Seguros',
+    'ai.description': 'Nuestro asistente de IA combina tecnología de vanguardia con conocimientos profundos en seguros para proporcionar recomendaciones personalizadas adaptadas a tus necesidades únicas.',
+    'ai.feature1.title': 'Conversaciones Naturales',
+    'ai.feature1.description': 'Charla naturalmente en español o inglés sobre tus necesidades de seguro',
+    'ai.feature2.title': 'Análisis de Documentos',
+    'ai.feature2.description': 'Sube polizas existentes para análisis de brechas de cobertura instantáneo',
+    'ai.feature3.title': 'Recomendaciones Inteligentes',
+    'ai.feature3.description': 'Obtén sugerencias personalizadas basadas en tu perfil',
+    'ai.feature4.title': 'Siempre Aprendiendo',
+    'ai.feature4.description': 'Nuestra IA se mejora con cada interacción',
+    
+    // Landing Page - Stats Section
+    'stats.title': 'Confiados por Miles',
+    'stats.subtitle': 'Únete a la comunidad creciente de compradores de seguros inteligentes',
+    'stats.users': 'Usuarios Activos',
+    'stats.plans': 'Planes de Seguros',
+    'stats.savings': 'Ahorros Promedio',
+    'stats.rating': 'Calificación de Usuarios',
+    
+    // Landing Page - Testimonials Section
+    'testimonials.title': 'Lo que dicen nuestros usuarios',
+    'testimonials.subtitle': 'Historias reales de personas que encontraron mejores seguros con Briki',
+    
+    // Landing Page - Final CTA Section
+    'cta.title': '¿Listo para encontrar tu seguro perfecto?',
+    'cta.subtitle': 'Únete a miles que están ahorrando tiempo y dinero con Briki',
+    'cta.button': 'Comienza Ahora',
+    'cta.demo': 'Programa una Demostración',
+    
+    // Footer
+    'footer.tagline': 'Seguros simplificados.',
+    'footer.terms': 'Términos',
+    'footer.privacy': 'Privacidad',
+    'footer.contact': 'Contacto',
+    'footer.rights': 'Todos los derechos reservados.',
+    
     // Trip Form
     tripDetails: 'Detalles del viaje',
     countryOfOrigin: 'País de Origen',
@@ -312,6 +480,90 @@ const translations: Translations = {
     support: 'Suporte',
     signIn: 'Entrar',
     signUp: 'Criar conta',
+    
+    // Landing Page - Hero Section
+    'hero.badge': 'Novo: Assistente de Seguros AI',
+    'hero.title1': 'Encontre seu',
+    'hero.title2': 'Seguro Perfeito',
+    'hero.title3': '',
+    'hero.subtitle': 'A primeira plataforma de seguros de Colômbia impulsada pela IA. Compare planos, obtenha cotações instantâneas e tome decisões informadas com nosso assistente inteligente.',
+    'hero.ctaAI': 'Comece com o Assistente AI',
+    'hero.ctaBrowse': 'Explore Planos de Seguro',
+    'hero.secure': 'Seguro & Privado',
+    'hero.users': '50,000+ Usuários',
+    'hero.rating': '4.8/5 Avaliação',
+    'hero.instant': 'Cotações Instantâneas',
+    
+    // Landing Page - PDF Summary Section
+    'pdf.badge': 'Análise AI',
+    'pdf.title': 'Suba seus documentos,',
+    'pdf.titleHighlight': 'Obtenha Insights Instantâneos',
+    'pdf.description': 'Nosso assistente de IA pode analisar seus documentos de seguro existentes, registros médicos e informações financeiras para fornecer recomendações personalizadas e identificar brechas de cobertura.',
+    'pdf.step1.title': 'Suba Documentos',
+    'pdf.step1.description': 'Arraste e solte seus PDFs de seguro, registros médicos ou documentos financeiros',
+    'pdf.step2.title': 'Análise AI',
+    'pdf.step2.description': 'Nossa IA extrai a informação chave e identifica suas necessidades de cobertura',
+    'pdf.step3.title': 'Recomendações Personalizadas',
+    'pdf.step3.description': 'Obtenha sugestões de seguro adaptadas à sua situação única',
+    'pdf.cta': 'Experimente Análise de Documentos',
+    'pdf.upload.title': 'Solte seus documentos aqui',
+    'pdf.upload.subtitle': 'Ou clique para procurar arquivos',
+    'pdf.processing': 'Processando AI...',
+    'pdf.success1': 'Documento escaneado com sucesso',
+    'pdf.success2': 'Informação chave extraída',
+    'pdf.success3': 'Brechas de cobertura identificadas',
+    
+    // Landing Page - Product Demo Section
+    'demo.badge': 'Plataforma em Vivo',
+    'demo.title': 'Veja como é fácil',
+    'demo.titleHighlight': 'Encontrar seu plano perfeito!',
+    'demo.description': 'Veja nossa plataforma em ação e descubra como o Briki simplifica a compra de seguros com recomendações impulsionadas pela IA!',
+    'demo.feature1.title': 'Busca Inteligente',
+    'demo.feature1.description': 'A IA entende suas necessidades instantaneamente',
+    'demo.feature2.title': 'Cotações em Tempo Real',
+    'demo.feature2.description': 'Compare preços de múltiplos fornecedores',
+    'demo.feature3.title': 'Guia Experta',
+    'demo.feature3.description': 'A assistente de IA 24/7 responde todas as perguntas',
+    'demo.cta': 'Comece sua busca',
+    
+    // Landing Page - AI Explainer Section
+    'ai.badge': 'Potenciado por IA Avançada',
+    'ai.title': 'Seu Especialista em',
+    'ai.titleHighlight': 'Seguros',
+    'ai.description': 'Nosso assistente de IA combina tecnologia de ponta com conhecimento profundo em seguros para fornecer recomendações personalizadas adaptadas às suas necessidades únicas.',
+    'ai.feature1.title': 'Conversas Naturais',
+    'ai.feature1.description': 'Fale naturalmente em português ou inglês sobre suas necessidades de seguro',
+    'ai.feature2.title': 'Análise de Documentos',
+    'ai.feature2.description': 'Suba políticas existentes para análise de brechas de cobertura instantânea',
+    'ai.feature3.title': 'Recomendações Inteligentes',
+    'ai.feature3.description': 'Obtenha sugestões personalizadas baseadas em seu perfil',
+    'ai.feature4.title': 'Sempre Aprendendo',
+    'ai.feature4.description': 'Nossa IA se melhora com cada interação',
+    
+    // Landing Page - Stats Section
+    'stats.title': 'Confiança de Milhares',
+    'stats.subtitle': 'Junte-se à comunidade crescente de compradores de seguros inteligentes',
+    'stats.users': 'Usuários Ativos',
+    'stats.plans': 'Planos de Seguros',
+    'stats.savings': 'Economia Média',
+    'stats.rating': 'Avaliação de Usuários',
+    
+    // Landing Page - Testimonials Section
+    'testimonials.title': 'O que nossos usuários dizem',
+    'testimonials.subtitle': 'Histórias reais de pessoas que encontraram seguros melhores com o Briki',
+    
+    // Landing Page - Final CTA Section
+    'cta.title': 'Pronto para encontrar seu seguro perfeito?',
+    'cta.subtitle': 'Junte-se a milhares que estão economizando tempo e dinheiro com o Briki',
+    'cta.button': 'Comece Agora',
+    'cta.demo': 'Agende uma Demonstração',
+    
+    // Footer
+    'footer.tagline': 'Seguros simplificados.',
+    'footer.terms': 'Termos',
+    'footer.privacy': 'Privacidade',
+    'footer.contact': 'Contato',
+    'footer.rights': 'Todos os direitos reservados.',
     
     // Trip Form
     tripDetails: 'Detalhes da viagem',

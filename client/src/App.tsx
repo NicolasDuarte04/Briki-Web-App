@@ -27,6 +27,7 @@ import AuthPage from "./pages/auth-page-enhanced";
 import TripInfoPage from "./pages/trip-info-page";
 import InsuranceCategoriesPage from "./pages/insurance-categories-page";
 import CheckoutPage from "./pages/checkout-page";
+import CheckoutSuccess from "./pages/checkout-success";
 import WeatherRiskPage from "./pages/weather-risk-page";
 import LearnMorePage from "./pages/learn-more-page";
 import TermsPage from "./pages/terms-page";
@@ -134,6 +135,7 @@ function Router() {
         <Route path="/categories" component={InsuranceCategoriesPage} />
         <Route path="/trip-info" component={TripInfoPage} />
         <Route path="/checkout/:planId" component={CheckoutPage} />
+        <Route path="/checkout-success" component={CheckoutSuccess} />
         <Route path="/weather-risk" component={WeatherRiskPage} />
         {/* Legacy routes - redirected to new paths */}
         <Route path="/auto-insurance" component={AutoInsuranceRedirect} />

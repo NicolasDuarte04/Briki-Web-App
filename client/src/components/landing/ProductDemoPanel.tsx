@@ -1,17 +1,30 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Monitor, Smartphone, Tablet, CheckCircle } from 'lucide-react';
+import { ArrowRight, Monitor, Smartphone, Tablet, CheckCircle, Search, Calculator, Brain } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useLocation } from 'wouter';
+import { useLanguage } from '../language-selector';
 
 export const ProductDemoPanel: React.FC = () => {
   const [, navigate] = useLocation();
+  const { t } = useLanguage();
 
   const features = [
-    "Real-time plan comparison",
-    "AI-powered recommendations", 
-    "Instant quote generation",
-    "Document analysis"
+    {
+      icon: <Search className="h-5 w-5" />,
+      title: t('demo.feature1.title'),
+      description: t('demo.feature1.description')
+    },
+    {
+      icon: <Calculator className="h-5 w-5" />,
+      title: t('demo.feature2.title'),
+      description: t('demo.feature2.description')
+    },
+    {
+      icon: <Brain className="h-5 w-5" />,
+      title: t('demo.feature3.title'),
+      description: t('demo.feature3.description')
+    }
   ];
 
   return (
@@ -29,20 +42,19 @@ export const ProductDemoPanel: React.FC = () => {
             <div className="inline-flex items-center gap-2 bg-green-100 dark:bg-green-900/30 px-4 py-2 rounded-full">
               <CheckCircle className="h-4 w-4 text-green-600" />
               <span className="text-sm font-medium text-green-700 dark:text-green-300">
-                Live Platform
+                {t('demo.badge')}
               </span>
             </div>
             
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white leading-tight">
-              Experience Briki{' '}
+              {t('demo.title')}{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">
-                Right Now
+                {t('demo.titleHighlight')}
               </span>
             </h2>
             
             <p className="text-xl text-gray-600 dark:text-gray-300 leading-relaxed max-w-3xl mx-auto">
-              Our platform is live and ready to help you find the perfect insurance coverage. 
-              Start comparing plans and get instant quotes today.
+              {t('demo.description')}
             </p>
           </motion.div>
 
@@ -52,7 +64,7 @@ export const ProductDemoPanel: React.FC = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
-            className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-4xl mx-auto"
+            className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto"
           >
             {features.map((feature, index) => (
               <motion.div
@@ -63,9 +75,12 @@ export const ProductDemoPanel: React.FC = () => {
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg"
               >
-                <div className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
-                  <span className="text-gray-900 dark:text-white font-medium">{feature}</span>
+                <div className="flex flex-col items-center text-center space-y-3">
+                  <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center text-blue-600">
+                    {feature.icon}
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{feature.title}</h3>
+                  <p className="text-gray-600 dark:text-gray-300 text-sm">{feature.description}</p>
                 </div>
               </motion.div>
             ))}
@@ -82,12 +97,11 @@ export const ProductDemoPanel: React.FC = () => {
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8">
               <div className="text-center space-y-6">
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  Ready to Get Started?
+                  {t('cta.title')}
                 </h3>
                 
                 <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-                  Join thousands of Colombians who are already using Briki to find better insurance coverage. 
-                  Our AI assistant is ready to help you right now.
+                  {t('cta.subtitle')}
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -96,7 +110,7 @@ export const ProductDemoPanel: React.FC = () => {
                     onClick={() => navigate('/ask-briki-ai')}
                     className="h-12 px-8 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white border-0 hover:shadow-lg font-semibold group"
                   >
-                    Start with AI Assistant
+                    {t('demo.cta')}
                     <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                   </Button>
                   
@@ -106,7 +120,7 @@ export const ProductDemoPanel: React.FC = () => {
                     onClick={() => navigate('/home')}
                     className="h-12 px-8 border-2 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
-                    Browse Plans
+                    {t('hero.ctaBrowse')}
                   </Button>
                 </div>
               </div>

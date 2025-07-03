@@ -3,6 +3,7 @@ import { useNavigation } from '../../lib/navigation';
 import { Link } from 'wouter';
 import { motion } from 'framer-motion';
 import Navbar from './navbar';
+import { useLanguage } from '../language-selector';
 
 interface PublicLayoutProps {
   children: React.ReactNode;
@@ -10,6 +11,7 @@ interface PublicLayoutProps {
 
 export function PublicLayout({ children }: PublicLayoutProps) {
   const { location } = useNavigation();
+  const { t } = useLanguage();
   
   return (
     <div className="min-h-screen flex flex-col">
@@ -32,16 +34,16 @@ export function PublicLayout({ children }: PublicLayoutProps) {
               >
                 briki
               </motion.h2>
-              <p className="text-sm text-gray-500">Insurance simplified.</p>
+              <p className="text-sm text-gray-500">{t('footer.tagline')}</p>
             </div>
             <div className="flex space-x-6">
-              <Link href="/terms" className="text-sm text-gray-500 hover:text-blue-600">Terms</Link>
-              <Link href="/privacy" className="text-sm text-gray-500 hover:text-blue-600">Privacy</Link>
-              <Link href="/contact" className="text-sm text-gray-500 hover:text-blue-600">Contact</Link>
+              <Link href="/terms" className="text-sm text-gray-500 hover:text-blue-600">{t('footer.terms')}</Link>
+              <Link href="/privacy" className="text-sm text-gray-500 hover:text-blue-600">{t('footer.privacy')}</Link>
+              <Link href="/contact" className="text-sm text-gray-500 hover:text-blue-600">{t('footer.contact')}</Link>
             </div>
           </div>
           <div className="mt-8 border-t border-gray-200 pt-4">
-            <p className="text-xs text-gray-400 text-center">© {new Date().getFullYear()} Briki. All rights reserved.</p>
+            <p className="text-xs text-gray-400 text-center">© {new Date().getFullYear()} Briki. {t('footer.rights')}</p>
           </div>
         </div>
       </footer>
