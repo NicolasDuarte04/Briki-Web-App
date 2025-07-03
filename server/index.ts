@@ -11,6 +11,7 @@ import { loadKnowledgeBase } from "./data-loader";
 import aiRoutes from './routes/ai';
 import apiRoutes from './routes/api';
 import vehicleRoutes from './routes/vehicle';
+import stripeRoutes from './routes/stripe';
 
 const app = express();
 
@@ -149,6 +150,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api', apiRoutes);
 app.use('/api/vehicle', vehicleRoutes);
+app.use('/api/stripe', stripeRoutes);
 
 (async () => {
   // Load knowledge base at startup

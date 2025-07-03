@@ -285,42 +285,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     });
 
-    app.post("/api/create-checkout-session", async (req, res) => {
-      try {
-        const { planId, planName, amount, successUrl, cancelUrl } = req.body;
-        
-        const session = await stripe.checkout.sessions.create({
-          payment_method_types: ['card'],
-          line_items: [
-            {
-              price_data: {
-                currency: 'usd',
-                product_data: {
-                  name: planName || `Insurance Plan ${planId}`,
-                  description: 'Insurance coverage plan',
-                },
-                unit_amount: Math.round(amount * 100), // Convert to cents
-              },
-              quantity: 1,
-            },
-          ],
-          mode: 'payment',
-          success_url: successUrl || `${process.env.FRONTEND_URL || 'http://localhost:5050'}/checkout-success?session_id={CHECKOUT_SESSION_ID}`,
-          cancel_url: cancelUrl || `${process.env.FRONTEND_URL || 'http://localhost:5050'}/checkout/${planId}`,
-          metadata: {
-            planId: planId.toString(),
-          },
-        });
 
-        res.json({ 
-          sessionId: session.id,
-          url: session.url 
-        });
-      } catch (error: any) {
-        console.error('Stripe checkout session error:', error);
-        res.status(500).json({ error: error.message });
-      }
-    });
   }
   
   app.get("/api/company/profile", requireAuth, async (req: AuthenticatedRequest, res) => {

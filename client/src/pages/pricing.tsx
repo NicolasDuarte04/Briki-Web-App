@@ -1,19 +1,38 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { PublicLayout } from '../components/layout/public-layout';
 import { motion } from 'framer-motion';
 import { useNavigation } from '../lib/navigation';
 import { Button } from '../components/ui/button';
 import { Helmet } from 'react-helmet';
+import { StripeService } from '../services/stripe-service';
 import { 
   ArrowRight, 
   Check, 
   Award, 
   CreditCard, 
-  Lock 
+  Lock,
+  Loader2
 } from 'lucide-react';
 
 export default function PricingPage() {
   const { navigate } = useNavigation();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handlePremiumSubscription = async () => {
+    try {
+      setIsLoading(true);
+      const session = await StripeService.createSubscriptionSession({
+        customerEmail: undefined, // Will be collected during checkout
+      });
+      StripeService.redirectToCheckout(session.url);
+    } catch (error) {
+      console.error('Failed to create subscription session:', error);
+      // Fallback to auth page if Stripe fails
+      navigate('/auth');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Animation variants
   const fadeIn = {
@@ -172,10 +191,18 @@ export default function PricingPage() {
                   </p>
                   <Button
                     className="w-full bg-gradient-to-r from-blue-600 to-cyan-500 hover:shadow-lg hover:shadow-blue-600/25 text-white"
-                    onClick={() => navigate("/auth")}
+                    onClick={handlePremiumSubscription}
+                    disabled={isLoading}
                     aria-label="Try premium plan free for 14 days"
                   >
-                    Try Free for 14 Days
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Processing...
+                      </>
+                    ) : (
+                      'Try Free for 14 Days'
+                    )}
                   </Button>
                 </div>
                 <div className="bg-gradient-to-r from-blue-600/5 to-cyan-500/5 p-8 border-t border-blue-100">
