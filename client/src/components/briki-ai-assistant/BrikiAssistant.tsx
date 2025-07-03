@@ -10,6 +10,8 @@ import { useAnalytics } from '../../hooks/use-analytics';
 import { RealInsurancePlan } from '../../data/realPlans';
 import { useLocation } from 'wouter';
 import { apiRequest } from '../../lib/api';
+import { FileUpload } from './FileUpload';
+import { uploadDocument } from '../../services/document-upload-service';
 
 interface Plan extends RealInsurancePlan {
   isRecommended?: boolean;
@@ -106,6 +108,7 @@ export function BrikiAssistant() {
   const { trackEvent } = useAnalytics();
   const [, navigate] = useLocation();
   const [isLoadingPlans, setIsLoadingPlans] = useState(false);
+  const [isUploadingDocument, setIsUploadingDocument] = useState(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -239,8 +242,8 @@ export function BrikiAssistant() {
       console.error('[BrikiAI] Error details:', {
         message: error instanceof Error ? error.message : 'Unknown error',
         stack: error instanceof Error ? error.stack : undefined,
-        apiUrl: import.meta.env.VITE_API_URL || 'Using proxy',
-        environment: import.meta.env.MODE
+        apiUrl: process.env.VITE_API_URL || 'Using proxy',
+        environment: process.env.NODE_ENV
       });
       
       const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
@@ -303,6 +306,74 @@ export function BrikiAssistant() {
   const handleShowAlternatives = () => {
     setInput("¿Qué otros tipos de seguros me recomiendas?");
     handleSubmit(new Event('submit') as any);
+  };
+
+  const handleDocumentUpload = async (file: File) => {
+    setIsUploadingDocument(true);
+    
+    // Add loading message
+    const loadingMessage: Message = {
+      id: `loading-doc-${Date.now()}`,
+      content: '📄 Procesando documento...',
+      role: 'assistant',
+      timestamp: new Date(),
+      type: 'text'
+    };
+    
+    setMessages(prev => [...prev, loadingMessage]);
+    
+    try {
+      const response = await uploadDocument(file);
+      
+      // Update the loading message with the summary
+      setMessages(prev => prev.map(msg => 
+        msg.id === loadingMessage.id 
+          ? {
+              ...msg,
+              content: response.summary,
+              type: 'text'
+            }
+          : msg
+      ));
+      
+      // Log the document upload for context
+      setMemory((prev: Record<string, any>) => ({
+        ...prev,
+        lastUploadedDocument: {
+          fileName: response.fileName,
+          fileSize: response.fileSize,
+          uploadTime: new Date().toISOString()
+        }
+      }));
+      
+      trackEvent('document_upload', {
+        category: 'Assistant',
+        action: 'UploadDocument',
+        label: file.name,
+        metadata: {
+          fileSize: file.size,
+          fileType: file.type
+        }
+      });
+      
+    } catch (error) {
+      console.error('Error uploading document:', error);
+      
+      // Remove loading message and show error
+      setMessages(prev => prev.filter(msg => msg.id !== loadingMessage.id));
+      
+      // Add error message
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        content: error instanceof Error ? error.message : "Error al procesar el documento PDF.",
+        role: 'assistant',
+        timestamp: new Date(),
+        type: 'text'
+      }]);
+      
+    } finally {
+      setIsUploadingDocument(false);
+    }
   };
 
   return (
@@ -483,7 +554,12 @@ export function BrikiAssistant() {
         </Button>
 
         <div className="max-w-4xl mx-auto pl-44">
-          <form onSubmit={handleSubmit} className="flex space-x-4">
+          <form onSubmit={handleSubmit} className="flex items-end gap-4">
+            <FileUpload
+              onFileSelect={handleDocumentUpload}
+              isUploading={isUploadingDocument}
+              className="flex-shrink-0 !min-w-[180px]"
+            />
             <Textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}

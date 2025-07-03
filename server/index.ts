@@ -186,9 +186,9 @@ app.use('/api/vehicle', vehicleRoutes);
     serveStatic(app);
   }
 
-  // Use PORT from environment or default to 5000 for deployment
-  // Replit and other deployment platforms expect port 5000
-  const port = process.env.PORT ? parseInt(process.env.PORT) : 5000;
+  // Use PORT from environment or default to 5051 for development
+  // This matches the Google OAuth callback URL configuration
+  const port = process.env.PORT ? parseInt(process.env.PORT) : 5051;
   server.listen(port, () => {
     log(`✅ Server is running on http://localhost:${port}`);
   });
