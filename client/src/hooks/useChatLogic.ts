@@ -214,7 +214,7 @@ export function useChatLogic(options: UseChatLogicOptions = {}) {
     
     const loadingMessage: ChatMessage = {
       id: `loading-doc-${Date.now()}`,
-      content: '📄 Procesando documento...',
+      content: '📄 Analizando documento...',
       role: 'assistant',
       timestamp: new Date(),
       type: 'text'
@@ -225,8 +225,11 @@ export function useChatLogic(options: UseChatLogicOptions = {}) {
     try {
       const response = await uploadDocument(file);
       
+      // Ensure response has a usable summary
+      const safeSummary = response.summary || 'Resumen no disponible. El análisis fue exitoso pero no se pudo generar un resumen detallado.';
+      
       updateMessage(loadingMessage.id, {
-        content: response.summary,
+        content: safeSummary,
         type: 'document',
         metadata: {
           summaryId: response.summaryId,
@@ -261,7 +264,7 @@ export function useChatLogic(options: UseChatLogicOptions = {}) {
       });
       
       toast({
-        title: "Documento procesado",
+        title: "Documento procesado ✔️",
         description: "El resumen del documento está listo.",
       });
       
@@ -273,11 +276,17 @@ export function useChatLogic(options: UseChatLogicOptions = {}) {
         console.error('[Briki Debug] Upload error:', error);
       }
       
-      removeMessage(loadingMessage.id);
+      const errorMessage = error instanceof Error ? error.message : 'No se pudo procesar el documento PDF.';
+      
+      // Update the loading message to show error instead of removing it
+      updateMessage(loadingMessage.id, {
+        content: `❌ Error al procesar documento: ${errorMessage}`,
+        type: 'text'
+      });
       
       toast({
         title: "Error al procesar documento",
-        description: error instanceof Error ? error.message : "No se pudo procesar el documento PDF.",
+        description: errorMessage,
         variant: "destructive",
       });
       
