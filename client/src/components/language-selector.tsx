@@ -453,12 +453,67 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 // Provider component
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguage] = useState<Language>('en');
+  // Detect browser language and default to Spanish for LATAM
+  const detectLanguage = (): Language => {
+    // Check localStorage first
+    const stored = localStorage.getItem('briki-language');
+    if (stored === 'es' || stored === 'en' || stored === 'pt') {
+      return stored as Language;
+    }
+    
+    // Check browser language
+    const browserLang = navigator.language.toLowerCase();
+    
+    // Default to Spanish for Spanish-speaking countries and regions
+    if (browserLang.startsWith('es') || 
+        browserLang.includes('-mx') || // Mexico
+        browserLang.includes('-co') || // Colombia
+        browserLang.includes('-ar') || // Argentina
+        browserLang.includes('-pe') || // Peru
+        browserLang.includes('-cl') || // Chile
+        browserLang.includes('-ve') || // Venezuela
+        browserLang.includes('-ec') || // Ecuador
+        browserLang.includes('-bo') || // Bolivia
+        browserLang.includes('-py') || // Paraguay
+        browserLang.includes('-uy') || // Uruguay
+        browserLang.includes('-cr') || // Costa Rica
+        browserLang.includes('-pa') || // Panama
+        browserLang.includes('-do') || // Dominican Republic
+        browserLang.includes('-gt') || // Guatemala
+        browserLang.includes('-sv') || // El Salvador
+        browserLang.includes('-hn') || // Honduras
+        browserLang.includes('-ni')    // Nicaragua
+    ) {
+      return 'es';
+    }
+    
+    // Check for Portuguese-speaking regions
+    if (browserLang.startsWith('pt') || browserLang.includes('-br')) {
+      return 'pt';
+    }
+    
+    // Default to English for everything else
+    return 'en';
+  };
+
+  const [language, setLanguageState] = useState<Language>(detectLanguage());
+
+  const setLanguage = (lang: Language) => {
+    setLanguageState(lang);
+    localStorage.setItem('briki-language', lang);
+    // Update document language attribute for accessibility
+    document.documentElement.lang = lang;
+  };
 
   // Translation function
   const t = (key: string): string => {
     return translations[language][key] || key;
   };
+
+  // Set document language on mount and language change
+  React.useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage, t }}>

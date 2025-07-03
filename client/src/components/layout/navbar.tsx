@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { Button } from "../ui/button";
 import { useAuth } from "../../hooks/use-auth";
-import { useLanguage } from "../language-selector";
+import { useLanguage, LanguageSelector } from "../language-selector";
 
 export default function Navbar() {
   const [, navigate] = useLocation();
@@ -51,8 +51,9 @@ export default function Navbar() {
             </Link>
           </div>
 
-          {/* Auth buttons */}
+          {/* Auth buttons and language selector */}
           <div className="flex items-center gap-3">
+            <LanguageSelector />
             <div className="flex items-center space-x-3">
               <Button 
                 variant="ghost" 

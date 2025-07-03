@@ -38,7 +38,6 @@ import {
 import { parseCSVFile, parseXLSXFile } from "./services/plan-upload";
 import { insuranceDataService } from "./services/insurance-data-service";
 import diagnosticRouter from './routes/diagnostic';
-import googleAuthRoutes from './routes/google-auth';
 import quotesRoutes from './routes/quotes';
 import aiRouter from './routes/ai';
 import insurancePlansRouter from './routes/insurance-plans';
@@ -68,7 +67,6 @@ const tripSchema = z.object({
 export async function registerRoutes(app: Express): Promise<Server> {
   await setupAuth(app);
   
-  app.use('/api/auth', googleAuthRoutes);
   app.use('/api/quotes', quotesRoutes);
   app.use('/api/ai', aiRouter);
   app.use('/api/insurance-plans', insurancePlansRouter);

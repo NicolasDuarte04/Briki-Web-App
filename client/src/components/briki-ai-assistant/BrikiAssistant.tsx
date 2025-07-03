@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Textarea } from '../ui/textarea';
 import { cn } from '../../lib/utils';
 import NewPlanCard from './NewPlanCard';
-import { useAnalytics } from '../../hooks/use-analytics';
+import { trackAIAssistantEvent, trackPlanInteraction } from '../../hooks/use-analytics';
 import { RealInsurancePlan } from '../../data/realPlans';
 import { useLocation } from 'wouter';
 import { apiRequest } from '../../lib/api';
@@ -79,7 +79,6 @@ const PlansLoadingPlaceholder: React.FC = () => (
 );
 
 export function BrikiAssistant() {
-  const { trackEvent } = useAnalytics();
   const [, navigate] = useLocation();
   const { toast } = useToast();
   const [selectedDocument, setSelectedDocument] = useState<DocumentSummary | null>(null);
@@ -112,36 +111,37 @@ export function BrikiAssistant() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Track message sent
+    trackAIAssistantEvent('message_sent', input.substring(0, 50), {
+      has_document: !!pendingFile,
+      message_length: input.length
+    });
     sendMessageWithDocument();
   };
 
   const handleReset = () => {
+    trackAIAssistantEvent('chat_reset');
     resetChat();
   };
 
   const handlePlanClick = (plan: Plan) => {
-    trackEvent('plan_click', {
-      category: 'Assistant',
-      action: 'PlanClick',
-      label: plan.provider,
-      metadata: {
-        plan_id: plan.id,
-        provider: plan.provider,
-        isRecommended: plan.isRecommended
-      }
+    trackAIAssistantEvent('plan_click', plan.provider, {
+      plan_id: plan.id,
+      provider: plan.provider,
+      isRecommended: plan.isRecommended
     });
+    
+    // Also track plan interaction
+    trackPlanInteraction('view', plan.id.toString(), plan.name, plan.provider);
   };
 
   const handleSuggestionClick = (suggestion: string) => {
     setInput(suggestion);
-    trackEvent('suggestion_clicked', {
-      category: 'Assistant',
-      action: 'SuggestionClick',
-      label: suggestion
-    });
+    trackAIAssistantEvent('suggestion_clicked', suggestion);
   };
 
   const handleShowAlternatives = () => {
+    trackAIAssistantEvent('show_alternatives_clicked');
     setInput("¿Qué otros tipos de seguros me recomiendas?");
     sendMessage("¿Qué otros tipos de seguros me recomiendas?");
   };
@@ -150,6 +150,10 @@ export function BrikiAssistant() {
     if (process.env.NODE_ENV === 'development') {
       console.log('[Briki Debug] File uploaded:', file);
     }
+    trackAIAssistantEvent('document_uploaded', file.name, {
+      file_size: file.size,
+      file_type: file.type
+    });
     // Don't upload immediately, just set as pending
     setPendingFile(file);
   };

@@ -5,7 +5,9 @@ export enum EventCategory {
   CompetitiveAnalysis = 'competitive_analysis',
   Marketplace = 'marketplace',
   Assistant = 'assistant',
+  AIAssistant = 'ai_assistant',
   Navigation = 'navigation',
   Auth = 'auth',
-  User = 'user'
+  User = 'user',
+  Conversion = 'conversion'
 }
