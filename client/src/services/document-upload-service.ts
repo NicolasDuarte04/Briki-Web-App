@@ -1,4 +1,5 @@
 import { apiRequest } from '../lib/api';
+import { getApiUrl } from '../lib/api-config';
 
 export interface DocumentUploadResponse {
   summary: string;
@@ -47,7 +48,12 @@ export async function uploadDocument(file: File): Promise<DocumentUploadResponse
   formData.append('file', file);
 
   try {
-    const response = await fetch('/api/ai/upload-document', {
+    const uploadUrl = getApiUrl('/api/ai/upload-document');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Briki Debug] Uploading document to:', uploadUrl);
+    }
+
+    const response = await fetch(uploadUrl, {
       method: 'POST',
       body: formData,
       credentials: 'include',
