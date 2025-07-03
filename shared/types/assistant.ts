@@ -20,4 +20,18 @@ export interface AssistantMemory {
     location?: string;
   };
   lastDetectedCategory?: string;
+  recentDocument?: {
+    fileName?: string;
+    fileSize?: number;
+    summaryId?: string;
+    summary?: string;
+    uploadTime?: string;
+  };
+  lastUploadedDocument?: {
+    fileName?: string;
+    fileSize?: number;
+    summaryId?: string;
+    summary?: string;
+    uploadTime?: string;
+  };
 } 

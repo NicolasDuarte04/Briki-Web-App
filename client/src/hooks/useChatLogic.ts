@@ -92,7 +92,7 @@ export function useChatLogic(options: UseChatLogicOptions = {}) {
   };
 
   // Send message
-  const sendMessage = async (messageText: string) => {
+  const sendMessage = async (messageText: string, documentContext?: { summaryId?: string; summary?: string }) => {
     if (!messageText.trim() || isTyping) return;
 
     const userMessage: ChatMessage = {
@@ -108,17 +108,28 @@ export function useChatLogic(options: UseChatLogicOptions = {}) {
     setIsTyping(true);
 
     try {
+      // Build the request data
+      const requestData: any = {
+        message: messageText.trim(),
+        conversationHistory: messages.map(m => ({
+          role: m.role,
+          content: m.content
+        })),
+        memory: memory,
+        resetContext: shouldResetContext
+      };
+
+      // If there's document context, include it in the memory
+      if (documentContext) {
+        requestData.memory = {
+          ...memory,
+          recentDocument: documentContext
+        };
+      }
+
       const responseData = await apiRequest('/api/ai/chat', {
         method: 'POST',
-        data: {
-          message: messageText.trim(),
-          conversationHistory: messages.map(m => ({
-            role: m.role,
-            content: m.content
-          })),
-          memory: memory,
-          resetContext: shouldResetContext
-        }
+        data: requestData
       });
 
       if (shouldResetContext) {
@@ -227,13 +238,15 @@ export function useChatLogic(options: UseChatLogicOptions = {}) {
       // Add to document history
       setDocumentHistory(prev => [...prev, response]);
       
-      // Update memory with document info
+      // Update memory with document info including the summary
       setMemory(prev => ({
         ...prev,
         lastUploadedDocument: {
           fileName: response.fileName,
           fileSize: response.fileSize,
-          uploadTime: new Date().toISOString()
+          uploadTime: new Date().toISOString(),
+          summaryId: response.summaryId,
+          summary: response.summary
         }
       }));
       
@@ -252,6 +265,9 @@ export function useChatLogic(options: UseChatLogicOptions = {}) {
         description: "El resumen del documento está listo.",
       });
       
+      // Return the response so sendMessageWithDocument can use it
+      return response;
+      
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
         console.error('[Briki Debug] Upload error:', error);
@@ -264,6 +280,8 @@ export function useChatLogic(options: UseChatLogicOptions = {}) {
         description: error instanceof Error ? error.message : "No se pudo procesar el documento PDF.",
         variant: "destructive",
       });
+      
+      return null;
       
     } finally {
       setIsUploadingDocument(false);
@@ -287,14 +305,22 @@ export function useChatLogic(options: UseChatLogicOptions = {}) {
     }
     setPendingFile(null);
 
+    let documentContext: { summaryId?: string; summary?: string } | undefined;
+
     // Upload document first if provided
     if (fileToUpload) {
-      await handleDocumentUpload(fileToUpload);
+      const uploadResponse = await handleDocumentUpload(fileToUpload);
+      if (uploadResponse) {
+        documentContext = {
+          summaryId: uploadResponse.summaryId,
+          summary: uploadResponse.summary
+        };
+      }
     }
 
-    // Then send message if provided
+    // Then send message if provided, including document context
     if (textToSend?.trim()) {
-      await sendMessage(textToSend);
+      await sendMessage(textToSend, documentContext);
     }
   };
 

@@ -659,8 +659,33 @@ function createSystemPrompt(
 `
     : '';
 
+  // Add document context if available
+  const documentContext = memory.recentDocument || memory.lastUploadedDocument
+    ? `
+## DOCUMENTO PDF CARGADO RECIENTEMENTE:
+${(() => {
+      const doc = memory.recentDocument || memory.lastUploadedDocument;
+      return `
+- Archivo: ${doc.fileName || 'PDF cargado'}
+- ID del resumen: ${doc.summaryId || 'No disponible'}
+${doc.summary ? `
+
+### RESUMEN DEL DOCUMENTO:
+${doc.summary}
+
+IMPORTANTE: El usuario ha subido este documento y puede estar preguntando sobre él. Usa esta información para:
+1. Responder preguntas específicas sobre el contenido del documento
+2. Comparar esta póliza con los planes disponibles en Briki
+3. Identificar mejoras o alternativas disponibles
+4. Explicar términos o coberturas mencionadas en el documento
+` : ''}`;
+    })()}
+`
+    : '';
+
   return `Eres Briki, un asistente especializado en seguros que ayuda a usuarios en Colombia a encontrar el mejor seguro. 
 ${vehicleContext}
+${documentContext}
 IMPORTANTE: NUNCA termines la conversación después de mostrar planes. SIEMPRE invita al usuario a hacer más preguntas.
 
 ## CAPACIDADES DE DOCUMENTOS PDF:
@@ -670,6 +695,7 @@ IMPORTANTE: NUNCA termines la conversación después de mostrar planes. SIEMPRE 
 - NUNCA debo decir que no puedo leer PDFs
 - Si el usuario menciona un documento o clausulado, debo invitarle a subirlo
 - Después de analizar un PDF, debo ofrecer explicar cualquier término o cobertura que no esté clara
+${documentContext ? `- El usuario YA ha subido un documento, usa la información del resumen para responder sus preguntas` : ''}
 
 ## COMPARACIÓN DE DOCUMENTOS:
 - Cuando el usuario haya subido un documento PDF y pregunte sobre comparaciones:
