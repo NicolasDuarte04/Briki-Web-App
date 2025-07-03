@@ -130,6 +130,33 @@ STRIPE_SECRET_KEY=your_stripe_secret_key
 SESSION_SECRET=your_session_secret
 ```
 
+### Frontend Environment Variables
+
+For production deployment, set these in your hosting platform:
+
+```bash
+VITE_API_URL=https://api.brikiapp.com  # Your Express backend URL
+VITE_ENABLE_ANALYTICS=true              # Enable analytics in production
+```
+
+## Deployment
+
+### Vercel Deployment (Frontend)
+
+The project includes a `vercel.json` configuration that:
+- Builds the client application
+- Sets up API proxying to the backend
+- Handles client-side routing
+
+The API proxy is configured to forward all `/api/*` requests to your Express backend automatically.
+
+### Backend Deployment (Render/Heroku)
+
+Deploy your Express backend separately and ensure:
+1. All environment variables are set
+2. Database is accessible
+3. CORS is configured for your frontend domain
+
 ## Development Scripts
 
 - `npm run dev` - Start development server
