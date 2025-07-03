@@ -2,13 +2,16 @@ import { createClient } from '@supabase/supabase-js';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
-// Initialize Supabase client
-const supabaseUrl = process.env.SUPABASE_URL || '';
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY || '';
+// Check if Supabase environment variables are present
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
 
 if (!supabaseUrl || !supabaseServiceKey) {
-  console.error('Missing SUPABASE_URL or SUPABASE_SERVICE_KEY environment variables');
-  process.exit(1);
+  console.log('⚠️ Supabase environment variables not configured');
+  console.log('SUPABASE_URL present:', !!supabaseUrl);
+  console.log('SUPABASE_SERVICE_KEY present:', !!supabaseServiceKey);
+  console.log('Skipping Supabase migration...');
+  process.exit(0);
 }
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey, {

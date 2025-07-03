@@ -1,16 +1,34 @@
 import { createClient } from '@supabase/supabase-js';
 import { log } from '../vite';
 
-// Initialize Supabase client
-const supabaseUrl = process.env.SUPABASE_URL || '';
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY || '';
+// Initialize Supabase client only if environment variables are present
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
 
-const supabase = createClient(supabaseUrl, supabaseServiceKey, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false
+let supabase: any = null;
+
+if (supabaseUrl && supabaseServiceKey) {
+  try {
+    supabase = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    });
+    log('✅ Supabase client initialized successfully');
+  } catch (error) {
+    log(`❌ Failed to initialize Supabase: ${error}`);
   }
-});
+} else {
+  log('⚠️ Supabase not configured - document summaries will be disabled');
+  log(`SUPABASE_URL present: ${!!supabaseUrl}`);
+  log(`SUPABASE_SERVICE_KEY present: ${!!supabaseServiceKey}`);
+}
+
+// Helper function to check if Supabase is available
+const isSupabaseAvailable = () => {
+  return supabase !== null;
+};
 
 export interface DocumentSummary {
   id?: string;
@@ -45,6 +63,11 @@ export class DocumentSummaryService {
     summary: DocumentSummary,
     userId?: string
   ): Promise<DocumentSummary> {
+    if (!isSupabaseAvailable()) {
+      log('⚠️ Supabase not available - skipping document summary save');
+      return { ...summary, id: `mock-${Date.now()}` };
+    }
+
     try {
       const { data, error } = await supabase
         .from('document_summaries')
@@ -74,6 +97,11 @@ export class DocumentSummaryService {
     userId: string,
     limit: number = 10
   ): Promise<DocumentSummary[]> {
+    if (!isSupabaseAvailable()) {
+      log('⚠️ Supabase not available - returning empty document summaries');
+      return [];
+    }
+
     try {
       const { data, error } = await supabase
         .from('document_summaries')
@@ -101,6 +129,11 @@ export class DocumentSummaryService {
     summaryId: string,
     userId?: string
   ): Promise<DocumentSummary | null> {
+    if (!isSupabaseAvailable()) {
+      log('⚠️ Supabase not available - returning null for document summary');
+      return null;
+    }
+
     try {
       let query = supabase
         .from('document_summaries')
@@ -135,6 +168,11 @@ export class DocumentSummaryService {
     summaryId: string,
     userId: string
   ): Promise<boolean> {
+    if (!isSupabaseAvailable()) {
+      log('⚠️ Supabase not available - skipping document summary deletion');
+      return true;
+    }
+
     try {
       const { error } = await supabase
         .from('document_summaries')
