@@ -31,15 +31,9 @@ export const TestimonialsSection: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800 relative overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute inset-0">
-        <div className="absolute top-1/4 -left-32 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 -right-32 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl" />
-      </div>
-
-      <div className="container px-4 md:px-6 mx-auto relative z-10">
-        <div className="text-center space-y-16">
+    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900 py-24 relative overflow-hidden">
+      <div className="container px-4 md:px-6 mx-auto">
+        <div className="text-center space-y-20">
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -74,7 +68,7 @@ export const TestimonialsSection: React.FC = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
-            className="grid md:grid-cols-3 gap-8"
+            className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto"
           >
             {testimonials.map((testimonial, index) => (
               <motion.div
@@ -83,11 +77,11 @@ export const TestimonialsSection: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 relative"
+                className="bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 relative border border-gray-100 dark:border-gray-700"
               >
                 {/* Quote icon */}
-                <div className="absolute top-6 right-6 w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
-                  <Quote className="h-4 w-4 text-blue-600" />
+                <div className="absolute -top-4 right-6 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center shadow-md">
+                  <Quote className="h-4 w-4 text-white" />
                 </div>
 
                 <div className="space-y-6">
@@ -99,17 +93,17 @@ export const TestimonialsSection: React.FC = () => {
                   </div>
 
                   {/* Content */}
-                  <p className="text-gray-700 dark:text-gray-300 leading-relaxed italic">
+                  <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-lg">
                     "{testimonial.content}"
                   </p>
 
                   {/* Author */}
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
+                  <div className="flex items-center gap-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md">
                       {testimonial.avatar}
                     </div>
                     <div>
-                      <h4 className="font-semibold text-gray-900 dark:text-white">
+                      <h4 className="font-semibold text-gray-900 dark:text-white text-lg">
                         {testimonial.name}
                       </h4>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -128,31 +122,31 @@ export const TestimonialsSection: React.FC = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, ease: "easeOut", delay: 0.4 }}
-            className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 max-w-4xl mx-auto"
+            className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-gray-800 dark:to-gray-700 rounded-2xl shadow-xl p-12 max-w-4xl mx-auto border border-gray-100 dark:border-gray-700"
           >
-            <div className="grid md:grid-cols-3 gap-8 text-center">
-              <div className="space-y-2">
-                <div className="text-3xl font-bold text-gray-900 dark:text-white">4.8/5</div>
-                <div className="text-sm text-gray-600 dark:text-gray-300">Average Rating</div>
+            <div className="grid md:grid-cols-3 gap-12 text-center">
+              <div className="space-y-3">
+                <div className="text-4xl font-bold text-gray-900 dark:text-white">4.8/5</div>
+                <div className="text-base text-gray-600 dark:text-gray-300 font-medium">Average Rating</div>
                 <div className="flex justify-center gap-1">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                    <Star key={i} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
                   ))}
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <div className="text-3xl font-bold text-gray-900 dark:text-white">2,847</div>
-                <div className="text-sm text-gray-600 dark:text-gray-300">Reviews</div>
-                <div className="text-xs text-green-600 font-medium">
+              <div className="space-y-3">
+                <div className="text-4xl font-bold text-gray-900 dark:text-white">2,847</div>
+                <div className="text-base text-gray-600 dark:text-gray-300 font-medium">Reviews</div>
+                <div className="text-sm text-green-600 dark:text-green-400 font-semibold">
                   ↗ 98% Positive
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <div className="text-3xl font-bold text-gray-900 dark:text-white">94%</div>
-                <div className="text-sm text-gray-600 dark:text-gray-300">Would Recommend</div>
-                <div className="text-xs text-blue-600 font-medium">
+              <div className="space-y-3">
+                <div className="text-4xl font-bold text-gray-900 dark:text-white">94%</div>
+                <div className="text-base text-gray-600 dark:text-gray-300 font-medium">Would Recommend</div>
+                <div className="text-sm text-blue-600 dark:text-blue-400 font-semibold">
                   To Family & Friends
                 </div>
               </div>

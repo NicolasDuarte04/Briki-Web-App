@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { TrendingUp, Users, Award, Clock } from 'lucide-react';
+import { TrendingUp, Users, Award, Clock, Shield, Star } from 'lucide-react';
 
 export const StatsSection: React.FC = () => {
   const stats = [
@@ -30,17 +30,28 @@ export const StatsSection: React.FC = () => {
     }
   ];
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 relative overflow-hidden">
-      {/* Background pattern */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute inset-0" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-        }} />
-      </div>
+  const trustIndicators = [
+    {
+      icon: <Shield className="h-6 w-6" />,
+      title: "SUPERSALUD Approved",
+      description: "Licensed by Colombian authorities"
+    },
+    {
+      icon: <Star className="h-6 w-6" />,
+      title: "Industry Recognition",
+      description: "Award-winning AI technology"
+    },
+    {
+      icon: <Users className="h-6 w-6" />,
+      title: "Community Trusted",
+      description: "Growing network of satisfied users"
+    }
+  ];
 
-      <div className="container px-4 md:px-6 mx-auto relative z-10">
-        <div className="text-center space-y-16">
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 py-24 relative overflow-hidden">
+      <div className="container px-4 md:px-6 mx-auto">
+        <div className="text-center space-y-20">
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -75,7 +86,7 @@ export const StatsSection: React.FC = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
-            className="grid md:grid-cols-2 lg:grid-cols-4 gap-8"
+            className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto"
           >
             {stats.map((stat, index) => (
               <motion.div
@@ -84,10 +95,10 @@ export const StatsSection: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 group"
+                className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 group border border-gray-100 dark:border-gray-700"
               >
                 <div className="text-center space-y-4">
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-blue-900/30 dark:to-cyan-900/30 rounded-2xl flex items-center justify-center mx-auto text-blue-600 group-hover:scale-110 transition-transform duration-300">
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-blue-900/30 dark:to-cyan-900/30 rounded-2xl flex items-center justify-center mx-auto text-blue-600 group-hover:scale-110 transition-transform duration-300 shadow-md">
                     {stat.icon}
                   </div>
                   
@@ -113,36 +124,46 @@ export const StatsSection: React.FC = () => {
             ))}
           </motion.div>
 
-          {/* Additional Trust Indicators */}
+          {/* Trust Indicators */}
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, ease: "easeOut", delay: 0.4 }}
-            className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 max-w-4xl mx-auto"
+            className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-12 max-w-5xl mx-auto border border-gray-100 dark:border-gray-700"
           >
-            <div className="text-center mb-8">
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-                Trusted by Leading Colombian Companies
+            <div className="text-center mb-12">
+              <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                Trusted & Regulated
               </h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                Join the growing community of satisfied customers
+              <p className="text-gray-600 dark:text-gray-300 text-lg">
+                Operating with full compliance and industry recognition
               </p>
             </div>
 
-            {/* Partner logos placeholder */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center justify-items-center">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="w-24 h-12 bg-gray-200 dark:bg-gray-600 rounded-lg flex items-center justify-center">
-                  <span className="text-xs text-gray-500 dark:text-gray-400">Partner {i}</span>
-                </div>
+            <div className="grid md:grid-cols-3 gap-8">
+              {trustIndicators.map((indicator, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  className="text-center space-y-4"
+                >
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-blue-900/30 dark:to-cyan-900/30 rounded-2xl flex items-center justify-center mx-auto text-blue-600 shadow-md">
+                    {indicator.icon}
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                      {indicator.title}
+                    </h4>
+                    <p className="text-gray-600 dark:text-gray-300">
+                      {indicator.description}
+                    </p>
+                  </div>
+                </motion.div>
               ))}
-            </div>
-
-            <div className="text-center mt-8">
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Licensed and regulated by Colombian insurance authorities
-              </p>
             </div>
           </motion.div>
         </div>
