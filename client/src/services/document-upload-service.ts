@@ -4,6 +4,23 @@ export interface DocumentUploadResponse {
   summary: string;
   fileName: string;
   fileSize: number;
+  summaryId?: string;
+}
+
+export interface DocumentSummary {
+  id: string;
+  user_id?: string | null;
+  filename: string;
+  insurance_type: 'auto' | 'health' | 'travel' | 'pet' | 'other';
+  insurer_name?: string;
+  coverage_summary?: any;
+  exclusions?: any;
+  deductibles?: string;
+  validity_period?: string;
+  raw_text?: string;
+  file_size?: number;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export async function uploadDocument(file: File): Promise<DocumentUploadResponse> {
@@ -74,5 +91,60 @@ export async function uploadDocument(file: File): Promise<DocumentUploadResponse
     }
     
     throw error;
+  }
+}
+
+export async function getUserDocumentSummaries(): Promise<DocumentSummary[]> {
+  try {
+    const response = await fetch('/api/ai/document-summaries', {
+      method: 'GET',
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch document summaries');
+    }
+
+    const data = await response.json();
+    return data.summaries || [];
+  } catch (error) {
+    console.error('Error fetching document summaries:', error);
+    return [];
+  }
+}
+
+export async function getDocumentSummary(summaryId: string): Promise<DocumentSummary | null> {
+  try {
+    const response = await fetch(`/api/ai/document-summaries/${summaryId}`, {
+      method: 'GET',
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        return null;
+      }
+      throw new Error('Failed to fetch document summary');
+    }
+
+    const data = await response.json();
+    return data.summary;
+  } catch (error) {
+    console.error('Error fetching document summary:', error);
+    return null;
+  }
+}
+
+export async function deleteDocumentSummary(summaryId: string): Promise<boolean> {
+  try {
+    const response = await fetch(`/api/ai/document-summaries/${summaryId}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    });
+
+    return response.ok;
+  } catch (error) {
+    console.error('Error deleting document summary:', error);
+    return false;
   }
 } 

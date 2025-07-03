@@ -10,6 +10,7 @@ import { desc, eq } from 'drizzle-orm';
 import multer from 'multer';
 import { parsePdfText, truncateTextForGPT } from '../utils/pdf-parser';
 import OpenAI from 'openai';
+import { DocumentSummaryService } from '../services/document-summary-service';
 
 const router = express.Router();
 
@@ -377,6 +378,28 @@ Si no puedes encontrar alguna información, indícalo como "No especificado en e
 
       const summary = completion.choices[0]?.message?.content || 'No se pudo generar un resumen.';
 
+      // Parse the summary to extract structured information
+      const parsedInfo = DocumentSummaryService.parseDocumentSummary(summary);
+
+      // Save document summary to database
+      let savedSummary;
+      try {
+        savedSummary = await DocumentSummaryService.saveDocumentSummary({
+          filename: req.file.originalname,
+          insurance_type: parsedInfo.insuranceType as any,
+          insurer_name: parsedInfo.insurerName,
+          coverage_summary: parsedInfo.coverageSummary,
+          exclusions: parsedInfo.exclusions,
+          deductibles: parsedInfo.deductibles,
+          validity_period: parsedInfo.validityPeriod,
+          raw_text: truncatedText,
+          file_size: req.file.size
+        }, userId || undefined);
+      } catch (saveError) {
+        console.error('Failed to save document summary:', saveError);
+        // Continue even if save fails
+      }
+
       // Log the document analysis
       await logConversation({
         userId,
@@ -387,14 +410,16 @@ Si no puedes encontrar alguna información, indícalo como "No especificado en e
           fileName: req.file.originalname,
           fileSize: req.file.size,
           textLength: rawText.length,
-          truncated: rawText.length > 8000
+          truncated: rawText.length > 8000,
+          summaryId: savedSummary?.id
         }
       });
 
       return res.json({ 
         summary,
         fileName: req.file.originalname,
-        fileSize: req.file.size
+        fileSize: req.file.size,
+        summaryId: savedSummary?.id
       });
 
     } catch (openaiError: any) {
@@ -524,6 +549,85 @@ router.get('/conversations/:id', async (req, res) => {
     console.error('Error fetching conversation:', error);
     res.status(500).json({ 
       error: 'Error fetching conversation',
+      details: error.message || 'Unknown error'
+    });
+  }
+});
+
+/**
+ * Get document summaries for the current user
+ */
+router.get('/document-summaries', async (req, res) => {
+  try {
+    const userId = req.session?.user?.id;
+    
+    if (!userId) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    const summaries = await DocumentSummaryService.getUserDocumentSummaries(userId);
+    
+    return res.json({ summaries });
+  } catch (error: any) {
+    console.error('Error fetching document summaries:', error);
+    res.status(500).json({ 
+      error: 'Error fetching document summaries',
+      details: error.message || 'Unknown error'
+    });
+  }
+});
+
+/**
+ * Get a specific document summary
+ */
+router.get('/document-summaries/:id', async (req, res) => {
+  try {
+    const userId = req.session?.user?.id;
+    const summaryId = req.params.id;
+    
+    if (!summaryId) {
+      return res.status(400).json({ error: 'Invalid summary ID' });
+    }
+
+    const summary = await DocumentSummaryService.getDocumentSummary(summaryId, userId);
+    
+    if (!summary) {
+      return res.status(404).json({ error: 'Document summary not found' });
+    }
+
+    return res.json({ summary });
+  } catch (error: any) {
+    console.error('Error fetching document summary:', error);
+    res.status(500).json({ 
+      error: 'Error fetching document summary',
+      details: error.message || 'Unknown error'
+    });
+  }
+});
+
+/**
+ * Delete a document summary
+ */
+router.delete('/document-summaries/:id', async (req, res) => {
+  try {
+    const userId = req.session?.user?.id;
+    const summaryId = req.params.id;
+    
+    if (!userId) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    if (!summaryId) {
+      return res.status(400).json({ error: 'Invalid summary ID' });
+    }
+
+    await DocumentSummaryService.deleteDocumentSummary(summaryId, userId);
+    
+    return res.json({ success: true });
+  } catch (error: any) {
+    console.error('Error deleting document summary:', error);
+    res.status(500).json({ 
+      error: 'Error deleting document summary',
       details: error.message || 'Unknown error'
     });
   }

@@ -215,7 +215,12 @@ export function useChatLogic(options: UseChatLogicOptions = {}) {
       
       updateMessage(loadingMessage.id, {
         content: response.summary,
-        type: 'document'
+        type: 'document',
+        metadata: {
+          summaryId: response.summaryId,
+          fileName: response.fileName,
+          fileSize: response.fileSize
+        }
       });
       
       // Add to document history

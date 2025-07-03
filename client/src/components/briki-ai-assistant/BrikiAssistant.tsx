@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { Send, RefreshCw, Home, Loader2, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '../ui/button';
@@ -15,6 +15,9 @@ import { uploadDocument } from '../../services/document-upload-service';
 import { useChatLogic } from '../../hooks/useChatLogic';
 import { ChatMessage } from '../../types/chat';
 import { useToast } from '../../hooks/use-toast';
+import { DocumentHistory } from './DocumentHistory';
+import { DocumentComparison } from './DocumentComparison';
+import { DocumentSummary } from '../../services/document-upload-service';
 
 type Plan = RealInsurancePlan & {
   isRecommended?: boolean;
@@ -78,6 +81,8 @@ export function BrikiAssistant() {
   const { trackEvent } = useAnalytics();
   const [, navigate] = useLocation();
   const { toast } = useToast();
+  const [selectedDocument, setSelectedDocument] = useState<DocumentSummary | null>(null);
+  const [showComparison, setShowComparison] = useState(false);
   
   const {
     messages,
@@ -91,6 +96,7 @@ export function BrikiAssistant() {
     sendMessage,
     handleDocumentUpload,
     resetChat,
+    addMessage,
   } = useChatLogic();
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -143,8 +149,57 @@ export function BrikiAssistant() {
     await handleDocumentUpload(file);
   };
 
+  const handleViewSummary = (summary: DocumentSummary) => {
+    // Format the summary content
+    const formattedSummary = `📄 **Resumen del Clausulado**
+
+🔹 **Tipo de seguro**: ${summary.insurance_type}
+🏢 **Aseguradora**: ${summary.insurer_name || 'No especificada'}
+
+✅ **Coberturas principales**:
+${summary.coverage_summary ? (Array.isArray(summary.coverage_summary) ? summary.coverage_summary.map(c => `• ${c}`).join('\n') : '• ' + summary.coverage_summary) : '• No especificadas'}
+
+⚠️ **Exclusiones importantes**:
+${summary.exclusions ? (Array.isArray(summary.exclusions) ? summary.exclusions.map(e => `• ${e}`).join('\n') : '• ' + summary.exclusions) : '• No especificadas'}
+
+💰 **Deducibles**: ${summary.deductibles || 'No especificados'}
+
+📅 **Vigencia**: ${summary.validity_period || 'No especificada'}
+
+---
+*Documento: ${summary.filename}*`;
+
+    // Add the summary as a new message
+    addMessage({
+      id: `doc-summary-${Date.now()}`,
+      content: formattedSummary,
+      role: 'assistant',
+      type: 'document',
+      metadata: {
+        summaryId: summary.id,
+        fileName: summary.filename,
+        fileSize: summary.file_size
+      }
+    });
+
+    // Set selected document for comparison
+    setSelectedDocument(summary);
+    
+    // Scroll to the new message
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  };
+
   return (
     <div className="flex flex-col h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+      {/* Document History */}
+      <div className="px-4 pt-4">
+        <DocumentHistory 
+          onViewSummary={handleViewSummary}
+          className="mb-4"
+        />
+      </div>
 
       {/* Chat Window */}
       <div 
@@ -274,6 +329,15 @@ export function BrikiAssistant() {
                       </motion.div>
                     ) : (
                       <NoPlansFound onShowAlternatives={handleShowAlternatives} />
+                    )}
+                    
+                    {/* Show comparison if we have a selected document and plans */}
+                    {selectedDocument && message.metadata.plans.length > 0 && (
+                      <DocumentComparison
+                        document={selectedDocument}
+                        plans={message.metadata.plans}
+                        className="mt-4"
+                      />
                     )}
                   </>
                 )}
