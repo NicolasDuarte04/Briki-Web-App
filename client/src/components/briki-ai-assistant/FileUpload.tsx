@@ -1,11 +1,13 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Upload, FileText, X, AlertCircle, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '../ui/button';
 import { cn } from '../../lib/utils';
 
 interface FileUploadProps {
-  onFileSelect: (file: File) => void;
+  onFileSelect?: (file: File) => void;
+  onFileChange?: (file: File | null) => void;
+  selectedFile?: File | null;
   isUploading?: boolean;
   maxSize?: number; // in MB
   className?: string;
@@ -13,13 +15,25 @@ interface FileUploadProps {
 
 export const FileUpload: React.FC<FileUploadProps> = ({
   onFileSelect,
+  onFileChange,
+  selectedFile: externalSelectedFile,
   isUploading = false,
   maxSize = 10,
   className
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [internalSelectedFile, setInternalSelectedFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Use external state if provided, otherwise use internal state
+  const selectedFile = externalSelectedFile !== undefined ? externalSelectedFile : internalSelectedFile;
+
+  // If external state changes to null, clear the input
+  useEffect(() => {
+    if (externalSelectedFile === null && fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  }, [externalSelectedFile]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -42,8 +56,18 @@ export const FileUpload: React.FC<FileUploadProps> = ({
       return;
     }
 
-    setSelectedFile(file);
-    onFileSelect(file);
+    // If onFileChange is provided, use it for controlled mode
+    if (onFileChange) {
+      onFileChange(file);
+    } else {
+      // Otherwise use internal state
+      setInternalSelectedFile(file);
+    }
+    
+    // Always call onFileSelect if provided (for backwards compatibility)
+    if (onFileSelect) {
+      onFileSelect(file);
+    }
   };
 
   const handleButtonClick = () => {
@@ -51,10 +75,16 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   };
 
   const clearFile = () => {
-    setSelectedFile(null);
     setError(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
+    }
+    
+    // Clear based on mode
+    if (onFileChange) {
+      onFileChange(null);
+    } else {
+      setInternalSelectedFile(null);
     }
   };
 

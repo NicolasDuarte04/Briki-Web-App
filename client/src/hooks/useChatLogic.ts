@@ -41,6 +41,7 @@ export function useChatLogic(options: UseChatLogicOptions = {}) {
   const [memory, setMemory] = useState<Record<string, any>>({});
   const [shownPlanIds, setShownPlanIds] = useState<Set<number>>(new Set());
   const [documentHistory, setDocumentHistory] = useState<DocumentUploadResponse[]>([]);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
   
   // Refs
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -269,6 +270,34 @@ export function useChatLogic(options: UseChatLogicOptions = {}) {
     }
   };
 
+  // Send message with optional document
+  const sendMessageWithDocument = async (messageText?: string, file?: File | null) => {
+    const textToSend = messageText || input;
+    const fileToUpload = file !== undefined ? file : pendingFile;
+    
+    // Check if we have something to send
+    if (!textToSend?.trim() && !fileToUpload) return;
+    
+    // If already processing, return
+    if (isTyping || isUploadingDocument) return;
+
+    // Clear inputs immediately
+    if (!messageText) {
+      setInput('');
+    }
+    setPendingFile(null);
+
+    // Upload document first if provided
+    if (fileToUpload) {
+      await handleDocumentUpload(fileToUpload);
+    }
+
+    // Then send message if provided
+    if (textToSend?.trim()) {
+      await sendMessage(textToSend);
+    }
+  };
+
   // Reset chat
   const resetChat = () => {
     setMessages([]);
@@ -277,6 +306,7 @@ export function useChatLogic(options: UseChatLogicOptions = {}) {
     setShownPlanIds(new Set());
     setDocumentHistory([]);
     setShouldResetContext(true);
+    setPendingFile(null);
     sessionStorage.removeItem(storageKey);
     
     trackEvent('chat_reset', {
@@ -302,6 +332,7 @@ export function useChatLogic(options: UseChatLogicOptions = {}) {
     placeholderHints,
     messagesEndRef,
     documentHistory,
+    pendingFile,
     
     // Actions
     setInput,
@@ -311,6 +342,8 @@ export function useChatLogic(options: UseChatLogicOptions = {}) {
     addMessage,
     updateMessage,
     removeMessage,
+    setPendingFile,
+    sendMessageWithDocument,
     
     // Utils
     scrollToBottom

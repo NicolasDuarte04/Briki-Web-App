@@ -92,23 +92,26 @@ export function BrikiAssistant() {
     currentSuggestion,
     placeholderHints,
     messagesEndRef,
+    pendingFile,
     setInput,
     sendMessage,
     handleDocumentUpload,
     resetChat,
     addMessage,
+    setPendingFile,
+    sendMessageWithDocument,
   } = useChatLogic();
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      sendMessage(input);
+      sendMessageWithDocument();
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    sendMessage(input);
+    sendMessageWithDocument();
   };
 
   const handleReset = () => {
@@ -146,7 +149,12 @@ export function BrikiAssistant() {
     if (process.env.NODE_ENV === 'development') {
       console.log('[Briki Debug] File uploaded:', file);
     }
-    await handleDocumentUpload(file);
+    // Don't upload immediately, just set as pending
+    setPendingFile(file);
+  };
+
+  const handleFileChange = (file: File | null) => {
+    setPendingFile(file);
   };
 
   const handleViewSummary = (summary: DocumentSummary) => {
@@ -370,7 +378,8 @@ ${summary.exclusions ? (Array.isArray(summary.exclusions) ? summary.exclusions.m
           {/* Mobile Layout */}
           <div className="flex flex-col gap-2 sm:hidden">
             <FileUpload 
-              onFileSelect={handleFileUpload}
+              onFileChange={handleFileChange}
+              selectedFile={pendingFile}
               isUploading={isUploadingDocument}
               className="w-full min-w-[180px]"
             />
@@ -382,16 +391,16 @@ ${summary.exclusions ? (Array.isArray(summary.exclusions) ? summary.exclusions.m
                 placeholder={placeholderHints[currentSuggestion]}
                 className="flex-1 resize-none bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 min-h-[60px] max-h-[200px]"
                 rows={1}
-                disabled={isTyping}
+                disabled={isTyping || isUploadingDocument}
               />
               <div className="flex flex-col gap-2">
                 <Button
                   type="submit"
-                  disabled={!input.trim() || isTyping}
+                  disabled={(!input.trim() && !pendingFile) || isTyping || isUploadingDocument}
                   className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white shadow-sm transition-all duration-200 hover:shadow-md"
                   size="icon"
                 >
-                  {isTyping ? (
+                  {isTyping || isUploadingDocument ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
                     <Send className="w-4 h-4" />
@@ -414,7 +423,8 @@ ${summary.exclusions ? (Array.isArray(summary.exclusions) ? summary.exclusions.m
           {/* Desktop Layout */}
           <div className="hidden sm:flex gap-2 items-end">
             <FileUpload 
-              onFileSelect={handleFileUpload}
+              onFileChange={handleFileChange}
+              selectedFile={pendingFile}
               isUploading={isUploadingDocument}
               className="min-w-[180px]"
             />
@@ -425,15 +435,15 @@ ${summary.exclusions ? (Array.isArray(summary.exclusions) ? summary.exclusions.m
               placeholder={placeholderHints[currentSuggestion]}
               className="flex-1 resize-none bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 min-h-[60px] max-h-[200px]"
               rows={1}
-              disabled={isTyping}
+              disabled={isTyping || isUploadingDocument}
             />
             <Button
               type="submit"
-              disabled={!input.trim() || isTyping}
+              disabled={(!input.trim() && !pendingFile) || isTyping || isUploadingDocument}
               className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white shadow-sm transition-all duration-200 hover:shadow-md hover:scale-105 focus:scale-105"
               size="default"
             >
-              {isTyping ? (
+              {isTyping || isUploadingDocument ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
                 <Send className="w-4 h-4" />
