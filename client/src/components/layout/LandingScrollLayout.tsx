@@ -1,69 +1,91 @@
-import React, { useEffect, useState } from 'react';
-import { motion, useScroll } from 'framer-motion';
+import React, { useState, useEffect, useCallback } from 'react';
+import { motion } from 'framer-motion';
+import { useInView } from 'react-intersection-observer';
 
 interface ScrollSection {
   id: string;
+  component: React.ReactNode;
   inView: boolean;
 }
 
-export const LandingScrollLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { scrollY } = useScroll();
-  const [activeSection, setActiveSection] = useState<string>('hero');
-  const [progress, setProgress] = useState(0);
+interface LandingScrollLayoutProps {
+  children: React.ReactNode[];
+  sectionIds: string[];
+}
 
-  // Update scroll progress
+export const LandingScrollLayout: React.FC<LandingScrollLayoutProps> = ({
+  children,
+  sectionIds
+}) => {
+  const [activeSection, setActiveSection] = useState<string>(sectionIds[0] || '');
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  // Track scroll progress
   useEffect(() => {
-    return scrollY.onChange((latest) => {
-      const windowHeight = window.innerHeight;
-      const documentHeight = document.documentElement.scrollHeight;
-      const maxScroll = documentHeight - windowHeight;
-      setProgress(Math.min(latest / maxScroll, 1));
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = (scrollTop / docHeight) * 100;
+      setScrollProgress(Math.min(progress, 100));
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Create intersection observers for each section
+  const sectionRefs = sectionIds.map((id) => {
+    const { ref, inView } = useInView({
+      threshold: 0.3, // Section is considered active when 30% visible
+      rootMargin: '-10% 0px -10% 0px'
     });
-  }, [scrollY]);
+
+    useEffect(() => {
+      if (inView) {
+        setActiveSection(id);
+      }
+    }, [inView, id]);
+
+    return { id, ref, inView };
+  });
 
   return (
-    <div className="relative min-h-screen">
+    <div className="relative">
       {/* Optional: Progress indicator */}
-      <motion.div 
-        className="fixed top-0 left-0 right-0 h-1 bg-primary z-50 origin-left"
-        style={{ scaleX: progress }}
+      <motion.div
+        className="fixed top-0 left-0 h-1 bg-gradient-to-r from-blue-600 to-cyan-500 z-50"
+        style={{ width: `${scrollProgress}%` }}
+        initial={{ width: 0 }}
+        animate={{ width: `${scrollProgress}%` }}
+        transition={{ duration: 0.1 }}
       />
-      
-      {/* Main content container */}
-      <div className="relative">
-        {React.Children.map(children, (child) => {
-          if (React.isValidElement(child)) {
-            return React.cloneElement(child, {
-              onViewportEnter: () => {
-                const id = child.props.id || '';
-                setActiveSection(id);
-              }
-            });
-          }
-          return child;
-        })}
-      </div>
 
-      {/* Optional: Navigation dots */}
-      <nav className="fixed right-4 top-1/2 transform -translate-y-1/2 space-y-2 z-50 hidden lg:block">
-        {React.Children.map(children, (child) => {
-          if (React.isValidElement(child)) {
-            const id = child.props.id || '';
-            return (
-              <button
-                key={id}
-                onClick={() => {
-                  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-                }}
-                className={`w-3 h-3 rounded-full transition-colors ${
-                  activeSection === id ? 'bg-primary' : 'bg-gray-300'
-                }`}
-                aria-label={`Scroll to ${id} section`}
-              />
-            );
-          }
-        })}
-      </nav>
+      {/* Sections */}
+      {children.map((child, index) => {
+        const sectionRef = sectionRefs[index];
+        return (
+          <motion.section
+            key={sectionIds[index]}
+            ref={sectionRef?.ref}
+            id={sectionIds[index]}
+            className="min-h-screen relative"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true, amount: 0.1 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+          >
+            {child}
+          </motion.section>
+        );
+      })}
+
+      {/* Optional: Debug info (remove in production) */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="fixed bottom-4 right-4 bg-black/70 text-white p-2 rounded text-xs z-50">
+          <div>Active: {activeSection}</div>
+          <div>Progress: {Math.round(scrollProgress)}%</div>
+        </div>
+      )}
     </div>
   );
 }; 

@@ -17,3 +17,4 @@ export { AIAssistantButton } from './ai-assistant-button';
 export { ContentWrapper } from './ContentWrapper';
 export { HeroWrapper } from './HeroWrapper';
 export { MainLayout } from './main-layout';
+export { LandingScrollLayout } from './LandingScrollLayout';
