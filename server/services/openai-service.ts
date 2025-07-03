@@ -86,34 +86,51 @@ async function getCachedPlans(): Promise<InsurancePlan[]> {
 
   // Fetch from database
   console.log('[Plan Cache] Fetching fresh plans from database');
-  const plans = await db.select({
-    id: insurancePlans.id,
-    name: insurancePlans.name,
-    category: insurancePlans.category,
-    provider: insurancePlans.provider,
-    basePrice: insurancePlans.basePrice,
-    coverageAmount: insurancePlans.coverageAmount,
-    currency: insurancePlans.currency,
-    country: insurancePlans.country,
-    benefits: insurancePlans.benefits,
-    externalLink: insurancePlans.externalLink,
-    isExternal: insurancePlans.isExternal,
-    createdAt: insurancePlans.createdAt,
-    updatedAt: insurancePlans.updatedAt,
-  }).from(insurancePlans).then(plans => 
-    plans.map(p => ({
-      ...p,
-      features: (p as any).features || (p as any).benefits || [],
-    }))
-  ) as InsurancePlan[];
+  
+  try {
+    const plans = await db.select({
+      id: insurancePlans.id,
+      name: insurancePlans.name,
+      category: insurancePlans.category,
+      provider: insurancePlans.provider,
+      basePrice: insurancePlans.basePrice,
+      coverageAmount: insurancePlans.coverageAmount,
+      currency: insurancePlans.currency,
+      country: insurancePlans.country,
+      benefits: insurancePlans.benefits,
+      externalLink: insurancePlans.externalLink,
+      isExternal: insurancePlans.isExternal,
+      createdAt: insurancePlans.createdAt,
+      updatedAt: insurancePlans.updatedAt,
+    }).from(insurancePlans).then(plans => 
+      plans.map(p => ({
+        ...p,
+        features: (p as any).features || (p as any).benefits || [],
+      }))
+    ) as InsurancePlan[];
 
-  // Update cache
-  planCache = {
-    plans,
-    timestamp: Date.now()
-  };
+    console.log(`[Plan Cache] Successfully loaded ${plans.length} plans from database`);
+    
+    // Update cache
+    planCache = {
+      plans,
+      timestamp: Date.now()
+    };
 
-  return plans;
+    return plans;
+  } catch (error: any) {
+    console.error('[Plan Cache] Database query failed:', error.message);
+    console.error('[Plan Cache] Full error:', error);
+    
+    // Check if it's a connection error
+    if (error.message?.includes('Database not initialized')) {
+      console.error('[Plan Cache] Database connection not initialized. This may be due to Supabase/PostgreSQL configuration conflict.');
+    }
+    
+    // Return empty array instead of throwing to prevent "Load failed" error
+    console.warn('[Plan Cache] Returning empty plans array due to database error');
+    return [];
+  }
 }
 
 /**
@@ -665,6 +682,7 @@ function createSystemPrompt(
 ## DOCUMENTO PDF CARGADO RECIENTEMENTE:
 ${(() => {
       const doc = memory.recentDocument || memory.lastUploadedDocument;
+      if (!doc) return '';
       return `
 - Archivo: ${doc.fileName || 'PDF cargado'}
 - ID del resumen: ${doc.summaryId || 'No disponible'}
@@ -794,7 +812,7 @@ ${(() => {
   if (preferredProviders.length > 0 && contextAnalysis.category !== 'general') {
     return `
 - El usuario pidió planes de ${preferredProviders.join(', ')} para ${contextAnalysis.category}
-- Explica claramente: "Actualmente no tengo planes de ${contextAnalysis.category} de ${preferredProviders.join(' o ')}"
+- Explica claramente: "Actualmente no tenemos planes de ${contextAnalysis.category} de ${preferredProviders.join(' o ')}"
 - Si sabes que ese proveedor ofrece otros tipos de seguros, menciona: "¿Te gustaría ver los planes de [otra categoría] de ${preferredProviders[0]}?"
 - NO muestres planes de otra categoría sin preguntar primero`;
   }
