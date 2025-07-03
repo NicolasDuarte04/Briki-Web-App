@@ -17,6 +17,7 @@ import { initGA, trackEvent } from "./lib/analytics";
 import { EventCategory } from "./constants/analytics";
 import { ColorProvider } from "./contexts/color-context";
 import { AnonymousUserProvider } from "./contexts/anonymous-user-context";
+import { Analytics } from '@vercel/analytics/react';
 
 import NotFound from "./pages/not-found";
 import LandingPage from "./pages/landing-page";
@@ -347,6 +348,7 @@ function App() {
               <RecentlyViewedProvider>
                 <TooltipProvider>
                   <AppContent />
+                  <Analytics />
                 </TooltipProvider>
               </RecentlyViewedProvider>
             </LanguageProvider>
