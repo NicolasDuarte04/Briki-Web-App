@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { useToast } from './use-toast';
-import { useAnalytics, trackAIAssistantEvent } from './use-analytics';
+import { useAnalytics } from './use-analytics';
 import { apiRequest } from '../lib/api';
 import { uploadDocument, DocumentUploadResponse } from '../services/document-upload-service';
 import { ChatMessage } from '../types/chat';
+import { trackEvent } from '../lib/analytics';
 
 interface UseChatLogicOptions {
   storageKey?: string;
@@ -14,6 +15,7 @@ interface AIResponse {
   message: string;
   suggestedPlans?: any[];
   memory?: Record<string, any>;
+  response?: string; // Added for backward compatibility
 }
 
 export function useChatLogic(options: UseChatLogicOptions = {}) {
@@ -136,12 +138,18 @@ export function useChatLogic(options: UseChatLogicOptions = {}) {
         setShouldResetContext(false);
       }
 
-      // Ensure responseData is valid
+      // Validate response data before destructuring
       if (!responseData || typeof responseData !== 'object') {
         throw new Error('Invalid response from AI service');
       }
 
-      const data: AIResponse = responseData;
+      const data: AIResponse = responseData as AIResponse;
+      
+      // Ensure the response has at least a message
+      if (!data.message && !data.response) {
+        console.error('[Briki Debug] Invalid AI response structure:', responseData);
+        throw new Error('AI response missing required fields');
+      }
       
       if (process.env.NODE_ENV === 'development') {
         console.log('[Briki Debug] AI Response:', data);
@@ -165,7 +173,7 @@ export function useChatLogic(options: UseChatLogicOptions = {}) {
       
       const assistantMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
-        content: data.message,
+        content: data.message || data.response || 'Sin respuesta del asistente',
         role: 'assistant',
         timestamp: new Date(),
         type: 'text'
@@ -187,12 +195,7 @@ export function useChatLogic(options: UseChatLogicOptions = {}) {
       newMessages.forEach(msg => addMessage(msg));
       
       if (newPlans.length > 0) {
-        trackEvent('ai_recommended_plans', {
-          category: 'Assistant',
-          action: 'RecommendPlans',
-          label: 'AI Assistant',
-          value: newPlans.length
-        });
+        trackEvent('ai_recommended_plans', 'Assistant', 'AI Assistant', newPlans.length);
       }
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {

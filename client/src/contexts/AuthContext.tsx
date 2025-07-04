@@ -29,6 +29,8 @@ export interface AuthContextType {
     email: string;
     password: string;
     confirmPassword: string;
+    firstName?: string;
+    lastName?: string;
     name?: string;
   }) => Promise<boolean>;
   loginWithGoogle: (returnTo?: string) => void;
@@ -134,6 +136,8 @@ export function AuthProvider({ children }: Props) {
     email: string;
     password: string;
     confirmPassword: string;
+    firstName?: string;
+    lastName?: string;
     name?: string;
   }): Promise<boolean> => {
     try {
@@ -144,7 +148,14 @@ export function AuthProvider({ children }: Props) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(userData),
+        body: JSON.stringify({
+          email: userData.email,
+          password: userData.password,
+          confirmPassword: userData.confirmPassword,
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          name: userData.name
+        }),
         credentials: 'include',
       });
       
