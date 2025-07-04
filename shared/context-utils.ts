@@ -249,7 +249,20 @@ export function analyzeContextNeeds(
         }
     }
 
-    // Special handling for auto: only skip context if we have actual vehicle data
+    // NEW: relaxed context requirement for auto insurance – allow if at least 2 of 3 key attributes are present
+    if (category === 'auto') {
+        const totalCriteria = 3; // brand, year, country
+        const satisfied = totalCriteria - result.missingInfo.length;
+        // Needs more context only if fewer than 2 attributes are provided
+        result.needsMoreContext = satisfied < 2;
+    } else {
+        // Maintain previous behaviour for other categories
+        if (result.missingInfo.length > 0) {
+            result.needsMoreContext = true;
+        }
+    }
+
+    // Special handling for auto: if full vehicle data is available from memory, context is sufficient regardless
     if (category === 'auto' && memory?.vehicle?.make && memory.vehicle.model && memory.vehicle.year) {
         // Complete vehicle data present from lookup – treat context as sufficient
         result.missingInfo = [];
@@ -257,12 +270,8 @@ export function analyzeContextNeeds(
         result.needsMoreContext = false;
         return result;
     }
-
-    if (result.missingInfo.length > 0) {
-        result.needsMoreContext = true;
-    }
-
-    return result;
+    
+    return result; // moved return here after new logic
 }
 
 /**

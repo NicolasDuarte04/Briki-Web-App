@@ -74,6 +74,20 @@ interface PlanCache {
   timestamp: number;
 }
 
+/**
+ * Returns a simple fallback list: cheapest `limit` plans in the given category.
+ * If price info is missing, keeps original order.
+ */
+function getFallbackPlans(plans: InsurancePlan[], limit: number = 5): InsurancePlan[] {
+  if (!plans || plans.length === 0) return [];
+  const sorted = [...plans].sort((a, b) => {
+    const priceA = typeof a.basePrice === 'number' ? a.basePrice : Number.MAX_SAFE_INTEGER;
+    const priceB = typeof b.basePrice === 'number' ? b.basePrice : Number.MAX_SAFE_INTEGER;
+    return priceA - priceB;
+  });
+  return sorted.slice(0, limit);
+}
+
 let planCache: PlanCache | null = null;
 const PLAN_CACHE_TTL = 10 * 60 * 1000; // 10 minutes
 
@@ -151,6 +165,7 @@ export interface AssistantResponse {
   needsMoreContext?: boolean;
   suggestedQuestions?: string[];
   missingInfo?: string[];
+  fallbackLabel?: string; // optional soft label for UI when fallback is used
 }
 
 /**
@@ -286,6 +301,8 @@ export async function generateAssistantResponse(
 
     // Initial empty plans array
     let suggestedPlans: InsurancePlan[] = [];
+    let fallbackLabel: string | undefined;
+    let usedFallback = false;
     
     // Use a single context analysis to drive all decisions
     // Important: use the full conversation context, not just the current message
@@ -356,8 +373,25 @@ export async function generateAssistantResponse(
       }
     }
     
-    // Final safety check: Don't show plans if context is insufficient
-    if (finalContextAnalysis.needsMoreContext) {
+    // If no relevant plans were found, attempt fallback logic
+    if (relevantPlans.length === 0) {
+      const categoryPlans = filteredPlans.filter(p => p.category === finalContextCategory);
+      if (categoryPlans.length > 0) {
+        suggestedPlans = getFallbackPlans(categoryPlans, 5);
+        if (suggestedPlans.length > 0) {
+          usedFallback = true;
+          fallbackLabel = finalContextCategory !== 'general' ? `Sugerencias generales para ${finalContextCategory}` : 'Planes recomendados por Briki';
+          // Relax context block when we're falling back but we have category + country
+          if (finalContextCategory !== 'general') {
+            finalContextAnalysis.needsMoreContext = false;
+          }
+          console.log(`[Fallback Plans] Showing ${suggestedPlans.length} fallback plans for ${finalContextCategory}`);
+        }
+      }
+    }
+
+    // Final safety check: Don't show plans if context is insufficient (unless fallback already applied)
+    if (finalContextAnalysis.needsMoreContext && !usedFallback) {
       console.log('[DEBUG] Final check: Context insufficient – clearing all suggestedPlans');
       suggestedPlans = [];
     }
@@ -469,7 +503,7 @@ export async function generateAssistantResponse(
     );
     
     // CRITICAL DEBUG: Log the exact response being sent
-    const finalApiResponse = {
+    const finalApiResponse: AssistantResponse = {
       message: assistantMessage,
       response: assistantMessage, // Provide both for compatibility
       suggestedPlans,
@@ -478,6 +512,7 @@ export async function generateAssistantResponse(
       needsMoreContext: finalContextAnalysis.needsMoreContext,
       suggestedQuestions: finalContextAnalysis.suggestedQuestions || [],
       missingInfo: finalContextAnalysis.missingInfo || [],
+      fallbackLabel,
     };
     
     console.log(`[OpenAI][${requestId}] FINAL RESPONSE TO FRONTEND:`, JSON.stringify(finalApiResponse, null, 2));
