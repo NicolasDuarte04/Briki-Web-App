@@ -11,11 +11,11 @@ export default function AuthPage() {
   const [, params] = useRoute<{ tab?: string }>("/auth/:tab?");
   const { user, isLoading, isAuthenticated } = useAuth();
   
-  // Redirect to home if already authenticated
+  // Redirect to AI assistant if already authenticated
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      console.log("User already authenticated, redirecting to home");
-      navigate("/home");
+      console.log("User already authenticated, redirecting to AI assistant");
+      navigate("/ask-briki-ai");
     }
   }, [isLoading, isAuthenticated, navigate]);
   

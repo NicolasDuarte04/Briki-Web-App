@@ -26,7 +26,7 @@ export default function UnifiedAuthScreen({ initialTab = "login" }: UnifiedAuthS
   
   // Success handler for form submission
   const handleAuthSuccess = () => {
-    navigate("/home");
+    navigate("/ask-briki-ai");
   };
 
   // Animation variants

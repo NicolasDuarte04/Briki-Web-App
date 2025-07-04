@@ -29,7 +29,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       navigate("/company-dashboard");
     } else {
       console.log("Standard user detected, redirecting to home page");
-      navigate("/home");
+      navigate("/ask-briki-ai");
     }
   };
   

@@ -4,12 +4,9 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { TooltipProvider } from "./components/ui/tooltip";
 import { AuthProvider } from "./contexts/AuthContext";
 import { useAuth } from "./hooks/use-auth";
-import ProtectedRoute from "./components/auth/ProtectedRoute";
 import { LanguageProvider } from "./components/language-selector";
 import { PageTransition } from "./components/ui/transition-effect";
-import { RecentlyViewedProvider } from "./contexts/recently-viewed-context";
-import { AIAssistantProvider, AuthenticatedLayout, MainLayout } from "./components/layout";
-import { LoginNotification } from "./components/login-notification";
+import { AIAssistantProvider, MainLayout } from "./components/layout";
 import { useNavigation } from "./lib/navigation";
 import { useAnalytics } from "./hooks/use-analytics";
 import { useEffect } from "react";
@@ -21,87 +18,31 @@ import { Analytics } from '@vercel/analytics/react';
 
 import NotFound from "./pages/not-found";
 import LandingPage from "./pages/landing-page";
-import DashboardRouter from "./components/dashboard-router";
-// Import our new unified authentication screen
+
+// Import authentication
 import AuthPage from "./pages/auth/AuthPage";
-import TripInfoPage from "./pages/trip-info-page";
-import InsuranceCategoriesPage from "./pages/insurance-categories-page";
-import CheckoutPage from "./pages/checkout-page";
-import CheckoutSuccess from "./pages/checkout-success";
-import WeatherRiskPage from "./pages/weather-risk-page";
-import LearnMorePage from "./pages/learn-more-page";
-import TermsPage from "./pages/terms-page";
+
+// Import user pages
 import ProfilePage from "./pages/profile-page";
 import SettingsPage from "./pages/settings-page";
-import ApiSettingsPage from "./pages/api-settings-page";
-// Import comparison screens
-// Removed legacy ComparePlansPage import - using ComparePlansFixed instead
-import ComparePlansFixed from "./pages/compare-plans-fixed";  // Fixed version of comparison component
 
-// Import new public site pages
+// Import marketing pages
 import FeaturesPage from "./pages/features";
 import PricingPage from "./pages/pricing";
 import AskBrikiPage from "./pages/ask-briki";
-
 import AskBrikiAIPage from "./pages/ask-briki-ai";
 import BlogPage from "./pages/blog";
 import BlogPostPage from "./pages/blog/[slug]";
 import ForumPage from "./pages/forum";
 import CareersPage from "./pages/careers";
-import ColorPaletteDemo from "./pages/color-palette-demo";
+import LearnMorePage from "./pages/learn-more-page";
+import TermsPage from "./pages/terms-page";
 
-// Import redirects from their respective files
-import { 
-  AutoInsuranceRedirect,
-  PetInsuranceRedirect,
-  HealthInsuranceRedirect,
-  TravelInsuranceRedirect
-} from "./pages/redirects/insurance-redirects";
-
-import { 
-  InsurancePlansRedirect 
-} from "./pages/redirects/plans-redirects";
-// Legacy AI assistant imports removed - all routes now redirect to /ask-briki-ai
-import CountdownPageNew from "./pages/countdown-page-new";
-import BrikiPilotPortal from "./pages/briki-pilot-portal";
-
-// New insurance category pages
-import TravelInsurance from "./pages/insurance/travel";
-import AutoInsurance from "./pages/insurance/auto";
-import PetInsurance from "./pages/insurance/pet";
-import HealthInsurance from "./pages/insurance/health";
-
-// Quote pages
-import GetQuotePage from "./pages/get-quote";
-import QuoteConfirmationPage from "./pages/quote-confirmation";
-import QuoteHistoryPage from "./pages/quote-history";
-import CotizarPage from "./pages/cotizar";
-
-// Comparison pages
-import InsuranceQuote from "./pages/insurance/[category]/quote";
-
-// Explore pages (public-facing SEO pages without app layout)
+// Import SEO/explore pages
 import ExploreTravelInsurance from "./pages/explore/travel";
 import ExploreAutoInsurance from "./pages/explore/auto";
 import ExplorePetInsurance from "./pages/explore/pet";
 import ExploreHealthInsurance from "./pages/explore/health";
-
-// Company pages
-import CompanyPage from "./pages/company-page";
-import CompanyLogin from "./pages/company-login";
-import CompanyRegister from "./pages/company-register";
-import CompanyDashboard from "./pages/company-dashboard";
-import CompanyUploadPage from "./pages/company-upload-page";
-import CompanyAnalysisPage from "./pages/company-analysis-page";
-import CompanyMarketplacePage from "./pages/company-marketplace-page";
-import CompanySettings from "./pages/company-settings";
-import CompanyPreviewPage from "./pages/company-preview-page";
-import CompanyRequestPilotPage from "./pages/company-request-pilot-page";
-import ContactSalesPage from "./pages/contact-sales-page";
-import CompanyPlans from "./pages/company-plans";
-import CompanyPlanEdit from "./pages/company-plan-edit";
-
-// Removed unused ConditionalAIProvider
 
 function Router() {
   const { location } = useNavigation();
@@ -120,11 +61,12 @@ function Router() {
   return (
     <PageTransition>
       <Switch>
+        {/* Core pages */}
         <Route path="/" component={LandingPage} />
-        <Route path="/countdown" component={CountdownPageNew} />
-        <Route path="/home" component={DashboardRouter} />
-        <Route path="/dashboard" component={DashboardRouter} />
         <Route path="/auth" component={AuthPage} />
+        <Route path="/ask-briki-ai" component={AskBrikiAIPage} />
+        
+        {/* Auth redirects */}
         <Route path="/sign-in" component={() => {
           window.location.replace("/auth");
           return null;
@@ -133,107 +75,42 @@ function Router() {
           window.location.replace("/auth");
           return null;
         }} />
-        <Route path="/categories" component={InsuranceCategoriesPage} />
-        <Route path="/trip-info" component={TripInfoPage} />
-        <Route path="/cotizar/:planId" component={CotizarPage} />
-        <Route path="/checkout/:planId" component={CheckoutPage} />
-        <Route path="/checkout-success" component={CheckoutSuccess} />
-        <Route path="/weather-risk" component={WeatherRiskPage} />
-        {/* Legacy routes - redirected to new paths */}
-        <Route path="/auto-insurance" component={AutoInsuranceRedirect} />
-        <Route path="/pet-insurance" component={PetInsuranceRedirect} />
-        <Route path="/health-insurance" component={HealthInsuranceRedirect} />
-        <Route path="/travel-insurance" component={TravelInsuranceRedirect} />
-        <Route path="/insurance-plans" component={InsurancePlansRedirect} />
-        
-        {/* New insurance category routes (for authenticated app) */}
-        <Route path="/insurance/travel" component={TravelInsurance} />
-        <Route path="/insurance/auto" component={AutoInsurance} />
-        <Route path="/insurance/pet" component={PetInsurance} />
-        <Route path="/insurance/health" component={HealthInsurance} />
-        {/* Use the fixed version of the comparison page */}
-        <Route path="/compare-plans" component={ComparePlansFixed} />
-        
-        {/* Legacy route removed - using ComparePlansFixed for all comparison needs */}
-        
-        {/* Public-facing explore pages (for SEO and non-authenticated users) */}
-        <Route path="/explore/travel" component={ExploreTravelInsurance} />
-        <Route path="/explore/auto" component={ExploreAutoInsurance} />
-        <Route path="/explore/pet" component={ExplorePetInsurance} />
-        <Route path="/explore/health" component={ExploreHealthInsurance} />
-        
-        {/* Quote pages for each insurance category */}
-        <Route path="/insurance/:category/quote" component={InsuranceQuote} />
-        <Route path="/get-quote" component={GetQuotePage} />
-        <Route path="/quote-confirmation" component={QuoteConfirmationPage} />
-        <Route path="/quote-history" component={QuoteHistoryPage} />
-
-        <Route path="/learn-more" component={LearnMorePage} />
-        <Route path="/terms" component={TermsPage} />
         <Route path="/ai-assistant" component={() => {
           window.location.replace("/ask-briki-ai");
           return null;
         }} />
-        <Route path="/profile" component={ProfilePage} />
-        <Route path="/settings" component={SettingsPage} />
-        <Route path="/api-settings" component={ApiSettingsPage} />
         <Route path="/assistant" component={() => {
           window.location.replace("/ask-briki-ai");
           return null;
         }} />
         
-        {/* Company/Partner Routes - Updated for consistency */}
-        <Route path="/company" component={CompanyPage} />
-        <Route path="/briki-pilot" component={BrikiPilotPortal} />
-        <Route path="/company-login" component={CompanyLogin} />
-        <Route path="/company-register" component={CompanyRegister} />
+        {/* User pages */}
+        <Route path="/profile" component={ProfilePage} />
+        <Route path="/settings" component={SettingsPage} />
         
-        {/* Backward compatibility redirects */}
-        <Route path="/company-login-new" component={() => {
-          window.location.replace("/company-login");
-          return null;
-        }} />
-        <Route path="/company-register-new" component={() => {
-          window.location.replace("/company-register");
-          return null;
-        }} />
-        
-        <Route path="/contact-sales" component={ContactSalesPage} />
-        <Route path="/company-dashboard" component={CompanyDashboard} />
-        
-        {/* Redirect for legacy routes */}
-        <Route path="/company-dashboard-redesigned" component={() => {
-          window.location.replace("/company-dashboard");
-          return null;
-        }} />
-        <Route path="/company-dashboard/upload" component={CompanyUploadPage} />
-        <Route path="/company-dashboard/analysis" component={CompanyAnalysisPage} />
-        <Route path="/company-dashboard/marketplace" component={CompanyMarketplacePage} />
-        <Route path="/company-dashboard/settings" component={CompanySettings} />
-        {/* Plan management routes */}
-        <Route path="/company-plans" component={CompanyPlans} />
-        <Route path="/company-plans/:id/edit" component={CompanyPlanEdit} />
-        {/* Legacy routes */}
-        <Route path="/company-dashboard/preview" component={CompanyPreviewPage} />
-        <Route path="/company-dashboard/request-pilot" component={CompanyRequestPilotPage} />
-        
-        {/* New public site routes */}
+        {/* Marketing pages */}
         <Route path="/features" component={FeaturesPage} />
         <Route path="/pricing" component={PricingPage} />
         <Route path="/ask-briki" component={AskBrikiPage} />
-
-        <Route path="/ask-briki-ai" component={AskBrikiAIPage} />
         <Route path="/blog" component={BlogPage} />
         <Route path="/blog/:slug" component={BlogPostPage} />
         <Route path="/forum" component={ForumPage} />
         <Route path="/careers" component={CareersPage} />
-        <Route path="/color-palette" component={ColorPaletteDemo} />
+        <Route path="/learn-more" component={LearnMorePage} />
+        <Route path="/terms" component={TermsPage} />
+        
+        {/* SEO/Explore pages */}
+        <Route path="/explore/travel" component={ExploreTravelInsurance} />
+        <Route path="/explore/auto" component={ExploreAutoInsurance} />
+        <Route path="/explore/pet" component={ExplorePetInsurance} />
+        <Route path="/explore/health" component={ExploreHealthInsurance} />
         
         <Route component={NotFound} />
       </Switch>
     </PageTransition>
   );
 }
+
 function AppContent() {
   const { location } = useNavigation();
   const { user } = useAuth();
@@ -248,9 +125,8 @@ function AppContent() {
     '/forum', 
     '/careers', 
     '/terms', 
-    '/privacy', 
-    '/contact',
-    '/color-palette'
+    '/learn-more',
+    '/privacy'
   ];
 
   // Check if current path is a marketing route
@@ -258,14 +134,8 @@ function AppContent() {
     location === route || location.startsWith(`${route}/`)
   );
 
-  // Public app routes that don't require authentication
-  const publicAppRoutes = ['/trip-info', '/get-quote', '/dashboard', '/insurance'];
-  const isPublicAppRoute = publicAppRoutes.some(path => 
-    location === path || location.startsWith(path)
-  );
-
   // List of paths where AI Assistant should NOT be provided
-  const excludedPaths = ['/', '/auth', '/countdown', '/login', '/register', '/terms', '/learn-more', '/landing', '/ask-briki', '/ask-briki-ai', '/profile'];
+  const excludedPaths = ['/', '/auth', '/login', '/register', '/terms', '/learn-more', '/ask-briki', '/ask-briki-ai'];
   const isExcludedPath = excludedPaths.some(path => 
     location === path || location.startsWith(`${path}/`)
   );
@@ -275,26 +145,12 @@ function AppContent() {
     path: location, 
     isAuthenticated: !!user, 
     isExcludedPath,
-    isPublicAppRoute,
-    isMarketingRoute,
-    shouldShowAI: (!!user || isPublicAppRoute) && !isExcludedPath
+    isMarketingRoute
   });
 
-  // Marketing routes render as-is (they have their own PublicLayout)
+  // Marketing routes and AI assistant render as-is (they have their own layout)
   if (isMarketingRoute) {
     return <Router />;
-  }
-
-  // For authenticated users on app pages - use AuthenticatedLayout with assistant
-  if (user && !isExcludedPath) {
-    return (
-      <AIAssistantProvider>
-        <AuthenticatedLayout>
-          <LoginNotification />
-          <Router />
-        </AuthenticatedLayout>
-      </AIAssistantProvider>
-    );
   }
 
   // For landing page, just render the Router directly (it has its own layout)
@@ -307,8 +163,8 @@ function AppContent() {
     return <Router />;
   }
 
-  // For public app routes - use MainLayout with limited assistant
-  if (isPublicAppRoute) {
+  // For authenticated users on profile/settings - use MainLayout
+  if (user && (location === '/profile' || location === '/settings')) {
     return (
       <AIAssistantProvider>
         <MainLayout>
@@ -318,18 +174,7 @@ function AppContent() {
     );
   }
 
-  // Use MainLayout for other B2C routes but not for auth pages
-  if (location !== '/auth' && !location.startsWith('/company') && !location.startsWith('/briki-pilot')) {
-    return (
-      <AIAssistantProvider>
-        <MainLayout>
-          <Router />
-        </MainLayout>
-      </AIAssistantProvider>
-    );
-  }
-
-  // Auth pages and B2B routes don't use MainLayout
+  // Auth pages don't use MainLayout
   return <Router />;
 }
 
@@ -349,12 +194,10 @@ function App() {
         <AnonymousUserProvider>
           <ColorProvider>
             <LanguageProvider>
-              <RecentlyViewedProvider>
-                <TooltipProvider>
-                  <AppContent />
-                  <Analytics />
-                </TooltipProvider>
-              </RecentlyViewedProvider>
+              <TooltipProvider>
+                <AppContent />
+                <Analytics />
+              </TooltipProvider>
             </LanguageProvider>
           </ColorProvider>
         </AnonymousUserProvider>

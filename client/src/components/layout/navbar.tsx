@@ -20,7 +20,7 @@ export default function Navbar() {
 
   const handleGetStarted = () => {
     if (user) {
-      navigate("/trip-info");
+      navigate("/ask-briki-ai");
     } else {
       navigate("/auth");
     }

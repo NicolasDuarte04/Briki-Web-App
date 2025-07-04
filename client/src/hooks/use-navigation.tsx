@@ -46,13 +46,13 @@ export function useNavigation() {
         sessionStorage.setItem('navigationHistory', JSON.stringify(history));
         navigate(previousPage);
       } else {
-        // Always go to home page to avoid going back to countdown
-        navigate('/home');
+        // Always go to AI assistant page
+        navigate('/ask-briki-ai');
       }
     } catch (error) {
       console.error('Error navigating back:', error);
-      // Fallback to home page on error
-      navigate(user ? '/home' : '/');
+      // Fallback to AI assistant page on error
+      navigate(user ? '/ask-briki-ai' : '/');
     }
   }, [location, navigate, user]);
 
