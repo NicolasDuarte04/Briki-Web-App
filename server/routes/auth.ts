@@ -137,16 +137,19 @@ router.post('/register', async (req: Request, res: Response) => {
     }
     
     // Create new user with email as primary identifier and enhanced profile fields
-    const newUser = await storage.createUser({
-      id: uuidv4(),
+    // Note: The actual database uses integer IDs that are auto-generated
+    const userData: any = {
       email,
       username, // Auto-generated from email
       password: hashedPassword,
-      firstName, // New profile field
-      lastName,  // New profile field
-      name,      // Generated from firstName/lastName if available
+      firstName: firstName || null, // Optional profile field
+      lastName: lastName || null,   // Optional profile field
+      name: name || null,
       role: "user", // Default role
-    });
+      companyProfile: {} // Empty object for company profile
+    };
+    
+    const newUser = await storage.createUser(userData);
     
     // Log in the new user
     req.login(newUser, (err) => {

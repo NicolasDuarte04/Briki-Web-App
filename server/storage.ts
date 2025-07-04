@@ -34,16 +34,16 @@ import {
 
 // Updated user input schema to match our enhanced DB schema
 export const userAuthSchema = z.object({
-  id: z.string().optional(),
+  id: z.number().optional(),
   email: z.string().email(),
-  password: z.string().nullable(),
+  password: z.string(),
   name: z.string().nullable().optional(),
-  username: z.string().nullable().optional(),
+  username: z.string(),
   role: z.string().nullable().optional().default("user"),
   profileImageUrl: z.string().nullable().optional(),
   firstName: z.string().nullable().optional(),
   lastName: z.string().nullable().optional(),
-  company_profile: z.any().optional()
+  companyProfile: z.any().optional()
 });
 
 export type User = SchemaUser;
@@ -106,7 +106,9 @@ export interface IStorage {
 
 export class DatabaseStorage implements IStorage {
     async getUser(id: string): Promise<User | undefined> {
-        const result = await db.select().from(users).where(eq(users.id, id));
+        const numericId = parseInt(id, 10);
+        if (isNaN(numericId)) return undefined;
+        const result = await db.select().from(users).where(eq(users.id, numericId));
         return result[0];
     }
     async getUserByUsername(username: string): Promise<User | undefined> {
@@ -125,7 +127,9 @@ export class DatabaseStorage implements IStorage {
         return user;
     }
     async updateUser(id: string, updates: UserUpdate): Promise<User> {
-        const [user] = await db.update(users).set(updates).where(eq(users.id, id)).returning();
+        const numericId = parseInt(id, 10);
+        if (isNaN(numericId)) throw new Error("Invalid user ID");
+        const [user] = await db.update(users).set(updates).where(eq(users.id, numericId)).returning();
         return user;
     }
     async resetUsers(): Promise<void> {
@@ -277,10 +281,11 @@ export class MockDataStorage implements IStorage {
     async getUserByEmail(email: string): Promise<User | undefined> { const id = this.emails.get(email); return id ? this.users.get(id) : undefined; }
     async getUserByGoogleId(googleId: string): Promise<User | undefined> { const id = this.googleIds.get(googleId); return id ? this.users.get(id) : undefined; }
     async createUser(userData: UserAuth): Promise<User> {
-        const newUser: User = { ...userData, id: nanoid(), createdAt: new Date(), updatedAt: new Date() } as User;
-        this.users.set(newUser.id, newUser);
-        if(newUser.email) this.emails.set(newUser.email, newUser.id);
-        if(newUser.username) this.usernames.set(newUser.username, newUser.id);
+        const id = Date.now(); // Use timestamp as numeric ID for mock storage
+        const newUser: User = { ...userData, id, createdAt: new Date(), updatedAt: new Date() } as User;
+        this.users.set(String(id), newUser);
+        if(newUser.email) this.emails.set(newUser.email, String(id));
+        if(newUser.username) this.usernames.set(newUser.username, String(id));
         return newUser;
     }
     async updateUser(id: string, updates: UserUpdate): Promise<User> {

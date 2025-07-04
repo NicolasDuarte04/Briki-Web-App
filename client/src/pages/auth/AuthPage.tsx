@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { useLocation, useRoute } from "wouter";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Shield, Zap, BarChart3, Users, Star, CheckCircle } from "lucide-react";
 import UnifiedAuthForm from "../../components/auth/UnifiedAuthForm";
 import { useAuth } from "../../hooks/use-auth";
 import { trackEvent } from "../../lib/analytics";
@@ -35,21 +35,6 @@ const FloatingElements = () => (
   </div>
 );
 
-// Animated background wrapper
-const AnimatedBackground = ({
-  children,
-  className,
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) => (
-  <div className={`relative min-h-screen ${className || ""}`}>
-    <div className="absolute inset-0 bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900" />
-    <FloatingElements />
-    <div className="relative z-10 w-full">{children}</div>
-  </div>
-);
-
 export default function AuthPage() {
   const [, navigate] = useLocation();
   const [, params] = useRoute<{ tab?: string }>("/auth/:tab?");
@@ -69,9 +54,11 @@ export default function AuthPage() {
   }, [params?.tab]);
   
   return (
-    <AnimatedBackground className="flex min-h-screen items-center justify-center px-4 py-0">
+    <div className="min-h-screen flex bg-gradient-to-br from-blue-50 via-white to-cyan-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 relative overflow-hidden">
+      <FloatingElements />
+      
       {/* Back to home button - Fixed position */}
-      <div className="fixed top-0 left-0 w-full bg-gradient-to-b from-white/80 to-white/0 dark:from-gray-950/80 dark:to-gray-950/0 backdrop-blur-sm z-[100]">
+      <div className="fixed top-0 left-0 w-full bg-gradient-to-b from-white/80 to-transparent dark:from-gray-950/80 dark:to-transparent backdrop-blur-sm z-[100]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.button 
             className="flex items-center gap-2 text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors py-6"
@@ -86,26 +73,145 @@ export default function AuthPage() {
           </motion.button>
         </div>
       </div>
-      
-      {/* Auth form container */}
-      <div className="w-full max-w-xl px-5 sm:px-8 py-2 mt-20">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: [0.21, 0.61, 0.35, 1] }}
-          className="text-center mb-4"
-        >
-          <h1 className="text-4xl sm:text-5xl font-bold tracking-tighter bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent drop-shadow-sm">
-            briki
-          </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-400 font-medium mt-2">
-            Your AI-powered insurance companion
-          </p>
-        </motion.div>
+
+      {/* Split Layout Container */}
+      <div className="relative z-10 w-full flex flex-col lg:flex-row min-h-screen">
         
-        {/* Auth form */}
-        <UnifiedAuthForm mode="login" />
+        {/* Left Side - Benefits Section */}
+        <div className="lg:w-1/2 bg-gradient-to-br from-blue-600 to-cyan-500 relative flex items-center justify-center p-8 lg:p-16">
+          {/* Decorative pattern */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-10 left-10 w-32 h-32 bg-white rounded-full blur-3xl" />
+            <div className="absolute bottom-20 right-20 w-48 h-48 bg-white rounded-full blur-3xl" />
+          </div>
+          
+          <div className="relative z-10 max-w-lg">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-white"
+            >
+              <h1 className="text-4xl lg:text-5xl font-bold mb-6">
+                Welcome to Briki
+              </h1>
+              <p className="text-xl mb-8 text-blue-50">
+                Colombia's #1 AI-powered insurance platform
+              </p>
+              
+              {/* Benefits list */}
+              <div className="space-y-6">
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="flex items-start gap-4"
+                >
+                  <div className="flex-shrink-0 w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
+                    <Zap className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg mb-1">Instant AI Analysis</h3>
+                    <p className="text-blue-50">Get personalized insurance recommendations in seconds</p>
+                  </div>
+                </motion.div>
+                
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="flex items-start gap-4"
+                >
+                  <div className="flex-shrink-0 w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
+                    <BarChart3 className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg mb-1">Compare Plans Easily</h3>
+                    <p className="text-blue-50">Side-by-side comparison of all major providers</p>
+                  </div>
+                </motion.div>
+                
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="flex items-start gap-4"
+                >
+                  <div className="flex-shrink-0 w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
+                    <Shield className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg mb-1">Secure & Private</h3>
+                    <p className="text-blue-50">Your data is encrypted and never shared</p>
+                  </div>
+                </motion.div>
+                
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.5 }}
+                  className="flex items-start gap-4"
+                >
+                  <div className="flex-shrink-0 w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
+                    <Users className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg mb-1">Trusted by 50,000+ Users</h3>
+                    <p className="text-blue-50">Join thousands who save time and money</p>
+                  </div>
+                </motion.div>
+              </div>
+              
+              {/* Testimonial */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6 }}
+                className="mt-12 p-6 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20"
+              >
+                <div className="flex items-center gap-1 mb-3">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                  ))}
+                </div>
+                <p className="text-blue-50 italic mb-3">
+                  "Briki helped me find the perfect health insurance plan in minutes. The AI assistant answered all my questions!"
+                </p>
+                <p className="text-white font-semibold">María González</p>
+                <p className="text-blue-100 text-sm">Verified Customer</p>
+              </motion.div>
+            </motion.div>
+          </div>
+        </div>
+        
+        {/* Right Side - Auth Form */}
+        <div className="lg:w-1/2 flex items-center justify-center p-8 lg:p-16">
+          <div className="w-full max-w-md">
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: [0.21, 0.61, 0.35, 1] }}
+              className="text-center mb-8"
+            >
+              <h2 className="text-4xl sm:text-5xl font-bold tracking-tighter bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent drop-shadow-sm">
+                briki
+              </h2>
+              <p className="text-lg text-gray-600 dark:text-gray-400 font-medium mt-2">
+                Your AI-powered insurance companion
+              </p>
+            </motion.div>
+            
+            {/* Auth form */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <UnifiedAuthForm mode={params?.tab === "signup" ? "signup" : "login"} />
+            </motion.div>
+          </div>
+        </div>
       </div>
-    </AnimatedBackground>
+    </div>
   );
 }

@@ -4,15 +4,18 @@ import { z } from "zod";
 
 // Base tables
 export const users = pgTable("users", {
-  id: varchar("id").primaryKey(),
+  id: serial("id").primaryKey(),
   email: varchar("email").unique(),
-  username: varchar("username").unique(),
+  username: varchar("username").unique().notNull(),
+  password: text("password").notNull(),
+  name: text("name"),
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
   role: varchar("role").default("user"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+  companyProfile: jsonb("company_profile"),
 });
 
 // Company profiles for business users
