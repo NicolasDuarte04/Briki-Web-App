@@ -38,12 +38,12 @@ export default function GoogleLoginButton({ mode, className }: GoogleLoginButton
       variant="outline"
       onClick={handleGoogleLogin}
       disabled={isLoading}
-      className={`w-full h-11 flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-800 border border-gray-300 ${className}`}
+      className={`w-full h-12 flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 rounded-xl transition-colors ${className}`}
     >
       {isLoading ? (
-        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+        <Loader2 className="h-5 w-5 animate-spin mr-2" />
       ) : (
-        <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg">
+        <svg viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
           <g transform="matrix(1, 0, 0, 1, 27.009001, -39.238998)">
             <path
               fill="#4285F4"
@@ -64,7 +64,9 @@ export default function GoogleLoginButton({ mode, className }: GoogleLoginButton
           </g>
         </svg>
       )}
-      <span className="ml-1">{mode === "login" ? "Sign in" : "Sign up"} with Google</span>
+      <span className="text-base font-medium">
+        {isLoading ? "Connecting..." : `${mode === "login" ? "Sign in" : "Sign up"} with Google`}
+      </span>
     </Button>
   );
 }
