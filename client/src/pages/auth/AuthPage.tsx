@@ -36,17 +36,32 @@ const FloatingElements = () => (
 );
 
 export default function AuthPage() {
-  const [, navigate] = useLocation();
+  const [location, navigate] = useLocation();
   const [, params] = useRoute<{ tab?: string }>("/auth/:tab?");
   const { user, isLoading, isAuthenticated } = useAuth();
+  
+  // Get returnTo parameter from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const returnTo = urlParams.get('returnTo');
   
   // Redirect to home if already authenticated
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      console.log("User already authenticated, redirecting to home");
-      navigate("/home");
+      // Check for quote intent first
+      const quoteIntentPlanId = sessionStorage.getItem('quoteIntentPlanId');
+      if (quoteIntentPlanId) {
+        console.log("User authenticated, redirecting to quote intent:", quoteIntentPlanId);
+        sessionStorage.removeItem('quoteIntentPlanId');
+        navigate(`/cotizar/${quoteIntentPlanId}`);
+      } else if (returnTo) {
+        console.log("User authenticated, redirecting to returnTo:", returnTo);
+        navigate(returnTo);
+      } else {
+        console.log("User already authenticated, redirecting to profile");
+        navigate("/profile");
+      }
     }
-  }, [isLoading, isAuthenticated, navigate]);
+  }, [isLoading, isAuthenticated, navigate, returnTo]);
   
   // Track page view
   useEffect(() => {
@@ -207,7 +222,21 @@ export default function AuthPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              <UnifiedAuthForm mode={params?.tab === "signup" ? "signup" : "login"} />
+              <UnifiedAuthForm 
+                mode={params?.tab === "signup" ? "signup" : "login"} 
+                onSuccess={() => {
+                  // Check for quote intent after successful auth
+                  const quoteIntentPlanId = sessionStorage.getItem('quoteIntentPlanId');
+                  if (quoteIntentPlanId) {
+                    sessionStorage.removeItem('quoteIntentPlanId');
+                    navigate(`/cotizar/${quoteIntentPlanId}`);
+                  } else if (returnTo) {
+                    navigate(returnTo);
+                  } else {
+                    // Let the auth hook handle role-based redirection
+                  }
+                }}
+              />
             </motion.div>
           </div>
         </div>

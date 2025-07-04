@@ -59,7 +59,7 @@ export default function AuthPageEnhanced() {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      navigate("/dashboard");
+      navigate("/profile");
     }
   }, [isAuthenticated, navigate]);
 

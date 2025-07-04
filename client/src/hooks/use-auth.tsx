@@ -81,9 +81,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       navigate("/company-dashboard");
       trackEvent('navigation', 'redirection', 'company_dashboard');
     } else {
-      console.log("Standard user detected, redirecting to home page");
-      navigate("/home");
-      trackEvent('navigation', 'redirection', 'home');
+      console.log("Standard user detected, redirecting to profile page");
+      navigate("/profile");
+      trackEvent('navigation', 'redirection', 'profile');
     }
   };
   
@@ -306,6 +306,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onSuccess: (data: TokenResponse) => {
       console.log("Login success callback, storing token:", data.token);
+      
+      // Immediate redirect for better UX
+      handleRoleBasedRedirection(data.user);
+      
       // Store token in localStorage
       localStorage.setItem('auth_token', data.token);
       setAuthToken(data.token);
@@ -417,6 +421,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onSuccess: (data: TokenResponse) => {
       console.log("Registration success callback, storing token:", data.token);
+      
+      // Immediate redirect for better UX
+      handleRoleBasedRedirection(data.user);
+      
       // Store token in localStorage
       localStorage.setItem('auth_token', data.token);
       setAuthToken(data.token);

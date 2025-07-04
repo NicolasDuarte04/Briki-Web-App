@@ -4,10 +4,12 @@ import { ArrowRight, Star, Users, Shield, Zap } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { Button } from '../ui/button';
 import { useLanguage } from '../language-selector';
+import { useAuth } from '../../hooks/use-auth';
 
 export const HeroSection: React.FC = () => {
   const [, navigate] = useLocation();
   const { t } = useLanguage();
+  const { user } = useAuth();
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-cyan-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative overflow-hidden py-20">
@@ -79,14 +81,25 @@ export const HeroSection: React.FC = () => {
               {t('hero.ctaAI')}
               <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-1 transition-transform" />
             </Button>
-            <Button 
-              size="lg" 
-              variant="outline"
-              onClick={() => navigate('/home')}
-              className="h-16 px-10 text-lg border-2 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium"
-            >
-              {t('hero.ctaBrowse')}
-            </Button>
+            {user ? (
+              <Button 
+                size="lg" 
+                variant="outline"
+                onClick={() => navigate('/profile')}
+                className="h-16 px-10 text-lg border-2 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium"
+              >
+                {t('hero.ctaProfile') || 'Ver mi perfil'}
+              </Button>
+            ) : (
+              <Button 
+                size="lg" 
+                variant="outline"
+                onClick={() => navigate('/auth')}
+                className="h-16 px-10 text-lg border-2 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium"
+              >
+                {t('hero.ctaGetStarted') || 'Comenzar'}
+              </Button>
+            )}
           </motion.div>
 
           {/* Trust indicators */}

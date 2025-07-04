@@ -75,6 +75,7 @@ import HealthInsurance from "./pages/insurance/health";
 import GetQuotePage from "./pages/get-quote";
 import QuoteConfirmationPage from "./pages/quote-confirmation";
 import QuoteHistoryPage from "./pages/quote-history";
+import CotizarPage from "./pages/cotizar";
 
 // Comparison pages
 import InsuranceQuote from "./pages/insurance/[category]/quote";
@@ -134,6 +135,7 @@ function Router() {
         }} />
         <Route path="/categories" component={InsuranceCategoriesPage} />
         <Route path="/trip-info" component={TripInfoPage} />
+        <Route path="/cotizar/:planId" component={CotizarPage} />
         <Route path="/checkout/:planId" component={CheckoutPage} />
         <Route path="/checkout-success" component={CheckoutSuccess} />
         <Route path="/weather-risk" component={WeatherRiskPage} />

@@ -80,6 +80,22 @@ const SuggestedPlans: React.FC<SuggestedPlansProps> = ({ plans, category, onView
     const plan = plans.find(p => p.id === planId);
     
     if (plan) {
+      // Check if user is authenticated
+      if (!user) {
+        // Store intended quote target for post-login redirect
+        sessionStorage.setItem('quoteIntentPlanId', planId.toString());
+        sessionStorage.setItem('quoteIntentPlan', JSON.stringify(plan));
+        
+        toast({
+          title: "Inicia sesión para continuar",
+          description: "Necesitas una cuenta para cotizar este plan",
+        });
+        
+        // Redirect to auth with return URL
+        navigate(`/auth?returnTo=/cotizar/${planId}`);
+        return;
+      }
+      
       // Check if plan is external
       const isExternal = (plan as any).isExternal;
       const externalLink = (plan as any).externalLink;
