@@ -116,8 +116,7 @@ export default function UnifiedAuthForm({ mode = "login", onSuccess }: UnifiedAu
         password: data.password,
         confirmPassword: data.confirmPassword,
         firstName: data.firstName,
-        lastName: data.lastName,
-        name: `${data.firstName} ${data.lastName}`.trim()
+        lastName: data.lastName
       });
       
       trackEvent("registration_success", "authentication", "email");

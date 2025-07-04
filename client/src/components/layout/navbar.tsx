@@ -131,21 +131,21 @@ export default function Navbar() {
               </DropdownMenu>
             ) : (
               // Non-authenticated buttons
-              <div className="flex items-center space-x-3">
-                <Button 
-                  variant="ghost" 
+            <div className="flex items-center space-x-3">
+              <Button 
+                variant="ghost" 
                   onClick={() => navigate("/auth")}
-                  className="text-gray-600 hover:text-primary px-4 py-2.5"
-                >
+                className="text-gray-600 hover:text-primary px-4 py-2.5"
+              >
                   {t('signIn') || 'Iniciar sesión'}
-                </Button>
-                <Button 
+              </Button>
+              <Button 
                   onClick={() => navigate("/auth")}
-                  className="px-5 py-2.5 font-medium shadow-sm"
-                >
+                className="px-5 py-2.5 font-medium shadow-sm"
+              >
                   {t('signUp') || 'Crear cuenta'}
-                </Button>
-              </div>
+              </Button>
+            </div>
             )}
           </div>
         </div>

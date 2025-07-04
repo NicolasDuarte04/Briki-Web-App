@@ -1,9 +1,9 @@
 # PDF Upload + Send Integration Fix
 
-## 🎯 Problem Fixed
+##  Problem Fixed
 The PDF upload feature was not integrated with the send button. When users selected a PDF and wrote a message, clicking Send would only send the message, leaving the PDF unprocessed.
 
-## ✅ Solution Implemented
+##  Solution Implemented
 
 ### 1. **FileUpload Component Enhancement** (`FileUpload.tsx`)
 - Added support for controlled component pattern
@@ -66,7 +66,7 @@ const sendMessageWithDocument = async (messageText?: string, file?: File | null)
 >
 ```
 
-## 📝 Notes
+##  Notes
 - The fix maintains all existing functionality
 - Error handling remains intact
 - Loading states work for both upload and message processing

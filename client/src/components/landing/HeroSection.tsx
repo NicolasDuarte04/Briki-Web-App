@@ -91,14 +91,14 @@ export const HeroSection: React.FC = () => {
                 {t('hero.ctaProfile') || 'Ver mi perfil'}
               </Button>
             ) : (
-              <Button 
-                size="lg" 
-                variant="outline"
+            <Button 
+              size="lg" 
+              variant="outline"
                 onClick={() => navigate('/auth')}
-                className="h-16 px-10 text-lg border-2 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium"
-              >
+              className="h-16 px-10 text-lg border-2 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium"
+            >
                 {t('hero.ctaGetStarted') || 'Comenzar'}
-              </Button>
+            </Button>
             )}
           </motion.div>
 

@@ -1,39 +1,10 @@
-import { useEffect } from "react";
-import { motion } from "framer-motion";
+import React, { useEffect } from "react";
 import { useLocation, useRoute } from "wouter";
-import { ArrowLeft, Shield, Zap, BarChart3, Users, Star, CheckCircle } from "lucide-react";
-import UnifiedAuthForm from "../../components/auth/UnifiedAuthForm";
 import { useAuth } from "../../hooks/use-auth";
-import { trackEvent } from "../../lib/analytics";
-
-// Animated floating elements for the background
-const FloatingElements = () => (
-  <div className="absolute inset-0 overflow-hidden pointer-events-none">
-    {/* Large blue blob */}
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 0.15 }}
-      transition={{ duration: 1.5 }}
-      className="absolute -top-[30%] -left-[10%] w-[60%] h-[60%] rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 filter blur-[120px]"
-    />
-    
-    {/* Medium blob */}
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 0.15 }}
-      transition={{ duration: 1.5, delay: 0.2 }}
-      className="absolute top-[40%] -right-[15%] w-[50%] h-[50%] rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 filter blur-[100px]"
-    />
-    
-    {/* Small blob */}
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 0.15 }}
-      transition={{ duration: 1.5, delay: 0.4 }}
-      className="absolute bottom-[10%] left-[10%] w-[30%] h-[30%] rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 filter blur-[80px]"
-    />
-  </div>
-);
+import UnifiedAuthForm from "../../components/auth/UnifiedAuthForm";
+import { PublicLayout } from "../../components/layout/public-layout";
+import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
+import { LoaderCircle } from "lucide-react";
 
 export default function AuthPage() {
   const [location, navigate] = useLocation();
@@ -47,183 +18,62 @@ export default function AuthPage() {
   // Redirect to home if already authenticated
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      // Check for quote intent first
+      // Check for quote intent after successful auth
       const quoteIntentPlanId = sessionStorage.getItem('quoteIntentPlanId');
       if (quoteIntentPlanId) {
-        console.log("User authenticated, redirecting to quote intent:", quoteIntentPlanId);
         sessionStorage.removeItem('quoteIntentPlanId');
         navigate(`/cotizar/${quoteIntentPlanId}`);
       } else if (returnTo) {
-        console.log("User authenticated, redirecting to returnTo:", returnTo);
         navigate(returnTo);
       } else {
-        console.log("User already authenticated, redirecting to profile");
+        // Let the auth hook handle role-based redirection
         navigate("/profile");
       }
     }
   }, [isLoading, isAuthenticated, navigate, returnTo]);
   
-  // Track page view
-  useEffect(() => {
-    trackEvent("view_auth_page", "authentication", params?.tab || "login");
-  }, [params?.tab]);
+  // Show loading state
+  if (isLoading) {
+    return (
+      <PublicLayout>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="flex flex-col items-center gap-4">
+            <LoaderCircle className="w-8 h-8 animate-spin text-blue-600" />
+            <p className="text-gray-600">Loading...</p>
+          </div>
+        </div>
+      </PublicLayout>
+    );
+  }
+  
+  const isSignup = params?.tab === "signup";
   
   return (
-    <div className="min-h-screen flex bg-gradient-to-br from-blue-50 via-white to-cyan-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 relative overflow-hidden">
-      <FloatingElements />
-      
-      {/* Back to home button - Fixed position */}
-      <div className="fixed top-0 left-0 w-full bg-gradient-to-b from-white/80 to-transparent dark:from-gray-950/80 dark:to-transparent backdrop-blur-sm z-[100]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.button 
-            className="flex items-center gap-2 text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors py-6"
-            onClick={() => navigate('/')}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            whileHover={{ x: -3 }}
-          >
-            <ArrowLeft size={18} />
-            <span className="text-sm font-medium">Back to home</span>
-          </motion.button>
-        </div>
-      </div>
-
-      {/* Split Layout Container */}
-      <div className="relative z-10 w-full flex flex-col lg:flex-row min-h-screen">
-        
-        {/* Left Side - Benefits Section */}
-        <div className="lg:w-1/2 bg-gradient-to-br from-blue-600 to-cyan-500 relative flex items-center justify-center p-8 lg:p-16">
-          {/* Decorative pattern */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-10 left-10 w-32 h-32 bg-white rounded-full blur-3xl" />
-            <div className="absolute bottom-20 right-20 w-48 h-48 bg-white rounded-full blur-3xl" />
+    <PublicLayout>
+      <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
+        <div className="max-w-md w-full space-y-8">
+          {/* Logo */}
+          <div className="text-center">
+            <div className="flex justify-center mb-6">
+              <div className="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center">
+                <span className="text-2xl font-bold text-white">B</span>
+              </div>
+            </div>
+            <h1 className="text-3xl font-bold text-gray-900">
+              {isSignup ? "Crea tu cuenta" : "Inicia sesión"}
+            </h1>
+            <p className="mt-2 text-gray-600">
+              {isSignup 
+                ? "Únete a Briki para comparar seguros fácilmente" 
+                : "Bienvenido de vuelta a Briki"}
+            </p>
           </div>
           
-          <div className="relative z-10 max-w-lg">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-white"
-            >
-              <h1 className="text-4xl lg:text-5xl font-bold mb-6">
-                Welcome to Briki
-              </h1>
-              <p className="text-xl mb-8 text-blue-50">
-                Colombia's #1 AI-powered insurance platform
-              </p>
-              
-              {/* Benefits list */}
-              <div className="space-y-6">
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="flex items-start gap-4"
-                >
-                  <div className="flex-shrink-0 w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
-                    <Zap className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg mb-1">Instant AI Analysis</h3>
-                    <p className="text-blue-50">Get personalized insurance recommendations in seconds</p>
-                  </div>
-                </motion.div>
-                
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.3 }}
-                  className="flex items-start gap-4"
-                >
-                  <div className="flex-shrink-0 w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
-                    <BarChart3 className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg mb-1">Compare Plans Easily</h3>
-                    <p className="text-blue-50">Side-by-side comparison of all major providers</p>
-                  </div>
-                </motion.div>
-                
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.4 }}
-                  className="flex items-start gap-4"
-                >
-                  <div className="flex-shrink-0 w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
-                    <Shield className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg mb-1">Secure & Private</h3>
-                    <p className="text-blue-50">Your data is encrypted and never shared</p>
-                  </div>
-                </motion.div>
-                
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.5 }}
-                  className="flex items-start gap-4"
-                >
-                  <div className="flex-shrink-0 w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
-                    <Users className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg mb-1">Trusted by 50,000+ Users</h3>
-                    <p className="text-blue-50">Join thousands who save time and money</p>
-                  </div>
-                </motion.div>
-              </div>
-              
-              {/* Testimonial */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 }}
-                className="mt-12 p-6 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20"
-              >
-                <div className="flex items-center gap-1 mb-3">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                  ))}
-                </div>
-                <p className="text-blue-50 italic mb-3">
-                  "Briki helped me find the perfect health insurance plan in minutes. The AI assistant answered all my questions!"
-                </p>
-                <p className="text-white font-semibold">María González</p>
-                <p className="text-blue-100 text-sm">Verified Customer</p>
-              </motion.div>
-            </motion.div>
-          </div>
-        </div>
-        
-        {/* Right Side - Auth Form */}
-        <div className="lg:w-1/2 flex items-center justify-center p-8 lg:p-16">
-          <div className="w-full max-w-md">
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, ease: [0.21, 0.61, 0.35, 1] }}
-              className="text-center mb-8"
-            >
-              <h2 className="text-4xl sm:text-5xl font-bold tracking-tighter bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent drop-shadow-sm">
-                briki
-              </h2>
-              <p className="text-lg text-gray-600 dark:text-gray-400 font-medium mt-2">
-                Your AI-powered insurance companion
-              </p>
-            </motion.div>
-            
-            {/* Auth form */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
+          {/* Auth Form Card */}
+          <Card className="shadow-lg border-0">
+            <CardContent className="p-8">
               <UnifiedAuthForm 
-                mode={params?.tab === "signup" ? "signup" : "login"} 
+                mode={isSignup ? "signup" : "login"} 
                 onSuccess={() => {
                   // Check for quote intent after successful auth
                   const quoteIntentPlanId = sessionStorage.getItem('quoteIntentPlanId');
@@ -237,10 +87,24 @@ export default function AuthPage() {
                   }
                 }}
               />
-            </motion.div>
+            </CardContent>
+          </Card>
+          
+          {/* Footer */}
+          <div className="text-center text-sm text-gray-600">
+            <p>
+              Al continuar, aceptas nuestros{" "}
+              <a href="/terms" className="text-blue-600 hover:text-blue-700 hover:underline">
+                Términos de Servicio
+              </a>{" "}
+              y{" "}
+              <a href="/privacy" className="text-blue-600 hover:text-blue-700 hover:underline">
+                Política de Privacidad
+              </a>
+            </p>
           </div>
         </div>
       </div>
-    </div>
+    </PublicLayout>
   );
 }

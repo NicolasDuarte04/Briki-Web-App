@@ -23,7 +23,7 @@ import NotFound from "./pages/not-found";
 import LandingPage from "./pages/landing-page";
 import DashboardRouter from "./components/dashboard-router";
 // Import our new unified authentication screen
-import AuthPage from "./pages/auth-page-enhanced";
+import AuthPage from "./pages/auth/AuthPage";
 import TripInfoPage from "./pages/trip-info-page";
 import InsuranceCategoriesPage from "./pages/insurance-categories-page";
 import CheckoutPage from "./pages/checkout-page";

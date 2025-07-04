@@ -7,21 +7,12 @@ async function throwIfResNotOk(res: Response) {
   }
 }
 
-// Get the auth token from localStorage
-function getAuthToken(): string | null {
-  return localStorage.getItem('auth_token');
-}
-
 export async function apiRequest(
   method: string,
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
   console.log(`API request: ${method} ${url}`, data);
-  
-  // Get token from localStorage for authenticated requests
-  const token = getAuthToken();
-  console.log(`Token for ${method} ${url}:`, token ? 'Token exists' : 'No token');
   
   const requestOptions = {
     method,
@@ -31,11 +22,10 @@ export async function apiRequest(
       "Cache-Control": "no-cache",
       "Pragma": "no-cache",
       "Accept": "application/json",
-      // Add auth token if available
-      ...(token ? { "Authorization": `Bearer ${token}` } : {})
     },
     body: data ? JSON.stringify(data) : undefined,
     mode: 'cors' as RequestMode,
+    credentials: 'include' as RequestCredentials, // Include cookies
   };
   
   try {
@@ -44,12 +34,7 @@ export async function apiRequest(
     
     // Handle unauthorized responses
     if (res.status === 401) {
-      console.log('Unauthorized request, token may be invalid');
-      // Clear token if it's invalid
-      if (token) {
-        localStorage.removeItem('auth_token');
-        console.log('Removed invalid token from localStorage');
-      }
+      console.log('Unauthorized request, session may be invalid');
     }
     
     await throwIfResNotOk(res);
@@ -68,21 +53,16 @@ export const getQueryFn: <T>(options: {
   async ({ queryKey }) => {
     console.log(`Query request: ${queryKey[0]}`);
     
-    // Get the auth token
-    const token = getAuthToken();
-    console.log(`Token for query ${queryKey[0]}:`, token ? 'Token exists' : 'No token');
-    
     try {
-      // Make authenticated request if token exists
+      // Make authenticated request with cookies
       const res = await fetch(queryKey[0] as string, {
         method: 'GET',
         mode: 'cors' as RequestMode,
+        credentials: 'include' as RequestCredentials, // Include cookies
         headers: {
           "Cache-Control": "no-cache",
           "Pragma": "no-cache",
           "Accept": "application/json",
-          // Add authorization header if token exists
-          ...(token ? { "Authorization": `Bearer ${token}` } : {})
         }
       });
       
@@ -91,12 +71,6 @@ export const getQueryFn: <T>(options: {
       // Handle authentication errors
       if (res.status === 401) {
         console.log(`Query unauthorized: ${queryKey[0]}`);
-        
-        // Clear token if it's invalid
-        if (token) {
-          localStorage.removeItem('auth_token');
-          console.log('Removed invalid token from localStorage');
-        }
         
         if (unauthorizedBehavior === "returnNull") {
           return null;

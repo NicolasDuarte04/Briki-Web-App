@@ -5,14 +5,14 @@ import {
   UseMutationResult,
 } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { insertUserSchema, User as SelectUser, InsertUser } from "../../../shared/schema";
+import { User as SelectUser } from "../../../shared/schema";
 import { getQueryFn, apiRequest, queryClient } from "../lib/queryClient";
 import { useToast } from "./use-toast";
 import { trackEvent } from "../lib/analytics";
 
-type TokenResponse = {
+// Update response type to remove token
+type AuthResponse = {
   user: SelectUser;
-  token: string;
 };
 
 type AuthContextType = {
@@ -20,9 +20,9 @@ type AuthContextType = {
   isLoading: boolean;
   error: Error | null;
   isAuthenticated: boolean;
-  loginMutation: UseMutationResult<TokenResponse, Error, LoginData>;
+  loginMutation: UseMutationResult<AuthResponse, Error, LoginData>;
   logoutMutation: UseMutationResult<null, Error, void>;
-  registerMutation: UseMutationResult<TokenResponse, Error, InsertUser>;
+  registerMutation: UseMutationResult<AuthResponse, Error, RegisterData>;
   refetchUser: () => Promise<any>;
   login: (email: string, password: string) => Promise<boolean>;
   register: (data: { 
@@ -42,34 +42,18 @@ type LoginData = {
   role?: string; // Add optional role parameter for company login
 };
 
+type RegisterData = {
+  email: string;
+  password: string;
+  confirmPassword: string;
+  firstName?: string;
+  lastName?: string;
+};
+
 export const AuthContext = createContext<AuthContextType | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
   const [, navigate] = useLocation();
-  const [authToken, setAuthToken] = useState<string | null>(() => {
-    // Try to get token from localStorage on initial load
-    return localStorage.getItem('auth_token');
-  });
-  
-  // This effect will run on page refresh or initial load
-  useEffect(() => {
-    const token = localStorage.getItem('auth_token');
-    if (token) {
-      console.log("Found auth token on page load/refresh, will validate shortly");
-      setAuthToken(token);
-    }
-  }, []);
-  
-  // Track when a user becomes authenticated
-  useEffect(() => {
-    if (!isLoading && user) {
-      trackEvent('user_authenticated', 'authentication', 'session_start', undefined, {
-        user_id: user.id,
-        email: user.email,
-        auth_method: 'token'
-      });
-    }
-  }, [isLoading, user]);
   
   // Centralized role-based redirection function
   const handleRoleBasedRedirection = (userData: SelectUser) => {
@@ -96,16 +80,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     queryKey: ["/api/user"],
     queryFn: async ({ queryKey }) => {
       try {
-        // If we don't have a token, the user is not authenticated
-        if (!authToken) {
-          console.log("No auth token available, user not authenticated");
-          return null;
-        }
-        
-        console.log("Fetching user data with token...");
+        console.log("Fetching user data...");
         const res = await fetch(queryKey[0] as string, {
+          credentials: 'include', // Include cookies
           headers: {
-            "Authorization": `Bearer ${authToken}`,
             "Cache-Control": "no-cache",
             "Pragma": "no-cache"
           }
@@ -114,11 +92,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.log("User data response status:", res.status);
         
         if (res.status === 401) {
-          console.log("Token invalid or expired (401)");
-          // Clear invalid token
-          localStorage.removeItem('auth_token');
-          setAuthToken(null);
-          trackEvent('auth_token_invalid', 'authentication', 'session_error');
+          console.log("User not authenticated (401)");
+          trackEvent('auth_session_invalid', 'authentication', 'session_error');
           return null;
         }
         
@@ -141,7 +116,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     refetchOnWindowFocus: true,
     refetchOnMount: true,
     retry: 2,
-    // Always enable the query, but we'll check token inside the queryFn
     enabled: true
   });
 
@@ -162,7 +136,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     confirmPassword?: string; 
     firstName?: string;
     lastName?: string;
-    name?: string 
   }): Promise<boolean> => {
     try {
       // Verify passwords match if confirmPassword is provided
@@ -177,19 +150,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       trackEvent('signup_attempt', 'authentication', 'form_signup');
       
-      // Now we send email, password, and profile fields
+      // Send registration data with confirmPassword
       const result = await registerMutation.mutateAsync({
-        // We don't need to generate a UUID here - the DB will assign an ID
         email: data.email,
         password: data.password,
-        // Include first and last name if provided
+        confirmPassword: data.confirmPassword || data.password,
         firstName: data.firstName,
         lastName: data.lastName,
-        // Use name if provided or leave it for the server to generate
-        name: data.name || (data.firstName && data.lastName ? `${data.firstName} ${data.lastName}` : undefined),
-        // Only provide fields that exist in the actual database schema
-        role: "user",
-        company_profile: { registeredWith: "email" },
       });
       return !!result;
     } catch (error) {
@@ -213,12 +180,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       trackEvent('password_reset_attempt', 'authentication', 'form');
       
       // Call the password reset endpoint
-      const response = await fetch("/api/reset-password", {
+      const response = await fetch("/api/auth/reset-password", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Cache-Control": "no-cache"
         },
+        credentials: 'include',
         body: JSON.stringify({ email })
       });
       
@@ -260,13 +228,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         role: credentials.role || 'user'
       });
       try {
-        // Make a direct fetch to control headers exactly
-        const response = await fetch("/api/login", {
+        // Make a direct fetch to the correct endpoint
+        const response = await fetch("/api/auth/login", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             "Cache-Control": "no-cache"
           },
+          credentials: 'include', // Include cookies
           body: JSON.stringify(credentials)
         });
         
@@ -298,21 +267,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         
         console.log("Login successful, auth data received");
         trackEvent('login_success', 'authentication', 'credentials');
-        return responseData as TokenResponse;
+        return responseData as AuthResponse;
       } catch (error: any) {
         console.error("Login error:", error.message || error);
         throw error;
       }
     },
-    onSuccess: (data: TokenResponse) => {
-      console.log("Login success callback, storing token:", data.token);
+    onSuccess: (data: AuthResponse) => {
+      console.log("Login success callback");
       
       // Immediate redirect for better UX
       handleRoleBasedRedirection(data.user);
-      
-      // Store token in localStorage
-      localStorage.setItem('auth_token', data.token);
-      setAuthToken(data.token);
       
       // Store user data in query cache
       queryClient.setQueryData(["/api/user"], data.user);
@@ -324,33 +289,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         role: data.user.role
       });
       
-      // Force token refresh by making an extra API call
-      setTimeout(async () => {
-        try {
-          console.log("Verifying token with fetch...");
-          const verifyResponse = await fetch('/api/user', {
-            headers: {
-              "Authorization": `Bearer ${data.token}`,
-              "Cache-Control": "no-cache",
-            }
-          });
-          if (verifyResponse.ok) {
-            console.log("Token verification successful");
-            
-            // Get the latest user data and handle role-based redirection
-            const userData = await verifyResponse.json();
-            
-            // Use the centralized role-based redirection function
-            handleRoleBasedRedirection(userData);
-          } else {
-            console.log("Token verification failed:", verifyResponse.status);
-            trackEvent('token_verification_failed', 'authentication', 'api_error', 0);
-          }
-        } catch (err) {
-          console.error("Token verification error:", err);
-          trackEvent('token_verification_error', 'authentication', 'api_error', 0);
-        }
-      }, 500);
+      // Force user data refresh
+      setTimeout(() => {
+        refetch();
+      }, 100);
       
       toast({
         title: "Login successful",
@@ -368,20 +310,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   });
 
   const registerMutation = useMutation({
-    mutationFn: async (credentials: InsertUser) => {
+    mutationFn: async (credentials: RegisterData) => {
       console.log("Registration attempt for:", credentials.email);
       trackEvent('signup_attempt', 'authentication', 'form', undefined, {
         email: credentials.email
       });
       
       try {
-        // Make a direct fetch to control headers exactly
-        const response = await fetch("/api/register", {
+        // Make a direct fetch to the correct endpoint
+        const response = await fetch("/api/auth/register", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             "Cache-Control": "no-cache"
           },
+          credentials: 'include', // Include cookies
           body: JSON.stringify(credentials)
         });
         
@@ -413,21 +356,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         
         console.log("Registration successful, auth data received");
         trackEvent('signup_success', 'authentication', 'form');
-        return responseData as TokenResponse;
+        return responseData as AuthResponse;
       } catch (error: any) {
         console.error("Registration error:", error.message || error);
         throw error;
       }
     },
-    onSuccess: (data: TokenResponse) => {
-      console.log("Registration success callback, storing token:", data.token);
+    onSuccess: (data: AuthResponse) => {
+      console.log("Registration success callback");
       
       // Immediate redirect for better UX
       handleRoleBasedRedirection(data.user);
-      
-      // Store token in localStorage
-      localStorage.setItem('auth_token', data.token);
-      setAuthToken(data.token);
       
       // Store user data in query cache
       queryClient.setQueryData(["/api/user"], data.user);
@@ -439,33 +378,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         role: data.user.role
       });
       
-      // Force token refresh by making an extra API call
-      setTimeout(async () => {
-        try {
-          console.log("Verifying token after registration...");
-          const verifyResponse = await fetch('/api/user', {
-            headers: {
-              "Authorization": `Bearer ${data.token}`,
-              "Cache-Control": "no-cache",
-            }
-          });
-          if (verifyResponse.ok) {
-            console.log("Token verification successful after registration");
-            
-            // Get the latest user data and handle role-based redirection
-            const userData = await verifyResponse.json();
-            
-            // Use the centralized role-based redirection function
-            handleRoleBasedRedirection(userData);
-          } else {
-            console.log("Token verification failed after registration:", verifyResponse.status);
-            trackEvent('token_verification_failed', 'authentication', 'api_error', 0);
-          }
-        } catch (err) {
-          console.error("Token verification error after registration:", err);
-          trackEvent('token_verification_error', 'authentication', 'api_error', 0);
-        }
-      }, 500);
+      // Force user data refresh
+      setTimeout(() => {
+        refetch();
+      }, 100);
       
       toast({
         title: "Registration successful",
@@ -488,24 +404,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       trackEvent('logout_initiated', 'authentication', 'user_action');
       
       try {
-        // Only try to logout on the server if we have a token
-        if (authToken) {
-          const response = await fetch("/api/logout", {
-            method: "POST",
-            headers: {
-              "Authorization": `Bearer ${authToken}`,
-              "Content-Type": "application/json",
-              "Cache-Control": "no-cache"
-            }
-          });
-          console.log("Logout response status:", response.status);
-          
-          if (!response.ok) {
-            trackEvent('logout_server_error', 'authentication', 'api_error', 0, {
-              status: response.status
-            });
+        const response = await fetch("/api/auth/logout", {
+          method: "GET", // Backend uses GET for logout
+          credentials: 'include', // Include cookies
+          headers: {
+            "Cache-Control": "no-cache"
           }
+        });
+        console.log("Logout response status:", response.status);
+        
+        if (!response.ok) {
+          trackEvent('logout_server_error', 'authentication', 'api_error', 0, {
+            status: response.status
+          });
         }
+        
         return null;
       } catch (error) {
         console.error("Logout error:", error);
@@ -525,10 +438,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         trackEvent('logout_success', 'authentication', 'user_action');
       }
       
-      // Clear token from localStorage
-      localStorage.removeItem('auth_token');
-      setAuthToken(null);
-      
       // Clear user data from query cache
       queryClient.setQueryData(["/api/user"], null);
       queryClient.invalidateQueries({ queryKey: ["/api/user"] });
@@ -546,8 +455,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       trackEvent('logout_failure', 'authentication', 'api_error', 0);
       
       // Even if there's an error, attempt to clear local auth state
-      localStorage.removeItem('auth_token');
-      setAuthToken(null);
       queryClient.setQueryData(["/api/user"], null);
       
       toast({
