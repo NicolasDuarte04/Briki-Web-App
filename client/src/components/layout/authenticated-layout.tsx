@@ -1,5 +1,6 @@
 import React from 'react';
 import { useLocation } from 'wouter';
+import Navbar from './navbar';
 
 interface AuthenticatedLayoutProps {
   children: React.ReactNode;
@@ -15,7 +16,7 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Header/Navbar will be handled by parent layout or navigation system */}
+      <Navbar />
       <main className="flex-grow">
         {children}
       </main>

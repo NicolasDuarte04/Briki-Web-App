@@ -9,7 +9,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
-import { AuthenticatedLayout } from "../components/layout";
 
 export default function ProfilePage() {
   const { user, isLoading } = useAuth();
@@ -44,7 +43,6 @@ export default function ProfilePage() {
   if (!user) return null;
 
   return (
-    <AuthenticatedLayout>
       <main className="flex-1 bg-gray-50">
         <div className="container px-4 py-8 mx-auto max-w-6xl">
           <motion.div
@@ -399,6 +397,5 @@ export default function ProfilePage() {
           </motion.div>
         </div>
       </main>
-    </AuthenticatedLayout>
   );
 }
