@@ -68,7 +68,7 @@ export const HeroSection: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.6 }}
-            className="flex flex-col sm:flex-row gap-6 justify-center"
+            className="flex justify-center"
           >
             <Button 
               size="lg" 
@@ -78,28 +78,9 @@ export const HeroSection: React.FC = () => {
               }}
               className="h-16 px-10 text-lg bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white border-0 hover:shadow-xl hover:shadow-blue-500/25 font-semibold group"
             >
-              {t('hero.ctaAI')}
+              Start with AI Assistant
               <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-1 transition-transform" />
             </Button>
-            {user ? (
-              <Button 
-                size="lg" 
-                variant="outline"
-                onClick={() => navigate('/profile')}
-                className="h-16 px-10 text-lg border-2 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium"
-              >
-                {t('hero.ctaProfile')?.trim() || 'Ver mi perfil'}
-              </Button>
-            ) : (
-            <Button 
-              size="lg" 
-              variant="outline"
-                onClick={() => navigate('/auth')}
-              className="h-16 px-10 text-lg border-2 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium"
-            >
-                {t('hero.ctaGetStarted') || 'Comenzar'}
-            </Button>
-            )}
           </motion.div>
 
           {/* Trust indicators */}

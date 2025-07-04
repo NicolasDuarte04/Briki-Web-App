@@ -104,23 +104,14 @@ export const ProductDemoPanel: React.FC = () => {
                   {t('cta.subtitle')}
                 </p>
 
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <div className="flex justify-center">
                   <Button 
                     size="lg" 
                     onClick={() => navigate('/ask-briki-ai')}
                     className="h-12 px-8 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white border-0 hover:shadow-lg font-semibold group"
                   >
-                    {t('demo.cta')}
+                    Start with AI Assistant
                     <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                  
-                  <Button 
-                    size="lg" 
-                    variant="outline"
-                    onClick={() => navigate('/home')}
-                    className="h-12 px-8 border-2 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
-                  >
-                    {t('hero.ctaBrowse')}
                   </Button>
                 </div>
               </div>
