@@ -145,6 +145,31 @@ export function hasSufficientContext(conversation: string, category: InsuranceCa
   }
 }
 
+// ===============================
+// CONFIGURABLE CONTEXT REQUIREMENTS
+// ===============================
+
+interface CategoryRequirement {
+  fields: string[];      // ordered list of logical field keys
+  minimum: number;       // minimum number of satisfied fields required
+}
+
+export const CONTEXT_REQUIREMENTS: Record<InsuranceCategory | 'home' | 'life', CategoryRequirement> = {
+  auto:   { fields: ['brand', 'year', 'country'],                         minimum: 2 },
+  travel: { fields: ['destination', 'datesOrDuration', 'travelers', 'purpose'], minimum: 3 },
+  health: { fields: ['age', 'gender', 'country'],                        minimum: 2 },
+  pet:    { fields: ['petType', 'petAge', 'location'],                   minimum: 2 },
+  soat:   { fields: ['vehicleType', 'location'],                         minimum: 2 },
+  home:   { fields: ['propertyType', 'location', 'value'],               minimum: 2 },
+  life:   { fields: ['age', 'coverage', 'beneficiaries'],                minimum: 2 },
+};
+
+/**
+ * Determines if additional context is needed given how many criteria are satisfied.
+ */
+export function needsMinimumCriteria(satisfied: number, minimum: number): boolean {
+  return satisfied < minimum;
+}
 // =================================================================
 // LÓGICA DE ANÁLISIS DE NECESIDADES DEL BACKEND
 // =================================================================
@@ -180,6 +205,7 @@ export function analyzeContextNeeds(
         return result;
     }
 
+    // Boolean checks per category (pattern matching & memory)
     const checks = {
         travel: {
             destination: /(europa|asia|méxico|estados unidos|colombia|españa|francia|alemania|italia|brasil|chile|perú|usa|canadá|argentina|viajar a)/i.test(lowerConversation),
@@ -209,6 +235,17 @@ export function analyzeContextNeeds(
         soat: {
             vehicleType: /(carro|moto|auto|vehiculo|vehículo|car|motorcycle)/i.test(lowerConversation),
             location: /(bogotá|medellín|cali|barranquilla|cartagena|colombia)/i.test(lowerConversation)
+        },
+        // Basic placeholder checks for new categories (home, life)
+        home: {
+            propertyType: /(casa|apartamento|vivienda|inmueble)/i.test(lowerConversation),
+            location: /(colombia|méxico|perú|chile|argentina|bogotá|medellín|cali|barranquilla|cartagena)/i.test(lowerConversation),
+            value: /(\$?\d+[\.\d]*\s*(mil|millón|m|k)?)/i.test(lowerConversation) // any monetary figure
+        },
+        life: {
+            age: /\d+\s*(años?|years?)/i.test(lowerConversation),
+            coverage: /(cobertura|coverage|valor asegurado)/i.test(lowerConversation),
+            beneficiaries: /(beneficiarios?|hijos?|espos[ao]|familia)/i.test(lowerConversation)
         }
     }[category];
 
@@ -239,27 +276,42 @@ export function analyzeContextNeeds(
         soat: {
             vehicleType: "¿Qué tipo de vehículo vas a asegurar? (carro o moto)",
             location: "¿En qué ciudad está registrado el vehículo?"
+        },
+        home: {
+            propertyType: "¿Qué tipo de propiedad deseas asegurar? (casa, apartamento, etc.)",
+            location: "¿Dónde se encuentra la propiedad?",
+            value: "¿Cuál es el valor aproximado de la propiedad?"
+        },
+        life: {
+            age: "¿Cuál es tu edad?",
+            coverage: "¿Qué monto de cobertura deseas?",
+            beneficiaries: "¿Quiénes serían los beneficiarios de la póliza?"
         }
     };
     
-    for (const key in checks) {
-        if (!(checks as any)[key]) {
-            result.missingInfo.push(key);
-            result.suggestedQuestions.push(questions[category][key]);
-        }
-    }
+    const config = (CONTEXT_REQUIREMENTS as any)[category] as CategoryRequirement | undefined;
 
-    // NEW: relaxed context requirement for auto insurance – allow if at least 2 of 3 key attributes are present
-    if (category === 'auto') {
-        const totalCriteria = 3; // brand, year, country
-        const satisfied = totalCriteria - result.missingInfo.length;
-        // Needs more context only if fewer than 2 attributes are provided
-        result.needsMoreContext = satisfied < 2;
+    if (config) {
+        // Iterate only through configured fields to evaluate context sufficiency
+        config.fields.forEach((field) => {
+            if (!(checks as any)[field]) {
+                result.missingInfo.push(field);
+                if (questions[category] && questions[category][field]) {
+                    result.suggestedQuestions.push(questions[category][field]);
+                }
+            }
+        });
+
+        const satisfiedCount = config.fields.length - result.missingInfo.length;
+        result.needsMoreContext = needsMinimumCriteria(satisfiedCount, config.minimum);
     } else {
-        // Maintain previous behaviour for other categories
-        if (result.missingInfo.length > 0) {
-            result.needsMoreContext = true;
+        // Fallback to previous logic if no config (shouldn't happen)
+        for (const key in checks) {
+            if (!(checks as any)[key]) {
+                result.missingInfo.push(key);
+            }
         }
+        result.needsMoreContext = result.missingInfo.length > 0;
     }
 
     // Special handling for auto: if full vehicle data is available from memory, context is sufficient regardless
@@ -271,7 +323,7 @@ export function analyzeContextNeeds(
         return result;
     }
     
-    return result; // moved return here after new logic
+    return result;
 }
 
 /**
