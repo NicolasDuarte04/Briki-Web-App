@@ -55,10 +55,10 @@ function useLoginMutation() {
       // works consistently for partner logins
       if (data.role === 'company') {
         // Direct navigation without setTimeout for better reliability
-        navigate("/company-dashboard-redesigned");
+        navigate("/company-dashboard");
       } else {
-        // For regular users, redirect to trip-info page
-        navigate("/trip-info");
+        // For regular users, redirect to dashboard/home page
+        navigate("/dashboard");
       }
     },
     onError: (error: Error) => {
@@ -99,9 +99,10 @@ function useRegisterMutation() {
         // Use the redesigned dashboard for company users
         // Note: company-register-new component already handles this navigation
         console.log('Company user registered successfully');
+        navigate("/company-dashboard");
       } else {
-        // Regular users go directly to trip-info
-        navigate("/trip-info");
+        // Regular users go directly to dashboard
+        navigate("/dashboard");
       }
     },
     onError: (error: Error) => {

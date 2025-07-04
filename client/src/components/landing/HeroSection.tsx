@@ -70,7 +70,10 @@ export const HeroSection: React.FC = () => {
           >
             <Button 
               size="lg" 
-              onClick={() => navigate('/ask-briki-ai')}
+              onClick={() => {
+                console.log('[HeroSection] Navigating to /ask-briki-ai');
+                navigate('/ask-briki-ai');
+              }}
               className="h-16 px-10 text-lg bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white border-0 hover:shadow-xl hover:shadow-blue-500/25 font-semibold group"
             >
               {t('hero.ctaAI')}

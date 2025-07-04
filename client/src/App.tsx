@@ -241,7 +241,6 @@ function AppContent() {
     '/features', 
     '/pricing', 
     '/ask-briki', 
-    '/ask-briki-ai', 
     '/blog', 
     '/forum', 
     '/careers', 
@@ -263,7 +262,7 @@ function AppContent() {
   );
 
   // List of paths where AI Assistant should NOT be provided
-  const excludedPaths = ['/', '/auth', '/countdown', '/login', '/register', '/terms', '/learn-more', '/landing', '/ask-briki', '/ask-briki-ai'];
+  const excludedPaths = ['/', '/auth', '/countdown', '/login', '/register', '/terms', '/learn-more', '/landing', '/ask-briki'];
   const isExcludedPath = excludedPaths.some(path => 
     location === path || location.startsWith(`${path}/`)
   );
