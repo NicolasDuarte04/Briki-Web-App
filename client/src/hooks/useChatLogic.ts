@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useToast } from './use-toast';
-import { useAnalytics } from './use-analytics';
+import { useAnalytics, trackAIAssistantEvent } from './use-analytics';
 import { apiRequest } from '../lib/api';
 import { uploadDocument, DocumentUploadResponse } from '../services/document-upload-service';
 import { ChatMessage } from '../types/chat';
@@ -48,7 +48,7 @@ export function useChatLogic(options: UseChatLogicOptions = {}) {
   
   // Hooks
   const { toast } = useToast();
-  const { trackEvent } = useAnalytics();
+  useAnalytics();
 
   // Auto-save messages to sessionStorage
   useEffect(() => {
@@ -134,6 +134,11 @@ export function useChatLogic(options: UseChatLogicOptions = {}) {
 
       if (shouldResetContext) {
         setShouldResetContext(false);
+      }
+
+      // Ensure responseData is valid
+      if (!responseData || typeof responseData !== 'object') {
+        throw new Error('Invalid response from AI service');
       }
 
       const data: AIResponse = responseData;

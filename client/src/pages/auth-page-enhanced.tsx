@@ -95,12 +95,11 @@ export default function AuthPageEnhanced() {
 
   const onRegisterSubmit: SubmitHandler<RegisterFormValues> = (values) => {
     registerMutation.mutate({
-      username: values.username,
-      password: values.password,
       email: values.email,
-      firstName: values.username,
-      lastName: "",
-      id: crypto.randomUUID(),
+      password: values.password,
+      confirmPassword: values.confirmPassword,
+      name: values.username,
+      username: values.username,
       role: "user"
     });
   };
