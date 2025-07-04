@@ -68,7 +68,7 @@ export const FinalCTA: React.FC = () => {
                 onClick={() => navigate('/ask-briki-ai')}
                 className="h-14 px-8 text-base bg-white text-blue-600 hover:bg-gray-50 hover:shadow-xl hover:shadow-white/20 font-semibold group"
               >
-                {t('hero.ctaAI')}
+                Habla con el asistente
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Button>
             </motion.div>
@@ -81,10 +81,10 @@ export const FinalCTA: React.FC = () => {
               <Button 
                 size="lg" 
                 variant="outline"
-                onClick={() => navigate('/home')}
+                onClick={() => navigate('/features')}
                 className="h-14 px-8 text-base bg-transparent text-white border-2 border-white/50 hover:bg-white/10 hover:border-white font-medium"
               >
-                {t('hero.ctaBrowse')}
+                Ver funciones
               </Button>
             </motion.div>
           </motion.div>

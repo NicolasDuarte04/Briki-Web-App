@@ -88,7 +88,7 @@ export const HeroSection: React.FC = () => {
                 onClick={() => navigate('/profile')}
                 className="h-16 px-10 text-lg border-2 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium"
               >
-                {t('hero.ctaProfile') || 'Ver mi perfil'}
+                {t('hero.ctaProfile')?.trim() || 'Ver mi perfil'}
               </Button>
             ) : (
             <Button 
