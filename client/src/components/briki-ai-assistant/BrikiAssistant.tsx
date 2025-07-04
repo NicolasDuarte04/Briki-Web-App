@@ -206,17 +206,17 @@ ${summary.exclusions ? (Array.isArray(summary.exclusions) ? summary.exclusions.m
 
   return (
     <div className="flex flex-col h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
-      {/* Document History */}
-      <div className="px-4 pt-4">
+      {/* Document History - Absolute positioned at top */}
+      <div className="absolute top-0 left-0 right-0 px-4 pt-4 z-10">
         <DocumentHistory 
           onViewSummary={handleViewSummary}
           className="mb-4"
         />
       </div>
 
-      {/* Chat Window */}
+      {/* Chat Window - Fills available space with padding for header and footer */}
       <div 
-        className="flex-1 overflow-y-auto px-4 py-6 space-y-6 rounded-lg"
+        className="flex-1 overflow-y-auto px-4 pt-20 pb-24 space-y-6"
         role="log"
         aria-live="polite"
       >
@@ -369,8 +369,8 @@ ${summary.exclusions ? (Array.isArray(summary.exclusions) ? summary.exclusions.m
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Area with File Upload */}
-      <div className="p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+      {/* Input Area - Fixed at bottom */}
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
         <form onSubmit={handleSubmit} className="max-w-4xl mx-auto">
           {/* Mobile Layout */}
           <div className="flex flex-col gap-2 sm:hidden">
