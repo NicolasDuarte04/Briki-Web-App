@@ -1,15 +1,15 @@
 import React, { useEffect } from "react";
 import { useLocation, useRoute } from "wouter";
-import { useAuth } from "../../hooks/use-auth";
-import UnifiedAuthForm from "../../components/auth/UnifiedAuthForm";
+import { useSupabaseAuth } from "../../contexts/SupabaseAuthContext";
+import SupabaseAuthForm from "../../components/auth/SupabaseAuthForm";
 import { PublicLayout } from "../../components/layout/public-layout";
-import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
+import { Card, CardContent } from "../../components/ui/card";
 import { LoaderCircle } from "lucide-react";
 
 export default function AuthPage() {
   const [location, navigate] = useLocation();
   const [, params] = useRoute<{ tab?: string }>("/auth/:tab?");
-  const { user, isLoading, isAuthenticated } = useAuth();
+  const { user, isLoading, isAuthenticated } = useSupabaseAuth();
   
   // Get returnTo parameter from URL
   const urlParams = new URLSearchParams(window.location.search);
@@ -26,8 +26,8 @@ export default function AuthPage() {
       } else if (returnTo) {
         navigate(returnTo);
       } else {
-        // Let the auth hook handle role-based redirection
-        navigate("/profile");
+        // Redirect to home or dashboard
+        navigate("/");
       }
     }
   }, [isLoading, isAuthenticated, navigate, returnTo]);
@@ -46,8 +46,6 @@ export default function AuthPage() {
     );
   }
   
-  const isSignup = params?.tab === "signup";
-  
   return (
     <PublicLayout>
       <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
@@ -60,20 +58,17 @@ export default function AuthPage() {
               </div>
             </div>
             <h1 className="text-3xl font-bold text-gray-900">
-              {isSignup ? "Crea tu cuenta" : "Inicia sesión"}
+              Welcome to Briki
             </h1>
             <p className="mt-2 text-gray-600">
-              {isSignup 
-                ? "Únete a Briki para comparar seguros fácilmente" 
-                : "Bienvenido de vuelta a Briki"}
+              Sign in to access your personalized insurance recommendations
             </p>
           </div>
           
           {/* Auth Form Card */}
           <Card className="shadow-lg border-0">
             <CardContent className="p-8">
-              <UnifiedAuthForm 
-                mode={isSignup ? "signup" : "login"} 
+              <SupabaseAuthForm 
                 onSuccess={() => {
                   // Check for quote intent after successful auth
                   const quoteIntentPlanId = sessionStorage.getItem('quoteIntentPlanId');
@@ -83,7 +78,8 @@ export default function AuthPage() {
                   } else if (returnTo) {
                     navigate(returnTo);
                   } else {
-                    // Let the auth hook handle role-based redirection
+                    // Redirect to home or dashboard
+                    navigate("/");
                   }
                 }}
               />
@@ -93,13 +89,13 @@ export default function AuthPage() {
           {/* Footer */}
           <div className="text-center text-sm text-gray-600">
             <p>
-              Al continuar, aceptas nuestros{" "}
+              By continuing, you agree to our{" "}
               <a href="/terms" className="text-blue-600 hover:text-blue-700 hover:underline">
-                Términos de Servicio
+                Terms of Service
               </a>{" "}
-              y{" "}
+              and{" "}
               <a href="/privacy" className="text-blue-600 hover:text-blue-700 hover:underline">
-                Política de Privacidad
+                Privacy Policy
               </a>
             </p>
           </div>

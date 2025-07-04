@@ -2,7 +2,7 @@ import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { TooltipProvider } from "./components/ui/tooltip";
-import { AuthProvider } from "./contexts/AuthContext";
+import { SupabaseAuthProvider } from "./contexts/SupabaseAuthContext";
 import { useAuth } from "./hooks/use-auth";
 import { LanguageProvider } from "./components/language-selector";
 import { PageTransition } from "./components/ui/transition-effect";
@@ -21,6 +21,7 @@ import LandingPage from "./pages/landing-page";
 
 // Import authentication
 import AuthPage from "./pages/auth/AuthPage";
+import TestAuthPage from "./pages/test-auth";
 
 // Import user pages
 import ProfilePage from "./pages/profile-page";
@@ -64,6 +65,7 @@ function Router() {
         {/* Core pages */}
         <Route path="/" component={LandingPage} />
         <Route path="/auth" component={AuthPage} />
+        <Route path="/test-auth" component={TestAuthPage} />
         <Route path="/ask-briki-ai" component={AskBrikiAIPage} />
         
         {/* Auth redirects */}
@@ -190,7 +192,7 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
+      <SupabaseAuthProvider>
         <AnonymousUserProvider>
           <ColorProvider>
             <LanguageProvider>
@@ -201,7 +203,7 @@ function App() {
             </LanguageProvider>
           </ColorProvider>
         </AnonymousUserProvider>
-      </AuthProvider>
+      </SupabaseAuthProvider>
     </QueryClientProvider>
   );
 }

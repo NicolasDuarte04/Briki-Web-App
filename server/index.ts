@@ -3,10 +3,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import cors from "cors";
-import passport from "passport";
-import { configureSession } from "./auth/session";
-import { configureGoogleAuth } from "./auth/google-auth";
-import authRoutes from "./routes/auth";
+// Removed passport and custom auth imports - using Supabase Auth instead
 import { loadKnowledgeBase } from "./data-loader";
 import aiRoutes from './routes/ai';
 import apiRoutes from './routes/api';
@@ -55,53 +52,8 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-// Setup session management before routes
-let sessionConfig;
-try {
-  sessionConfig = configureSession();
-  app.use(sessionConfig);
-  console.log("Using PostgreSQL session store for auth sessions");
-} catch (error) {
-  console.warn("Unable to configure PostgreSQL session, using memory session store for auth sessions");
-  const session = require('express-session');
-  const MemoryStore = require('memorystore')(session);
-  
-  // Fallback to memory store
-  app.use(session({
-    cookie: { maxAge: 86400000 }, // 24 hours
-    store: new MemoryStore({
-      checkPeriod: 86400000 // Prune expired entries every 24h
-    }),
-    resave: false,
-    saveUninitialized: false,
-    secret: process.env.SESSION_SECRET || 'briki-dev-secret'
-  }));
-}
-
-// Initialize passport for authentication
-app.use(passport.initialize());
-app.use(passport.session());
-
-// Configure passport serialization
-passport.serializeUser((user: any, done) => {
-  done(null, user.id);
-});
-
-passport.deserializeUser(async (id: string, done) => {
-  try {
-    // Use the storage module to fetch user by ID
-    const { storage } = require('./storage');
-    const user = await storage.getUser(id);
-    done(null, user || null);
-  } catch (err) {
-    done(err, null);
-  }
-});
-
-// Setup Google OAuth if credentials are available
-configureGoogleAuth().catch(err => {
-  console.error("Failed to configure Google Auth:", err);
-});
+// Session management removed - using Supabase Auth instead
+console.log("Using Supabase Auth for authentication");
 
 // Standard middleware
 app.use(express.json());
@@ -145,8 +97,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Mount routes
-app.use('/api/auth', authRoutes);
+// Mount routes (auth routes removed - using Supabase Auth)
 app.use('/api/ai', aiRoutes);
 app.use('/api', apiRoutes);
 app.use('/api/vehicle', vehicleRoutes);

@@ -1,51 +1,20 @@
 import { Link, useLocation } from "wouter";
 import { Button } from "../ui/button";
-import { useAuth } from "../../hooks/use-auth";
+import { useSupabaseAuth } from "../../contexts/SupabaseAuthContext";
 import { useLanguage, LanguageSelector } from "../language-selector";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { 
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
-import { User, Settings, LogOut } from "lucide-react";
+import UserProfile from "../auth/UserProfile";
 
 export default function Navbar() {
   const [, navigate] = useLocation();
-  const { user, logout } = useAuth();
+  const { user, isAuthenticated } = useSupabaseAuth();
   const { t } = useLanguage();
 
   const handleGetStarted = () => {
-    if (user) {
+    if (isAuthenticated) {
       navigate("/ask-briki-ai");
     } else {
       navigate("/auth");
     }
-  };
-
-  const handleLogout = async () => {
-    await logout();
-    navigate("/");
-  };
-
-  // Get user initials for avatar
-  const getUserInitials = () => {
-    if (!user) return "U";
-    
-    if (user.name) {
-      return user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-    }
-    
-    // Skip firstName/lastName check as they may not exist on User type
-    
-    if (user.username) {
-      return user.username.slice(0, 2).toUpperCase();
-    }
-    
-    return user.email ? user.email[0].toUpperCase() : "U";
   };
 
   return (
@@ -84,68 +53,29 @@ export default function Navbar() {
           </div>
 
           {/* Auth buttons and language selector */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center space-x-4">
             <LanguageSelector />
-            {user ? (
-              // Authenticated user menu
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                    <Avatar className="h-10 w-10">
-                      <AvatarImage 
-                        src={(user.profileImageUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${getUserInitials()}`)} 
-                        alt={(user.name || user.username) || ''} 
-                      />
-                      <AvatarFallback className="bg-gradient-to-br from-blue-600 to-cyan-500 text-white">
-                        {getUserInitials()}
-                      </AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
-                  <DropdownMenuLabel className="font-normal">
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">
-                        {user.name || user.username}
-                      </p>
-                      <p className="text-xs leading-none text-muted-foreground">
-                        {user.email}
-                      </p>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => navigate("/profile")}>
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Mi Perfil</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate("/settings")}>
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Configuración</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout} className="text-red-600">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Cerrar sesión</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+            
+            {isAuthenticated ? (
+              // Show user profile when authenticated
+              <UserProfile />
             ) : (
               // Non-authenticated buttons
-            <div className="flex items-center space-x-3">
-              <Button 
-                variant="ghost" 
+              <div className="flex items-center space-x-3">
+                <Button 
+                  variant="ghost" 
                   onClick={() => navigate("/auth")}
-                className="text-gray-600 hover:text-primary px-4 py-2.5"
-              >
-                  {t('signIn') || 'Iniciar sesión'}
-              </Button>
-              <Button 
+                  className="text-gray-600 hover:text-primary px-4 py-2.5"
+                >
+                  {t('signIn') || 'Sign In'}
+                </Button>
+                <Button 
                   onClick={() => navigate("/auth")}
-                className="px-5 py-2.5 font-medium shadow-sm"
-              >
-                  {t('signUp') || 'Crear cuenta'}
-              </Button>
-            </div>
+                  className="px-5 py-2.5 font-medium shadow-sm"
+                >
+                  {t('signUp') || 'Sign Up'}
+                </Button>
+              </div>
             )}
           </div>
         </div>
