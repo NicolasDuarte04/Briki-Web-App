@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { analyzeContextNeeds, detectInsuranceCategory, InsuranceCategory } from '../../shared/context-utils';
+import { analyzeContextNeeds, detectInsuranceCategory } from '../../shared/context-utils';
+import { InsuranceCategory } from '../../shared/schema';
+import { AssistantMemory } from '../../shared/types/assistant';
 
 describe('Shared Context Utilities', () => {
 
@@ -67,6 +69,101 @@ describe('Shared Context Utilities', () => {
     expect(result.needsMoreContext).toBe(true);
     expect(result.missingInfo).toContain('location');
     expect(result.suggestedQuestions.length).toBe(1);
+  });
+
+  // --- New tests for natural language responses ---
+  describe('Natural language responses', () => {
+    it('should parse comma-separated travel response correctly', () => {
+      const conversation = 'México, 10 días desde hoy, 1, turismo';
+      const category: InsuranceCategory = 'travel';
+      const result = analyzeContextNeeds(conversation, category);
+      
+      expect(result.needsMoreContext).toBe(false);
+      expect(result.missingInfo.length).toBe(0);
+      expect(result.suggestedQuestions.length).toBe(0);
+    });
+
+    it('should parse health insurance response with city correctly', () => {
+      const conversation = 'Mujer, 28 años, Medellín';
+      const category: InsuranceCategory = 'health';
+      const result = analyzeContextNeeds(conversation, category);
+      
+      expect(result.needsMoreContext).toBe(false);
+      expect(result.missingInfo.length).toBe(0);
+      expect(result.suggestedQuestions.length).toBe(0);
+    });
+
+    it('should parse pet insurance response correctly', () => {
+      const conversation = 'Pastor alemán, 3 años, Bogotá';
+      const category: InsuranceCategory = 'pet';
+      const result = analyzeContextNeeds(conversation, category);
+      
+      expect(result.needsMoreContext).toBe(false);
+      expect(result.missingInfo.length).toBe(0);
+      expect(result.suggestedQuestions.length).toBe(0);
+    });
+
+    it('should handle bare numbers for travelers', () => {
+      const conversation = 'Voy a Europa, 2 semanas, 2, turismo';
+      const category: InsuranceCategory = 'travel';
+      const result = analyzeContextNeeds(conversation, category);
+      
+      expect(result.needsMoreContext).toBe(false);
+      expect(result.missingInfo.length).toBe(0);
+    });
+
+    it('should handle accented text correctly', () => {
+      const conversation = 'Perú, 5 días, 1 persona, vacaciones';
+      const category: InsuranceCategory = 'travel';
+      const result = analyzeContextNeeds(conversation, category);
+      
+      expect(result.needsMoreContext).toBe(false);
+      expect(result.missingInfo.length).toBe(0);
+    });
+
+    it('should extract country from city name', () => {
+      const conversation = 'Hombre, 35 años, vivo en Guadalajara';
+      const category: InsuranceCategory = 'health';
+      const result = analyzeContextNeeds(conversation, category);
+      
+      expect(result.needsMoreContext).toBe(false);
+      expect(result.missingInfo.length).toBe(0);
+    });
+
+    it('should handle mixed format responses', () => {
+      const conversation = 'Quiero asegurar a mi gato, tiene 5 años';
+      const category: InsuranceCategory = 'pet';
+      const result = analyzeContextNeeds(conversation, category);
+      
+      // Should only be missing location since we have pet type and age
+      expect(result.needsMoreContext).toBe(true);
+      expect(result.missingInfo).toEqual(['location']);
+      expect(result.suggestedQuestions.length).toBe(1);
+    });
+
+    it('should handle auto insurance with year as bare number', () => {
+      const conversation = 'Toyota Corolla, 2020, Colombia';
+      const category: InsuranceCategory = 'auto';
+      const result = analyzeContextNeeds(conversation, category);
+      
+      expect(result.needsMoreContext).toBe(false);
+      expect(result.missingInfo.length).toBe(0);
+    });
+
+    it('should persist partial context in memory', () => {
+      const memory: AssistantMemory = { preferences: {} };
+      const conversation = 'Tengo 30 años';
+      const category: InsuranceCategory = 'health';
+      const result = analyzeContextNeeds(conversation, category, memory);
+      
+      // Should be missing gender and country
+      expect(result.needsMoreContext).toBe(true);
+      expect(result.missingInfo).toContain('gender');
+      expect(result.missingInfo).toContain('country');
+      
+      // Memory should have age stored
+      expect(memory.preferences?.age).toBe(true);
+    });
   });
 
 }); 

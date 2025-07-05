@@ -170,6 +170,206 @@ export const CONTEXT_REQUIREMENTS: Record<InsuranceCategory | 'home' | 'life', C
 export function needsMinimumCriteria(satisfied: number, minimum: number): boolean {
   return satisfied < minimum;
 }
+
+// =================================================================
+// HELPER FUNCTIONS FOR IMPROVED CONTEXT PARSING
+// =================================================================
+
+// City to country mapping for better location detection
+const CITY_TO_COUNTRY: Record<string, string> = {
+  // Colombia
+  'bogotá': 'colombia',
+  'bogota': 'colombia',
+  'medellín': 'colombia',
+  'medellin': 'colombia',
+  'cali': 'colombia',
+  'barranquilla': 'colombia',
+  'cartagena': 'colombia',
+  'bucaramanga': 'colombia',
+  'pereira': 'colombia',
+  'manizales': 'colombia',
+  'cúcuta': 'colombia',
+  'cucuta': 'colombia',
+  'ibagué': 'colombia',
+  'ibague': 'colombia',
+  
+  // México
+  'ciudad de méxico': 'méxico',
+  'cdmx': 'méxico',
+  'guadalajara': 'méxico',
+  'monterrey': 'méxico',
+  'puebla': 'méxico',
+  'tijuana': 'méxico',
+  'león': 'méxico',
+  'leon': 'méxico',
+  'juárez': 'méxico',
+  'juarez': 'méxico',
+  'cancún': 'méxico',
+  'cancun': 'méxico',
+  
+  // Argentina
+  'buenos aires': 'argentina',
+  'córdoba': 'argentina',
+  'cordoba': 'argentina',
+  'rosario': 'argentina',
+  'mendoza': 'argentina',
+  'la plata': 'argentina',
+  'mar del plata': 'argentina',
+  
+  // Chile
+  'santiago': 'chile',
+  'valparaíso': 'chile',
+  'valparaiso': 'chile',
+  'concepción': 'chile',
+  'concepcion': 'chile',
+  'viña del mar': 'chile',
+  'antofagasta': 'chile',
+  
+  // Perú
+  'lima': 'perú',
+  'arequipa': 'perú',
+  'trujillo': 'perú',
+  'chiclayo': 'perú',
+  'cusco': 'perú',
+  'cuzco': 'perú',
+  
+  // España
+  'madrid': 'españa',
+  'barcelona': 'españa',
+  'valencia': 'españa',
+  'sevilla': 'españa',
+  'zaragoza': 'españa',
+  'málaga': 'españa',
+  'malaga': 'españa',
+  
+  // USA
+  'nueva york': 'estados unidos',
+  'new york': 'estados unidos',
+  'los angeles': 'estados unidos',
+  'los ángeles': 'estados unidos',
+  'chicago': 'estados unidos',
+  'houston': 'estados unidos',
+  'miami': 'estados unidos',
+  'orlando': 'estados unidos',
+  'las vegas': 'estados unidos',
+};
+
+/**
+ * Normalize text by removing accents and converting to lowercase
+ */
+function normalizeText(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim();
+}
+
+/**
+ * Parse comma-separated values from user input
+ */
+function parseCommaSeparatedValues(text: string): string[] {
+  return text
+    .split(/[,;]/)
+    .map(s => s.trim())
+    .filter(s => s.length > 0);
+}
+
+/**
+ * Extract country from text, including city-to-country mapping
+ */
+function extractCountry(text: string): string | null {
+  const normalizedText = normalizeText(text);
+  
+  // Direct country mentions
+  const countries = ['colombia', 'mexico', 'peru', 'chile', 'argentina', 'españa', 'estados unidos', 'brasil'];
+  for (const country of countries) {
+    if (normalizedText.includes(normalizeText(country))) {
+      return country;
+    }
+  }
+  
+  // Check city mappings
+  for (const [city, country] of Object.entries(CITY_TO_COUNTRY)) {
+    if (normalizedText.includes(normalizeText(city))) {
+      return country;
+    }
+  }
+  
+  return null;
+}
+
+/**
+ * Extract structured data from natural language using GPT
+ * This is a placeholder for the actual OpenAI integration
+ */
+async function extractStructuredDataWithGPT(
+  message: string,
+  category: InsuranceCategory | 'general'
+): Promise<Record<string, any> | null> {
+  // TODO: Implement OpenAI API call
+  // Example implementation:
+  /*
+  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  
+  const categoryPrompts = {
+    travel: "Extract destination, datesOrDuration, numTravelers, and purpose from the user message. Return JSON or null if unknown.",
+    health: "Extract age, gender, and country/location from the user message. Return JSON or null if unknown.",
+    pet: "Extract petType, petAge, petBreed, and location from the user message. Return JSON or null if unknown.",
+    auto: "Extract brand, model, year, and country from the user message. Return JSON or null if unknown.",
+  };
+  
+  try {
+    const completion = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [
+        {
+          role: "system",
+          content: `${categoryPrompts[category] || "Extract relevant insurance information from the user message."} 
+                   Format: {"field1": "value1", "field2": "value2"}. 
+                   Only include fields you can extract with confidence.`
+        },
+        {
+          role: "user",
+          content: message
+        }
+      ],
+      temperature: 0.1,
+      max_tokens: 200
+    });
+    
+    const response = completion.choices[0]?.message?.content;
+    if (response) {
+      return JSON.parse(response);
+    }
+  } catch (error) {
+    console.error('GPT extraction failed:', error);
+  }
+  */
+  
+  // For now, return null to use regex fallback
+  return null;
+}
+
+/**
+ * Merge extracted data into memory preferences
+ */
+function mergeIntoMemory(
+  memory: AssistantMemory | undefined,
+  extractedData: Record<string, any>
+): AssistantMemory {
+  const updatedMemory = memory || {};
+  
+  if (!updatedMemory.preferences) {
+    updatedMemory.preferences = {};
+  }
+  
+  // Merge extracted data into preferences
+  Object.assign(updatedMemory.preferences, extractedData);
+  
+  return updatedMemory;
+}
+
 // =================================================================
 // LÓGICA DE ANÁLISIS DE NECESIDADES DEL BACKEND
 // =================================================================
@@ -193,7 +393,7 @@ export function analyzeContextNeeds(
   category: InsuranceCategory | 'general',
   memory?: AssistantMemory
 ): ContextAnalysisResult {
-    const lowerConversation = conversation.toLowerCase();
+    const lowerConversation = normalizeText(conversation);
     const result: ContextAnalysisResult = {
         needsMoreContext: false,
         category,
@@ -205,47 +405,64 @@ export function analyzeContextNeeds(
         return result;
     }
 
-    // Boolean checks per category (pattern matching & memory)
+    // First, try to parse comma-separated values for quick answers
+    const commaParts = parseCommaSeparatedValues(conversation);
+    
+    // Extract country with improved logic
+    const detectedCountry = extractCountry(conversation) || 
+                           (memory?.preferences?.location ? extractCountry(memory.preferences.location) : null);
+
+    // Boolean checks per category (pattern matching & memory) - RELAXED PATTERNS
     const checks = {
         travel: {
-            destination: /(europa|asia|méxico|estados unidos|colombia|españa|francia|alemania|italia|brasil|chile|perú|usa|canadá|argentina|viajar a)/i.test(lowerConversation),
-            // Check for either dates OR duration (not both required)
-            datesOrDuration: (/(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre|\d{1,2}\/\d{1,2}\/\d{2,4}|del \d+|hasta el \d+)/i.test(lowerConversation) || 
-                             /(\d+\s*(días?|semanas?|meses?)|una semana|dos semanas|un mes|dos meses|la próxima semana|próxima semana|siguiente semana)/i.test(lowerConversation)),
-            travelers: /(\d+\s*(personas?|viajeros?|travelers?))/i.test(lowerConversation),
-            purpose: /(negocio|business|trabajo|turismo|leisure|vacaciones)/i.test(lowerConversation)
+            destination: /(europa|asia|méxico|mexico|estados unidos|usa|colombia|españa|espana|francia|alemania|italia|brasil|chile|perú|peru|canadá|canada|argentina|viajar a)/i.test(lowerConversation) ||
+                        commaParts.some(part => /(europa|asia|méxico|mexico|estados unidos|usa|colombia|españa|espana|francia|alemania|italia|brasil|chile|perú|peru|canadá|canada|argentina)/i.test(normalizeText(part))),
+            // Check for either dates OR duration (not both required) - RELAXED
+            datesOrDuration: (/(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre|\d{1,2}\/\d{1,2}\/\d{2,4}|del \d+|hasta el \d+|desde hoy|mañana|proxim[oa])/i.test(lowerConversation) || 
+                             /(\d+\s*(días?|dias?|semanas?|meses?)|una semana|dos semanas|un mes|dos meses|la próxima semana|proxima semana|siguiente semana)/i.test(lowerConversation)) ||
+                             commaParts.some(part => /^\d+\s*(días?|dias?|semanas?|meses?)$/.test(normalizeText(part))),
+            travelers: /(\d+\s*(personas?|viajeros?|travelers?|pax)?)/i.test(lowerConversation) ||
+                      commaParts.some(part => /^\d+$/.test(part.trim())), // Allow bare numbers
+            purpose: /(negocio|business|trabajo|turismo|leisure|vacaciones|placer)/i.test(lowerConversation) ||
+                    commaParts.some(part => /(negocio|business|trabajo|turismo|leisure|vacaciones|placer)/i.test(normalizeText(part)))
         },
         pet: {
-            petType: /(perro|gato|dog|cat|mascota|pet|labrador|golden|bulldog|poodle|chihuahua|pastor|pug|beagle|husky|pitbull|rottweiler|boxer|cocker|terrier|maltés|schnauzer|shih tzu|dálmata|dóberman|gran danés)/i.test(lowerConversation),
-            petAge: /(\d+\s*(años?|meses?|years?|months?))/i.test(lowerConversation), // Strict: must have number + unit
-            petBreed: /(labrador|golden|bulldog|poodle|chihuahua|pastor|pug|beagle|husky|pitbull|rottweiler|boxer|cocker|terrier|maltés|schnauzer|shih tzu|dálmata|dóberman|gran danés|mestizo|criollo|persa|siamés|angora)/i.test(lowerConversation),
+            petType: /(perro|gato|dog|cat|mascota|pet|labrador|golden|bulldog|poodle|chihuahua|pastor|pug|beagle|husky|pitbull|rottweiler|boxer|cocker|terrier|maltés|maltes|schnauzer|shih tzu|dálmata|dalmata|dóberman|doberman|gran danés|gran danes)/i.test(lowerConversation) ||
+                    commaParts.some(part => /(perro|gato|dog|cat|mascota|pet)/i.test(normalizeText(part))),
+            petAge: /(\d+\s*(años?|anos?|meses?|years?|months?))/i.test(lowerConversation) ||
+                   commaParts.some(part => /^\d+\s*(años?|anos?|meses?)$/.test(normalizeText(part))), // Relaxed
+            petBreed: /(labrador|golden|bulldog|poodle|chihuahua|pastor|pug|beagle|husky|pitbull|rottweiler|boxer|cocker|terrier|maltés|maltes|schnauzer|shih tzu|dálmata|dalmata|dóberman|doberman|gran danés|gran danes|mestizo|criollo|persa|siamés|siames|angora)/i.test(lowerConversation),
             petWeight: /(\d+\s*(kg|kilos?|libras?|pounds?))/i.test(lowerConversation),
-            location: /(colombia|bogotá|medellín|cali|barranquilla|cartagena|méxico|perú|chile|argentina)/i.test(lowerConversation)
+            location: detectedCountry !== null || memory?.preferences?.location
         },
         auto: {
             brand: !!memory?.vehicle?.make || /(marca|toyota|honda|ford|chevrolet|nissan|mazda|kia|hyundai|bmw|mercedes|audi|volkswagen|vw|renault|fiat|picanto|spark|onix|sail|march|versa|sentra|corolla|civic)/i.test(lowerConversation),
-            year: !!memory?.vehicle?.year || /(año|\d{4}|modelo)/i.test(lowerConversation),
-            country: /(colombia|méxico|perú|chile|argentina|bogotá|medellín|cali|barranquilla|cartagena)/i.test(lowerConversation)
+            year: !!memory?.vehicle?.year || /(\d{4}|año \d{4}|modelo \d{4})/i.test(lowerConversation) ||
+                  commaParts.some(part => /^\d{4}$/.test(part.trim())),
+            country: detectedCountry !== null || memory?.preferences?.location
         },
         health: {
-            age: /(\d+\s*(años?|years?))/i.test(lowerConversation),
-            gender: /(hombre|mujer|masculino|femenino)/i.test(lowerConversation),
-            country: /(colombia|méxico|perú|chile|argentina)/i.test(lowerConversation)
+            age: /(\d+\s*(años?|anos?|years?))/i.test(lowerConversation) ||
+                commaParts.some(part => /^\d+\s*(años?|anos?)$/.test(normalizeText(part))),
+            gender: /(hombre|mujer|masculino|femenino|male|female|m|f|h)/i.test(lowerConversation) ||
+                   commaParts.some(part => /^(hombre|mujer|masculino|femenino|m|f|h)$/i.test(normalizeText(part))),
+            country: detectedCountry !== null || memory?.preferences?.location
         },
         soat: {
-            vehicleType: /(carro|moto|auto|vehiculo|vehículo|car|motorcycle)/i.test(lowerConversation),
-            location: /(bogotá|medellín|cali|barranquilla|cartagena|colombia)/i.test(lowerConversation)
+            vehicleType: /(carro|moto|auto|vehiculo|vehículo|vehicle|car|motorcycle)/i.test(lowerConversation),
+            location: detectedCountry !== null || memory?.preferences?.location
         },
         // Basic placeholder checks for new categories (home, life)
         home: {
-            propertyType: /(casa|apartamento|vivienda|inmueble)/i.test(lowerConversation),
-            location: /(colombia|méxico|perú|chile|argentina|bogotá|medellín|cali|barranquilla|cartagena)/i.test(lowerConversation),
-            value: /(\$?\d+[\.\d]*\s*(mil|millón|m|k)?)/i.test(lowerConversation) // any monetary figure
+            propertyType: /(casa|apartamento|vivienda|inmueble|apto|depto)/i.test(lowerConversation),
+            location: detectedCountry !== null || memory?.preferences?.location,
+            value: /(\$?\d+[\.\d]*\s*(mil|millón|millon|m|k)?)/i.test(lowerConversation) // any monetary figure
         },
         life: {
-            age: /\d+\s*(años?|years?)/i.test(lowerConversation),
-            coverage: /(cobertura|coverage|valor asegurado)/i.test(lowerConversation),
-            beneficiaries: /(beneficiarios?|hijos?|espos[ao]|familia)/i.test(lowerConversation)
+            age: /(\d+\s*(años?|anos?|years?))/i.test(lowerConversation) ||
+                commaParts.some(part => /^\d+\s*(años?|anos?)$/.test(normalizeText(part))),
+            coverage: /(cobertura|coverage|valor asegurado|\$?\d+)/i.test(lowerConversation),
+            beneficiaries: /(beneficiarios?|hijos?|espos[ao]|familia|conyuge|pareja)/i.test(lowerConversation)
         }
     }[category];
 
@@ -292,15 +509,30 @@ export function analyzeContextNeeds(
     const config = (CONTEXT_REQUIREMENTS as any)[category] as CategoryRequirement | undefined;
 
     if (config) {
+        // Store satisfied fields in memory for persistence
+        const satisfiedFields: Record<string, any> = {};
+        
         // Iterate only through configured fields to evaluate context sufficiency
         config.fields.forEach((field) => {
-            if (!(checks as any)[field]) {
+            const isSatisfied = !!(checks as any)[field];
+            if (!isSatisfied) {
                 result.missingInfo.push(field);
                 if (questions[category] && questions[category][field]) {
                     result.suggestedQuestions.push(questions[category][field]);
                 }
+            } else {
+                // Store satisfied field data
+                satisfiedFields[field] = true;
             }
         });
+
+        // Update memory with satisfied fields
+        if (memory && Object.keys(satisfiedFields).length > 0) {
+            memory.preferences = {
+                ...memory.preferences,
+                ...satisfiedFields
+            };
+        }
 
         const satisfiedCount = config.fields.length - result.missingInfo.length;
         result.needsMoreContext = needsMinimumCriteria(satisfiedCount, config.minimum);

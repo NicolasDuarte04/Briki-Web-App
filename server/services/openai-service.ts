@@ -297,6 +297,13 @@ export async function generateAssistantResponse(
       console.log(`[DEBUG][${requestId}] Category is general or undefined, searching all plans`);
       relevantPlans = getTopRelevantPlans(userMessage, filteredPlans, 6);
       console.log(`[OpenAI][${requestId}] No specific category detected, selected ${relevantPlans.length} most relevant from all plans`);
+      // DEBUG: Verify plan filtering pipeline and output sample of results
+      console.log("DEBUG PLANS:", {
+        category,
+        totalPlans: filteredPlans.length,
+        filteredPlans: relevantPlans.length,
+        filteredSample: relevantPlans.slice(0, 2)
+      });
     }
 
     // Initial empty plans array
