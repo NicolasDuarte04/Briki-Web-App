@@ -335,6 +335,21 @@ export async function generateAssistantResponse(
       }
     }
     
+    // CATEGORY LOCK IMPLEMENTATION: Check if user is explicitly changing category
+    const isExplicitCategoryChange = checkExplicitCategoryChange(userMessage, finalContextCategory);
+    
+    if (isExplicitCategoryChange.changed && updatedMemory.lastDetectedCategory) {
+      console.log(`[DEBUG][${requestId}] Explicit category change detected: ${updatedMemory.lastDetectedCategory} -> ${isExplicitCategoryChange.newCategory}`);
+      finalContextCategory = isExplicitCategoryChange.newCategory;
+      // Clear previous context when switching categories
+      updatedMemory.preferences = {};
+      updatedMemory.vehicle = undefined;
+    } else if (updatedMemory.lastDetectedCategory && updatedMemory.lastDetectedCategory !== 'general') {
+      // Lock to previous category unless explicitly changed
+      finalContextCategory = updatedMemory.lastDetectedCategory as InsuranceCategory;
+      console.log(`[DEBUG][${requestId}] Category locked to: ${finalContextCategory}`);
+    }
+    
     // Store the detected category in memory for consistency
     if (finalContextCategory !== 'general') {
       updatedMemory.lastDetectedCategory = finalContextCategory;
@@ -1275,6 +1290,41 @@ const PLATE_REGEX = /[A-Z]{3}[-\s]?[0-9]{3}|[A-Z]{3}[-\s]?[0-9]{2}[A-Z]/i;
 function extractPlate(message: string): string | null {
   const match = message.match(PLATE_REGEX);
   return match ? match[0].replace(/[-\s]/g, '').toUpperCase() : null;
+}
+
+/**
+ * Check if the user is explicitly requesting a category change
+ */
+function checkExplicitCategoryChange(message: string, currentCategory: InsuranceCategory | 'general'): { changed: boolean; newCategory: InsuranceCategory | 'general' } {
+  const lowerMessage = message.toLowerCase();
+  
+  // Explicit category change patterns
+  const changePatterns = [
+    /(?:ahora|mejor|prefiero|quiero|necesito|muéstrame|muestrame|busco|cotiza|cotízame)\s+(?:un\s+)?(?:seguro\s+)?(?:de\s+|para\s+)?(viaje|auto|salud|mascota|pet|carro|vehículo|vehiculo)/i,
+    /(?:cambiar|cambio|pasar)\s+(?:a|al|para)\s+(?:seguro\s+)?(?:de\s+)?(viaje|auto|salud|mascota|pet|carro|vehículo|vehiculo)/i,
+    /(?:seguro|seguros)\s+(?:de\s+|para\s+)(viaje|auto|salud|mascota|pet|carro|vehículo|vehiculo)/i,
+  ];
+  
+  for (const pattern of changePatterns) {
+    const match = lowerMessage.match(pattern);
+    if (match) {
+      // Extract the category from the match
+      const categoryMatch = match[1] || match[0];
+      let newCategory: InsuranceCategory | 'general' = 'general';
+      
+      if (/viaje|travel/.test(categoryMatch)) newCategory = 'travel';
+      else if (/auto|carro|vehículo|vehiculo/.test(categoryMatch)) newCategory = 'auto';
+      else if (/salud|health/.test(categoryMatch)) newCategory = 'health';
+      else if (/mascota|pet/.test(categoryMatch)) newCategory = 'pet';
+      
+      // Only consider it a change if it's different from current
+      if (newCategory !== 'general' && newCategory !== currentCategory) {
+        return { changed: true, newCategory };
+      }
+    }
+  }
+  
+  return { changed: false, newCategory: currentCategory };
 }
 
 // This function is now deprecated and will be removed.

@@ -25,6 +25,18 @@ export default function PlanCard({ plan, onClick }: PlanCardProps) {
     }).format(price);
   };
 
+  // Get price display with fallback
+  const getPriceDisplay = (price: number | null | undefined) => {
+    if (!price || price === 0) {
+      return { text: "Según cotización", isQuoteOnly: true };
+    }
+    return { 
+      text: formatPrice(price), 
+      isQuoteOnly: false,
+      unit: plan.priceUnit === 'annual' ? 'año' : 'mes' 
+    };
+  };
+
   // Collapsed mobile view
   if (isMobile && !isExpanded) {
     return (
@@ -49,11 +61,15 @@ export default function PlanCard({ plan, onClick }: PlanCardProps) {
               <ChevronDown className="h-4 w-4 text-gray-400" />
             </div>
           </div>
-          {plan.basePrice && (
-            <div className="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">
-              {formatPrice(plan.basePrice)}/{plan.priceUnit === 'annual' ? 'año' : 'mes'}
-            </div>
-          )}
+          {(() => {
+            const priceInfo = getPriceDisplay(plan.basePrice);
+            return (
+              <div className="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">
+                {priceInfo.text}
+                {!priceInfo.isQuoteOnly && `/${priceInfo.unit}`}
+              </div>
+            );
+          })()}
         </CardHeader>
       </Card>
     );
@@ -87,11 +103,15 @@ export default function PlanCard({ plan, onClick }: PlanCardProps) {
         <div className="text-sm text-gray-500 dark:text-gray-400">
           {plan.provider}
         </div>
-        {plan.basePrice && (
-          <div className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-            {formatPrice(plan.basePrice)}/{plan.priceUnit === 'annual' ? 'año' : 'mes'}
-          </div>
-        )}
+        {(() => {
+            const priceInfo = getPriceDisplay(plan.basePrice);
+            return (
+              <div className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                {priceInfo.text}
+                {!priceInfo.isQuoteOnly && `/${priceInfo.unit}`}
+              </div>
+            );
+          })()}
       </CardHeader>
       
       <AnimatePresence>

@@ -34,6 +34,13 @@ const formatPrice = (price: number, currency: string) => {
   }).format(price);
 };
 
+const getPriceDisplay = (price: number | null | undefined, currency: string) => {
+  if (!price || price === 0) {
+    return { text: "Según cotización", isQuoteOnly: true };
+  }
+  return { text: formatPrice(price, currency), isQuoteOnly: false };
+};
+
 const NewPlanCard: React.FC<NewPlanCardProps> = ({ plan, onViewDetails, onQuote }) => {
   const cardVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -93,12 +100,21 @@ const NewPlanCard: React.FC<NewPlanCardProps> = ({ plan, onViewDetails, onQuote 
           <div className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl p-4 mb-4">
             <div className="flex items-baseline justify-between">
               <div>
-                <span className="text-3xl font-extrabold text-gray-900 dark:text-white">
-                  {formatPrice(plan.basePrice, plan.currency)}
-                </span>
-                <span className="text-sm text-gray-600 dark:text-gray-400 ml-1">/mes</span>
+                {(() => {
+                  const priceInfo = getPriceDisplay(plan.basePrice, plan.currency);
+                  return (
+                    <>
+                      <span className="text-3xl font-extrabold text-gray-900 dark:text-white">
+                        {priceInfo.text}
+                      </span>
+                      {!priceInfo.isQuoteOnly && (
+                        <span className="text-sm text-gray-600 dark:text-gray-400 ml-1">/mes</span>
+                      )}
+                    </>
+                  );
+                })()}
               </div>
-              {plan.basePrice < 150000 && (
+              {plan.basePrice && plan.basePrice > 0 && plan.basePrice < 150000 && (
                 <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
                   <TrendingUp className="h-3 w-3 mr-1" />
                   Mejor precio

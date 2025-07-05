@@ -19,6 +19,7 @@ import { DocumentHistory } from './DocumentHistory';
 import { DocumentComparison } from './DocumentComparison';
 import { DocumentSummary } from '../../services/document-upload-service';
 import { ChatBubble } from './ChatBubble';
+import { FloatingPrompts } from './FloatingPrompts';
 
 type Plan = RealInsurancePlan & {
   isRecommended?: boolean;
@@ -145,6 +146,11 @@ export function BrikiAssistant() {
     setInput("¿Qué otros tipos de seguros me recomiendas?");
     sendMessage("¿Qué otros tipos de seguros me recomiendas?");
   };
+
+  // Determine if we have an active conversation or plans
+  const isActiveConversation = messages.length > 0 && (isTyping || messages.some(m => m.type === 'plans' && m.metadata?.plans?.length > 0));
+  const hasPlans = messages.some(m => m.type === 'plans' && m.metadata?.plans && m.metadata.plans.length > 0);
+  const currentCategory = messages.find(m => m.metadata?.category)?.metadata?.category;
 
   const handleFileUpload = async (file: File) => {
     if (process.env.NODE_ENV === 'development') {
@@ -305,7 +311,7 @@ ${summary.exclusions ? (Array.isArray(summary.exclusions) ? summary.exclusions.m
                         <motion.div
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
-                          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 mt-4"
+                          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mt-6"
                         >
                           {message.metadata.plans.slice(0, MAX_PLANS_SHOWN).map((plan: Plan) => (
                             <NewPlanCard
@@ -469,6 +475,17 @@ ${summary.exclusions ? (Array.isArray(summary.exclusions) ? summary.exclusions.m
           </button>
         </div>
       </div>
+      
+      {/* Floating prompts for insurance categories */}
+      <FloatingPrompts
+        isActiveConversation={isActiveConversation}
+        hasPlans={hasPlans}
+        currentCategory={currentCategory}
+        onPromptClick={(prompt) => {
+          setInput(prompt);
+          sendMessage(prompt);
+        }}
+      />
     </div>
   );
 }
