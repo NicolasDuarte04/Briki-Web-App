@@ -19,7 +19,6 @@ import { DocumentHistory } from './DocumentHistory';
 import { DocumentComparison } from './DocumentComparison';
 import { DocumentSummary } from '../../services/document-upload-service';
 import { ChatBubble } from './ChatBubble';
-import { FloatingPrompts } from './FloatingPrompts';
 
 type Plan = RealInsurancePlan & {
   isRecommended?: boolean;
@@ -147,10 +146,7 @@ export function BrikiAssistant() {
     sendMessage("¿Qué otros tipos de seguros me recomiendas?");
   };
 
-  // Determine if we have an active conversation or plans
-  const isActiveConversation = messages.length > 0 && (isTyping || messages.some(m => m.type === 'plans' && m.metadata?.plans?.length > 0));
-  const hasPlans = messages.some(m => m.type === 'plans' && m.metadata?.plans && m.metadata.plans.length > 0);
-  const currentCategory = messages.find(m => m.metadata?.category)?.metadata?.category;
+
 
   const handleFileUpload = async (file: File) => {
     if (process.env.NODE_ENV === 'development') {
@@ -476,16 +472,6 @@ ${summary.exclusions ? (Array.isArray(summary.exclusions) ? summary.exclusions.m
         </div>
       </div>
       
-      {/* Floating prompts for insurance categories */}
-      <FloatingPrompts
-        isActiveConversation={isActiveConversation}
-        hasPlans={hasPlans}
-        currentCategory={currentCategory}
-        onPromptClick={(prompt) => {
-          setInput(prompt);
-          sendMessage(prompt);
-        }}
-      />
     </div>
   );
 }
