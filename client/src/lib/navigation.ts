@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from 'react';
 import { useLocation } from 'wouter';
-import { useAuth } from '../hooks/use-auth';
+import { useSupabaseAuth } from '../contexts/SupabaseAuthContext';
 
 /**
  * Get the appropriate insurance path based on authentication status
@@ -16,7 +16,7 @@ export function getInsurancePath(category: string, isAuthenticated: boolean): st
  */
 export function useNavigation() {
   const [location, navigate] = useLocation();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user } = useSupabaseAuth();
   
   // Track navigation history in session storage for smart back navigation
   useEffect(() => {

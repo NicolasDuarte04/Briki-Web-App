@@ -50,6 +50,16 @@ export default function UserProfile() {
         <Button
           variant="ghost"
           size="sm"
+          onClick={() => window.location.href = '/profile'}
+          className="hidden sm:flex items-center gap-1 text-gray-600 hover:text-gray-900"
+        >
+          <User className="w-4 h-4" />
+          <span>Profile</span>
+        </Button>
+        
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => window.location.href = '/settings'}
           className="hidden sm:flex items-center gap-1 text-gray-600 hover:text-gray-900"
         >

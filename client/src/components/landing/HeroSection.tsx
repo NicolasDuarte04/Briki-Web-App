@@ -4,12 +4,12 @@ import { ArrowRight, Star, Users, Shield, Zap } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { Button } from '../ui/button';
 import { useLanguage } from '../language-selector';
-import { useAuth } from '../../hooks/use-auth';
+import { useSupabaseAuth } from '../../contexts/SupabaseAuthContext';
 
 export const HeroSection: React.FC = () => {
   const [, navigate] = useLocation();
   const { t } = useLanguage();
-  const { user } = useAuth();
+  const { user } = useSupabaseAuth();
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-cyan-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative overflow-hidden py-20">

@@ -1,26 +1,33 @@
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { ArrowRight } from 'lucide-react';
 import { useToast } from '../../hooks/use-toast';
 import { formatCurrency } from '../../utils/format';
 import { InsurancePlan } from '../../types/insurance';
 import { logPlanAnalytics } from '../../lib/analytics';
-import { useAuth } from '../../hooks/use-auth';
+import { useSupabaseAuth } from '../../contexts/SupabaseAuthContext';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardFooter, CardHeader } from '../ui/card';
 
 interface PlanCardProps {
   plan: InsurancePlan;
+  highlighted?: boolean;
+  onQuote?: (planId: string) => void;
 }
 
 const PlanCard: React.FC<PlanCardProps> = ({ plan, highlighted = false, onQuote }) => {
   const [showAllBenefits, setShowAllBenefits] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const { toast } = useToast();
-  const { addPlan, removePlan, isPlanSelected } = useCompareStore();
-  const { user } = useAuth();
-  const isSelected = isPlanSelected(plan.id);
+  const { user } = useSupabaseAuth();
 
   const handleCompareClick = () => {
     logPlanAnalytics('plan_clicked', { ...plan, name: `${plan.name} - Compare` }, user?.id);
-    if (isSelected) {
-      removePlan(plan.id);
-    }
+    // TODO: Implement compare functionality
+    toast({
+      title: "Comparar plan",
+      description: `Comparando ${plan.name}`,
+    });
   };
 
   const handleQuoteClick = () => {

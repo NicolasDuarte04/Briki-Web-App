@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useAuth } from "../hooks/use-auth";
+import { useSupabaseAuth } from "../contexts/SupabaseAuthContext";
 import { useLocation } from "wouter";
 import { Loader2, User, Bell, CreditCard, Shield, Globe, Lock } from "lucide-react";
 import { AnimatedButton } from "../components/ui/animated-button";
@@ -14,7 +14,7 @@ import { Badge } from "../components/ui/badge";
 import { AuthenticatedLayout } from "../components/layout";
 
 export default function SettingsPage() {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading } = useSupabaseAuth();
   const [, navigate] = useLocation();
 
   useEffect(() => {
@@ -105,8 +105,8 @@ export default function SettingsPage() {
                             <Input id="name" placeholder="Enter your full name" defaultValue={user.name || ""} />
                           </div>
                           <div className="space-y-2">
-                            <Label htmlFor="username">Username</Label>
-                            <Input id="username" defaultValue={user.username} disabled className="bg-gray-50" />
+                            <Label htmlFor="email-disabled">Email</Label>
+                            <Input id="email-disabled" defaultValue={user.email} disabled className="bg-gray-50" />
                           </div>
                           <div className="space-y-2">
                             <Label htmlFor="email">Email Address</Label>
@@ -122,7 +122,7 @@ export default function SettingsPage() {
                           <h3 className="text-lg font-medium mb-4">Profile Picture</h3>
                           <div className="flex items-center gap-4">
                             <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center text-primary text-2xl font-bold">
-                              {user.name ? user.name[0].toUpperCase() : user.username[0].toUpperCase()}
+                              {user.name ? user.name[0].toUpperCase() : user.email[0].toUpperCase()}
                             </div>
                             <div>
                               <AnimatedButton variant="outline" size="sm" className="mb-2">

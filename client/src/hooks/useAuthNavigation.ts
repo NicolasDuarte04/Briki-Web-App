@@ -1,4 +1,4 @@
-import { useAuth } from "./use-auth";
+import { useSupabaseAuth } from "../contexts/SupabaseAuthContext";
 import { InsuranceCategory } from "../../../shared/schema";
 import { CATEGORY_PATHS } from "../constants/sharedContent";
 
@@ -7,7 +7,7 @@ import { CATEGORY_PATHS } from "../constants/sharedContent";
  * Returns paths based on authentication status and handles redirects intelligently
  */
 export function useAuthNavigation() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useSupabaseAuth();
 
   /**
    * Get the appropriate path for a category based on auth status

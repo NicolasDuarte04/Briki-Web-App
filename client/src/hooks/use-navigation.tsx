@@ -1,6 +1,6 @@
 import { useEffect, useCallback } from 'react';
 import { useLocation } from 'wouter';
-import { useAuth } from './use-auth';
+import { useSupabaseAuth } from '../contexts/SupabaseAuthContext';
 
 /**
  * Custom hook to provide enhanced navigation functionality
@@ -8,7 +8,7 @@ import { useAuth } from './use-auth';
  */
 export function useNavigation() {
   const [location, navigate] = useLocation();
-  const { user } = useAuth();
+  const { user } = useSupabaseAuth();
 
   // Track navigation history in session storage
   useEffect(() => {

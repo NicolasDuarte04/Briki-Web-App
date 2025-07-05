@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "../hooks/use-auth";
+import { useSupabaseAuth } from "../contexts/SupabaseAuthContext";
 import { useLocation } from "wouter";
 import { Loader2, User, Bookmark, Shield, Clock, CreditCard } from "lucide-react";
 import { AnimatedButton } from "../components/ui/animated-button";
@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../co
 import { Badge } from "../components/ui/badge";
 
 export default function ProfilePage() {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading } = useSupabaseAuth();
   const [, navigate] = useLocation();
   const [profileTab, setProfileTab] = useState("overview");
 
@@ -29,7 +29,7 @@ export default function ProfilePage() {
       return user.name[0].toUpperCase();
     }
 
-    return user.username[0].toUpperCase();
+    return user.email[0].toUpperCase();
   };
 
   if (isLoading) {
@@ -59,12 +59,12 @@ export default function ProfilePage() {
                       <Avatar className="h-24 w-24">
                         <AvatarImage
                           src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserInitials()}`}
-                          alt={user.username}
+                          alt={user.email}
                         />
                         <AvatarFallback className="text-2xl">{getUserInitials()}</AvatarFallback>
                       </Avatar>
                     </div>
-                    <CardTitle className="text-xl">{user.name || user.username}</CardTitle>
+                    <CardTitle className="text-xl">{user.name || user.email}</CardTitle>
                     <CardDescription>{user.email}</CardDescription>
                     <div className="mt-2">
                       <Badge variant="outline" className="mr-1">Traveler</Badge>
@@ -228,11 +228,11 @@ export default function ProfilePage() {
                                 />
                               </div>
                               <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                                 <input
                                   type="text"
                                   className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50"
-                                  defaultValue={user.username}
+                                  defaultValue={user.email}
                                   disabled
                                 />
                               </div>

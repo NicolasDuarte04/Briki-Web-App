@@ -1,12 +1,12 @@
 import React, { useEffect } from "react";
 import { useToast } from "../hooks/use-toast";
-import { useAuth } from "../hooks/use-auth";
+import { useSupabaseAuth } from "../contexts/SupabaseAuthContext";
 import { LayoutGroup, motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
 
 export function LoginNotification() {
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user } = useSupabaseAuth();
 
   useEffect(() => {
     // Only show the notification when the component mounts and user exists

@@ -12,7 +12,7 @@ import {
   LogOut,
   Menu
 } from "lucide-react";
-import { useAuth } from "../../hooks/use-auth";
+import { useSupabaseAuth } from "../../contexts/SupabaseAuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import {
@@ -97,7 +97,7 @@ const navItems = [
  */
 export default function CompanyLayout({ children, pageTitle = "Dashboard", activeNav = "dashboard" }: CompanyLayoutProps) {
   const [location] = useLocation();
-  const { user, logoutMutation } = useAuth();
+  const { user, signOut } = useSupabaseAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Active nav helper
@@ -113,7 +113,7 @@ export default function CompanyLayout({ children, pageTitle = "Dashboard", activ
       return company;
     }
 
-    return user.username || user.email.split('@')[0];
+    return user.name || user.email.split('@')[0];
   };
 
   // Get user initials for avatar
@@ -199,8 +199,8 @@ export default function CompanyLayout({ children, pageTitle = "Dashboard", activ
               <Button 
                 variant="ghost" 
                 className="w-full justify-start text-gray-300 hover:text-white hover:bg-[#002C7A]"
-                onClick={() => {
-                  logoutMutation.mutate();
+                onClick={async () => {
+                  await signOut();
                   setIsMobileMenuOpen(false);
                 }}
               >

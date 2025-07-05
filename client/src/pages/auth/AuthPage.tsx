@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { useLocation, useRoute } from "wouter";
+import { useEffect } from "react";
+import { useLocation } from "wouter";
 import { useSupabaseAuth } from "../../contexts/SupabaseAuthContext";
 import SupabaseAuthForm from "../../components/auth/SupabaseAuthForm";
 import { PublicLayout } from "../../components/layout/public-layout";
@@ -7,9 +7,8 @@ import { Card, CardContent } from "../../components/ui/card";
 import { LoaderCircle } from "lucide-react";
 
 export default function AuthPage() {
-  const [location, navigate] = useLocation();
-  const [, params] = useRoute<{ tab?: string }>("/auth/:tab?");
-  const { user, isLoading, isAuthenticated } = useSupabaseAuth();
+  const [, navigate] = useLocation();
+  const { isLoading, isAuthenticated } = useSupabaseAuth();
   
   // Get returnTo parameter from URL
   const urlParams = new URLSearchParams(window.location.search);

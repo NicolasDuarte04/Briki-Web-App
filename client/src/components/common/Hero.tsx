@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { cn } from "../../lib/utils";
-import { useAuth } from "../../hooks/use-auth";
+import { useSupabaseAuth } from "../../contexts/SupabaseAuthContext";
 
 interface HeroProps {
   title: string;
@@ -32,7 +32,7 @@ export function Hero({
   centered = true,
   className,
 }: HeroProps) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useSupabaseAuth();
   
   // If user is authenticated, redirect CTA to the appropriate authenticated route
   const primaryCtaLink = isAuthenticated && ctaLink === "/auth" 

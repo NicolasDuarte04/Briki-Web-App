@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useAuth } from '../hooks/use-auth';
+import { useSupabaseAuth } from '../contexts/SupabaseAuthContext';
 import { fetchConversationHistory, fetchConversation } from '../services/openai-service';
 import { ConversationPreviewCard } from '../components/briki-ai-assistant/ConversationPreviewCard';
 import { ScrollArea } from '../components/ui/scroll-area';
@@ -26,7 +26,7 @@ interface ConversationDetail {
 }
 
 export default function ConversationHistoryPage() {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useSupabaseAuth();
   const { toast } = useToast();
   
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -167,7 +167,7 @@ export default function ConversationHistoryPage() {
                   )}
                 </div>
                 <div className="text-sm text-gray-500">
-                  Welcome back, {user?.username || 'User'}!
+                  Welcome back, {user?.name || user?.email || 'User'}!
                 </div>
               </div>
             </CardContent>

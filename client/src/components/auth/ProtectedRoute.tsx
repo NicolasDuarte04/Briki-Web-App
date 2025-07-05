@@ -1,6 +1,6 @@
 import { ReactNode, useEffect } from 'react';
 import { useLocation } from 'wouter';
-import { useAuth } from '../../hooks/use-auth';
+import { useSupabaseAuth } from '../../contexts/SupabaseAuthContext';
 import { Spinner } from '../ui/spinner';
 
 interface ProtectedRouteProps {
@@ -14,7 +14,7 @@ export default function ProtectedRoute({
   redirectTo = '/auth',
   allowRoles = ['user', 'admin', 'company'],
 }: ProtectedRouteProps) {
-  const { user, isLoading, isAuthenticated } = useAuth();
+  const { user, isLoading, isAuthenticated } = useSupabaseAuth();
   const [, setLocation] = useLocation();
 
   useEffect(() => {
