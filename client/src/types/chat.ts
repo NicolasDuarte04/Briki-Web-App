@@ -36,7 +36,7 @@ export interface ChatMessage {
   id: string;
   content: string;
   role: 'user' | 'assistant';
-  type?: 'text' | 'plans' | 'document';
+  type?: 'text' | 'plans' | 'document' | 'comparison';
   timestamp?: Date;
   metadata?: Record<string, any>;
   isLoading?: boolean;

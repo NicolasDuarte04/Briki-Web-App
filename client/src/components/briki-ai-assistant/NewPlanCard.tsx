@@ -3,8 +3,9 @@ import { motion } from 'framer-motion';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
-import { CheckCircle, ArrowRight, ExternalLink, Star, TrendingUp } from "lucide-react";
+import { CheckCircle, ArrowRight, ExternalLink, Star, TrendingUp, Check } from "lucide-react";
 import { Separator } from '../ui/separator';
+import { cn } from '../../lib/utils';
 
 // This interface matches the data coming from the backend AI service
 export interface InsurancePlan {
@@ -24,6 +25,8 @@ interface NewPlanCardProps {
   plan: InsurancePlan;
   onViewDetails: (planId: number) => void;
   onQuote: (planId: number) => void;
+  isSelected?: boolean;
+  onSelectionToggle?: (planId: number) => void;
 }
 
 const formatPrice = (price: number, currency: string) => {
@@ -41,7 +44,7 @@ const getPriceDisplay = (price: number | null | undefined, currency: string) => 
   return { text: formatPrice(price, currency), isQuoteOnly: false };
 };
 
-const NewPlanCard: React.FC<NewPlanCardProps> = ({ plan, onViewDetails, onQuote }) => {
+const NewPlanCard: React.FC<NewPlanCardProps> = ({ plan, onViewDetails, onQuote, isSelected = false, onSelectionToggle }) => {
   const cardVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 },
@@ -57,6 +60,13 @@ const NewPlanCard: React.FC<NewPlanCardProps> = ({ plan, onViewDetails, onQuote 
     }
   };
 
+  const handleSelectionClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onSelectionToggle) {
+      onSelectionToggle(plan.id);
+    }
+  };
+
   // Determine if this is a recommended plan (mock logic - could be based on price, features, etc.)
   const isRecommended = plan.basePrice < 200000 && plan.benefits.length > 3;
 
@@ -67,10 +77,29 @@ const NewPlanCard: React.FC<NewPlanCardProps> = ({ plan, onViewDetails, onQuote 
       animate="visible"
       transition={{ duration: 0.5, ease: "easeOut" }}
     >
-      <Card className="relative flex flex-col h-full overflow-hidden rounded-2xl bg-white dark:bg-gray-800 shadow-sm hover:shadow-2xl hover:scale-[1.02] transform-gpu transition-all duration-300 border border-gray-100 dark:border-gray-700">
-        {/* Recommended badge */}
+      <Card className={cn(
+        "relative flex flex-col h-full overflow-hidden rounded-2xl bg-white dark:bg-gray-800 shadow-sm hover:shadow-2xl hover:scale-[1.02] transform-gpu transition-all duration-300 border",
+        isSelected ? "border-blue-500 dark:border-blue-400 ring-2 ring-blue-500/20" : "border-gray-100 dark:border-gray-700"
+      )}>
+        {/* Selection checkbox */}
+        {onSelectionToggle && (
+          <button
+            onClick={handleSelectionClick}
+            className={cn(
+              "absolute top-3 right-3 z-20 w-6 h-6 rounded-md border-2 flex items-center justify-center transition-all",
+              isSelected 
+                ? "bg-blue-500 border-blue-500 text-white" 
+                : "bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 hover:border-blue-400"
+            )}
+            aria-label={isSelected ? "Deseleccionar plan" : "Seleccionar plan para comparar"}
+          >
+            {isSelected && <Check className="h-4 w-4" />}
+          </button>
+        )}
+
+        {/* Recommended badge - adjust position if selection is enabled */}
         {isRecommended && (
-          <div className="absolute top-3 right-3 z-10">
+          <div className={cn("absolute top-3 z-10", onSelectionToggle ? "right-12" : "right-3")}>
             <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0 shadow-md">
               <Star className="h-3 w-3 mr-1" />
               Recomendado

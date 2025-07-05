@@ -19,6 +19,8 @@ import { DocumentHistory } from './DocumentHistory';
 import { DocumentComparison } from './DocumentComparison';
 import { DocumentSummary } from '../../services/document-upload-service';
 import { ChatBubble } from './ChatBubble';
+import PlanComparisonButton from './PlanComparisonButton';
+import PlanComparison from './PlanComparison';
 
 type Plan = RealInsurancePlan & {
   isRecommended?: boolean;
@@ -84,6 +86,18 @@ export function BrikiAssistant() {
   const [selectedDocument, setSelectedDocument] = useState<DocumentSummary | null>(null);
   const [showComparison, setShowComparison] = useState(false);
   
+  // Initialize selected plans from sessionStorage
+  const [selectedPlans, setSelectedPlans] = useState<Set<number>>(() => {
+    try {
+      const stored = sessionStorage.getItem('briki-selected-plans');
+      return stored ? new Set(JSON.parse(stored)) : new Set();
+    } catch {
+      return new Set();
+    }
+  });
+  
+  const [comparisonPlans, setComparisonPlans] = useState<Plan[]>([]);
+  
   const {
     messages,
     input,
@@ -122,6 +136,15 @@ export function BrikiAssistant() {
   const handleReset = () => {
     trackAIAssistantEvent('chat_reset');
     resetChat();
+    setSelectedPlans(new Set());
+    setComparisonPlans([]);
+    
+    // Clear sessionStorage
+    try {
+      sessionStorage.removeItem('briki-selected-plans');
+    } catch (e) {
+      console.warn('Failed to clear selected plans from storage:', e);
+    }
   };
 
   const handlePlanClick = (plan: Plan) => {
@@ -201,6 +224,82 @@ ${summary.exclusions ? (Array.isArray(summary.exclusions) ? summary.exclusions.m
     setSelectedDocument(summary);
     
     // Scroll to the new message
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  };
+
+  const handlePlanSelectionToggle = (planId: number) => {
+    setSelectedPlans(prev => {
+      const next = new Set(prev);
+      if (next.has(planId)) {
+        next.delete(planId);
+      } else {
+        next.add(planId);
+      }
+      
+      // Persist to sessionStorage
+      try {
+        sessionStorage.setItem('briki-selected-plans', JSON.stringify(Array.from(next)));
+      } catch (e) {
+        console.warn('Failed to persist selected plans:', e);
+      }
+      
+      return next;
+    });
+    
+    trackAIAssistantEvent('plan_selection_toggled', planId.toString(), {
+      selected: !selectedPlans.has(planId),
+      total_selected: selectedPlans.has(planId) ? selectedPlans.size - 1 : selectedPlans.size + 1
+    });
+  };
+
+  const handleCompareClick = () => {
+    // Find all selected plans from messages
+    const allPlans: Plan[] = [];
+    messages.forEach(message => {
+      if (message.type === 'plans' && message.metadata?.plans) {
+        message.metadata.plans.forEach((plan: Plan) => {
+          const planId = typeof plan.id === 'string' ? parseInt(plan.id) : plan.id;
+          if (selectedPlans.has(planId)) {
+            allPlans.push(plan);
+          }
+        });
+      }
+    });
+
+    setComparisonPlans(allPlans);
+    
+    // Add comparison as a new message
+    const comparisonMessage: ChatMessage = {
+      id: `comparison-${Date.now()}`,
+      role: 'assistant',
+      content: '',
+      type: 'comparison',
+      metadata: {
+        plans: allPlans
+      }
+    };
+    
+    addMessage(comparisonMessage);
+    
+    // Track event
+    trackAIAssistantEvent('comparison_initiated', '', {
+      plan_count: allPlans.length,
+      plan_ids: Array.from(selectedPlans).join(',')
+    });
+    
+    // Clear selections after comparison
+    setSelectedPlans(new Set());
+    
+    // Clear from sessionStorage
+    try {
+      sessionStorage.removeItem('briki-selected-plans');
+    } catch (e) {
+      console.warn('Failed to clear selected plans from storage:', e);
+    }
+    
+    // Scroll to comparison
     setTimeout(() => {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, 100);
@@ -323,6 +422,8 @@ ${summary.exclusions ? (Array.isArray(summary.exclusions) ? summary.exclusions.m
                                 isExternal: plan.isExternal,
                                 externalLink: plan.externalLink
                               }}
+                              isSelected={selectedPlans.has(typeof plan.id === 'string' ? parseInt(plan.id) : plan.id)}
+                              onSelectionToggle={handlePlanSelectionToggle}
                               onViewDetails={(planId) => {
                                 handlePlanClick(plan);
                               }}
@@ -346,6 +447,14 @@ ${summary.exclusions ? (Array.isArray(summary.exclusions) ? summary.exclusions.m
                         />
                       )}
                     </>
+                  )}
+                  
+                  {/* Render comparison view */}
+                  {message.type === 'comparison' && message.metadata?.plans && (
+                    <PlanComparison 
+                      plans={message.metadata.plans}
+                      className="mt-6"
+                    />
                   )}
                 </ChatBubble>
               </motion.div>
@@ -472,6 +581,11 @@ ${summary.exclusions ? (Array.isArray(summary.exclusions) ? summary.exclusions.m
         </div>
       </div>
       
+      {/* Plan Comparison Button */}
+      <PlanComparisonButton
+        selectedCount={selectedPlans.size}
+        onClick={handleCompareClick}
+      />
     </div>
   );
 }

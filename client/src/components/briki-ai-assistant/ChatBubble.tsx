@@ -13,7 +13,7 @@ interface ChatBubbleProps {
   isLoading?: boolean;
   timestamp?: Date;
   children?: React.ReactNode;
-  type?: 'text' | 'document' | 'plans';
+  type?: 'text' | 'document' | 'plans' | 'comparison';
   metadata?: {
     fileName?: string;
     fileSize?: number;
