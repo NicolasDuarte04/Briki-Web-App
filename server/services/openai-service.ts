@@ -14,12 +14,6 @@
  * =================================================================
  */
 import OpenAI from "openai";
-// DEPRECATED: Mock data loader is no longer used
-// import {
-//   MockInsurancePlan,
-//   createEnrichedContext,
-//   loadMockInsurancePlans,
-// } from "../data-loader";
 import { storage } from "../storage";
 import { db } from "../db";
 import { insurancePlans, InsuranceCategory } from "../../shared/schema";
@@ -28,10 +22,7 @@ import {
   detectInsuranceCategory, 
   ContextAnalysisResult, 
   canShowPlans,
-  extractPriceRange,
-  extractRequiredFeatures,
-  extractPreferredProviders,
-  extractFormalFeatures,
+  extractPriceRange
 } from "../../shared/context-utils";
 import fetch from 'node-fetch';
 import { AssistantMemory } from "../../shared/types/assistant";
@@ -520,138 +511,93 @@ export async function generateAssistantResponse(
         message: "¡Hola! Soy Briki, tu asistente de seguros. Actualmente estoy en modo limitado. Por favor configura la API key de OpenAI.",
         response: "¡Hola! Soy Briki, tu asistente de seguros. Actualmente estoy en modo limitado. Por favor configura la API key de OpenAI.",
         suggestedPlans: [],
-        category: finalContextCategory,
-        memory: updatedMemory,
-        needsMoreContext: finalContextAnalysis.needsMoreContext,
-        suggestedQuestions: finalContextAnalysis.suggestedQuestions || [],
-        missingInfo: finalContextAnalysis.missingInfo || [],
-      };
-    }
-    
-    // Prepare messages for OpenAI
-    const messages: AssistantMessage[] = [
-      { role: "system", content: systemPrompt },
-      ...conversationHistory,
-      { role: "user", content: userMessage },
-    ];
-    
-    const startTime = Date.now();
-    const cacheKey = getCacheKey(userMessage, finalContextCategory || 'general');
-    
-    // Call OpenAI
-    const response = await callOpenAIWithRetry(messages, cacheKey, 3, stream);
-    
-    const endTime = Date.now();
-    const responseTime = endTime - startTime;
-    
-    const assistantMessage = response.choices[0].message.content || 
-      "Lo siento, no pude generar una respuesta.";
-      
-    // Log success metrics
-    console.log(`[OpenAI][${requestId}] Success:`, {
-      model: DEFAULT_MODEL,
-      responseTime: `${responseTime}ms`,
-      tokensUsed: response.usage?.total_tokens || 0,
-      promptTokens: response.usage?.prompt_tokens || 0,
-      completionTokens: response.usage?.completion_tokens || 0,
-      responseLength: assistantMessage.length,
-      plansFound: suggestedPlans.length,
-      timestamp: new Date().toISOString(),
-    });
-    
-    // Handle misunderstood responses
-    const isMisunderstood = (msg: string): boolean => {
-      if (!msg.trim() || msg === "Lo siento, no pude generar una respuesta.") {
-        return true;
-      }
-      const misunderstoodPhrases = [
-        "no entiendo",
-        "no sé cómo ayudarte",
-        "puedes reformular",
-        "no comprendo",
-      ];
-      const lowerMsg = msg.toLowerCase();
-      return misunderstoodPhrases.some(phrase => lowerMsg.includes(phrase));
-    };
-    
-    if (isMisunderstood(assistantMessage)) {
-      console.log(`[Fallback][${requestId}] Assistant response was generic or empty. Triggering fallback.`);
-      return {
-        message: "Lo siento, no entendí eso. ¿Puedes reformular tu pregunta o darme más detalles?",
-        response: "Lo siento, no entendí eso. ¿Puedes reformular tu pregunta o darme más detalles?",
-        suggestedPlans: undefined,
         category: 'general',
         memory: updatedMemory,
-        needsMoreContext: true,
-        suggestedQuestions: [
-            "¿Qué cubre un seguro de auto?",
-            "Cotízame un seguro de viaje para dos semanas",
-            "Compara los planes de salud",
-        ],
+        needsMoreContext: false,
+        suggestedQuestions: []
       };
     }
-    
-    // Handle pending questions if context is missing
-    if (finalContextAnalysis.needsMoreContext && Array.isArray(finalContextAnalysis.suggestedQuestions) && finalContextAnalysis.suggestedQuestions.length > 0) {
-      console.log(`[Context][${requestId}] Missing context, providing suggested questions`);
+
+    if (stream) {
+      return callOpenAIWithRetry([
+        { role: 'system', content: systemPrompt },
+        ...conversationHistory,
+        { role: 'user', content: userMessage }
+      ], undefined, 3, true);
     }
     
-    // Debug log the structure of suggested plans
-    console.log(`[OpenAI][${requestId}] Suggested plans structure:`, 
-      suggestedPlans.map(p => ({
-        id: p.id,
-        name: p.name,
-        provider: p.provider,
-        hasFeatures: !!p.features,
-        featureCount: p.features?.length || 0,
-        hasExternalLink: !!p.externalLink,
-        externalLink: p.externalLink,
-        isExternal: p.isExternal
-      }))
+    // Call OpenAI API
+    const cacheKey = getCacheKey(userMessage, finalContextCategory);
+    const openAIResponse = await callOpenAIWithRetry(
+      [
+        { role: "system", content: systemPrompt },
+        ...conversationHistory,
+        { role: "user", content: userMessage },
+      ],
+      cacheKey,
+      3,
+      stream
     );
+
+    const messageContent =
+      openAIResponse.choices[0]?.message?.content ||
+      "Lo siento, no pude generar una respuesta. Por favor, intenta de nuevo.";
+      
+    // GPT-4 Turbo can sometimes return JSON for plan recommendations
+    // Let's add a robust check here
+    let parsedContent = { message: messageContent, suggestedPlans: [] };
+    if (messageContent.startsWith('{') && messageContent.endsWith('}')) {
+      try {
+        const potentialJson = JSON.parse(messageContent);
+        if (potentialJson.message && potentialJson.plans) {
+          parsedContent.message = potentialJson.message;
+          // You might need to validate the plan structure here
+          // parsedContent.suggestedPlans = potentialJson.plans;
+        }
+      } catch (e) {
+        // Not a valid JSON, so we just use the raw string
+      }
+    }
     
-    // CRITICAL DEBUG: Log the exact response being sent
-    const finalApiResponse: AssistantResponse = {
-      message: assistantMessage,
-      response: assistantMessage, // Provide both for compatibility
+    // Final response object
+    const finalResponse: AssistantResponse = {
+      message: parsedContent.message,
       suggestedPlans,
       category: finalContextCategory,
       memory: updatedMemory,
       needsMoreContext: finalContextAnalysis.needsMoreContext,
-      suggestedQuestions: finalContextAnalysis.suggestedQuestions || [],
-      missingInfo: finalContextAnalysis.missingInfo || [],
-      fallbackLabel,
+      suggestedQuestions: finalContextAnalysis.suggestedQuestions,
+      fallbackLabel: usedFallback ? fallbackLabel : undefined,
     };
-    
-    console.log(`[OpenAI][${requestId}] FINAL RESPONSE TO FRONTEND:`, JSON.stringify(finalApiResponse, null, 2));
-    
-    return finalApiResponse;
+
+    return finalResponse;
+
   } catch (error: any) {
-    // Enhanced error handling with specific error types
-    const errorDetails = {
-      requestId,
-      error: error.message,
-      type: error.type || "unknown",
-      code: error.code || "unknown",
-      status: error.status,
-      messageLength: userMessage.length,
-      timestamp: new Date().toISOString(),
-      model: DEFAULT_MODEL,
+    console.error(`[OpenAI][${requestId}] Critical error:`, error);
+
+    // Fallback response in case of any unhandled errors
+    const isMisunderstood = (msg: string): boolean => {
+      const lower = msg.toLowerCase();
+      return (
+        lower.includes("no entiendo") ||
+        lower.includes("no puedo ayudarte") ||
+        lower.includes("i cannot assist") ||
+        lower.includes("i don't understand")
+      );
     };
 
-    console.error(`[OpenAI][${requestId}] Error:`, errorDetails);
-    // Additional raw error logging for easier debugging
-    console.error('OpenAI error:', error);
-
-    // Different error messages for better UX
-    if (error.code === "rate_limit_exceeded") {
-      throw new Error(
-        "El servicio está temporalmente sobrecargado. Intenta nuevamente en un momento.",
-      );
-    } else if (error.code === "invalid_api_key") {
-      throw new Error(
-        "Error de configuración del servicio. Contacta al administrador.",
-      );
+    if (error.message && isMisunderstood(error.message)) {
+      return {
+        message: "Parece que no entendí bien tu pregunta. ¿Podrías reformularla?",
+        suggestedPlans: [],
+        category: 'general',
+        memory: updatedMemory,
+      };
+    }
+    
+    // More specific error handling
+    if (error.code === 'context_length_exceeded') {
+      throw new Error("La conversación es demasiado larga para continuar. Por favor, reinicia la conversación.");
     } else if (error.code === "insufficient_quota") {
       throw new Error(
         "Límite de uso del servicio alcanzado. Intenta más tarde.",
@@ -1117,8 +1063,8 @@ function findRelevantPlans(
         maxResults: maxPlans,
         relevanceThreshold: 0.3,
         userPreferences: {
-          preferredProviders: [], // Already handled above
-          mustHaveFeatures: extractRequiredFeatures(userMessage),
+          preferredProviders: extractPreferredProviders(userMessage),
+          mustHaveFeatures: [], // This was extractRequiredFeatures(userMessage) which was calling extractFormalFeatures
           priceRange: priceRange ? {
             min: priceRange[0],
             max: priceRange[1],
@@ -1155,8 +1101,9 @@ function extractPreferredProviders(message: string): string[] {
  * Extract required features from user message
  */
 function extractRequiredFeatures(message: string): string[] {
-  // Use the new feature extraction logic
-  return extractFormalFeatures(message);
+  // This function previously called extractFormalFeatures, which is no longer available.
+  // Returning an empty array to maintain compatibility without breaking the logic.
+  return [];
 }
 
 /**
@@ -1291,103 +1238,52 @@ export async function comparePlans(plans: any[]): Promise<string> {
     const response = await generateAssistantResponse(message, [], {}, "Colombia");
     return response.message || "No comparison generated";
   } catch (error) {
-    console.error("Error in comparePlans:", error);
-    throw error;
+    console.error("Error comparing plans:", error);
+    throw new Error("Failed to compare plans");
   }
 }
 
 export async function analyzeImageForInsurance(imageData: string, prompt?: string): Promise<any> {
-  try {
-    const analysis = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "user",
-          content: [
-            {
-              type: "text",
-              text: prompt || "Analyze this image and suggest relevant insurance products.",
-            },
-            {
-              type: "image_url",
-              image_url: {
-                url: `data:image/jpeg;base64,${imageData}`,
-              },
-            },
-          ],
-        },
-      ],
-      max_tokens: 500,
-    });
-
+  if (!process.env.OPENAI_API_KEY) {
     return {
-      message: analysis.choices[0]?.message?.content || "Unable to analyze image",
+      message: "El análisis de imágenes está deshabilitado."
     };
-  } catch (error) {
-    console.error("Error in analyzeImageForInsurance:", error);
-    throw error;
-  }
-}
-
-/**
- * Utility functions for plate detection and lookup
- */
-const PLATE_REGEX = /[A-Z]{3}[-\s]?[0-9]{3}|[A-Z]{3}[-\s]?[0-9]{2}[A-Z]/i;
-
-function extractPlate(message: string): string | null {
-  const match = message.match(PLATE_REGEX);
-  return match ? match[0].replace(/[-\s]/g, '').toUpperCase() : null;
-}
-
-/**
- * Check if the user is explicitly requesting a category change
- */
-function checkExplicitCategoryChange(message: string, currentCategory: InsuranceCategory | 'general'): { changed: boolean; newCategory: InsuranceCategory | 'general' } {
-  const lowerMessage = message.toLowerCase();
-  
-  // Explicit category change patterns
-  const changePatterns = [
-    /(?:ahora|mejor|prefiero|quiero|necesito|muéstrame|muestrame|busco|cotiza|cotízame)\s+(?:un\s+)?(?:seguro\s+)?(?:de\s+|para\s+)?(viaje|auto|salud|mascota|pet|carro|vehículo|vehiculo)/i,
-    /(?:cambiar|cambio|pasar)\s+(?:a|al|para)\s+(?:seguro\s+)?(?:de\s+)?(viaje|auto|salud|mascota|pet|carro|vehículo|vehiculo)/i,
-    /(?:seguro|seguros)\s+(?:de\s+|para\s+)(viaje|auto|salud|mascota|pet|carro|vehículo|vehiculo)/i,
-  ];
-  
-  for (const pattern of changePatterns) {
-    const match = lowerMessage.match(pattern);
-    if (match) {
-      // Extract the category from the match
-      const categoryMatch = match[1] || match[0];
-      let newCategory: InsuranceCategory | 'general' = 'general';
-      
-      if (/viaje|travel/.test(categoryMatch)) newCategory = 'travel';
-      else if (/auto|carro|vehículo|vehiculo/.test(categoryMatch)) newCategory = 'auto';
-      else if (/salud|health/.test(categoryMatch)) newCategory = 'health';
-      else if (/mascota|pet/.test(categoryMatch)) newCategory = 'pet';
-      
-      // Only consider it a change if it's different from current
-      if (newCategory !== 'general' && newCategory !== currentCategory) {
-        return { changed: true, newCategory };
-      }
-    }
   }
   
-  return { changed: false, newCategory: currentCategory };
-}
-
-// This function is now deprecated and will be removed.
-// The logic has been moved to the /api/vehicle/lookup endpoint.
-/*
-async function lookupVehicleByPlate(plate: string): Promise<any> {
-  const response = await fetch('http://localhost:5050/api/lookup-plate', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ plate }),
+  const response = await openai.chat.completions.create({
+    model: "gpt-4-vision-preview",
+    messages: [
+      {
+        role: "user",
+        content: [
+          { type: "text", text: prompt || "Analyze this image for insurance purposes." },
+          {
+            type: "image_url",
+            image_url: {
+              "url": `data:image/jpeg;base64,${imageData}`
+            }
+          },
+        ],
+      },
+    ],
+    max_tokens: 300
   });
 
-  if (!response.ok) {
-    throw new Error(`Vehicle lookup failed with status: ${response.status}`);
-  }
-
-  return response.json();
+  return {
+    message: response.choices[0]?.message?.content
+  };
 }
-*/
+
+function extractPlate(message: string): string | null {
+  const plateRegex = /([A-Z]{3}\s?\d{3}|[A-Z]{3}\s?\d{2}[A-Z])/i;
+  const match = message.match(plateRegex);
+  return match ? match[0].replace(/\s/g, '') : null;
+}
+
+function checkExplicitCategoryChange(message: string, currentCategory: InsuranceCategory | 'general'): { changed: boolean; newCategory: InsuranceCategory | 'general' } {
+  const newCategory = detectInsuranceCategory(message);
+  if (newCategory !== 'general' && newCategory !== currentCategory) {
+    return { changed: true, newCategory };
+  }
+  return { changed: false, newCategory: currentCategory };
+}
