@@ -23,13 +23,84 @@ import OpenAI from "openai";
 import { storage } from "../storage";
 import { db } from "../db";
 import { insurancePlans, InsuranceCategory } from "../../shared/schema";
-import { analyzeContextNeeds, detectInsuranceCategory, ContextAnalysisResult, canShowPlans } from "../../shared/context-utils";
+import { 
+  analyzeContextNeeds, 
+  detectInsuranceCategory, 
+  ContextAnalysisResult, 
+  canShowPlans,
+  extractPriceRange,
+  extractRequiredFeatures,
+  extractPreferredProviders,
+  extractFormalFeatures,
+} from "../../shared/context-utils";
 import fetch from 'node-fetch';
 import { AssistantMemory } from "../../shared/types/assistant";
 import { getLatestUserContext } from "./context-service";
 import { filterPlans, FilterCriteria } from "../../client/src/lib/plan-filter";
-import { extractFormalFeatures } from "../../shared/feature-synonyms";
-import { extractPriceRange } from "../../shared/context-utils";
+
+
+const SYSTEM_PROMPT_INTRO = `Eres Briki, un asistente especializado en seguros que ayuda a usuarios en Colombia a encontrar el mejor seguro.`;
+
+const PDF_INSTRUCTIONS = `
+## CAPACIDADES DE DOCUMENTOS PDF:
+- Puedo leer y analizar archivos PDF de seguros
+- Si un usuario pregunta sobre subir o leer PDFs, debo responder:
+"¡Sí! Puedes subir tu archivo PDF usando el botón 'Subir documento' que aparece junto al chat. Lo analizaré y te daré un resumen detallado."
+- NUNCA debo decir que no puedo leer PDFs
+- Si el usuario menciona un documento o clausulado, debo invitarle a subirlo
+- Después de analizar un PDF, debo ofrecer explicar cualquier término o cobertura que no esté clara`;
+
+const PDF_COMPARISON_INSTRUCTIONS = `
+## COMPARACIÓN DE DOCUMENTOS:
+- Cuando el usuario haya subido un documento PDF y pregunte sobre comparaciones:
+  - Compara la póliza del documento con los planes disponibles en Briki
+  - Destaca las diferencias en coberturas, exclusiones y deducibles
+  - Sugiere planes que podrían mejorar su cobertura actual
+  - Usa el formato de comparación lado a lado cuando sea relevante
+- Si detectas información de una póliza en la memoria, úsala para hacer comparaciones proactivas`;
+
+const MEMORY_INSTRUCTIONS = `
+## INSTRUCCIONES DE MEMORIA Y CONTINUIDAD:
+- MANTÉN el contexto de toda la conversación anterior
+- Si ya mostraste planes, recuerda cuáles fueron y sigue ayudando
+- Responde preguntas de seguimiento sobre los planes ya recomendados
+- Invita activamente a comparar opciones y hacer más preguntas
+- NO resetees la conversación después de dar recomendaciones`;
+
+const CATEGORY_REQUIREMENTS = `
+## INFORMACIÓN REQUERIDA POR CATEGORÍA:
+- PET: Tipo de mascota, edad ESPECÍFICA (ej: "2 años", no "joven"), raza, peso, ubicación
+- AUTO: Marca, año/modelo, ubicación/país (ej: "Colombia", "Bogotá")
+- TRAVEL: Destino, fechas O duración, número de viajeros, propósito (turismo/negocio)
+- HEALTH: Edad específica, género, país de residencia
+- SOAT: Tipo de vehículo, ciudad de registro`;
+
+const COMPARISON_FORMAT = `
+## FORMATO DE COMPARACIONES:
+Cuando el usuario pida comparar planes específicos:
+- NO generes comparaciones de texto largas
+- En su lugar, responde: "Para comparar planes de manera visual, selecciona las casillas en las esquinas de las tarjetas de los planes que quieres comparar. Luego haz clic en el botón 'Comparar planes' que aparecerá."
+- Si el usuario insiste en una comparación textual, proporciona solo un resumen muy breve (2-3 líneas máximo) y sugiere usar la herramienta visual
+- Ejemplo de respuesta: "He notado que quieres comparar planes. Para una mejor experiencia, usa nuestra herramienta de comparación visual: selecciona los planes que te interesan marcando las casillas en cada tarjeta."`;
+
+const POST_RECOMMENDATION_GUIDE = `
+## DESPUÉS DE MOSTRAR PLANES:
+- Pregunta si necesita más información sobre algún plan específico
+- Si el usuario quiere comparar, guíalo a usar la herramienta visual: "Puedes comparar planes seleccionando las casillas en cada tarjeta"
+- Invita a aclarar dudas sobre coberturas o precios
+- Mantén un tono consultivo y servicial`;
+
+const RESPONSE_STYLE_GUIDE = `
+## ESTILO DE RESPUESTA:
+- Conversacional y amigable
+- Usa listas con viñetas para mejor legibilidad
+- Estructura la información en secciones claras
+- Evita párrafos largos y densos
+- Haz preguntas relevantes para entender mejor las necesidades
+- SIEMPRE termina invitando a continuar la conversación`;
+
+const FINAL_INSTRUCTIONS = `Responde de manera útil y mantén la conversación activa.`;
+
 
 // Define a simpler, unified plan type for the assistant's purpose
 interface InsurancePlan {
@@ -178,7 +249,8 @@ export async function generateAssistantResponse(
   userCountry: string = "Colombia",
   userId?: string | null,
   resetContext: boolean = false,
-): Promise<AssistantResponse> {
+  stream: boolean = false, // Add stream parameter
+): Promise<any> { // Return type will be either AssistantResponse or a stream
   const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   let updatedMemory = { ...memory };
 
@@ -248,7 +320,7 @@ export async function generateAssistantResponse(
             };
             
             if (previousVehicle && previousVehicle.plate !== vehicleData.plate) {
-              console.log(`[Vehicle Lookup][${requestId}] Vehicle changed from ${previousVehicle.make} ${previousVehicle.model} to ${vehicleData.brand} ${vehicleData.model}`);
+              console.log(`[Vehicle Lookup][${requestId}] Vehicle changed from ${previousVehicle.make} ${previousVehicle.model} to ${updatedMemory.vehicle.make} ${updatedMemory.vehicle.model}`);
             }
             console.log(`[Vehicle Lookup][${requestId}] Success. Vehicle data injected into memory:`, updatedMemory.vehicle);
           }
@@ -357,6 +429,20 @@ export async function generateAssistantResponse(
     
     const finalContextAnalysis = analyzeContextNeeds(finalConversation, finalContextCategory, updatedMemory);
     
+    if (stream && finalContextAnalysis.needsMoreContext && finalContextCategory !== 'general') {
+      async function* contextStream() {
+        yield `data: ${JSON.stringify({
+          type: 'context_request',
+          payload: {
+            category: finalContextCategory,
+            missingInfo: finalContextAnalysis.missingInfo,
+            initialData: updatedMemory.preferences || {},
+          }
+        })}\n\n`;
+      }
+      return contextStream();
+    }
+
     // Debug log the context analysis result
     console.log('[DEBUG] Context analysis result:', {
       ...finalContextAnalysis,
@@ -453,7 +539,7 @@ export async function generateAssistantResponse(
     const cacheKey = getCacheKey(userMessage, finalContextCategory || 'general');
     
     // Call OpenAI
-    const response = await callOpenAIWithRetry(messages, cacheKey);
+    const response = await callOpenAIWithRetry(messages, cacheKey, 3, stream);
     
     const endTime = Date.now();
     const responseTime = endTime - startTime;
@@ -581,9 +667,9 @@ export async function generateAssistantResponse(
 /**
  * OpenAI API call with automatic retry mechanism and caching
  */
-async function callOpenAIWithRetry(messages: any[], cacheKey?: string, retries = 3): Promise<any> {
+async function callOpenAIWithRetry(messages: any[], cacheKey?: string, retries = 3, stream = false): Promise<any> {
   // Check cache first
-  if (cacheKey) {
+  if (cacheKey && !stream) {
     const cached = responseCache.get(cacheKey);
     if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
       console.log(`[Cache] Hit for key: ${cacheKey}`);
@@ -598,10 +684,11 @@ async function callOpenAIWithRetry(messages: any[], cacheKey?: string, retries =
         messages: messages as any,
         temperature: 0.7,
         max_tokens: 800,
+        stream: stream,
       });
 
-      // Cache the response
-      if (cacheKey) {
+      // Cache the response only if not streaming
+      if (cacheKey && !stream) {
         responseCache.set(cacheKey, {
           response,
           timestamp: Date.now()
@@ -757,125 +844,101 @@ IMPORTANTE: El usuario ha subido este documento y puede estar preguntando sobre 
     })()}
 `
     : '';
+    
+  let prompt = [
+    SYSTEM_PROMPT_INTRO,
+    `IMPORTANTE: NUNCA termines la conversación después de mostrar planes. SIEMPRE invita al usuario a hacer más preguntas.`
+  ];
 
-  return `Eres Briki, un asistente especializado en seguros que ayuda a usuarios en Colombia a encontrar el mejor seguro. 
-${vehicleContext}
-${documentContext}
-IMPORTANTE: NUNCA termines la conversación después de mostrar planes. SIEMPRE invita al usuario a hacer más preguntas.
+  if (vehicleContext) prompt.push(vehicleContext);
+  if (documentContext) prompt.push(documentContext);
 
-## CAPACIDADES DE DOCUMENTOS PDF:
-- Puedo leer y analizar archivos PDF de seguros
-- Si un usuario pregunta sobre subir o leer PDFs, debo responder:
-"¡Sí! Puedes subir tu archivo PDF usando el botón 'Subir documento' que aparece junto al chat. Lo analizaré y te daré un resumen detallado."
-- NUNCA debo decir que no puedo leer PDFs
-- Si el usuario menciona un documento o clausulado, debo invitarle a subirlo
-- Después de analizar un PDF, debo ofrecer explicar cualquier término o cobertura que no esté clara
-${documentContext ? `- El usuario YA ha subido un documento, usa la información del resumen para responder sus preguntas` : ''}
-
-## COMPARACIÓN DE DOCUMENTOS:
-- Cuando el usuario haya subido un documento PDF y pregunte sobre comparaciones:
-  - Compara la póliza del documento con los planes disponibles en Briki
-  - Destaca las diferencias en coberturas, exclusiones y deducibles
-  - Sugiere planes que podrían mejorar su cobertura actual
-  - Usa el formato de comparación lado a lado cuando sea relevante
-- Si detectas información de una póliza en la memoria, úsala para hacer comparaciones proactivas
-
-## INSTRUCCIONES DE MEMORIA Y CONTINUIDAD:
-- MANTÉN el contexto de toda la conversación anterior
-- Si ya mostraste planes, recuerda cuáles fueron y sigue ayudando
-- Responde preguntas de seguimiento sobre los planes ya recomendados
-- Invita activamente a comparar opciones y hacer más preguntas
-- NO resetees la conversación después de dar recomendaciones
-
-## FLUJO CONVERSACIONAL:
-${isFollowUp ? `
+  prompt.push(PDF_INSTRUCTIONS);
+  if (documentContext) {
+    prompt.push(`- El usuario YA ha subido un documento, usa la información del resumen para responder sus preguntas`);
+  }
+  prompt.push(PDF_COMPARISON_INSTRUCTIONS);
+  prompt.push(MEMORY_INSTRUCTIONS);
+  
+  // Conversational flow
+  prompt.push('## FLUJO CONVERSACIONAL:');
+  if (isFollowUp) {
+    prompt.push(`
 🧠 MODO SEGUIMIENTO: El usuario está preguntando sobre planes mostrados o quiere más información.
 - Si pregunta por un plan específico (por nombre, proveedor o posición), enfócate en ese plan
 - Si es una pregunta general, ayuda a comparar las opciones mostradas
-- Mantén la conversación fluida y natural
-` : `
-${contextAnalysis.needsMoreContext ? `
+- Mantén la conversación fluida y natural`);
+  } else {
+    if (contextAnalysis.needsMoreContext) {
+      prompt.push(`
 🤔 MODO RECOLECCIÓN: Necesitas más información antes de mostrar planes.
 - Categoría detectada: ${contextAnalysis.category}
 - Información faltante: ${contextAnalysis.missingInfo.join(', ')}
-- Haz preguntas específicas antes de recomendar planes
-` : `
+- Haz preguntas específicas antes de recomendar planes`);
+    } else {
+      prompt.push(`
 ✅ MODO RECOMENDACIÓN: Tienes suficiente contexto para mostrar planes.
 - Recomienda planes específicos para la categoría detectada
-- Después de mostrar planes, invita a preguntas de seguimiento
-`}
-`}
+- Después de mostrar planes, invita a preguntas de seguimiento`);
+    }
+  }
 
-## INFORMACIÓN REQUERIDA POR CATEGORÍA:
-- PET: Tipo de mascota, edad ESPECÍFICA (ej: "2 años", no "joven"), raza, peso, ubicación
-- AUTO: Marca, año/modelo, ubicación/país (ej: "Colombia", "Bogotá")
-- TRAVEL: Destino, fechas O duración, número de viajeros, propósito (turismo/negocio)
-- HEALTH: Edad específica, género, país de residencia
-- SOAT: Tipo de vehículo, ciudad de registro
+  prompt.push(CATEGORY_REQUIREMENTS);
+  prompt.push(COMPARISON_FORMAT);
+  prompt.push(POST_RECOMMENDATION_GUIDE);
+  prompt.push(RESPONSE_STYLE_GUIDE);
 
-## FORMATO DE COMPARACIONES:
-Cuando el usuario pida comparar planes específicos:
-- NO generes comparaciones de texto largas
-- En su lugar, responde: "Para comparar planes de manera visual, selecciona las casillas en las esquinas de las tarjetas de los planes que quieres comparar. Luego haz clic en el botón 'Comparar planes' que aparecerá."
-- Si el usuario insiste en una comparación textual, proporciona solo un resumen muy breve (2-3 líneas máximo) y sugiere usar la herramienta visual
-- Ejemplo de respuesta: "He notado que quieres comparar planes. Para una mejor experiencia, usa nuestra herramienta de comparación visual: selecciona los planes que te interesan marcando las casillas en cada tarjeta."
-
-## DESPUÉS DE MOSTRAR PLANES:
-- Pregunta si necesita más información sobre algún plan específico
-- Si el usuario quiere comparar, guíalo a usar la herramienta visual: "Puedes comparar planes seleccionando las casillas en cada tarjeta"
-- Invita a aclarar dudas sobre coberturas o precios
-- Mantén un tono consultivo y servicial
-
-## ESTILO DE RESPUESTA:
-- Conversacional y amigable
-- Usa listas con viñetas para mejor legibilidad
-- Estructura la información en secciones claras
-- Evita párrafos largos y densos
-- Haz preguntas relevantes para entender mejor las necesidades
-- SIEMPRE termina invitando a continuar la conversación
-${relevantPlans.length > 0 ? `
-- CUANDO MUESTRES PLANES: Menciona brevemente que verán las opciones como tarjetas visuales
-` : ''}
-
-## CRÍTICO - MANEJO DE PLANES:
-${relevantPlans.length > 0 ? `
+  if (relevantPlans.length > 0) {
+    prompt.push(`- CUANDO MUESTRES PLANES: Menciona brevemente que verán las opciones como tarjetas visuales`);
+  }
+  
+  // Critical plan handling
+  prompt.push('## CRÍTICO - MANEJO DE PLANES:');
+  if (relevantPlans.length > 0) {
+    prompt.push(`
 - Hay ${relevantPlans.length} planes disponibles que aparecerán como tarjetas interactivas
 - SOLO di "He encontrado algunas opciones que aparecerán abajo" o similar
 - NO listes los nombres de los planes, precios, o características
 - Las tarjetas muestran toda la información - tu texto debe ser breve
-- Enfócate en invitar al usuario a revisar las tarjetas y hacer preguntas
-` : `
+- Enfócate en invitar al usuario a revisar las tarjetas y hacer preguntas`);
+  } else {
+    prompt.push(`
 - NO HAY PLANES DISPONIBLES en la base de datos para esta consulta
-- NO digas "He encontrado planes" o frases similares
-${(() => {
-  // Check if user asked for specific provider
-  const preferredProviders = extractPreferredProviders(userMessage);
-  if (preferredProviders.length > 0 && contextAnalysis.category !== 'general') {
-    return `
+- NO digas "He encontrado planes" o frases similares`);
+    
+    const preferredProviders = extractPreferredProviders(userMessage);
+    if (preferredProviders.length > 0 && contextAnalysis.category !== 'general') {
+      prompt.push(`
 - El usuario pidió planes de ${preferredProviders.join(', ')} para ${contextAnalysis.category}
 - Explica claramente: "Actualmente no tenemos planes de ${contextAnalysis.category} de ${preferredProviders.join(' o ')}"
 - Si sabes que ese proveedor ofrece otros tipos de seguros, menciona: "¿Te gustaría ver los planes de [otra categoría] de ${preferredProviders[0]}?"
-- NO muestres planes de otra categoría sin preguntar primero`;
-  }
-  return `
+- NO muestres planes de otra categoría sin preguntar primero`);
+    } else {
+      prompt.push(`
 - En su lugar, di algo como:
   * "Actualmente no tenemos planes disponibles para esta categoría, pero puedo ayudarte con información general sobre seguros de ${contextAnalysis.category}."
   * "Estamos trabajando para agregar más opciones. ¿Te gustaría conocer qué buscar en un seguro de ${contextAnalysis.category}?"
-  * "No encontré planes específicos, pero puedo explicarte las coberturas típicas de seguros de ${contextAnalysis.category}."`;
-})()}
-- Ofrece ayuda con información general sobre seguros
+  * "No encontré planes específicos, pero puedo explicarte las coberturas típicas de seguros de ${contextAnalysis.category}."`);
+    }
+    prompt.push(`- Ofrece ayuda con información general sobre seguros
 - Sugiere otras categorías que podrían tener planes disponibles
-- Mantén un tono positivo y servicial
-`}
+- Mantén un tono positivo y servicial`);
+  }
 
-${relevantPlans.length > 0 ? `
+  if (relevantPlans.length > 0) {
+    prompt.push(`
 ## PLANES DISPONIBLES PARA REFERENCIA (NO INCLUIR EN RESPUESTA):
-${relevantPlans.map(plan => `
-- ${plan.name} (${plan.provider}) - ${plan.category}
-`).join('\n')}
-` : ''}
+${relevantPlans.map(plan => `- ${plan.name} (${plan.provider}) - ${plan.category}`).join('\n')}`);
+  }
 
-Responde de manera útil y mantén la conversación activa. ${relevantPlans.length > 0 ? 'Si muestras planes, SIEMPRE pregunta si el usuario quiere saber más detalles, comparar opciones, o tiene otras dudas.' : 'Ayuda al usuario con información general y sugiere alternativas.'}`;
+  prompt.push(FINAL_INSTRUCTIONS);
+  if (relevantPlans.length > 0) {
+    prompt.push('Si muestras planes, SIEMPRE pregunta si el usuario quiere saber más detalles, comparar opciones, o tiene otras dudas.');
+  } else {
+    prompt.push('Ayuda al usuario con información general y sugiere alternativas.');
+  }
+  
+  return prompt.join('\n');
 }
 
 /**

@@ -21,6 +21,10 @@ import { DocumentSummary } from '../../services/document-upload-service';
 import { ChatBubble } from './ChatBubble';
 import PlanComparisonButton from './PlanComparisonButton';
 import PlanComparison from './PlanComparison';
+import { AutoContextForm } from './AutoContextForm';
+import { TravelContextForm } from './TravelContextForm';
+import { PetContextForm } from './PetContextForm';
+import { HealthContextForm } from './HealthContextForm';
 
 type Plan = RealInsurancePlan & {
   isRecommended?: boolean;
@@ -107,6 +111,7 @@ export function BrikiAssistant() {
     placeholderHints,
     messagesEndRef,
     pendingFile,
+    contextRequest,
     setInput,
     sendMessage,
     handleDocumentUpload,
@@ -114,6 +119,8 @@ export function BrikiAssistant() {
     addMessage,
     setPendingFile,
     sendMessageWithDocument,
+    handleContextFormSubmit,
+    clearContextRequest,
   } = useChatLogic();
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -457,6 +464,72 @@ ${summary.exclusions ? (Array.isArray(summary.exclusions) ? summary.exclusions.m
                     />
                   )}
                 </ChatBubble>
+
+                {/* Render context form if needed */}
+                {contextRequest?.category === 'auto' && (
+                  <AutoContextForm
+                    initialData={contextRequest.initialData}
+                    onSubmit={handleContextFormSubmit}
+                    onCancel={() => {
+                      addMessage({
+                        id: `form-cancel-${Date.now()}`,
+                        content: 'Se canceló la solicitud de información adicional.',
+                        role: 'user',
+                        type: 'text',
+                        timestamp: new Date(),
+                      });
+                      clearContextRequest();
+                    }}
+                  />
+                )}
+                {contextRequest?.category === 'travel' && (
+                  <TravelContextForm
+                    initialData={contextRequest.initialData}
+                    onSubmit={handleContextFormSubmit}
+                    onCancel={() => {
+                      addMessage({
+                        id: `form-cancel-${Date.now()}`,
+                        content: 'Se canceló la solicitud de información adicional.',
+                        role: 'user',
+                        type: 'text',
+                        timestamp: new Date(),
+                      });
+                      clearContextRequest();
+                    }}
+                  />
+                )}
+                {contextRequest?.category === 'pet' && (
+                  <PetContextForm
+                    initialData={contextRequest.initialData}
+                    onSubmit={handleContextFormSubmit}
+                    onCancel={() => {
+                      addMessage({
+                        id: `form-cancel-${Date.now()}`,
+                        content: 'Se canceló la solicitud de información adicional.',
+                        role: 'user',
+                        type: 'text',
+                        timestamp: new Date(),
+                      });
+                      clearContextRequest();
+                    }}
+                  />
+                )}
+                {contextRequest?.category === 'health' && (
+                  <HealthContextForm
+                    initialData={contextRequest.initialData}
+                    onSubmit={handleContextFormSubmit}
+                    onCancel={() => {
+                      addMessage({
+                        id: `form-cancel-${Date.now()}`,
+                        content: 'Se canceló la solicitud de información adicional.',
+                        role: 'user',
+                        type: 'text',
+                        timestamp: new Date(),
+                      });
+                      clearContextRequest();
+                    }}
+                  />
+                )}
               </motion.div>
             ))}
             {isTyping && (

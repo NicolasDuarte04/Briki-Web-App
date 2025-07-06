@@ -8,16 +8,15 @@
  */
 
 // --- Mock Data ---
-const mockBrands = ['Mazda', 'Toyota', 'Chevrolet', 'Nissan', 'Ford', 'Kia', 'Renault', 'Hyundai'];
-const mockModels: { [key: string]: string[] } = {
+const mockBrands = ['Chevrolet', 'Renault', 'Mazda', 'Kia', 'Nissan', 'Toyota', 'Ford'];
+const mockModels: Record<string, string[]> = {
+  Chevrolet: ['Onix', 'Spark', 'Sail'],
+  Renault: ['Duster', 'Sandero', 'Logan'],
   Mazda: ['3', 'CX-5', '2'],
-  Toyota: ['Corolla', 'Hilux', 'RAV4'],
-  Chevrolet: ['Onix', 'Spark', 'Tracker'],
-  Nissan: ['Versa', 'Kicks', 'Frontier'],
-  Ford: ['Fiesta', 'Ranger', 'Explorer'],
   Kia: ['Picanto', 'Rio', 'Sportage'],
-  Renault: ['Sandero', 'Duster', 'Logan'],
-  Hyundai: ['i10', 'Accent', 'Tucson'],
+  Nissan: ['Versa', 'Kicks', 'Frontier'],
+  Toyota: ['Corolla', 'Hilux', 'RAV4'],
+  Ford: ['Fiesta', 'Ranger', 'Explorer'],
 };
 const fuelTypes = ['Gasolina', 'Diesel', 'Híbrido', 'Eléctrico'];
 
@@ -34,8 +33,8 @@ const getRandomInt = (min: number, max: number) => {
  * @returns A mock vehicle data object.
  */
 const generateMockVehicle = (plate: string) => {
-  const brand = mockBrands[getRandomInt(0, mockBrands.length - 1)];
-  const modelList = mockModels[brand] || ['Modelo Genérico'];
+  const make = mockBrands[getRandomInt(0, mockBrands.length - 1)];
+  const modelList = mockModels[make] || ['Modelo Genérico'];
   const model = modelList[getRandomInt(0, modelList.length - 1)];
   const year = getRandomInt(2015, 2024);
   const fuel = fuelTypes[getRandomInt(0, fuelTypes.length - 1)];
@@ -43,7 +42,7 @@ const generateMockVehicle = (plate: string) => {
 
   return {
     plate: plate.toUpperCase(),
-    brand,
+    make,
     model,
     year,
     fuel,

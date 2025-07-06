@@ -181,15 +181,6 @@ function AppContent() {
 }
 
 function App() {
-  // Initialize Google Analytics on app mount
-  useEffect(() => {
-    if (import.meta.env.VITE_GA_MEASUREMENT_ID) {
-      initGA();
-    } else {
-      console.warn('Google Analytics Measurement ID not provided');
-    }
-  }, []);
-
   return (
     <QueryClientProvider client={queryClient}>
       <SupabaseAuthProvider>

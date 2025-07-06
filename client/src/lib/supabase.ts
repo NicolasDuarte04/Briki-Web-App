@@ -1,33 +1,29 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-console.log("DEBUG ENV:", {
-  url: import.meta.env.VITE_SUPABASE_URL,
-  anon: import.meta.env.VITE_SUPABASE_ANON_KEY
-});
+let supabase: SupabaseClient | null = null;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('⚠️ Supabase environment variables not configured');
-  console.warn('VITE_SUPABASE_URL present:', !!supabaseUrl);
-  console.warn('VITE_SUPABASE_ANON_KEY present:', !!supabaseAnonKey);
-  console.warn('Authentication features will be disabled');
+if (supabaseUrl && supabaseAnonKey && supabaseUrl !== 'https://placeholder.supabase.co') {
+  supabase = createClient(
+    supabaseUrl,
+    supabaseAnonKey,
+    {
+      auth: {
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: true
+      }
+    }
+  );
+} else {
+  console.warn('⚠️ Supabase environment variables not configured. Authentication and document upload features will be disabled.');
 }
 
-export const supabase = createClient(
-  supabaseUrl || 'https://placeholder.supabase.co',
-  supabaseAnonKey || 'placeholder-key',
-  {
-    auth: {
-      autoRefreshToken: true,
-      persistSession: true,
-      detectSessionInUrl: true
-    }
-  }
-);
+export { supabase };
 
 // Helper function to check if Supabase is properly configured
-export const isSupabaseConfigured = () => {
-  return !!(supabaseUrl && supabaseAnonKey);
+export const isSupabaseConfigured = (): boolean => {
+  return supabase !== null && !!supabaseUrl && !!supabaseAnonKey && supabaseUrl !== 'https://placeholder.supabase.co';
 }; 

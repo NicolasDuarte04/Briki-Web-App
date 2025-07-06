@@ -19,12 +19,20 @@ interface RuntApiResponse {
 
 interface VehicleData {
   plate: string;
-  brand: string;
+  make: string;
   model: string;
   year: number;
   fuel: string;
   cc: number;
   retrievedAt: string;
+}
+
+interface VehicleOwnerData {
+  ownerId: string;
+  fullName: string;
+  make: string;
+  model: string;
+  year: number;
 }
 
 /**
@@ -63,7 +71,7 @@ export const realRuntLookup = async (plate: string): Promise<VehicleData> => {
     // Transform API response to our internal format
     return {
       plate: data.plate.toUpperCase(),
-      brand: data.brand,
+      make: data.brand,
       model: data.model,
       year: data.year,
       fuel: data.fuel,

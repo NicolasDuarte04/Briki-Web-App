@@ -155,7 +155,7 @@ interface CategoryRequirement {
 }
 
 export const CONTEXT_REQUIREMENTS: Record<InsuranceCategory | 'home' | 'life', CategoryRequirement> = {
-  auto:   { fields: ['brand', 'year', 'country'],                         minimum: 2 },
+  auto:   { fields: ['make', 'year', 'country'],                         minimum: 2 },
   travel: { fields: ['destination', 'datesOrDuration', 'travelers', 'purpose'], minimum: 3 },
   health: { fields: ['age', 'gender', 'country'],                        minimum: 2 },
   pet:    { fields: ['petType', 'petAge', 'location'],                   minimum: 2 },
@@ -316,7 +316,7 @@ async function extractStructuredDataWithGPT(
     travel: "Extract destination, datesOrDuration, numTravelers, and purpose from the user message. Return JSON or null if unknown.",
     health: "Extract age, gender, and country/location from the user message. Return JSON or null if unknown.",
     pet: "Extract petType, petAge, petBreed, and location from the user message. Return JSON or null if unknown.",
-    auto: "Extract brand, model, year, and country from the user message. Return JSON or null if unknown.",
+    auto: "Extract make, model, year, and country from the user message. Return JSON or null if unknown.",
   };
   
   try {
@@ -436,7 +436,7 @@ export function analyzeContextNeeds(
             location: detectedCountry !== null || memory?.preferences?.location
         },
         auto: {
-            brand: !!memory?.vehicle?.make || /(marca|toyota|honda|ford|chevrolet|nissan|mazda|kia|hyundai|bmw|mercedes|audi|volkswagen|vw|renault|fiat|picanto|spark|onix|sail|march|versa|sentra|corolla|civic)/i.test(lowerConversation),
+            make: !!memory?.vehicle?.make || /(marca|toyota|honda|ford|chevrolet|nissan|mazda|kia|hyundai|bmw|mercedes|audi|volkswagen|vw|renault|fiat|picanto|spark|onix|sail|march|versa|sentra|corolla|civic)/i.test(lowerConversation),
             year: !!memory?.vehicle?.year || /(\d{4}|año \d{4}|modelo \d{4})/i.test(lowerConversation) ||
                   commaParts.some(part => /^\d{4}$/.test(part.trim())),
             country: detectedCountry !== null || memory?.preferences?.location
@@ -481,7 +481,7 @@ export function analyzeContextNeeds(
             location: "¿En qué ciudad/país vives?"
         },
         auto: {
-            brand: "¿Cuál es la marca de tu vehículo?",
+            make: "¿Cuál es la marca de tu vehículo?",
             year: "¿De qué año es tu carro?",
             country: "¿En qué país está registrado el vehículo (ej. Colombia, México)?"
         },

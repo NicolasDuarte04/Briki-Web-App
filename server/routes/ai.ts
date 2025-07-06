@@ -71,16 +71,9 @@ router.post('/chat', async (req, res) => {
     userAgent: req.headers['user-agent']
   });
 
+  const acceptsStream = req.headers.accept === 'text/event-stream';
+
   try {
-    // Validate request body exists
-    if (!req.body || typeof req.body !== 'object') {
-      console.error('[AI Route] Invalid request body:', req.body);
-      return res.status(400).json({ 
-        error: 'Invalid request body',
-        details: 'Request body must be a JSON object'
-      });
-    }
-    
     const { message, conversationHistory, memory, category = 'general', resetContext = false } = req.body;
     const userId = req.session?.user?.id || null;
 
@@ -113,61 +106,51 @@ router.post('/chat', async (req, res) => {
       content: msg.content
     }));
 
-    let response;
-    try {
-      response = await generateAssistantResponse(message, formattedHistory, memory, "Colombia", userId, resetContext);
-    } catch (innerError: any) {
-      console.error('[AI Route] Error generating assistant response:', innerError);
-      console.error('[AI Route] Stack trace:', innerError.stack);
-      
-      // Return a safe fallback response
-      return res.json({
-        message: "Lo siento, hubo un error al procesar tu solicitud. Por favor, intenta de nuevo.",
-        response: "Lo siento, hubo un error al procesar tu solicitud. Por favor, intenta de nuevo.",
-        suggestedPlans: [],
-        category: 'general',
-        memory: memory || {},
-        needsMoreContext: false,
-        suggestedQuestions: []
+    if (acceptsStream) {
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+      res.flushHeaders();
+
+      try {
+        const stream = await generateAssistantResponse(message, formattedHistory, memory, "Colombia", userId, resetContext, true);
+        
+        let fullResponse = '';
+        for await (const chunk of stream) {
+          const content = chunk.choices[0]?.delta?.content || '';
+          fullResponse += content;
+          res.write(`data: ${JSON.stringify({ content })}\n\n`);
+        }
+        
+        // After streaming, log the full conversation
+        logConversation({
+          userId,
+          category,
+          input: message,
+          output: fullResponse,
+          memoryJson: memory, // This might need adjustment to get final memory state
+        });
+        
+        res.end();
+      } catch (streamError: any) {
+        console.error('[AI Route] Error during stream:', streamError);
+        res.write(`data: ${JSON.stringify({ error: 'Stream failed' })}\n\n`);
+        res.end();
+      }
+    } else {
+      // Fallback to standard non-streaming response
+      const response = await generateAssistantResponse(message, formattedHistory, memory, "Colombia", userId, resetContext, false);
+
+      logConversation({
+        userId,
+        category,
+        input: message,
+        output: response.message || null,
+        memoryJson: response.memory,
       });
+
+      res.json(response);
     }
-    
-    // Validate response structure before sending
-    if (!response || typeof response !== 'object') {
-      console.error('[AI Route] Invalid response structure:', response);
-      return res.json({
-        message: "Error: respuesta inválida del asistente",
-        response: "Error: respuesta inválida del asistente",
-        suggestedPlans: [],
-        category: 'general',
-        memory: memory || {},
-        needsMoreContext: false,
-        suggestedQuestions: []
-      });
-    }
-    
-    // Log the interaction
-    logConversation({
-      userId,
-      category,
-      input: message,
-      output: response.message || null,
-      memoryJson: response.memory,
-    });
-    
-    // CRITICAL DEBUG: Log exactly what we're sending
-    console.log('[AI Route] Sending response to frontend:', {
-      hasMessage: !!response.message,
-      hasResponse: !!response.response,
-      messageLength: response.message?.length,
-      responseType: typeof response,
-      responseKeys: Object.keys(response),
-      fullResponse: JSON.stringify(response, null, 2)
-    });
-    
-    // Ensure proper JSON response
-    res.setHeader('Content-Type', 'application/json');
-    return res.json(response);
   } catch (error: any) {
     console.error('Error en el chat IA:', error);
     console.error('Stack trace:', error.stack);

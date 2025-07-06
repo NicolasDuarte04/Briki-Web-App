@@ -6,6 +6,12 @@ import { uploadDocument, DocumentUploadResponse } from '../services/document-upl
 import { ChatMessage } from '../types/chat';
 import { trackEvent } from '../lib/analytics';
 
+interface ContextRequest {
+  category: string;
+  missingInfo: string[];
+  initialData: Record<string, string>;
+}
+
 interface UseChatLogicOptions {
   storageKey?: string;
   placeholderHints?: string[];
@@ -44,6 +50,7 @@ export function useChatLogic(options: UseChatLogicOptions = {}) {
   const [shownPlanIds, setShownPlanIds] = useState<Set<number>>(new Set());
   const [documentHistory, setDocumentHistory] = useState<DocumentUploadResponse[]>([]);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [contextRequest, setContextRequest] = useState<ContextRequest | null>(null);
   
   // Refs
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -110,103 +117,80 @@ export function useChatLogic(options: UseChatLogicOptions = {}) {
     setIsTyping(true);
 
     try {
-      // Build the request data
-      const requestData: any = {
-        message: messageText.trim(),
-        conversationHistory: messages.map(m => ({
-          role: m.role,
-          content: m.content
-        })),
-        memory: memory,
-        resetContext: shouldResetContext
-      };
-
-      // If there's document context, include it in the memory
-      if (documentContext) {
-        requestData.memory = {
-          ...memory,
-          recentDocument: documentContext
-        };
-      }
-
-      const responseData = await apiRequest('/api/ai/chat', {
+      const response = await fetch('/api/ai/chat', {
         method: 'POST',
-        data: requestData
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'text/event-stream',
+        },
+        body: JSON.stringify({
+          message: messageText.trim(),
+          conversationHistory: messages.map(m => ({ role: m.role, content: m.content })),
+          memory: memory,
+          resetContext: shouldResetContext,
+        }),
       });
 
-      if (shouldResetContext) {
-        setShouldResetContext(false);
+      if (!response.body) {
+        throw new Error('Streaming response not available');
       }
 
-      // Validate response data before destructuring
-      if (!responseData || typeof responseData !== 'object') {
-        throw new Error('Invalid response from AI service');
-      }
+      setIsTyping(false);
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let done = false;
 
-      const data: AIResponse = responseData as AIResponse;
-      
-      // Ensure the response has at least a message
-      if (!data.message && !data.response) {
-        console.error('[Briki Debug] Invalid AI response structure:', responseData);
-        throw new Error('AI response missing required fields');
-      }
-      
-      if (process.env.NODE_ENV === 'development') {
-        console.log('[Briki Debug] AI Response:', data);
-      }
-      
-      // Update memory
-      if (data.memory) {
-        setMemory(data.memory);
-      }
-      
-      // Process plans
-      const plans = Array.isArray(data.suggestedPlans) ? data.suggestedPlans : [];
-      
-      // Filter out already shown plans
-      const newPlans = plans.filter(plan => !shownPlanIds.has(plan.id));
-      if (newPlans.length > 0) {
-        const newShownIds = new Set(shownPlanIds);
-        newPlans.forEach(plan => newShownIds.add(plan.id));
-        setShownPlanIds(newShownIds);
-      }
-      
-      const assistantMessage: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        content: data.message || data.response || 'Sin respuesta del asistente',
-        role: 'assistant',
-        timestamp: new Date(),
-        type: 'text'
-      };
+      let assistantMessageId: string | null = null;
+      let fullResponse = '';
 
-      const newMessages = [assistantMessage];
-      
-      if (newPlans.length > 0) {
-        newMessages.push({
-          id: (Date.now() + 2).toString(),
-          content: '',
-          role: 'assistant',
-          timestamp: new Date(),
-          type: 'plans',
-          metadata: { plans: newPlans }
-        });
-      }
+      while (!done) {
+        const { value, done: readerDone } = await reader.read();
+        done = readerDone;
+        const chunk = decoder.decode(value, { stream: true });
+        
+        const lines = chunk.split('\\n\\n').filter(line => line.startsWith('data: '));
+        for (const line of lines) {
+          const jsonString = line.substring('data: '.length);
+          try {
+            const data = JSON.parse(jsonString);
 
-      newMessages.forEach(msg => addMessage(msg));
-      
-      if (newPlans.length > 0) {
-        trackEvent('ai_recommended_plans', 'Assistant', 'AI Assistant', newPlans.length);
+            if (data.error) throw new Error(data.error);
+
+            if (data.type === 'context_request') {
+              setContextRequest(data.payload);
+              // You might want to add a placeholder message like "Please fill out the form"
+              return; // Stop processing the stream
+            }
+
+            fullResponse += data.content || '';
+
+            if (assistantMessageId === null) {
+              const newAssistantMessage: ChatMessage = {
+                id: (Date.now() + 1).toString(),
+                content: data.content,
+                role: 'assistant',
+                timestamp: new Date(),
+                type: 'text',
+              };
+              assistantMessageId = newAssistantMessage.id;
+              addMessage(newAssistantMessage);
+            } else {
+              updateMessage(assistantMessageId, {
+                content: fullResponse,
+              });
+            }
+          } catch (e) {
+            console.error('Error parsing stream data:', e);
+          }
+        }
       }
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
         console.error('[Briki Debug] Error:', error);
       }
-      
-      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-      
       addMessage({
         id: (Date.now() + 1).toString(),
-        content: `Lo siento, hubo un error al procesar tu solicitud. Error: ${errorMessage}`,
+        content: `Lo siento, hubo un error al procesar tu solicitud.`,
         role: 'assistant',
         timestamp: new Date(),
         type: 'text'
@@ -214,6 +198,16 @@ export function useChatLogic(options: UseChatLogicOptions = {}) {
     } finally {
       setIsTyping(false);
     }
+  };
+
+  const handleContextFormSubmit = (data: Record<string, string>) => {
+    const syntheticMessage = Object.values(data).join(', ');
+    setContextRequest(null);
+    sendMessage(syntheticMessage);
+  };
+
+  const clearContextRequest = () => {
+    setContextRequest(null);
   };
 
   // Handle document upload
@@ -275,14 +269,9 @@ export function useChatLogic(options: UseChatLogicOptions = {}) {
         }
       }));
       
-      trackEvent('document_upload', {
-        category: 'Assistant',
-        action: 'UploadDocument',
-        label: file.name,
-        metadata: {
-          fileSize: file.size,
-          fileType: file.type
-        }
+      trackEvent('document_upload', 'Assistant', file.name, {
+        fileSize: file.size,
+        fileType: file.type
       });
       
       toast({
@@ -419,11 +408,7 @@ export function useChatLogic(options: UseChatLogicOptions = {}) {
     setPendingFile(null);
     sessionStorage.removeItem(storageKey);
     
-    trackEvent('chat_reset', {
-      category: 'Assistant',
-      action: 'Reset',
-      label: 'Chat Reset'
-    });
+    trackEvent('chat_reset', 'Assistant', 'Chat Reset');
     
     toast({
       title: "Conversación reiniciada",
@@ -443,6 +428,7 @@ export function useChatLogic(options: UseChatLogicOptions = {}) {
     messagesEndRef,
     documentHistory,
     pendingFile,
+    contextRequest,
     
     // Actions
     setInput,
@@ -454,6 +440,8 @@ export function useChatLogic(options: UseChatLogicOptions = {}) {
     removeMessage,
     setPendingFile,
     sendMessageWithDocument,
+    handleContextFormSubmit,
+    clearContextRequest,
     
     // Utils
     scrollToBottom
