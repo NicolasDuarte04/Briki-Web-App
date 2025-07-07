@@ -150,7 +150,12 @@ export function useChatLogic(options: UseChatLogicOptions = {}) {
         
         const lines = chunk.split('\\n\\n').filter(line => line.startsWith('data: '));
         for (const line of lines) {
-          const jsonString = line.substring('data: '.length);
+          const jsonString = line.substring('data: '.length).trim();
+
+          if (jsonString === '[DONE]') {
+            continue; // Skip the [DONE] sentinel line
+          }
+          
           try {
             const data = JSON.parse(jsonString);
 
@@ -180,7 +185,7 @@ export function useChatLogic(options: UseChatLogicOptions = {}) {
               });
             }
           } catch (e) {
-            console.error('Error parsing stream data:', e);
+            console.warn('[Stream] Skipped non-JSON line:', jsonString, e);
           }
         }
       }
